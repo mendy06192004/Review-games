@@ -1,0 +1,2283 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>元素勇者：週期表大冒險</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{ --ink:#2b2238; --paper:#fff8e7; --paper2:#f1dfbb; }
+html,body{ margin:0; height:100%; overflow:hidden; background:#1e1830; -webkit-tap-highlight-color:transparent; overscroll-behavior:none; }
+body{ font-family:'Noto Sans TC',system-ui,sans-serif; color:var(--ink); user-select:none; -webkit-user-select:none; touch-action:none; }
+.hidden{ display:none !important; }
+.font-pixel{ font-family:'Press Start 2P','Noto Sans TC',monospace; }
+canvas,img.px{ image-rendering:pixelated; image-rendering:crisp-edges; }
+#game{ position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; display:block; }
+
+.pbox{ background:var(--paper); margin:4px;
+  box-shadow:0 -4px 0 0 var(--ink),0 4px 0 0 var(--ink),-4px 0 0 0 var(--ink),4px 0 0 0 var(--ink),
+             inset -4px -4px 0 0 var(--paper2), inset 4px 4px 0 0 #fff; }
+.pdark{ background:rgba(43,34,56,.88); color:#fff; margin:3px;
+  box-shadow:0 -3px 0 0 #fff8e7,0 3px 0 0 #fff8e7,-3px 0 0 0 #fff8e7,3px 0 0 0 #fff8e7; }
+.pbtn{ background:var(--btn,#ffd166); color:var(--ink); font-weight:900; margin:4px; cursor:pointer; border:0; font-family:inherit;
+  box-shadow:0 -4px 0 0 var(--ink),0 4px 0 0 var(--ink),-4px 0 0 0 var(--ink),4px 0 0 0 var(--ink),
+             0 8px 0 0 rgba(0,0,0,.3), inset -4px -4px 0 0 rgba(0,0,0,.14), inset 4px 4px 0 0 rgba(255,255,255,.6);
+  transition:transform .05s; }
+.pbtn:active{ transform:translateY(4px);
+  box-shadow:0 -4px 0 0 var(--ink),0 4px 0 0 var(--ink),-4px 0 0 0 var(--ink),4px 0 0 0 var(--ink), inset 4px 4px 0 0 rgba(0,0,0,.12); }
+.pbtn:disabled{ cursor:default; opacity:.45; filter:grayscale(.5); }
+.sbtn{ background:#fff8e7; color:var(--ink); font-weight:900; font-size:14px; padding:5px 10px; border:0; cursor:pointer; font-family:inherit;
+  box-shadow:0 0 0 3px var(--ink),0 4px 0 3px rgba(0,0,0,.3); }
+.sbtn:active{ transform:translateY(3px); box-shadow:0 0 0 3px var(--ink); }
+.sbtn:disabled{ opacity:.4; }
+.bar{ height:8px; background:#5a4d73; box-shadow:0 0 0 2px var(--ink); }
+.bar > div{ height:100%; transition:width .4s steps(6); }
+.hp-fill{ background:linear-gradient(#ff9fb4 0 50%,#ff7f9c 50%); }
+.mp-fill{ background:linear-gradient(#9fd4ff 0 50%,#6fb6ff 50%); }
+.xp-fill{ background:linear-gradient(#ffe48a 0 50%,#ffcf4d 50%); }
+
+/* 元素格（週期表樣式）*/
+.cell{ position:relative; background:var(--c,#fff); box-shadow:0 0 0 2px var(--ink), inset -2px -2px 0 rgba(0,0,0,.12), inset 2px 2px 0 rgba(255,255,255,.6);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.05; flex-shrink:0; }
+.cell .num{ position:absolute; left:3px; top:2px; font-size:9px; font-weight:900; opacity:.7; }
+.cell .sym{ font-family:'Press Start 2P',monospace; }
+.cell .nm{ font-weight:900; }
+sub{ font-size:.65em; vertical-align:-.2em; line-height:0; }
+
+/* HUD */
+#hud{ position:fixed; left:0; right:0; top:0; padding:6px 8px; display:flex; justify-content:space-between; align-items:flex-start; pointer-events:none; z-index:20; }
+#hud button{ pointer-events:auto; }
+#minimap{ box-shadow:0 0 0 3px #fff8e7,0 0 0 6px var(--ink); margin:8px 6px 0 0; background:#000; }
+#banner{ position:fixed; left:50%; top:30%; transform:translateX(-50%); z-index:25; }
+@media (max-height:520px){ #hud .pdark{ font-size:12px; } }
+
+#dialog{ position:fixed; left:50%; bottom:10px; transform:translateX(-50%); width:min(760px,94vw); z-index:30; }
+body.touch #dialog{ width:min(680px,56vw); }
+#dialog .tri{ animation:blink .8s steps(2) infinite; }
+@keyframes blink{ 50%{opacity:0} }
+
+/* 觸控（只在手機/平板出現）*/
+#touch{ position:fixed; inset:auto 0 0 0; z-index:28; pointer-events:none; }
+#dpad{ position:fixed; left:18px; bottom:18px; display:grid; grid-template-columns:repeat(3,52px); grid-template-rows:repeat(3,52px); pointer-events:auto; opacity:.82; }
+.dbtn{ background:#5a4d73; color:#fff8e7; font-size:20px; display:flex; align-items:center; justify-content:center; border:0;
+  box-shadow:inset -4px -4px 0 rgba(0,0,0,.25), inset 4px 4px 0 rgba(255,255,255,.15), 0 0 0 3px var(--ink); touch-action:none; }
+.dbtn.on{ background:#8a7bb0; }
+#tbtns{ position:fixed; right:18px; bottom:18px; display:flex; gap:14px; align-items:flex-end; pointer-events:auto; opacity:.9; }
+.rbtn{ border-radius:50%; border:0; color:var(--ink); font-weight:900; touch-action:none; font-family:inherit; line-height:1.1;
+  box-shadow:0 0 0 4px var(--ink),0 6px 0 4px rgba(0,0,0,.35), inset -4px -5px 0 rgba(0,0,0,.18), inset 4px 4px 0 rgba(255,255,255,.55); }
+.rbtn:active{ transform:translateY(4px); box-shadow:0 0 0 4px var(--ink), inset 4px 4px 0 rgba(0,0,0,.15); }
+#keyhint{ position:fixed; left:50%; bottom:8px; transform:translateX(-50%); z-index:19; white-space:nowrap; font-size:13px; }
+#keyhint kbd{ font-family:'Press Start 2P',monospace; font-size:9px; background:#fff8e7; color:var(--ink); padding:2px 5px; box-shadow:0 2px 0 #9a8fb5; margin:0 2px; }
+
+.overlay{ position:fixed; inset:0; background:rgba(30,24,44,.65); display:flex; align-items:center; justify-content:center; z-index:72; padding:12px; }
+.panel{ width:100%; max-width:940px; max-height:94vh; max-height:94dvh; overflow-y:auto; }
+.tab{ padding:5px 12px; font-weight:900; background:#e9e1f5; box-shadow:0 0 0 3px var(--ink); margin:3px; border:0; font-family:inherit; cursor:pointer; }
+.tab.on{ background:#ffd166; }
+.row{ display:flex; align-items:center; gap:10px; padding:6px 8px; background:#fff; box-shadow:0 0 0 3px var(--ink); margin:7px 3px; }
+.grid-items{ display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:6px; }
+
+#ptable{ display:grid; grid-template-columns:repeat(18,var(--cs)); grid-auto-rows:var(--cs); gap:3px; justify-content:center; margin:6px 0; }
+#ptable .cell{ font-size:calc(var(--cs)*.36); }
+#ptable .cell .nm{ font-size:calc(var(--cs)*.24); }
+#ptable .cell .num{ font-size:calc(var(--cs)*.2); left:2px; top:1px; }
+#ptable .cell.off{ opacity:.33; filter:saturate(.4); }
+#ptable .cell.on{ cursor:pointer; }
+#ptable .cell.on:hover{ transform:scale(1.15); z-index:2; }
+#ptable .gap{ visibility:hidden; }
+
+/* 地區選擇 */
+#regions{ position:fixed; inset:0; z-index:62; display:flex; flex-direction:column; padding:10px 14px; background:linear-gradient(#2f2550,#1e1830); color:#fff; overflow:auto; }
+#region-cards{ display:flex; gap:12px; flex:1; min-height:0; align-items:flex-start; padding:8px 4px; overflow-x:auto; }
+.rcard{ flex:1 1 0; min-width:150px; display:flex; flex-direction:column; color:var(--ink); cursor:pointer; text-align:left; padding:8px; border:0; font-family:inherit; }
+.rcard img{ width:100%; aspect-ratio:3/2; object-fit:cover; box-shadow:0 0 0 3px var(--ink); }
+.rcard:hover{ transform:translateY(-4px); }
+.stars{ color:#f59f00; letter-spacing:1px; }
+
+/* 戰鬥：上方場景、下方訊息 + 一列選項 */
+#battle{ position:fixed; inset:0; z-index:50; display:flex; flex-direction:column; background:#1e1830; }
+#b-scene{ position:relative; flex:1; min-height:0; overflow:hidden; background-size:cover; background-position:center bottom; image-rendering:pixelated; }
+#b-fxc{ position:absolute; inset:0; width:100%; height:100%; z-index:4; pointer-events:none; }
+#b-bottom{ display:flex; gap:10px; padding:8px 10px 10px; height:clamp(118px,32vh,176px); background:#2b2238; }
+#b-msg{ flex:0 0 36%; margin:4px; padding:8px 12px; font-weight:900; font-size:clamp(14px,2.6vh,19px); line-height:1.35; overflow:hidden; display:flex; flex-direction:column; }
+#b-panel{ flex:1; display:grid; gap:8px; grid-template-columns:repeat(4,1fr); }
+#b-panel .pbtn{ height:calc(100% - 12px); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:clamp(14px,2.8vh,20px); line-height:1.2; padding:2px 4px; }
+#b-panel .opt{ position:relative; }
+#b-panel .opt .k{ position:absolute; left:6px; top:3px; font-family:'Press Start 2P',monospace; font-size:8px; opacity:.55; }
+#b-panel .big{ font-family:'Press Start 2P',monospace; font-size:clamp(16px,4.2vh,30px); }
+#b-panel .big2{ font-size:clamp(18px,4.6vh,32px); font-weight:900; }
+#b-panel .txt{ font-size:clamp(14px,3.1vh,22px); font-weight:900; }
+#b-panel .sm{ font-size:clamp(11px,2.2vh,15px); font-weight:900; margin-top:2px; }
+.mon{ position:absolute; right:16%; bottom:12%; height:52%; image-rendering:pixelated; animation:bob 1.1s steps(2) infinite; }
+.mon.boss{ height:68%; right:12%; }
+.bhero{ position:absolute; left:16%; bottom:9%; height:34%; image-rendering:pixelated; }
+.binfo{ position:absolute; top:8px; padding:6px 10px; width:min(240px,30vw); z-index:5; }
+#b-hint{ position:absolute; left:50%; top:10px; transform:translateX(-50%); width:min(520px,46vw); z-index:6; padding:8px 12px; font-weight:900; font-size:clamp(13px,2.5vh,17px); background:#fff3bf; }
+#b-fact{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(600px,64vw); z-index:7; padding:12px 16px; }
+#b-move{ position:absolute; left:50%; top:22%; transform:translateX(-50%); z-index:6; font-size:clamp(18px,4vh,30px); font-weight:900; color:#fff;
+  text-shadow:3px 0 var(--ink),-3px 0 var(--ink),0 3px var(--ink),0 -3px var(--ink); white-space:nowrap; }
+.opt-wrong{ opacity:.35; filter:grayscale(1); }
+.opt-wrong::after{ content:'✕'; position:absolute; right:8px; top:2px; font-size:18px; }
+.opt-right{ --btn:#b2f2bb !important; }
+.opt-right:disabled{ opacity:1; filter:none; }
+.opt-glow{ animation:glow .8s steps(2) infinite; outline:4px dashed #f59f00; outline-offset:6px; }
+@media (orientation:portrait){
+  #b-bottom{ flex-direction:column; height:auto; }
+  #b-msg{ flex:none; }
+  #b-panel{ grid-template-columns:repeat(2,1fr) !important; grid-auto-rows:84px; }
+}
+@keyframes bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes glow{ 50%{filter:brightness(1.2)} }
+@keyframes shake{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 50%{transform:translateX(8px)} 75%{transform:translateX(-5px)} }
+@keyframes hurt{ 0%,50%{filter:brightness(3)} 25%,75%{filter:none} }
+@keyframes lunge{ 0%,100%{transform:translateX(0) scale(1)} 40%{transform:translateX(-40px) scale(1.1)} }
+@keyframes defeat{ 0%{opacity:1} 15%{opacity:0} 30%{opacity:1} 45%{opacity:0} 60%{opacity:1;transform:none} 100%{opacity:0;transform:translateY(40px) scale(.4)} }
+@keyframes heroAtk{ 0%,100%{transform:none} 40%{transform:translate(28px,-16px)} }
+@keyframes floatUp{ from{transform:translateY(0);opacity:1} to{transform:translateY(-50px);opacity:0} }
+@keyframes fadeIn{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+@keyframes popIn{ 0%{opacity:0;transform:translateX(-50%) scale(.5)} 30%{opacity:1;transform:translateX(-50%) scale(1.15)} 80%{opacity:1;transform:translateX(-50%) scale(1)} 100%{opacity:0;transform:translateX(-50%) scale(1)} }
+@keyframes rainbow{ 0%{color:#ff8fab} 33%{color:#ffd43b} 66%{color:#74c0fc} 100%{color:#ff8fab} }
+@keyframes flash{ 0%,40%,80%{opacity:1} 20%,60%,100%{opacity:0} }
+.shake{ animation:shake .4s steps(4); }
+.hurt{ animation:hurt .45s steps(4) !important; }
+.lunge{ animation:lunge .45s steps(4) !important; }
+.defeated{ animation:defeat 1.1s steps(8) forwards !important; }
+.hero-atk{ animation:heroAtk .4s steps(4); }
+.fade-in{ animation:fadeIn .25s steps(3); }
+.pop{ animation:popIn 1.3s steps(8) forwards; }
+.rainbow{ animation:rainbow 1.2s steps(3) infinite; }
+.float-num{ position:absolute; font-family:'Press Start 2P',monospace; font-size:20px; color:#fff; z-index:8;
+  text-shadow:2px 0 var(--ink),-2px 0 var(--ink),0 2px var(--ink),0 -2px var(--ink); animation:floatUp 1s steps(6) forwards; }
+#flash{ position:fixed; inset:0; background:#fff; z-index:90; pointer-events:none; opacity:0; }
+#flash.go{ animation:flash .6s steps(1) forwards; }
+#toast-wrap{ position:fixed; right:10px; bottom:10px; z-index:95; display:flex; flex-direction:column; gap:6px; align-items:flex-end; pointer-events:none; width:min(420px,46vw); }
+body.touch #toast-wrap{ bottom:auto; top:10px; right:50%; transform:translateX(50%); width:min(460px,60vw); align-items:center; }
+#rotate{ position:fixed; inset:0; z-index:99; background:#2b2238; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; padding:20px; }
+</style>
+</head>
+<body>
+
+<canvas id="game" width="400" height="240"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="flex flex-col items-start gap-1">
+    <div class="pdark px-3 py-2 w-[190px]">
+      <div class="flex justify-between text-[13px] font-black"><span>勇者 <span class="font-pixel text-[9px]">LV</span><span id="h-lv" class="font-pixel text-[9px]">1</span></span><span id="h-hpt" class="font-pixel text-[8px] pt-[3px]"></span></div>
+      <div class="bar mt-2 mx-[2px]"><div id="h-hp" class="hp-fill"></div></div>
+      <div class="bar mt-[7px] mx-[2px]"><div id="h-mp" class="mp-fill"></div></div>
+      <div class="bar mt-[7px] mx-[2px]" style="height:4px"><div id="h-xp" class="xp-fill"></div></div>
+    </div>
+    <button id="quest-box" class="pdark px-3 py-1 text-[13px] font-bold text-left leading-tight max-w-[260px]" style="pointer-events:auto">
+      <span class="text-[#ffd166]">📜 任務</span><br><span id="quest-text"></span>
+    </button>
+  </div>
+  <div class="flex flex-col items-end">
+    <div class="flex gap-2 items-center">
+      <div class="pdark px-3 py-1 text-[13px] font-black">📍 <span id="h-area"></span></div>
+      <div class="pdark px-3 py-1 text-[13px] font-black">🪙 <span id="h-gold">0</span></div>
+      <button id="btn-codex" class="sbtn">📖 圖鑑</button>
+      <button id="btn-menu" class="sbtn">☰ 選單</button>
+      <button id="btn-full" class="sbtn" title="全螢幕">⛶</button>
+    </div>
+    <canvas id="minimap" width="112" height="72"></canvas>
+  </div>
+</div>
+<div id="banner" class="hidden pbox px-8 py-3 text-2xl font-black whitespace-nowrap fade-in"></div>
+
+<div id="dialog" class="hidden pbox p-3 flex gap-3 items-start">
+  <div id="d-face" class="w-16 h-16 shrink-0 bg-[#e9e1f5] p-1" style="box-shadow:0 0 0 3px var(--ink)"></div>
+  <div class="flex-1 min-w-0">
+    <div class="flex justify-between items-center">
+      <span id="d-name" class="font-black text-[#7048e8]"></span>
+      <button id="d-speak" class="sbtn" aria-label="唸出來">🔊 唸給我聽</button>
+    </div>
+    <p id="d-text" class="font-bold text-[18px] leading-snug min-h-[50px] mt-1"></p>
+    <div class="text-right text-xs tri"><span class="kb-only">▼ 按 空白鍵 / Enter 繼續</span><span class="touch-only">▼ 點一下繼續</span></div>
+  </div>
+</div>
+
+<div id="touch" class="hidden">
+  <div id="dpad">
+    <div></div><button class="dbtn" data-dir="up" aria-label="上">▲</button><div></div>
+    <button class="dbtn" data-dir="left" aria-label="左">◀</button><div></div><button class="dbtn" data-dir="right" aria-label="右">▶</button>
+    <div></div><button class="dbtn" data-dir="down" aria-label="下">▼</button><div></div>
+  </div>
+  <div id="tbtns">
+    <button id="t-menu" class="rbtn w-14 h-14 text-[13px]" style="background:#ffc9d6">☰<br>選單</button>
+    <button id="t-act" class="rbtn w-[78px] h-[78px] text-[15px]" style="background:#ffd166">🔍<br>調查</button>
+  </div>
+</div>
+<div id="keyhint" class="hidden pdark px-3 py-1 font-bold">
+  移動 <kbd>↑↓←→</kbd>/<kbd>WASD</kbd>　調查 <kbd>空白鍵</kbd>/<kbd>Enter</kbd>（樹、石頭、河邊、草地都可以試試！）　選單 <kbd>Esc</kbd>　圖鑑 <kbd>C</kbd>　全螢幕 <kbd>F</kbd>
+</div>
+
+<!-- 標題 -->
+<div id="title" class="fixed inset-0 z-[65] flex items-center justify-center p-4" style="background:#1e1830 center/cover no-repeat;image-rendering:pixelated">
+  <div class="flex items-center gap-8 flex-wrap justify-center">
+    <div class="flex flex-col items-center gap-3">
+      <div class="pbox px-8 py-5 text-center">
+        <p class="font-pixel text-[10px] text-[#9c6b3c]">ELEMENT HERO RPG</p>
+        <h1 class="text-5xl font-black mt-3">元素勇者</h1>
+        <p class="text-2xl font-black mt-2 text-[#5b8def]">週期表大冒險</p>
+      </div>
+      <div class="flex items-end gap-6">
+        <img id="t-hero" class="px w-20" style="animation:bob 1s steps(2) infinite">
+        <img id="t-slime" class="px w-16" style="animation:bob 1.3s steps(2) infinite">
+        <img id="t-elder" class="px w-20" style="animation:bob 1.2s steps(2) infinite">
+      </div>
+    </div>
+    <div class="flex flex-col items-center gap-3">
+      <button id="t-start" class="pbtn w-64 py-4 text-xl">▶ 開始冒險</button>
+      <button id="t-new" class="pbtn w-64 py-3 text-lg hidden" style="--btn:#ffd8e4">✦ 重新開始</button>
+      <div class="pbox p-3 text-[14px] font-bold leading-relaxed w-80">
+        <div class="kb-only">⌨️ 方向鍵 / WASD 走路<br>空白鍵 / Enter：說話、採集、調查<br>Esc：選單　C：圖鑑　F：全螢幕</div>
+        <div class="touch-only">🕹️ 左下十字鍵走路<br>🔍「調查」：說話、採集<br>☰「選單」：背包、圖鑑</div>
+        <div class="mt-1">🌳 對著樹、石頭、河水、草地調查，可能找到元素或寶箱！</div>
+        <div>💡 答錯沒關係，會有提示，可以一直再試！</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 地區選擇 -->
+<div id="regions" class="hidden">
+  <div class="flex items-center justify-between gap-3 flex-wrap">
+    <div class="flex items-center gap-3">
+      <img id="rs-hero" class="px w-12">
+      <div>
+        <div class="text-2xl font-black">🗺️ 選擇冒險地區</div>
+        <div class="text-sm font-bold opacity-80">越右邊越難：從「單一元素」一路挑戰到「化學反應」！</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 font-black">
+      <span class="pdark px-3 py-1">勇者 Lv.<span id="rs-lv"></span></span>
+      <span class="pdark px-3 py-1">🪙 <span id="rs-gold"></span></span>
+      <span class="pdark px-3 py-1">📖 <span id="rs-codex"></span></span>
+      <button id="rs-codex-btn" class="sbtn">📖 圖鑑</button>
+      <button id="rs-title" class="sbtn">🏠 標題</button>
+    </div>
+  </div>
+  <div id="region-cards"></div>
+</div>
+
+<!-- 戰鬥 -->
+<div id="battle" class="hidden">
+  <div id="b-scene">
+    <div class="binfo pbox" style="right:8px">
+      <div class="flex justify-between font-black"><span id="b-mname"></span><span class="font-pixel text-[8px] pt-1" id="b-mlv"></span></div>
+      <div class="bar mt-2 mx-[2px]"><div id="b-mhp" class="hp-fill" style="width:100%"></div></div>
+    </div>
+    <div class="binfo pbox" style="left:8px">
+      <div class="flex justify-between font-black"><span>勇者</span><span class="font-pixel text-[8px] pt-1">LV<span id="b-lv"></span></span></div>
+      <div class="flex items-center gap-1 text-[10px] font-pixel mt-2"><span>HP</span><div class="bar flex-1"><div id="b-hp" class="hp-fill"></div></div></div>
+      <div class="flex items-center gap-1 text-[10px] font-pixel mt-2"><span>MP</span><div class="bar flex-1"><div id="b-mp" class="mp-fill"></div></div></div>
+      <div class="text-right font-pixel text-[8px] mt-1" id="b-hpt"></div>
+    </div>
+    <img id="b-mon" class="mon">
+    <img id="b-hero" class="bhero">
+    <canvas id="b-fxc" width="320" height="180"></canvas>
+    <div id="b-move" class="hidden"></div>
+    <div id="b-hint" class="pbox hidden"></div>
+    <div id="b-fact" class="pbox hidden fade-in"></div>
+    <div id="b-fx" class="absolute inset-0 pointer-events-none" style="z-index:8"></div>
+  </div>
+  <div id="b-bottom">
+    <div id="b-msg" class="pbox"></div>
+    <div id="b-panel"></div>
+  </div>
+</div>
+
+<div id="modal" class="overlay hidden">
+  <div class="pbox panel p-4 fade-in">
+    <div class="flex items-center justify-between mb-2 gap-2">
+      <h2 id="m-title" class="text-xl font-black"></h2>
+      <button id="m-close" class="sbtn">✕ 關閉</button>
+    </div>
+    <div id="m-body"></div>
+  </div>
+</div>
+
+<div id="rotate" class="hidden">
+  <div class="text-6xl">📱↻</div>
+  <div class="text-2xl font-black">請把手機轉成橫向</div>
+  <div class="font-bold opacity-80">橫著拿，地圖會更大、更好玩！</div>
+  <button id="rotate-ok" class="pbtn px-6 py-3">還是直式玩</button>
+</div>
+<div id="flash"></div>
+<div id="toast-wrap"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   元素勇者：週期表大冒險（橫式 RPG 版）
+   ---------------------------------------------------------------------
+   0. 小工具
+   1. 遊戲資料：週期表、元素、化合物、題庫、環境互動、火爐反應、配方、怪物、地區
+   2. 像素美術：點陣字、角色、NPC、設施、物件、地圖圖塊
+   3. 音效與音樂
+   4. 存檔與能力值
+   5. 地圖生成：五個地區各有自己的佈局函式
+   6. 大地圖：移動、調查、砍樹、寶箱、繪製、光影
+   7. 輸入
+   8. 介面：HUD、對話、選單、背包（吸收元素）、圖鑑、商店、煉金、火爐
+   9. 戰鬥：題庫抽題 + 依招式不同的特效
+  10. 標題、地區選擇、開始
+   ===================================================================== */
+
+/* =====================================================================
+   0. 小工具
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const rand = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function makeCanvas(w,h){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
+function seeded(seed){ let s=(Math.imul(seed|0,2654435761)>>>0)||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
+const strHash = s => [...s].reduce((a,c)=>(Math.imul(a,31)+c.charCodeAt(0))|0, 7);
+function wpick(list, r=Math.random){ const tot=list.reduce((a,[,w])=>a+w,0); let x=r()*tot; for(const [v,w] of list){ x-=w; if(x<0) return v; } return list[0][0]; }
+function shade(hex, amt){ const n=parseInt(hex.slice(1),16); const f=v=>clamp(v+amt,0,255); return '#'+[f(n>>16),f((n>>8)&255),f(n&255)].map(v=>v.toString(16).padStart(2,'0')).join(''); }
+const SUBS = '₀₁₂₃₄₅₆₇₈₉';
+const fmtU = f => f.replace(/\d/g, d => SUBS[d]);
+const fmtH = f => f.replace(/(\d+)/g, '<sub>$1</sub>');
+const fmtTxt = s => s.replace(/[₀-₉]+/g, m => `<sub>${[...m].map(c=>SUBS.indexOf(c)).join('')}</sub>`);
+function parseF(f){ const o={}; f.replace(/([A-Z][a-z]?)(\d*)/g,(_,e,n)=>{ o[e]=(o[e]||0)+(+n||1); return ''; }); return o; }
+const speakable = s => s.replace(/[₀-₉]/g, d => ' '+SUBS.indexOf(d)+' ');
+
+/* =====================================================================
+   1-1. 完整週期表（118 個）
+   ===================================================================== */
+const PT_RAW = 'H氫He氦Li鋰Be鈹B硼C碳N氮O氧F氟Ne氖Na鈉Mg鎂Al鋁Si矽P磷S硫Cl氯Ar氬K鉀Ca鈣Sc鈧Ti鈦V釩Cr鉻Mn錳Fe鐵Co鈷Ni鎳Cu銅Zn鋅Ga鎵Ge鍺As砷Se硒Br溴Kr氪Rb銣Sr鍶Y釔Zr鋯Nb鈮Mo鉬Tc鎝Ru釕Rh銠Pd鈀Ag銀Cd鎘In銦Sn錫Sb銻Te碲I碘Xe氙Cs銫Ba鋇La鑭Ce鈰Pr鐠Nd釹Pm鉕Sm釤Eu銪Gd釓Tb鋱Dy鏑Ho鈥Er鉺Tm銩Yb鐿Lu鎦Hf鉿Ta鉭W鎢Re錸Os鋨Ir銥Pt鉑Au金Hg汞Tl鉈Pb鉛Bi鉍Po釙At砈Rn氡Fr鍅Ra鐳Ac錒Th釷Pa鏷U鈾Np錼Pu鈽Am鋂Cm鋦Bk鉳Cf鉲Es鑀Fm鐨Md鍆No鍩Lr鐒Rf鑪Db𨧀Sg𨭎Bh𨨏Hs𨭆Mt䥑Ds鐽Rg錀Cn鎶Nh鉨Fl鈇Mc鏌Lv鉝Ts鿬Og鿫';
+const PT = [];
+PT_RAW.replace(/([A-Z][a-z]?)([^A-Za-z]+)/gu, (_,s,n) => { PT.push({ sym:s, name:n, num:PT.length+1 }); return ''; });
+const CAT = {
+  alkali:{ c:'#ffadad', n:'鹼金屬' }, alkaline:{ c:'#ffd6a5', n:'鹼土金屬' }, transition:{ c:'#ffc6ff', n:'過渡金屬' },
+  post:{ c:'#cdd5ff', n:'其他金屬' }, metalloid:{ c:'#fdffb6', n:'類金屬' }, nonmetal:{ c:'#caffbf', n:'非金屬' },
+  halogen:{ c:'#9bf6ff', n:'鹵素' }, noble:{ c:'#a0c4ff', n:'惰性氣體' }, lanth:{ c:'#f1e4ff', n:'鑭系' }, actin:{ c:'#ffe5ec', n:'錒系' },
+};
+function catOf(n){
+  if ([3,11,19,37,55,87].includes(n)) return 'alkali';
+  if ([4,12,20,38,56,88].includes(n)) return 'alkaline';
+  if ([2,10,18,36,54,86,118].includes(n)) return 'noble';
+  if ([9,17,35,53,85,117].includes(n)) return 'halogen';
+  if ([5,14,32,33,51,52].includes(n)) return 'metalloid';
+  if ([1,6,7,8,15,16,34].includes(n)) return 'nonmetal';
+  if (n>=57 && n<=71) return 'lanth';
+  if (n>=89 && n<=103) return 'actin';
+  if ([13,31,49,50,81,82,83,84,113,114,115,116].includes(n)) return 'post';
+  return 'transition';
+}
+function ptPos(n){
+  if (n===1) return [1,1]; if (n===2) return [1,18];
+  if (n<=10) return [2, n<=4 ? n-2 : n+8];
+  if (n<=18) return [3, n<=12 ? n-10 : n];
+  if (n<=36) return [4, n-18];
+  if (n<=54) return [5, n-36];
+  if (n<=86){ if (n<=56) return [6, n-54]; if (n<=71) return [9, n-54]; return [6, n-68]; }
+  if (n<=88) return [7, n-86]; if (n<=103) return [10, n-86]; return [7, n-100];
+}
+PT.forEach(e => { e.cat = catOf(e.num); e.color = CAT[e.cat].c; e.pos = ptPos(e.num); });
+const PTS = Object.fromEntries(PT.map(e => [e.sym, e]));
+
+/* =====================================================================
+   1-2. 遊戲中會學到的 33 個元素
+   ===================================================================== */
+const LEARN = [
+  ['H', 1,'宇宙裡最多的元素！氫氣是最輕的氣體，燃燒後只產生水。','最輕的氣體，燃燒後只會產生水的元素是？'],
+  ['He',1,'比空氣輕又不會燃燒，氣球裡裝的就是氦氣。','可以讓氣球飄上天、又不會燃燒的元素是？'],
+  ['C', 1,'鉛筆芯（石墨）、木炭和鑽石都是碳。','鉛筆芯和木炭的主要元素是？'],
+  ['N', 1,'空氣裡最多的是氮氣（約 78%），也是肥料三要素之一。','空氣中含量最多的元素是？'],
+  ['O', 1,'我們呼吸需要氧氣，氧氣能幫助燃燒（助燃性）。','我們呼吸需要、又能幫助燃燒的元素是？'],
+  ['Na',1,'食鹽（氯化鈉）裡有鈉；鈉燃燒是黃色火焰。','食鹽裡的金屬元素是？'],
+  ['Mg',1,'燃燒時會發出耀眼白光，生成白色的氧化鎂。','燃燒時發出強烈白光的金屬是？'],
+  ['Al',1,'很輕的金屬，可以做成飲料罐和鋁箔紙，可以回收。','飲料罐和鋁箔紙是用哪一種金屬做的？'],
+  ['Fe',1,'用途最廣的金屬，接觸水和氧氣會生鏽；血液裡也有鐵。','會生鏽、用來蓋橋樑和大樓的金屬是？'],
+  ['Cu',1,'導電性很好，電線裡就是銅；銅加熱會變黑（氧化銅）。','電線裡用來導電的金屬是？'],
+  ['Li',2,'最輕的金屬，手機和電動車的鋰電池就用它；燃燒是紅色火焰。','手機充電電池裡的輕金屬是？'],
+  ['Be',2,'很輕又很硬的金屬，太空望遠鏡的鏡子用到它。','很輕很硬、用在太空望遠鏡鏡子的金屬是？'],
+  ['B', 2,'硼砂可以做史萊姆黏土，耐熱玻璃裡也有硼。','做史萊姆黏土用的硼砂，含有哪一個元素？'],
+  ['F', 2,'含氟牙膏可以讓牙齒更堅固、預防蛀牙。','含在牙膏裡、可以預防蛀牙的元素是？'],
+  ['Ne',2,'惰性氣體，通電會發出橘紅色光，用在霓虹燈。','霓虹燈裡發出橘紅色光的氣體是？'],
+  ['Si',2,'沙子和玻璃的主要成分含矽；電腦晶片也是矽做的。','沙子、玻璃和電腦晶片裡都有哪一個元素？'],
+  ['P', 2,'火柴盒側面有紅磷；磷也是肥料三要素之一。','火柴盒側面摩擦點火的元素是？'],
+  ['S', 2,'黃色的固體，燃燒產生有刺激味的二氧化硫。','黃色固體、燃燒會產生刺激性氣體的元素是？'],
+  ['Cl',2,'黃綠色有毒氣體；自來水和游泳池用氯消毒。','自來水和游泳池用來消毒的元素是？'],
+  ['Ar',2,'空氣中含量第三多，是惰性氣體，燈泡裡充氬氣保護燈絲。','燈泡裡用來保護燈絲的惰性氣體是？'],
+  ['K', 2,'肥料三要素之一；鉀燃燒是紫色火焰，香蕉裡也很多。','肥料三要素裡，除了氮和磷，還有哪一個？'],
+  ['Ca',2,'骨頭、牙齒、貝殼、大理石裡都有鈣；燃燒是磚紅色火焰。','骨頭、牙齒和貝殼裡都有哪一個元素？'],
+  ['Zn',2,'把鋅鍍在鐵上（白鐵）可以防止生鏽，乾電池外殼也是鋅。','鍍在鐵上防止生鏽的金屬是？'],
+  ['Ag',2,'導電性最好的金屬，可以做首飾和餐具。','導電性最好、常做成首飾的銀色金屬是？'],
+  ['Au',2,'活性很小、不容易生鏽，所以古代金器還是亮晶晶的。','活性很小、幾乎不會生鏽的貴重金屬是？'],
+  ['Mn',3,'二氧化錳是製造氧氣時的「催化劑」，乾電池裡也有。','雙氧水製造氧氣時當催化劑的二氧化錳，含有哪一個元素？'],
+  ['Ni',3,'很多硬幣和不鏽鋼裡都有鎳。','很多硬幣和不鏽鋼裡都含有哪一種金屬？'],
+  ['Br',3,'常溫下唯一是液體的非金屬，紅棕色、有毒。','常溫下是紅棕色液體的非金屬元素是？'],
+  ['Sn',3,'焊接電路板的焊錫主要是錫；罐頭鐵皮鍍錫叫馬口鐵。','焊接電路板用的焊錫，主要是哪一種金屬？'],
+  ['I', 3,'碘酒可以消毒傷口；碘液遇到澱粉會變藍黑色。','遇到澱粉會變藍黑色的碘液，含有哪一個元素？'],
+  ['Pt',4,'又叫「白金」，很穩定，也能當汽車排氣管的觸媒。','又叫「白金」的貴重金屬是？'],
+  ['Hg',4,'常溫下唯一是液體的金屬（水銀），有毒不能碰！','常溫下唯一是液體的金屬是？'],
+  ['Pb',4,'很重的金屬，汽車電瓶是鉛蓄電池；鉛有毒要小心。','汽車電瓶（蓄電池）裡用的重金屬是？'],
+];
+const EL = {};
+LEARN.forEach(([s,tier,fact,life]) => { EL[s] = { ...PTS[s], tier, fact, life }; });
+const ELS = Object.keys(EL);
+const TOXIC = { Hg:'汞（水銀）有毒，絕對不能吃或碰！', Pb:'鉛是有毒的重金屬，不能吸收！', Br:'溴是有毒的紅棕色液體，不能吸收！',
+  F:'氟氣有毒，只有很少量加在牙膏裡才安全！', Cl:'氯氣有毒，只能少量用來消毒自來水！', HCl:'鹽酸是強酸，會腐蝕皮膚！', NaOH:'氫氧化鈉是強鹼，會腐蝕皮膚！',
+  H2SO4:'硫酸是強酸，碰到要立刻用大量清水沖洗！', CO:'一氧化碳有毒，吸入會中毒！', SO2:'二氧化硫有刺激性又會造成酸雨，不能吸！', NH3:'氨有刺鼻臭味，吸太多會不舒服！', CH4:'甲烷（瓦斯）不能吸，要小心瓦斯外洩！' };
+
+/* =====================================================================
+   1-3. 化合物
+   ===================================================================== */
+const COMPOUNDS = [
+  ['H2O','水',3,'地球表面大約七成被水覆蓋；水是由氫和氧組成的化合物。','由 2 個氫原子和 1 個氧原子組成，我們每天都要喝的是？'],
+  ['O2','氧氣',3,'能幫助燃燒（助燃性），可以讓帶火星的線香復燃。','能讓帶有火星的線香重新燃燒的氣體是？'],
+  ['H2','氫氣',3,'最輕的氣體，具有可燃性，燃燒後只產生水。','最輕、而且燃燒後只產生水的氣體是？'],
+  ['N2','氮氣',3,'空氣中約 78%；很穩定，零食包裝充氮氣防止變質。','零食包裝裡充的、讓食物不容易變質的氣體是？'],
+  ['CO2','二氧化碳',3,'會讓澄清石灰水變混濁；固體叫乾冰；是主要的溫室氣體。','會讓澄清石灰水變混濁的氣體是？'],
+  ['NaCl','氯化鈉',3,'就是食鹽；海水曬乾就能得到。','煮菜用的食鹽，主要成分是？'],
+  ['Fe2O3','氧化鐵',3,'鐵鏽的主要成分，紅褐色。','鐵生鏽後產生的紅褐色物質主要是？'],
+  ['CH4','甲烷',4,'天然氣（瓦斯）的主要成分，完全燃燒產生二氧化碳和水。','天然氣（瓦斯）的主要成分是？'],
+  ['NH3','氨',4,'有刺鼻臭味的氣體，水溶液是鹼性，可以製造肥料。','有刺鼻臭味、溶在水裡呈鹼性的氣體是？'],
+  ['HCl','氯化氫',4,'溶在水裡就是鹽酸；胃酸的主要成分。','胃酸的主要成分是？'],
+  ['NaOH','氫氧化鈉',4,'強鹼，可以用來做肥皂，會腐蝕皮膚。','可以用來做肥皂的強鹼是？'],
+  ['CaCO3','碳酸鈣',4,'大理石、石灰石、貝殼和蛋殼的主要成分；加鹽酸會產生二氧化碳。','大理石和貝殼的主要成分是？'],
+  ['H2O2','過氧化氫',4,'雙氧水的主要成分，加二氧化錳會分解產生氧氣。','雙氧水的主要成分是？'],
+  ['CO','一氧化碳',4,'燃燒不完全時產生，無色無味但有毒！','燃燒不完全產生、無色無味又有毒的氣體是？'],
+  ['MgO','氧化鎂',4,'鎂帶燃燒發出強光後留下的白色粉末。','鎂帶燃燒後產生的白色粉末是？'],
+  ['CuO','氧化銅',4,'銅加熱後表面變成的黑色物質。','銅片在火焰上加熱後，表面變黑的物質是？'],
+  ['CaO','氧化鈣',4,'又叫生石灰，可以當乾燥劑；碳酸鈣加熱會產生它。','食品包裝裡的乾燥劑「生石灰」是？'],
+  ['SO2','二氧化硫',5,'硫燃燒產生的刺激性氣體，是酸雨的主要原因之一。','造成酸雨的主要氣體之一是？'],
+  ['H2SO4','硫酸',5,'強酸，汽車鉛蓄電池裡有，碰到要立刻沖水。','汽車電瓶（鉛蓄電池）裡的強酸是？'],
+  ['C6H12O6','葡萄糖',5,'植物光合作用製造的糖，也是身體的能量來源。','植物光合作用製造、身體能量來源的糖是？'],
+];
+const CP = {};
+COMPOUNDS.forEach(([f,name,tier,fact,life]) => { CP[f] = { f, name, tier, fact, life, parts:parseF(f) }; });
+const CPS = Object.keys(CP);
+const CP_COLOR = '#c5f6fa';
+
+/* =====================================================================
+   1-4. 國中理化題庫（模仿國中考試題型；全部四選一）
+   欄位：[地區難度, 題目, 正確答案, [錯誤選項×3], 提示, 答對後的說明, 攻擊特效, 學到的元素/化合物]
+   ===================================================================== */
+const QBANK_RAW = [
+  // ---- 1 新手村：元素符號、金屬與非金屬、空氣 ----
+  [1,'鈉的元素符號，哪一個寫法正確？','Na',['NA','na','nA'],'第一個字母大寫，第二個字母小寫！','元素符號：第一個字母大寫、第二個字母小寫，例如 Na、Mg、Cl。','fire','el:Na'],
+  [1,'下列哪一個是「金屬」元素？','鐵 Fe',['氧 O','碳 C','氮 N'],'金屬亮亮的、可以導電。','鐵是金屬，有金屬光澤、能導電導熱。','bolt','el:Fe'],
+  [1,'下列哪一個「不是」金屬？','氧 O',['鐵 Fe','銅 Cu','鎂 Mg'],'它在常溫下是氣體。','氧在常溫下是氣體，屬於非金屬。','gas','el:O'],
+  [1,'空氣中含量最多的氣體是？','氮氣',['氧氣','二氧化碳','氫氣'],'大約佔空氣的 78%！','空氣中氮氣約 78%、氧氣約 21%。','gas','cp:N2'],
+  [1,'空氣中含量第二多、我們呼吸需要的氣體是？','氧氣',['氮氣','二氧化碳','氦氣'],'約佔空氣的 21%。','氧氣約佔空氣的 21%，能幫助燃燒和呼吸。','gas','cp:O2'],
+  [1,'鉛筆芯的主要成分是石墨，石墨由哪一種元素組成？','碳 C',['鉛 Pb','鐵 Fe','矽 Si'],'鉛筆芯裡其實沒有鉛喔！','鉛筆芯是石墨（碳）加黏土做的，裡面沒有鉛。','earth','el:C'],
+  [1,'氣球裡裝哪一種氣體，又輕又不會燃燒，最安全？','氦氣',['氫氣','氧氣','二氧化碳'],'氫氣也很輕，但會燃燒爆炸！','氦氣很輕又不會燃燒，所以氣球用氦氣比較安全。','light','el:He'],
+  [1,'飲料罐和鋁箔紙是用哪一種金屬做的？','鋁 Al',['銀 Ag','鐵 Fe','金 Au'],'很輕的金屬，可以回收。','鋁很輕、不易生鏽，常做成飲料罐和鋁箔紙。','bolt','el:Al'],
+  [1,'電線裡面用來導電的金屬通常是？','銅 Cu',['金 Au','鐵 Fe','鈉 Na'],'它是紅褐色的金屬。','銅的導電性好又比較便宜，所以電線用銅。','bolt','el:Cu'],
+  [1,'燃燒時會發出強烈白光的金屬是？','鎂 Mg',['鐵 Fe','銅 Cu','鋁 Al'],'煙火裡也有它！','鎂燃燒發出強光，生成白色的氧化鎂。','flash','el:Mg'],
+  [1,'鐵生鏽需要什麼條件？','水和氧氣',['只要陽光','只要沙子','氮氣和氦氣'],'潮濕的地方鐵比較容易生鏽！','鐵和水、氧氣作用就會生鏽，保持乾燥可以防鏽。','water','el:Fe'],
+  [1,'下列哪一個是「元素符號」的正確寫法？','Cu',['CU','cu','cU'],'第一個大寫、第二個小寫。','銅的元素符號是 Cu。','bolt','el:Cu'],
+  // ---- 2 村落：金屬性質、純物質與混合物、生活中的元素 ----
+  [2,'金屬共同的特性是什麼？','能導電',['都是液體','都會燃燒','都是透明的'],'電線用金屬做就是這個原因！','金屬有金屬光澤、能導電導熱、有延展性。','bolt',''],
+  [2,'常溫下唯一是液體的金屬是？','汞 Hg',['鐵 Fe','金 Au','鈉 Na'],'舊式溫度計裡的銀色液體！','汞（水銀）常溫下是液體，有毒，不可以碰！','water','el:Hg'],
+  [2,'下列哪一種是「惰性氣體（鈍氣）」？','氖 Ne',['氧 O','氮 N','氫 H'],'霓虹燈裡的氣體！','惰性氣體很穩定、不容易反應，例如氦、氖、氬。','light','el:Ne'],
+  [2,'植物肥料三要素是氮、磷和哪一個？','鉀 K',['鐵 Fe','鈉 Na','銅 Cu'],'香蕉裡也很多的元素。','肥料三要素：氮 N、磷 P、鉀 K。','earth','el:K'],
+  [2,'下列哪一個是「純物質」？','蒸餾水',['空氣','海水','牛奶'],'只有一種成分的才是純物質。','蒸餾水只有水；空氣、海水、牛奶都是混合物。','water','cp:H2O'],
+  [2,'下列哪一個是「混合物」？','空氣',['氧氣','蒸餾水','鐵'],'裡面有好多種氣體。','空氣裡有氮氣、氧氣、二氧化碳…是混合物。','gas',''],
+  [2,'含氟牙膏的功用是什麼？','預防蛀牙',['讓頭髮變黑','幫助長高','治療感冒'],'刷牙用的嘛！','氟能讓牙齒表面更堅固，預防蛀牙。','light','el:F'],
+  [2,'火柴盒側面摩擦點火的元素是？','磷 P',['硫 S','碳 C','鈉 Na'],'肥料三要素裡也有它。','火柴盒側面有紅磷，摩擦生熱就能點燃火柴。','fire','el:P'],
+  [2,'鐵製品防止生鏽，下列哪個方法最好？','塗油漆',['泡在水裡','放在潮濕處','用鹽水擦'],'要把水和氧氣隔開！','塗油漆、上油、鍍鋅都能隔絕水和氧氣，防止生鏽。','slash','el:Fe'],
+  [2,'金器放了幾千年還是亮晶晶的，因為金？','不容易生鏽',['會自己發光','表面有油','溫度很高'],'金的活性很小！','金的活性很小，不容易和氧反應，所以不會生鏽。','light','el:Au'],
+  [2,'沙子和玻璃的主要成分裡，含有哪一種元素？','矽 Si',['鈉 Na','鐵 Fe','氦 He'],'電腦晶片也用它！','沙子和玻璃的主要成分是二氧化矽，含有矽 Si。','earth','el:Si'],
+  [2,'自來水和游泳池用哪一種元素消毒？','氯 Cl',['氧 O','氖 Ne','鈣 Ca'],'游泳池有特別的味道！','自來水和游泳池用含氯的藥劑消毒殺菌。','acid','el:Cl'],
+  [2,'在鐵上鍍一層鋅防鏽，這種鐵叫做？','白鐵',['馬口鐵','生鐵','磁鐵'],'鍍「鋅」的是白鐵，鍍「錫」的是馬口鐵。','鍍鋅的叫白鐵（常做水桶、屋頂），鍍錫的叫馬口鐵（做罐頭）。','bolt','el:Zn'],
+  // ---- 3 城鎮：氧氣與二氧化碳、燃燒、水 ----
+  [3,'檢驗二氧化碳常用什麼？','澄清石灰水',['線香','石蕊試紙','碘液'],'二氧化碳會讓它變混濁！','CO₂ 通入澄清石灰水，石灰水會變混濁。','gas','cp:CO2'],
+  [3,'把帶有火星的線香放進哪一種氣體，線香會重新燃燒？','氧氣',['二氧化碳','氮氣','氫氣'],'它有「助燃性」！','氧氣能幫助燃燒（助燃性），可以讓線香復燃。','fire','cp:O2'],
+  [3,'實驗室製造氧氣，常用雙氧水加上什麼？','二氧化錳',['食鹽','大理石','鹽酸'],'它是「催化劑」，本身不會被用完！','雙氧水加二氧化錳分解產生氧氣，二氧化錳是催化劑。','gas','el:Mn'],
+  [3,'製造二氧化碳，常用大理石加上什麼？','稀鹽酸',['雙氧水','清水','酒精'],'是一種酸！','大理石（碳酸鈣）加稀鹽酸會產生二氧化碳。','acid','cp:CaCO3'],
+  [3,'燃燒的三個條件：可燃物、溫度達到燃點，還有？','助燃物（氧氣）',['二氧化碳','水','氮氣'],'沒有它，火就燒不起來！','燃燒三要素：可燃物、助燃物（氧）、溫度達燃點。','fire','cp:O2'],
+  [3,'油鍋起火時蓋上鍋蓋，可以滅火的原因是？','隔絕氧氣',['降低燃點','增加可燃物','產生水'],'燃燒需要什麼氣體？','蓋上鍋蓋隔絕了氧氣，火就熄滅了。','water',''],
+  [3,'植物行光合作用時，會吸收什麼氣體？','二氧化碳',['氧氣','氮氣','氫氣'],'和我們呼吸相反！','植物吸收二氧化碳 CO₂，放出氧氣 O₂。','earth','cp:CO2'],
+  [3,'植物行光合作用時，會放出什麼氣體？','氧氣',['二氧化碳','氮氣','氦氣'],'我們呼吸需要的氣體！','光合作用：二氧化碳＋水 → 葡萄糖＋氧氣。','light','cp:O2'],
+  [3,'電解水時，產生的氫氣和氧氣「體積比」是？','2：1',['1：1','1：2','3：1'],'和 H₂O 裡氫、氧原子的比例一樣！','H₂O 有 2 個 H、1 個 O，所以氫氣：氧氣＝2：1。','water','cp:H2'],
+  [3,'「乾冰」是什麼物質的固體？','二氧化碳',['水','氧氣','氮氣'],'它會直接變成氣體（昇華）。','乾冰是固態二氧化碳，在常溫下會昇華成氣體。','ice','cp:CO2'],
+  [3,'一個水分子 H₂O 是由哪些原子組成？','2個H、1個O',['1個H、2個O','2個H、2個O','1個H、1個O'],'右下角的小數字是原子個數！','H₂O：氫 H 有 2 個、氧 O 有 1 個（沒寫數字就是 1）。','water','cp:H2O'],
+  [3,'海水曬乾後，留下的白色晶體主要是？','氯化鈉',['碳酸鈣','葡萄糖','氧化鐵'],'就是食鹽！','海水裡溶有食鹽（氯化鈉 NaCl），曬乾就得到鹽。','water','cp:NaCl'],
+  [3,'鐵鏽的主要成分是？','氧化鐵',['氧化銅','氯化鈉','碳酸鈣'],'鐵和氧結合了！','鐵和水、氧氣作用，生成紅褐色的氧化鐵。','earth','cp:Fe2O3'],
+  [3,'氫氣在空氣中燃燒，會產生什麼？','水',['二氧化碳','氧氣','食鹽'],'氫和氧結合會變成……','2H₂ ＋ O₂ → 2H₂O，氫氣燃燒只產生水，很乾淨！','fire','cp:H2'],
+  [3,'二氧化碳 CO₂ 是由哪兩種元素組成？','碳和氧',['碳和氫','氮和氧','鈣和氧'],'看大寫字母：C 和 O。','CO₂ 由碳 C 和氧 O 組成，1 個 C、2 個 O。','gas','cp:CO2'],
+  // ---- 4 都會：酸鹼、化學反應 ----
+  [4,'藍色石蕊試紙碰到酸性溶液，會變成什麼顏色？','紅色',['藍色','綠色','黃色'],'酸會讓藍色石蕊變紅！','酸性：藍色石蕊試紙變紅；鹼性：紅色石蕊試紙變藍。','acid',''],
+  [4,'紅色石蕊試紙碰到鹼性溶液，會變成什麼顏色？','藍色',['紅色','黑色','白色'],'鹼會讓紅色石蕊變藍！','鹼性溶液會讓紅色石蕊試紙變藍。','water',''],
+  [4,'pH 值等於 7 的溶液是？','中性',['酸性','鹼性','強酸'],'純水就是這個！','pH＜7 酸性、pH＝7 中性、pH＞7 鹼性。','water',''],
+  [4,'pH 值小於 7 的溶液是？','酸性',['中性','鹼性','純水'],'檸檬汁、醋都是。','pH 值越小，酸性越強。','acid',''],
+  [4,'胃酸的主要成分是？','鹽酸',['硫酸','醋酸','碳酸'],'化學式是 HCl。','胃酸主要是鹽酸（HCl），幫助消化食物。','acid','cp:HCl'],
+  [4,'酸和鹼混合（酸鹼中和），會產生鹽和什麼？','水',['氧氣','二氧化碳','氫氣'],'H⁺ 和 OH⁻ 會結合！','酸 ＋ 鹼 → 鹽 ＋ 水。','water','cp:H2O'],
+  [4,'肥皂水、小蘇打水是什麼性質？','鹼性',['酸性','中性','強酸性'],'摸起來滑滑的！','肥皂水、小蘇打水、氨水都是鹼性。','water','cp:NaOH'],
+  [4,'酚酞指示劑遇到鹼性溶液，會變成什麼顏色？','紅色',['無色','藍色','黃色'],'粉紅粉紅的！','酚酞：遇鹼變紅色；遇酸或中性是無色。','fire',''],
+  [4,'天然氣（瓦斯）的主要成分是？','甲烷',['氫氣','氧氣','氮氣'],'化學式是 CH₄。','天然氣主要是甲烷 CH₄，完全燃燒產生 CO₂ 和 H₂O。','fire','cp:CH4'],
+  [4,'鎂帶燃燒後，產生的白色粉末是？','氧化鎂',['氧化銅','碳酸鈣','氯化鈉'],'鎂和氧結合了！','2Mg ＋ O₂ → 2MgO，產生白色的氧化鎂。','flash','cp:MgO'],
+  [4,'銅片在火焰中加熱，表面會變成什麼顏色？','黑色',['白色','黃色','透明'],'生成了氧化銅！','銅和氧結合生成黑色的氧化銅 CuO。','fire','cp:CuO'],
+  [4,'化學反應前後，什麼「不會改變」？','原子的種類和數目',['分子的種類','物質的顏色','物質的狀態'],'這就是質量守恆！','質量守恆：反應前後原子的種類和數目都不變。','light',''],
+  [4,'2H₂ ＋ O₂ → 2H₂O，箭頭左邊的 H₂ 和 O₂ 叫做？','反應物',['生成物','催化劑','混合物'],'反應「之前」的物質。','箭頭左邊是反應物，右邊是生成物。','light','cp:H2O'],
+  [4,'燃燒不完全產生、無色無味又有毒的氣體是？','一氧化碳',['二氧化碳','氧氣','氮氣'],'化學式是 CO。','一氧化碳 CO 會讓人中毒，使用瓦斯要保持通風！','gas','cp:CO'],
+  [4,'大理石、貝殼、蛋殼的主要成分是？','碳酸鈣',['氯化鈉','氧化鐵','葡萄糖'],'化學式是 CaCO₃。','碳酸鈣 CaCO₃ 加鹽酸會產生二氧化碳。','earth','cp:CaCO3'],
+  [4,'雙氧水的主要成分是？','過氧化氫',['水','氫氣','氯化鈉'],'化學式是 H₂O₂。','過氧化氫 H₂O₂ 加二氧化錳會分解出氧氣。','water','cp:H2O2'],
+  [4,'食醋、檸檬汁是什麼性質？','酸性',['鹼性','中性','強鹼性'],'吃起來酸酸的！','食醋、檸檬汁都是酸性，會讓藍色石蕊試紙變紅。','acid',''],
+  // ---- 5 魔王城：氧化還原、活性、原子數、平衡 ----
+  [5,'下列金屬中，活性最大（最容易反應）的是？','鉀 K',['鐵 Fe','銅 Cu','金 Au'],'丟進水裡會劇烈反應！','活性：鉀＞鈉＞鈣＞鎂＞鋁＞鋅＞鐵＞銅＞銀＞金。','fire','el:K'],
+  [5,'下列金屬中，活性最小、最不容易生鏽的是？','金 Au',['鎂 Mg','鐵 Fe','鋅 Zn'],'寶藏裡的金幣一直亮晶晶！','金的活性最小，幾乎不和氧反應。','light','el:Au'],
+  [5,'把鐵釘放進硫酸銅溶液，鐵釘表面會出現什麼？','紅色的銅',['白色的鹽','黃色的硫','透明的冰'],'鐵的活性比銅大！','鐵會把銅置換出來，鐵釘表面附著紅色的銅。','bolt','el:Cu'],
+  [5,'物質和「氧」結合的反應叫做？','氧化反應',['還原反應','中和反應','電解'],'燃燒和生鏽都是！','燃燒、生鏽、呼吸作用都是氧化反應。','fire','el:O'],
+  [5,'氧化物「失去氧」的反應叫做？','還原反應',['氧化反應','燃燒','中和反應'],'和氧化相反！','失去氧叫還原；得到氧叫氧化。','light',''],
+  [5,'煉鐵時用焦炭把氧化鐵變回鐵，焦炭（碳）的作用是？','還原劑',['氧化劑','催化劑','指示劑'],'它把氧「搶走」了！','碳搶走氧化鐵的氧，自己被氧化，是還原劑。','earth','cp:Fe2O3'],
+  [5,'2 個水分子（2H₂O）總共有幾個氫原子？','4 個',['2 個','3 個','6 個'],'1 個 H₂O 有 2 個 H，2 個就是 2×2！','2H₂O：2 × 2 ＝ 4 個氫原子。','water','cp:H2O'],
+  [5,'一個 CO₂ 分子，一共有幾個原子？','3 個',['1 個','2 個','4 個'],'1 個 C ＋ 2 個 O。','CO₂：1 個碳原子 ＋ 2 個氧原子 ＝ 3 個原子。','gas','cp:CO2'],
+  [5,'葡萄糖 C₆H₁₂O₆ 是由幾「種」元素組成？','3 種',['6 種','12 種','24 種'],'數一數大寫字母：C、H、O。','葡萄糖由碳、氫、氧 3 種元素組成。','light','cp:C6H12O6'],
+  [5,'□H₂ ＋ O₂ → 2H₂O，□ 裡要填多少才平衡？','2',['1','3','4'],'右邊有 4 個 H，每個 H₂ 有 2 個 H。','2H₂ ＋ O₂ → 2H₂O，兩邊都是 4 個 H、2 個 O。','fire','cp:H2'],
+  [5,'造成「酸雨」的主要氣體是？','二氧化硫',['氧氣','氮氣','氦氣'],'燃燒煤和石油會產生。','二氧化硫和二氧化氮溶在雨水裡，形成酸雨。','acid','cp:SO2'],
+  [5,'造成「溫室效應」最主要的氣體是？','二氧化碳',['氧氣','氬氣','氫氣'],'多種樹可以減少它！','二氧化碳增加會讓地球變熱（溫室效應）。','gas','cp:CO2'],
+  [5,'汽車電瓶（鉛蓄電池）裡的酸是？','硫酸',['鹽酸','醋酸','碳酸'],'化學式是 H₂SO₄。','鉛蓄電池裡有鉛和硫酸。','acid','cp:H2SO4'],
+  [5,'下列哪一個是「化合物」？','H₂O',['O₂','Fe','He'],'化合物由兩種以上元素組成。','H₂O 由氫和氧兩種元素組成；O₂、Fe、He 都只有一種元素。','water','cp:H2O'],
+  [5,'下列哪一個只由「一種元素」組成？','O₂',['CO₂','NaCl','H₂O'],'只看到一種大寫字母的！','O₂ 只有氧元素，是元素；其他都是化合物。','gas','cp:O2'],
+  [5,'光合作用：二氧化碳 ＋ 水 → 葡萄糖 ＋ ？','氧氣',['氮氣','氫氣','食鹽'],'我們呼吸需要的！','植物利用陽光，把 CO₂ 和 H₂O 變成葡萄糖和氧氣。','light','cp:C6H12O6'],
+];
+const QBANK = QBANK_RAW.map(([tier,q,a,o,h,x,fx,learn],i) => ({ id:i, tier, q, a, o, h, x, fx, learn: learn ? learn.split(':') : null }));
+
+/* =====================================================================
+   1-5. 道具、裝備、配方、火爐反應
+   ===================================================================== */
+const CP_USE = {
+  H2O:{ heal:30, txt:'喝下去回復 30 HP' }, O2:{ mp:15, txt:'吸一口回復 15 MP' }, NaCl:{ heal:20, mp:5, txt:'補充鹽分：回復 20 HP、5 MP' },
+  H2O2:{ heal:60, txt:'消毒傷口，回復 60 HP' }, C6H12O6:{ heal:999, mp:999, txt:'能量滿滿！HP、MP 全部回滿' },
+  CO2:{ dmg:40, txt:'戰鬥用：乾冰彈，造成 40 點傷害' },
+};
+const MISC = { wood:{ name:'樹枝', icon:'wood', desc:'木頭主要是纖維素，含有碳 C、氫 H、氧 O。拿去火爐燒燒看！' } };
+const GEAR = {
+  woodSword:    { name:'木劍',     slot:'weapon', atk:2,  icon:'woodSword',  desc:'攻擊 +2。' },
+  steelSword:   { name:'鋼鐵劍',   slot:'weapon', atk:6,  icon:'steelSword', desc:'攻擊 +6。鋼 = 鐵 Fe + 少量碳 C。' },
+  goldSword:    { name:'黃金劍',   slot:'weapon', atk:14, icon:'goldSword',  desc:'攻擊 +14，閃閃發亮！' },
+  platinumBlade:{ name:'白金聖劍', slot:'weapon', atk:22, icon:'ptSword',    desc:'攻擊 +22，傳說中的元素之劍。' },
+  copperShield: { name:'銅盾',     slot:'armor',  def:3,  icon:'cuShield',   desc:'防禦 +3。' },
+  alArmor:      { name:'鋁鎂輕甲', slot:'armor',  def:5,  icon:'alArmor',    desc:'防禦 +5，鋁鎂合金又輕又堅固。' },
+  silverArmor:  { name:'銀之鎧',   slot:'armor',  def:8,  icon:'agArmor',    desc:'防禦 +8。' },
+};
+const itemName = id => EL[id]||(PTS[id]&&!CP[id]) ? `${PTS[id].name} ${id}` : CP[id] ? `${CP[id].name} ${fmtU(id)}` : GEAR[id] ? GEAR[id].name : MISC[id] ? MISC[id].name : id;
+const ALCHEMY_UNLOCK = 3;
+/* 煉金：把原子組合起來（需要的數量就是化學式裡的原子個數）*/
+const RECIPES = [
+  { out:{ H2:1 },  lv:3, need:{ H:2 },       quiz:{ q:'氫氣 H₂ 是由幾個氫原子組成的？', ans:'2', opts:['1','2','3'] } },
+  { out:{ O2:1 },  lv:3, need:{ O:2 },       quiz:{ q:'氧氣 O₂ 是由幾個氧原子組成的？', ans:'2', opts:['1','2','3'] } },
+  { out:{ H2O:1 }, lv:3, need:{ H:2, O:1 },  quiz:{ q:'做 1 個水分子 H₂O，需要幾個氫原子 H？', ans:'2', opts:['1','2','3'] } },
+  { out:{ NaCl:1 },lv:3, need:{ Na:1, Cl:1 },quiz:{ q:'食鹽 NaCl 是由哪兩種元素組成的？', ans:'Na、Cl', opts:['Na、Cl','N、Cl','Na、C'] } },
+  { out:{ steelSword:1 }, lv:3, need:{ Fe:3, C:1 }, quiz:{ q:'鋼是「鐵」加一點碳，鐵的元素符號是？', ans:'Fe', opts:['Fe','F','FE'] } },
+  { out:{ CO2:1 }, lv:4, need:{ C:1, O:2 },  quiz:{ q:'一個 CO₂ 裡有幾個氧原子 O？', ans:'2', opts:['1','2','3'] } },
+  { out:{ NH3:1 }, lv:4, need:{ N:1, H:3 },  quiz:{ q:'氨 NH₃ 裡有幾個氫原子 H？', ans:'3', opts:['1','2','3'] } },
+  { out:{ CH4:1 }, lv:4, need:{ C:1, H:4 },  quiz:{ q:'甲烷 CH₄ 裡有幾個氫原子 H？', ans:'4', opts:['2','4','6'] } },
+  { out:{ copperShield:1 }, lv:4, need:{ Cu:3 }, quiz:{ q:'銅的元素符號是？', ans:'Cu', opts:['Cu','Co','CU'] } },
+  { out:{ H2O2:1 },lv:5, need:{ H:2, O:2 },  quiz:{ q:'過氧化氫 H₂O₂ 裡有幾個氧原子？', ans:'2', opts:['1','2','4'] } },
+  { out:{ H2O:2, O2:1 }, lv:5, need:{ H2O2:2 }, cat:'Mn', eq:'2H₂O₂ ─MnO₂→ 2H₂O ＋ O₂',
+    quiz:{ q:'雙氧水分解時，二氧化錳（含錳 Mn）是什麼角色？', ans:'催化劑', opts:['催化劑','反應物','生成物'] } },
+  { out:{ CaCO3:1 },lv:5, need:{ Ca:1, C:1, O:3 }, quiz:{ q:'碳酸鈣 CaCO₃ 裡有幾個氧原子？', ans:'3', opts:['1','2','3'] } },
+  { out:{ alArmor:1 }, lv:5, need:{ Al:4, Mg:1 }, quiz:{ q:'鋁的元素符號是？', ans:'Al', opts:['Al','AL','Ag'] } },
+  { out:{ goldSword:1 }, lv:7, need:{ Au:3, C:1 }, quiz:{ q:'金的元素符號是？', ans:'Au', opts:['Au','Ag','Al'] } },
+  { out:{ silverArmor:1 }, lv:7, need:{ Ag:3, Ni:1 }, quiz:{ q:'銀的元素符號是？', ans:'Ag', opts:['Ag','Au','Si'] } },
+  { out:{ C6H12O6:1 }, lv:7, need:{ C:6, H:12, O:6 }, quiz:{ q:'葡萄糖 C₆H₁₂O₆ 裡有幾個氫原子 H？', ans:'12', opts:['6','12','24'] } },
+  { out:{ platinumBlade:1 }, lv:9, need:{ Pt:2, Au:2, Fe:2 }, quiz:{ q:'又叫「白金」的元素，符號是？', ans:'Pt', opts:['Pt','Pb','P'] } },
+];
+/* 火爐：加熱與燃燒反應 */
+const FIRE = [
+  { need:{ wood:1 },          out:{ C:2 },            eq:'樹枝 ─加熱（缺少氧氣）→ 木炭 C', txt:'木頭在缺少氧氣的情況下加熱（乾餾），會變成黑黑的木炭，主要成分是碳 C。' },
+  { need:{ wood:1, O2:1 },    out:{ CO2:1, H2O:1 },   eq:'樹枝 ＋ O₂ → CO₂ ＋ H₂O', txt:'木頭在氧氣充足時完全燃燒，產生二氧化碳和水。燃燒需要氧氣！' },
+  { need:{ C:1, O2:1 },       out:{ CO2:1 },          eq:'C ＋ O₂ → CO₂', txt:'碳完全燃燒生成二氧化碳；氧氣不夠時會產生有毒的一氧化碳。' },
+  { need:{ Mg:2, O2:1 },      out:{ MgO:2 },          eq:'2Mg ＋ O₂ → 2MgO', txt:'鎂燃燒發出耀眼的白光，生成白色粉末氧化鎂。' },
+  { need:{ Cu:2, O2:1 },      out:{ CuO:2 },          eq:'2Cu ＋ O₂ → 2CuO', txt:'銅加熱後和氧結合，表面變成黑色的氧化銅。' },
+  { need:{ S:1, O2:1 },       out:{ SO2:1 },          eq:'S ＋ O₂ → SO₂', txt:'硫燃燒產生有刺激性臭味的二氧化硫，是酸雨的成因之一。' },
+  { need:{ H2:2, O2:1 },      out:{ H2O:2 },          eq:'2H₂ ＋ O₂ → 2H₂O', txt:'氫氣燃燒只產生水，是乾淨的燃料。' },
+  { need:{ CaCO3:1 },         out:{ CaO:1, CO2:1 },   eq:'CaCO₃ ─加熱→ CaO ＋ CO₂', txt:'碳酸鈣（石灰石）加熱分解，產生生石灰和二氧化碳。' },
+  { need:{ CH4:1, O2:2 },     out:{ CO2:1, H2O:2 },   eq:'CH₄ ＋ 2O₂ → CO₂ ＋ 2H₂O', txt:'甲烷（瓦斯）完全燃燒，產生二氧化碳和水。' },
+];
+
+/* =====================================================================
+   1-6. 環境互動：對著物件或地面「調查」可能得到的東西（附上知識）
+   give: [[道具, 權重]]、chance: 成功機率
+   ===================================================================== */
+const ENV_OBJ = {
+  bush:     { chance:.5, give:[['C6H12O6',1]], ok:'摘到甜甜的漿果！水果裡的糖是葡萄糖 C₆H₁₂O₆，是植物光合作用做出來的。', no:'灌木叢裡什麼都沒有。' },
+  rock:     { chance:.55, give:[['Si',3],['Fe',2],['Ca',2],['Al',1]], ok:'敲開石頭！岩石裡常有矽 Si，有些礦石含鐵 Fe、鋁 Al，石灰岩含鈣 Ca。', no:'只是普通的石頭。' },
+  well:     { chance:1, give:[['H2O',1]], ok:'從井裡打上一桶水 H₂O！地下水要煮沸才能喝。', cd:4 },
+  lamp:     { chance:.6, give:[['Ne',1]], ok:'霓虹燈管裡有氖氣 Ne，通電會發出橘紅色的光！', no:'路燈亮亮的。' },
+  fountain: { chance:.7, give:[['H2O',2],['Cl',1]], ok:'噴泉的水是自來水，自來水廠會加氯 Cl 消毒。', no:'噴泉的水嘩啦嘩啦。' },
+  car:      { chance:.6, give:[['Pb',1],['Fe',2]], ok:'汽車車身是鐵 Fe；電瓶是鉛蓄電池，裡面有鉛 Pb 和硫酸。', no:'這台車鎖住了。' },
+  vending:  { chance:.7, give:[['Al',1]], ok:'販賣機掉出一個空罐——飲料罐是鋁 Al 做的，記得回收！', no:'販賣機沒有反應。' },
+  chimney:  { chance:.6, give:[['CO2',2],['SO2',1]], ok:'工廠煙囪排出二氧化碳 CO₂ 和二氧化硫 SO₂，SO₂ 會造成酸雨。', no:'煙好嗆！' },
+  hay:      { chance:.8, give:[['wood',1]], ok:'乾草和木頭一樣主要是纖維素（含 C、H、O），可以當燃料。', no:'乾草堆軟綿綿的。' },
+  windmill: { chance:0, ok:'風車利用風力轉動，不會排放二氧化碳，是乾淨的能源！', no:'風車利用風力轉動，不會排放二氧化碳，是乾淨的能源！' },
+  lighthouse:{ chance:.6, give:[['Ar',1]], ok:'燈塔的大燈泡裡充有氬氣 Ar（惰性氣體），保護燈絲不會燒斷。', no:'燈塔好高！' },
+  crate:    { chance:.6, give:[['NaCl',1],['Sn',1]], ok:'貨箱裡有海鹽 NaCl 和罐頭——罐頭鐵皮鍍了錫 Sn（馬口鐵）。', no:'貨箱是空的。' },
+  brazier:  { chance:.6, give:[['CO2',1]], ok:'火盆裡的木炭燃燒：C ＋ O₂ → CO₂。燃燒需要氧氣！', no:'火好燙，小心！' },
+  bookshelf:{ chance:.5, give:[['C',1],['I',1]], ok:'古書的紙是植物纖維（含碳 C）；書裡夾著一瓶消毒用的碘酒（碘 I）。', no:'書架上滿滿的古書。' },
+  armor:    { chance:.6, give:[['Fe',2],['Ni',1]], ok:'盔甲是鋼做的：鋼是鐵加少量碳；不鏽鋼還加了鎳 Ni、鉻。', no:'一套空盔甲。' },
+  gold:     { chance:.7, give:[['Au',1],['Ag',1]], ok:'金銀財寶！金 Au 活性很小，不會生鏽，所以古代寶物還是亮晶晶的。', no:'只剩金色的灰塵。' },
+  house:    { chance:.15, give:[['Cu',1]], ok:'在屋子旁撿到一段廢電線，裡面是銅 Cu！', no:'這是別人的家，敲敲門……沒人在。' },
+  building: { chance:.2, give:[['Si',1]], ok:'大樓的玻璃窗原料是沙子（含矽 Si）。', no:'好高的大樓！' },
+  throne:   { chance:0, ok:'魔王的寶座……上面刻著：「元素的力量，來自學習」。', no:'魔王的寶座……上面刻著：「元素的力量，來自學習」。' },
+  boatDeco: { chance:.5, give:[['NaCl',1]], ok:'船上曬著海鹽 NaCl。', no:'一艘小漁船。' },
+};
+const ENV_TILE = {
+  '~':{ chance:1, give:[['H2O',1]], ok:'裝了一瓶水 H₂O！河水和湖水要過濾、煮沸才能喝喔。', cd:3 },
+  sea:{ chance:1, give:[['H2O',3],['NaCl',1]], ok:'海水裡溶了很多鹽（氯化鈉 NaCl），把海水曬乾就能得到鹽。', cd:3 },
+  's':{ chance:.45, give:[['Si',3],['Ca',1]], ok:'沙子的主要成分是二氧化矽（含矽 Si）；碎貝殼含有碳酸鈣（鈣 Ca）。', no:'只有沙子。' },
+  'F':{ chance:.6, give:[['N',1],['P',1],['K',1]], ok:'田裡施了肥料——肥料三要素是氮 N、磷 P、鉀 K！', no:'農作物長得很好。' },
+  ',':{ chance:.4, give:[['O2',1]], ok:'花草在陽光下行光合作用，放出了氧氣 O₂！', no:'花朵香香的。' },
+  ';':{ chance:.3, give:[['N',1]], ok:'豆科植物的根上有根瘤菌，能把空氣中的氮 N 變成養分。', no:'高高的草叢沙沙響。' },
+  '.':{ chance:.12, give:[['O2',1]], ok:'草地在陽光下行光合作用，放出氧氣 O₂。', no:'' },
+};
+
+/* =====================================================================
+   1-7. 怪物
+   ===================================================================== */
+const MONSTERS = {
+  slime:   { name:'綠史萊姆',   spr:'slime',    hp:18,  atk:3,  xp:8,   gold:5 },
+  mushroom:{ name:'蘑菇怪',     spr:'mushroom', hp:24,  atk:4,  xp:10,  gold:6 },
+  golem:   { name:'生鏽鐵甲人', spr:'golem',    hp:45,  atk:5,  xp:30,  gold:40,  boss:true },
+  treant:  { name:'枯木怪',     spr:'treant',   hp:40,  atk:7,  xp:16,  gold:9 },
+  bat:     { name:'夜行蝙蝠',   spr:'bat',      hp:34,  atk:8,  xp:15,  gold:9 },
+  treeKing:{ name:'枯木王',     spr:'treeKing', hp:90,  atk:9,  xp:60,  gold:80,  boss:true },
+  crab:    { name:'鹽巴螃蟹',   spr:'crab',     hp:60,  atk:11, xp:24,  gold:14 },
+  bubble:  { name:'泡泡水精靈', spr:'bubble',   hp:55,  atk:10, xp:22,  gold:13 },
+  seaKing: { name:'深海泡泡王', spr:'seaKing',  hp:150, atk:13, xp:100, gold:150, boss:true },
+  robot:   { name:'鐵皮機器人', spr:'robot',    hp:90,  atk:15, xp:34,  gold:20 },
+  smog:    { name:'廢氣幽靈',   spr:'smog',     hp:80,  atk:14, xp:32,  gold:19 },
+  mecha:   { name:'合金巨像',   spr:'mecha',    hp:220, atk:18, xp:160, gold:250, boss:true },
+  ghost:   { name:'城堡幽靈',   spr:'ghost',    hp:120, atk:19, xp:45,  gold:26 },
+  knight:  { name:'暗影騎士',   spr:'knight',   hp:140, atk:21, xp:50,  gold:28 },
+  demon:   { name:'混沌魔王',   spr:'demon',    hp:380, atk:24, xp:300, gold:600, boss:true },
+};
+
+/* =====================================================================
+   1-8. 五個地區：每區有自己的 NPC（同一種功能只出現一個）
+   cast：chief 長老型（回復＋任務）、shop 商店、tips 提示、lab 煉金設施、fire 火爐、warp 傳送
+   ===================================================================== */
+const els = maxTier => ELS.filter(s => EL[s].tier <= maxTier);
+const cps = maxTier => CPS.filter(f => CP[f].tier <= maxTier);
+const REGIONS = [
+  { id:'r1', name:'晨光新手村', stars:1, rec:1, theme:'meadow', music:'village', tier:1, learn:'單一元素：符號、名稱、金屬與非金屬',
+    els:els(1), cps:[], gen:[['e_n2s',3],['e_s2n',3],['e_life',3]], bankW:.4,
+    nodes:['H','H','O','O','C','N','Na','Mg','Al','Fe','Fe','Cu','He'], cpNodes:[], mons:['slime','mushroom'], boss:'golem',
+    cast:{ chief:{ name:'元素長老', spr:'elder' }, shop:{ name:'雜貨店阿寶', spr:'merchant', items:[['H',4],['O',4],['C',5],['Fe',10],['H2O',12]] },
+           tips:{ name:'小芽', spr:'kid', lines:['對著河邊或池塘調查，可以裝到水 H₂O！','砍樹會拿到樹枝，可是樹會少一棵——樹會吸收 CO₂、放出 O₂ 喔。','樹枝拿去營火加熱，就會變成木炭（碳 C）！','背包裡的元素可以「吸收」，會增加經驗值！','聽說草叢和石頭底下藏著寶箱……'] },
+           lab:{ name:'煉金大鍋', spr:'cauldron' }, fire:{ name:'營火', spr:'campfire' }, warp:{ name:'傳送水晶', spr:'warpA' } },
+    intro:['歡迎來到晨光新手村，年輕的勇者！我是元素長老。','世界上的東西都是由「元素」組成的。每個元素都有名字和符號，像「鐵」的符號是 Fe。',
+           '地上發光的方塊是「元素晶塊」。另外，對著樹、石頭、池塘、草叢調查，也可能找到元素和寶箱！','碰到怪物會戰鬥，答對題目就能攻擊。答錯沒關係，慢慢來。'] },
+  { id:'r2', name:'微風村落', stars:2, rec:3, theme:'farm', music:'field', tier:2, learn:'更多元素：金屬性質、純物質與混合物',
+    els:els(2), cps:[], gen:[['e_n2s',2],['e_s2n',2],['e_life',3]], bankW:.5,
+    nodes:['Li','Be','B','F','Ne','Si','P','S','Cl','Ar','K','Ca','Zn','Ag','Au','H','O','C','N'], cpNodes:[], mons:['treant','bat'], boss:'treeKing',
+    cast:{ chief:{ name:'農夫老王', spr:'farmer' }, shop:{ name:'市場阿姨', spr:'aunt', items:[['N',6],['P',6],['K',6],['H2O',12],['wood',5]] },
+           tips:{ name:'牧羊女小米', spr:'girl', lines:['田裡施了氮、磷、鉀三種肥料，對著田地調查看看！','乾草堆和木頭一樣含有碳、氫、氧，可以當燃料。','窯爐可以把樹枝燒成木炭，也能讓東西燃燒。','風車用風力發電，不會排放二氧化碳。','河水裝起來是水 H₂O，但要煮沸才能喝！'] },
+           lab:{ name:'木工實驗桌', spr:'benchWood' }, fire:{ name:'磚窯', spr:'kiln' }, warp:{ name:'風之傳送陣', spr:'warpB' } },
+    intro:['你好呀，我是微風村落的農夫老王！','我們村子靠元素種田：植物需要氮、磷、鉀三種肥料。','金屬能導電、會發亮；空氣是混合物、蒸餾水是純物質，這些都要記住喔！',
+           '東北邊的松樹林裡有「枯木王」在搗亂，拜託你了！'] },
+  { id:'r3', name:'港灣城鎮', stars:3, rec:5, theme:'harbor', music:'harbor', tier:3, learn:'化學式：氧氣、二氧化碳、燃燒與水',
+    els:els(3), cps:cps(3), gen:[['e_life',2],['c_n2f',3],['c_f2n',3],['c_life',3]], bankW:.6,
+    nodes:['H','H','O','O','C','N','Na','Cl','Fe','Mn','Ni','Sn','I','Br','Ca'], cpNodes:['H2O','O2','CO2','NaCl'], mons:['crab','bubble'], boss:'seaKing',
+    cast:{ chief:{ name:'老船長', spr:'captain' }, shop:{ name:'漁獲商人', spr:'fisher', items:[['NaCl',10],['H2O',10],['O2',14],['Mn',15],['H2O2',22]] },
+           tips:{ name:'海鷗啾啾', spr:'seagull', lines:['啾！對著海水調查，可以得到水和鹽 NaCl！','啾啾！沙灘的沙子含有矽 Si，碎貝殼含有鈣 Ca。','燈塔的燈泡裡有氬氣 Ar 喔，啾！','雙氧水加二氧化錳會產生氧氣，啾！','海邊烤爐可以做燃燒實驗！'] },
+           lab:{ name:'燈塔實驗台', spr:'benchBlue' }, fire:{ name:'海邊烤爐', spr:'grill' }, warp:{ name:'渡船', spr:'boat' } },
+    intro:['哈囉，小勇者！我是港灣城鎮的老船長。','從這裡開始，元素會「組合」成化合物。像水是 H₂O：2 個氫原子＋1 個氧原子。',
+           '元素符號右下角的小數字就是原子的個數！','東南邊小島上的「深海泡泡王」把海水攪得亂七八糟，走碼頭就能過去！'] },
+  { id:'r4', name:'霓虹都會', stars:4, rec:7, theme:'city', music:'city', tier:4, learn:'酸鹼與化學反應：石蕊、pH、反應物',
+    els:els(4), cps:cps(4), gen:[['c_n2f',3],['c_f2n',3],['c_life',3],['c_comp',3]], bankW:.65,
+    nodes:['H','O','C','N','Pt','Hg','Pb','Cu','Al','Mg','Ca','Si','Ag','Au','Li'], cpNodes:['H2O','CO2','CH4','NH3','CaCO3'], mons:['robot','smog'], boss:'mecha',
+    cast:{ chief:{ name:'化學博士', spr:'doctor' }, shop:{ name:'便利商店店員', spr:'clerk', items:[['H2O',10],['O2',12],['H2O2',20],['CaCO3',18],['Li',15]] },
+           tips:{ name:'助手機器人', spr:'helper', lines:['嗶！路燈的霓虹燈管裡有氖 Ne。','嗶嗶！停車場的汽車電瓶裡有鉛 Pb 和硫酸。','販賣機的空罐是鋁 Al，可以回收！','工廠煙囪排出的二氧化硫會造成酸雨，嗶。','本生燈可以做很多加熱實驗！'] },
+           lab:{ name:'實驗室工作台', spr:'benchLab' }, fire:{ name:'本生燈', spr:'bunsen' }, warp:{ name:'地鐵站', spr:'subway' } },
+    intro:['歡迎來到霓虹都會，我是化學博士！','城市裡到處都是化學：瓦斯是甲烷 CH₄、大理石是碳酸鈣 CaCO₃。',
+           '還要學會分辨酸和鹼：藍色石蕊遇酸變紅、紅色石蕊遇鹼變藍！','西北邊工廠裡的「合金巨像」一直在排放廢氣，請你阻止它！'] },
+  { id:'r5', name:'混沌魔王城', stars:5, rec:9, theme:'castle', music:'castle', tier:5, learn:'氧化還原、活性大小、原子個數',
+    els:els(4), cps:cps(5), gen:[['e_life',1],['c_n2f',2],['c_f2n',2],['c_life',2],['c_comp',2],['c_count',3]], bankW:.7,
+    nodes:['Au','Ag','Pt','Hg','Pb','S','C','H','O','I','Br','Fe','K'], cpNodes:['H2O','O2','CO2'], mons:['ghost','knight'], boss:'demon',
+    cast:{ chief:{ name:'光之騎士', spr:'lightKnight' }, shop:{ name:'幽靈商人', spr:'ghostShop', items:[['C6H12O6',40],['O2',14],['H2O',12],['Au',30],['Pt',40]] },
+           tips:{ name:'小蝙蝠啪啪', spr:'batKid', lines:['啪！書架上可能有碘酒（碘 I）喔。','盔甲是鋼做的，有鐵和鎳！','寶物室的金子不會生鏽，因為金的活性很小。','魔王很強，記得帶葡萄糖和水！','火盆燃燒會產生二氧化碳，啪啪！'] },
+           lab:{ name:'魔法祭壇', spr:'altar' }, fire:{ name:'魔焰火盆', spr:'magicFire' }, warp:{ name:'魔法陣', spr:'circle' } },
+    intro:['勇者，我是守護這座城的光之騎士……魔王把元素水晶藏在王座廳。','從大門沿著紅地毯一直往北走，就能到達王座廳。',
+           '這裡會考氧化還原、金屬活性，還要數一數原子的個數！','準備好就出發吧！'] },
+];
+const RG = Object.fromEntries(REGIONS.map(r => [r.id, r]));
+
+/* =====================================================================
+   2. 像素美術
+   2-1. 點陣字（地圖上的元素晶塊用）
+   ===================================================================== */
+const GLYPH = {
+  A:'.#.|#.#|###|#.#|#.#', B:'##.|#.#|##.|#.#|##.', C:'.##|#..|#..|#..|.##', D:'##.|#.#|#.#|#.#|##.', E:'###|#..|##.|#..|###',
+  F:'###|#..|##.|#..|#..', G:'.##|#..|#.#|#.#|.##', H:'#.#|#.#|###|#.#|#.#', I:'###|.#.|.#.|.#.|###', J:'..#|..#|..#|#.#|.#.',
+  K:'#.#|#.#|##.|#.#|#.#', L:'#..|#..|#..|#..|###', M:'#...#|##.##|#.#.#|#...#|#...#', N:'#..#|##.#|#.##|#..#|#..#', O:'.#.|#.#|#.#|#.#|.#.',
+  P:'##.|#.#|##.|#..|#..', Q:'.#.|#.#|#.#|##.|.##', R:'##.|#.#|##.|#.#|#.#', S:'.##|#..|.#.|..#|##.', T:'###|.#.|.#.|.#.|.#.',
+  U:'#.#|#.#|#.#|#.#|###', V:'#.#|#.#|#.#|#.#|.#.', W:'#...#|#...#|#.#.#|##.##|#...#', X:'#.#|#.#|.#.|#.#|#.#', Y:'#.#|#.#|.#.|.#.|.#.', Z:'###|..#|.#.|#..|###',
+  a:'...|.##|#.#|#.#|.##', b:'#..|##.|#.#|#.#|##.', c:'...|.##|#..|#..|.##', d:'..#|.##|#.#|#.#|.##', e:'...|.#.|###|#..|.##',
+  g:'...|.##|#.#|#.#|.##|..#|##.', h:'#..|##.|#.#|#.#|#.#', i:'.#.|...|.#.|.#.|.#.', l:'.#.|.#.|.#.|.#.|.##', m:'...|##.|###|#.#|#.#',
+  n:'...|##.|#.#|#.#|#.#', o:'...|.#.|#.#|#.#|.#.', r:'...|#.#|##.|#..|#..', s:'...|.##|##.|..#|##.', t:'.#.|###|.#.|.#.|.##', u:'...|#.#|#.#|#.#|.##',
+  0:'###|#.#|#.#|#.#|###', 1:'.#.|##.|.#.|.#.|###', 2:'##.|..#|.#.|#..|###', 3:'##.|..#|.#.|..#|##.', 4:'#.#|#.#|###|..#|..#',
+  5:'###|#..|##.|..#|##.', 6:'.##|#..|###|#.#|###', 7:'###|..#|.#.|.#.|.#.', 8:'###|#.#|###|#.#|###', 9:'###|#.#|###|..#|##.',
+};
+const glyphW = ch => GLYPH[ch] ? GLYPH[ch].split('|')[0].length : 3;
+const textW = s => [...s].reduce((a,ch)=>a+glyphW(ch)+1,0) - 1;
+function drawText(g, s, x, y, col){
+  let cx = x;
+  for (let i=0;i<s.length;i++){
+    const ch=s[i], gl=GLYPH[ch]; if (!gl){ cx+=4; continue; }
+    const sub = /\d/.test(ch) && i>0 ? 2 : 0;
+    gl.split('|').forEach((row,ry) => [...row].forEach((p,rx) => { if (p==='#'){ g.fillStyle=col; g.fillRect(cx+rx, y+ry+sub, 1, 1); } }));
+    cx += glyphW(ch)+1;
+  }
+}
+
+/* 2-2. 角色點陣（8 字元的列會左右鏡像）*/
+const INK = '#2b2238';
+const HERO_PAL = { k:INK, H:'#e09a5a', h:'#b0673a', s:'#ffd7b5', S:'#f0b98e', e:INK, c:'#ff9eb5', r:'#ff7a93', b:'#4f86f7', B:'#3d6fd9', y:'#ffcf4d', Y:'#e8a13a', p:'#5b6b9a', o:'#6b4630', w:'#ffffff' };
+const HERO_DOWN = ['.....kkk','...kkHHH','..kHHHhh','..khhhhh','.khhhhhh','.khsssss','.khssess','..kscsss','...kSsss','..krrrrr','.kbBbbbb','.ksbbbbb','..kyyyyY'];
+const HERO_UP   = ['.....kkk','...kkHHH','..kHHHhh','..khhhhh','.khhhhhh','.khhhhhh','.khhhhhh','..khhhhh','...khhhh','..krrrrr','.kbbbbbb','.ksbbbbb','..kyyyyy'];
+const LEGS_A = ['...kpppk','...koook','...kkkk.'];
+const LEGS_B = ['...kpppkkpppk...','...koookkpppk...','...kkkk.koook...'];
+const LEGS_C = ['...kpppkkpppk...','...kpppkkoook...','...koook.kkkk...'];
+const HERO_SIDE = ['.....kkkkk......','...kkHHHHHk.....','..kHHhhhhhHk....','..khhhhhhhhhk...','..khhhhsssssk...',
+  '..khhhssssesk...','...khsssscsk....','....kkSsssk.....','....krrrrrk.....','...kbbbbbbk.....','...kbBbsbbk.....','...kyyyyyYk.....','....kpppk.......'];
+const SIDE_A = ['....kpppk.......','....koook.......','....kkkk........'];
+const SIDE_B = ['...kppkkppk.....','..koook.koook...','..kkkkk.kkkkk...'];
+/* NPC 產生器：帽子 / 臉 / 身體可以組合 */
+const HATS = {
+  hair:   ['.....kkk','...kkHHH','..kHHHhh','..khhhhh','.khhhhhh'],
+  straw:  ['........','....kkkk','...kzzzz','.kkZZZZZ','kzzzzzzz'],
+  captain:['....kkkk','...kwwww','..kwwwww','..kqqqqq','.kkkkkkk'],
+  cap:    ['........','....kkkk','...kgggg','..kggggg','.kkkgggg'],
+  bandana:['........','....kkkk','...kmmmm','..kmmMmm','..kmmmmm'],
+  helmet: ['....kkkk','...kiiii','..kiiIii','..kiiiii','.kkkkkkk'],
+  messy:  ['...k.k.k','..kkHkHH','.kHHHHhh','.khhhhhh','.khhhhhh'],
+  long:   ['.....kkk','...kkHHH','..kHHHhh','.kHhhhhh','.khhhhhh'],
+};
+const FACES = {
+  plain:  ['.khsssss','.khssess','..kscsss','...kssss'],
+  beard:  ['.khsssss','.khssess','..kwwwww','...kwwww'],
+  glasses:['.khsssss','.kkkwkwk','..kscsss','...kssss'],
+  long:   ['.khsssss','.khssess','.khscsss','.kh.ksss'],
+};
+const BODY = ['..krrrrr','.kbBbbbb','.ksbbbbb','..kyyyyY','...kpppk','...koook','...kkkk.'];
+const person = (hat, face, pal) => buildSprite([...HATS[hat], ...FACES[face], ...BODY], { ...HERO_PAL, ...pal });
+
+const SPRITE_DEFS = {
+  elder:{ pal:{k:INK,p:'#9b7bff',P:'#7a5ae0',w:'#f8f9fa',W:'#dee2e6',s:'#ffd7b5',e:INK,y:'#ffd43b'}, rows:[
+    '.......k','......kp','.....kpP','....kppy','..kkkkkk','...kssss','...ksess','...kssss',
+    '..kwwwww','..kwWwww','.kpkwwww','.kppkwWw','.kpppkww','.kPppPkw','.kpppppp','.kkkkkkk'] },
+  merchant:{ pal:{k:INK,o:'#ff9f43',O:'#e8590c',s:'#ffd7b5',e:INK,n:'#8a5a3c',g:'#63c27a',G:'#41a35c',y:'#ffe066',p:'#6b4630'}, rows:[
+    '........','....kkkk','...koooo','..kooOoo','..kooooo','..kkkkkk','..kssess','..kssnnn',
+    '...kssss','..kkgggg','.kggyggg','.ksgyGgg','..kggggg','..kyyyyy','...kpppk','...kkkk.'] },
+  slime:{ pal:{k:INK,g:'#7bdc6a',G:'#4fb64a',w:'#e8ffe0',e:INK,c:'#ffb3c7'}, rows:[
+    '........','........','........','........','......kk','....kkgg','...kgwgg','..kgwggg','..kggggg',
+    '.kgggegg','.kgggegg','kgcggggg','kggggggg','kGGGGGGG','.kkkkkkk','........'] },
+  mushroom:{ pal:{k:INK,r:'#ff8fa3',R:'#e8687f',w:'#fff',c:'#fff1d6',C:'#f0d9b5',e:INK}, rows:[
+    '........','....kkkk','..kkrrrr','.krrwwrr','.krwwrrr','krrrrrrw','kRrrrrrr','kkkkkkkk',
+    '..kccccc','..kccecc','..kccecc','..kCcccc','...kcccc','...kkkkk','..kcck..','..kkkk..'] },
+  treant:{ pal:{k:INK,l:'#8ce99a',L:'#51cf66',n:'#b07a4f',N:'#8a5a38',w:'#ffffff'}, rows:[
+    '...lllll','..llLlll','.lllllLl','lLllllll','.lllllll','..kkkkkk','..knnnnn','..knwknn',
+    '..knnnnn','..knnkkk','..kNnnnn','kknnnnnn','..knnnnn','..knnknn','.knnk.kn','.kkk..kk'] },
+  golem:{ pal:{k:INK,g:'#adb5bd',G:'#868e96',o:'#e0965a',y:'#ffe066'}, rows:[
+    '...kkkkk','..kggggg','.kgooggg','.kgyyggg','.kggggoo','.kgkkkkk','..kggggg','kkkkkkkk',
+    'kgoggggg','kgGggogg','kgkggggg','kkkgoggg','..kgGggg','..kggkkk','..kggk..','.kkkkk..'] },
+  bat:{ pal:{k:INK,w:'#b197fc',W:'#9775fa',b:'#7d6bb0',e:'#ffe066',f:'#fff'}, rows:[
+    '........','........','........','kk.....k','kwk...kb','kwWk.kbb','kwwWkbbb','.kwwkbeb',
+    '..kwkbbb','...kkbbb','.....kbf','......kk','........','........','........','........'] },
+  ghost:{ pal:{k:INK,w:'#f3f0ff',W:'#d0bfff',e:'#5f3dc4',c:'#ffc9de'}, rows:[
+    '........','....kkkk','..kkwwww','.kwwwwww','.kwwwwww','kwwwkeww','kwwwkeww','kwcwwwww',
+    'kwwwwwkk','kWwwwwww','kWwwwwww','kWWwwwww','kWWWwwww','kwkWwkWw','kk.kk.kk','........'] },
+  crab:{ pal:{k:INK,r:'#ff9b73',R:'#e8754a',w:'#fff',e:INK}, rows:[
+    '........','........','........','.kk.....','krrk....','krkk..kk','.kk..kwe','....krrr',
+    '...krrrr','..krrrrr','.krRrrrr','.kRRrrrr','..kkkkkk','.k.k.k..','........','........'] },
+  demon:{ pal:{k:INK,p:'#9775fa',P:'#7048e8',c:'#5f3dc4',y:'#ffe066',w:'#fff'}, rows:[
+    '.k......','.kk.....','..kk.kkk','..kkkppp','..kppppp','.kpppppp','.kppykpp','.kpppppp',
+    '..kpkwkw','...kpppp','kkkccccc','kcckpppp','kcccpPpp','kccpyyyy','.kccpppp','..kkkkkk'] },
+  seagull:{ pal:{k:INK,w:'#ffffff',W:'#dee2e6',y:'#ffa94d',g:'#adb5bd'}, rows:[
+    '........','........','........','.....kkk','....kwww','...kwwkw','...kwwww','....kwyy',
+    '.kk.kwww','kggkwwww','.kgWwwww','..kWwwww','...kkwww','.....kyk','.....kyk','....kk.k'] },
+};
+const ICON_DEFS = {
+  sword:['.......k','......kb','......kb','......kb','......kb','......kb','......kb','......kb','......kb','..kkkkkk','..kggggg','...kkkkh','......kh','......kh','......kg','......kk'],
+  shield:['........','..kkkkkk','.kcccccc','.kcwcccc','.kcwcccc','.kccccyy','.kccccyy','..kccccc','..kccccc','...kcccc','....kccc','.....kcc','......kk'],
+  armor:['........','........','.kkk....','kssskkkk','ksssssss','kssSssss','.kssssss','.kssSsss','.kssssss','.kyyyyyy','.kssssss','.kkkkkkk'],
+  wood:['........','........','........','.....kkk','....knnn','...knnNk','..knnNk.','.knnNk..','knnNk.k.','kNNk.klk','.kk...k.','........'],
+};
+const ICONS = {
+  woodSword:['sword',{k:INK,b:'#d6a46b',g:'#a8703c',h:'#6b4630'}], steelSword:['sword',{k:INK,b:'#e3ecf7',g:'#9aa5b8',h:'#6b4630'}],
+  goldSword:['sword',{k:INK,b:'#ffe066',g:'#f59f00',h:'#8f73d6'}], ptSword:['sword',{k:INK,b:'#f1f3f5',g:'#74c0fc',h:'#9775fa'}],
+  cuShield:['shield',{k:INK,c:'#ff9b73',w:'#ffd8c7',y:'#ffd43b'}], alArmor:['armor',{k:INK,s:'#e9ecef',S:'#c5ccd6',y:'#74c0fc'}],
+  agArmor:['armor',{k:INK,s:'#dfe7f2',S:'#aeb8c8',y:'#ffd43b'}], wood:['wood',{k:INK,n:'#c98a52',N:'#8a5a38',l:'#7ed957'}],
+};
+function normRow(r){ if (r.length<=8){ r=r.padEnd(8,'.'); return r+[...r].reverse().join(''); } return r.padEnd(16,'.').slice(0,16); }
+function buildSprite(rows, pal, center){
+  const c=makeCanvas(16,16), g=c.getContext('2d'), off = center ? Math.floor((16-rows.length)/2) : 16-rows.length;
+  rows.forEach((row,y) => [...normRow(row)].forEach((ch,x) => { if (ch!=='.' && pal[ch]){ g.fillStyle=pal[ch]; g.fillRect(x,y+off,1,1); } }));
+  return c;
+}
+function flipH(src){ const c=makeCanvas(src.width,src.height), g=c.getContext('2d'); g.translate(src.width,0); g.scale(-1,1); g.drawImage(src,0,0); return c; }
+
+/* 2-3. 程式繪製的物件 */
+const PX = (g,x,y,c) => { g.fillStyle=c; g.fillRect(x,y,1,1); };
+const RC = (g,x,y,w,h,c) => { g.fillStyle=c; g.fillRect(x,y,w,h); };
+const TREE_PAL = {
+  tree:  { o:'#2f6b3a', d:'#3f8f4c', m:'#5cbf5a', l:'#8de06a', h:'#c3f59a', t:'#9a6640', T:'#6f4528' },
+  cherry:{ o:'#a8456b', d:'#e07aa0', m:'#f5a3c0', l:'#ffc9dc', h:'#fff0f6', t:'#8a5a3c', T:'#5f3a24' },
+  pine:  { o:'#245e3a', d:'#2e7d47', m:'#3a9a58', l:'#5cc274', h:'#8ee09c', t:'#8a5a38', T:'#5f3a24' },
+  palm:  { o:'#2f6b3a', d:'#3f8f4c', m:'#5cbf5a', l:'#8de06a', h:'#c3f59a', t:'#c9925a', T:'#8a5a38' },
+  dead:  { o:'#3c2f5c', d:'#5f4d8a', m:'#7a68ad', l:'#9a8bc9', h:'#c0b4e6', t:'#6f5f9e', T:'#4d3f78' },
+  bush:  { o:'#2f6b3a', d:'#3f8f4c', m:'#5cbf5a', l:'#8de06a', h:'#c3f59a' },
+};
+function blob(g, cx, cy, rx, ry, P, rnd){
+  for (let y=Math.floor(cy-ry-1); y<=cy+ry+1; y++) for (let x=Math.floor(cx-rx-1); x<=cx+rx+1; x++){
+    const dx=(x+.5-cx)/rx, dy=(y+.5-cy)/ry, d=Math.sqrt(dx*dx+dy*dy)+(rnd()-.5)*.08; if (d>1) continue;
+    const v=-(dx*.6+dy*.8); let c = d>.86?P.o: v>.55?P.h: v>.15?P.l: v>-.35?P.m: P.d;
+    if (c===P.m && v>.1 && (x+y)%2) c=P.l; if (c===P.d && v>-.4 && (x+y)%2) c=P.m;
+    PX(g,x,y,c);
+  }
+}
+function makeTree(type){
+  const c=makeCanvas(16,24), g=c.getContext('2d'), P=TREE_PAL[type], rnd=seeded(strHash(type));
+  RC(g,3,21,10,2,'rgba(30,30,50,.22)'); RC(g,2,22,12,1,'rgba(30,30,50,.12)');
+  if (type==='pine'){
+    RC(g,7,18,2,5,P.t); PX(g,7,18,P.T);
+    [[1,7,3],[5,12,5],[9,18,7]].forEach(([y0,y1,hw]) => { for (let y=y0;y<=y1;y++){ const w=Math.max(1,Math.round((y-y0+1)/(y1-y0+1)*hw));
+      for (let x=8-w;x<8+w;x++){ const edge=x===8-w||x===8+w-1||y===y1; PX(g,x,y, edge?P.o:(x<7?P.l:x<9?P.m:P.d)); } } });
+    PX(g,7,2,P.h); PX(g,6,7,P.h); PX(g,5,12,P.h);
+  } else if (type==='palm'){
+    for (let y=8;y<23;y++){ const x=7+Math.round(Math.sin(y/4)); RC(g,x,y,2,1,(y%3)?P.t:P.T); PX(g,x-1,y,P.T); }
+    const leaf=(sx,sy,dx,dy)=>{ for (let i=0;i<7;i++){ const x=Math.round(sx+dx*i), y=Math.round(sy+dy*i+i*i*.08); PX(g,x,y,P.m); PX(g,x,y+1,P.d); if(i%2) PX(g,x,y-1,P.l); } };
+    leaf(8,7,1,-.4); leaf(8,7,-1,-.4); leaf(8,7,1,.35); leaf(8,7,-1,.35); leaf(8,6,.2,-1);
+    RC(g,7,8,3,2,'#8a5a38'); PX(g,8,9,'#ffd43b');
+  } else if (type==='dead'){
+    RC(g,7,10,3,13,P.t); RC(g,7,10,1,13,P.T);
+    [[8,10,-1,-1,5],[9,9,1,-1,6],[8,6,-1,-.5,4],[9,5,1,-.6,4],[8,4,0,-1,3]].forEach(([x,y,dx,dy,n]) => { for (let i=0;i<n;i++) PX(g,Math.round(x+dx*i),Math.round(y+dy*i),P.d); });
+  } else {
+    RC(g,6,14,4,9,P.t); RC(g,6,14,1,9,P.T); RC(g,9,16,1,7,shade(P.t,20));
+    blob(g,8,8,7.6,7.4,P,rnd);
+    for (let i=0;i<5;i++){ const x=3+(rnd()*10|0), y=3+(rnd()*8|0); PX(g,x,y,P.h); PX(g,x+1,y,P.l); }
+    if (type==='cherry') for (let i=0;i<8;i++) PX(g,3+(rnd()*10|0),3+(rnd()*10|0),'#ffffff');
+  }
+  return c;
+}
+function makeStump(){ const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,3,13,10,2,'rgba(30,30,50,.2)'); RC(g,4,8,8,6,INK); RC(g,5,9,6,5,'#9a6640'); RC(g,5,8,6,2,'#e8c48f'); PX(g,7,8,'#c99a5a'); PX(g,8,9,'#c99a5a'); RC(g,3,13,2,1,'#6f4528'); RC(g,11,13,2,1,'#6f4528'); return c; }
+function makeBush(){ const c=makeCanvas(16,16), g=c.getContext('2d'), rnd=seeded(9); RC(g,2,13,12,2,'rgba(30,30,50,.2)'); blob(g,8,9,7,5.4,TREE_PAL.bush,rnd);
+  [[4,8],[10,7],[7,11],[11,10]].forEach(([x,y]) => { PX(g,x,y,'#ff8fab'); PX(g,x,y-1,'#ffc9de'); }); return c; }
+function makeRock(){
+  const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,3,13,11,2,'rgba(40,30,60,.2)');
+  for (let y=3;y<16;y++) for (let x=0;x<16;x++){ const dx=(x-7.5)/6.8, dy=(y-9.5)/5.6, d=dx*dx+dy*dy;
+    if (d<1){ const v=-(dx*.6+dy*.8); PX(g,x,y, d>.78?'#6b5a48': v>.5?'#f2e6d3': v>.05?'#dccab0': v>-.4?'#c4ae8f':'#a8916f'); } }
+  [[5,5],[6,5],[7,4],[5,6]].forEach(([x,y]) => PX(g,x,y,'#8ccf6a')); return c;
+}
+function makeHouse(roof, wall, kind){
+  const c=makeCanvas(64,56), g=c.getContext('2d'), rD=shade(roof,-34), rL=shade(roof,28);
+  RC(g,4,52,58,4,'rgba(40,30,60,.22)');
+  RC(g,3,26,58,26,wall); for (let x=3;x<61;x+=5) RC(g,x,26,1,26,shade(wall,-14));
+  RC(g,3,26,58,3,shade(wall,-40)); RC(g,3,48,58,4,'#a39bb5'); RC(g,3,48,58,1,'#c3bdd2');
+  RC(g,2,26,1,26,INK); RC(g,61,26,1,26,INK); RC(g,2,51,60,1,INK);
+  RC(g,26,33,12,19,INK); RC(g,27,34,10,18,'#a86b3d'); RC(g,27,34,10,2,'#c98a52'); RC(g,31,36,1,15,'#7a4d2e'); PX(g,34,43,'#ffd43b'); PX(g,29,43,'#ffd43b');
+  [9,43].forEach(wx => { RC(g,wx,33,12,10,INK); RC(g,wx+1,34,10,8,'#a5d8ff'); RC(g,wx+1,34,4,3,'#e7f5ff'); RC(g,wx+5,34,1,8,INK); RC(g,wx+1,38,10,1,INK);
+    RC(g,wx,43,12,3,'#c9925a'); PX(g,wx+2,42,'#ff8fab'); PX(g,wx+6,42,'#ffd43b'); PX(g,wx+9,42,'#ff8fab'); });
+  RC(g,45,1,7,14,INK); RC(g,46,2,5,13,'#c97a63'); RC(g,46,2,5,2,'#e0957d');
+  for (let y=4;y<28;y++){ const inset=Math.max(0,12-(y-4)), x0=1+inset, x1=63-inset;
+    RC(g,x0,y,x1-x0,1,(y-4)%4===3?rD:(y<9?rL:roof)); if ((y-4)%4<3) for (let x=x0+((Math.floor((y-4)/4)%2)?2:0);x<x1;x+=5) PX(g,x,y,rD); PX(g,x0,y,INK); PX(g,x1-1,y,INK); }
+  RC(g,13,3,38,1,INK); RC(g,13,4,38,1,rL); RC(g,1,27,62,1,INK); RC(g,1,26,62,1,rD);
+  if (kind==='shop'){ for (let x=21;x<43;x++) RC(g,x,28,1,5,(Math.floor((x-21)/4)%2)?'#fff8e7':'#ff8fab'); RC(g,21,33,22,1,INK); }
+  return c;
+}
+function makeBuilding(col, seed){
+  const c=makeCanvas(48,80), g=c.getContext('2d'), rnd=seeded(seed), top=6+Math.floor(rnd()*16), side=shade(col,-24);
+  RC(g,2,76,46,4,'rgba(40,30,60,.22)'); RC(g,2,top,44,78-top,INK); RC(g,3,top+1,42,76-top,col); RC(g,36,top+1,9,76-top,side);
+  RC(g,1,top,46,4,INK); RC(g,2,top+1,44,2,shade(col,-40));
+  if (rnd()<.5){ RC(g,8,top-7,2,7,INK); PX(g,8,top-8,'#ff8fab'); } else { RC(g,26,top-6,10,6,INK); RC(g,27,top-5,8,5,'#adb5bd'); }
+  for (let y=top+8;y<58;y+=9) for (let x=7;x<40;x+=9){ const lit=rnd()<.5; RC(g,x,y,6,6,INK); RC(g,x+1,y+1,4,4,lit?'#fff3bf':'#9cc2ff'); PX(g,x+1,y+1,lit?'#fff':'#d0e3ff'); }
+  const acc=['#ff8fab','#8ce99a','#ffd43b','#74c0fc'][(rnd()*4)|0];
+  RC(g,15,60,18,3,INK); RC(g,15,60,18,2,acc); RC(g,17,63,14,15,INK); RC(g,18,64,12,14,'#9cc2ff'); RC(g,24,64,1,14,INK); RC(g,18,64,4,3,'#d0e3ff');
+  return c;
+}
+function makeLamp(){ const c=makeCanvas(16,32), g=c.getContext('2d'); RC(g,5,30,6,2,'rgba(40,30,60,.25)'); RC(g,7,8,2,22,INK); RC(g,8,8,1,22,'#8d87a6'); RC(g,5,29,6,2,INK);
+  RC(g,4,2,8,7,INK); RC(g,5,3,6,5,'#ffa94d'); RC(g,5,3,2,2,'#fff3bf'); RC(g,3,1,10,2,'#5c5470'); return c; }
+function flame(g,x,y,f,cols){ const fl=f?['....kk..','...kbbk.','..kbwwbk','..kbwwbk','..kbbbbk','...kkkk.']:['...kk...','..kbbk..','.kbbwbk.','..kbwwbk','..kbbbbk','...kkkk.'];
+  fl.forEach((row,yy)=>[...row].forEach((ch,xx)=>{ const col={k:cols[0],b:cols[1],w:cols[2]}[ch]; if (col) PX(g,x+xx,y+yy,col); })); }
+function makeBrazier(f, cols=['#5f3dc4','#b197fc','#e5dbff']){ const c=makeCanvas(16,24), g=c.getContext('2d');
+  RC(g,3,22,10,2,'rgba(20,10,40,.3)'); RC(g,5,14,6,9,INK); RC(g,6,15,4,8,'#6f5f9e'); RC(g,3,11,10,4,INK); RC(g,4,12,8,2,'#9a8bc9'); flame(g,4,5,f,cols); return c; }
+function makeCampfire(f){ const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,2,14,12,2,'rgba(30,20,40,.25)');
+  [[2,12,12,2],[3,11,10,1]].forEach(([x,y,w,h])=>RC(g,x,y,w,h,'#8a5a38')); RC(g,4,12,8,1,'#6b4630'); [[1,13],[13,13],[3,13],[11,13]].forEach(([x,y])=>PX(g,x,y,'#a39bb5'));
+  flame(g,4,5,f,['#e8590c','#ffa94d','#fff3bf']); return c; }
+function makeKiln(f){ const c=makeCanvas(16,24), g=c.getContext('2d'); RC(g,1,22,14,2,'rgba(30,20,40,.25)');
+  for (let y=6;y<23;y++){ const w=y<12?Math.round(4+(y-6)*1.5):13; const x0=8-Math.ceil(w/2); RC(g,x0,y,w,1,y%3?'#d9825f':'#b8664a'); PX(g,x0,y,INK); PX(g,x0+w-1,y,INK); }
+  RC(g,6,2,4,5,'#b8664a'); RC(g,6,2,4,1,INK); RC(g,5,15,6,7,INK); RC(g,6,16,4,6, f?'#ffa94d':'#ffd43b'); PX(g,7,18,'#fff3bf'); PX(g,6+(f?1:2),0,'#ced4da'); PX(g,7,1,'#e9ecef'); return c; }
+function makeGrill(f){ const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,2,14,12,2,'rgba(30,20,40,.25)');
+  RC(g,2,7,12,5,INK); RC(g,3,8,10,3,'#5c5470'); RC(g,3,7,10,1,'#adb5bd'); for (let x=3;x<13;x+=2) PX(g,x,6,'#adb5bd');
+  RC(g,4,12,1,3,INK); RC(g,11,12,1,3,INK); RC(g,5,5,3,1,'#ff9b73'); RC(g,9,5,3,1,'#ffd8a8'); PX(g,6+(f?1:0),2,'#dee2e6'); PX(g,9-(f?1:0),1,'#f1f3f5'); PX(g,4,9,'#ffa94d'); PX(g,8,9,'#ff922b'); return c; }
+function makeBunsen(f){ const c=makeCanvas(16,24), g=c.getContext('2d'); RC(g,3,22,10,2,'rgba(30,20,40,.25)');
+  RC(g,4,20,8,3,INK); RC(g,5,20,6,2,'#adb5bd'); RC(g,7,10,2,10,INK); RC(g,7,10,1,10,'#dee2e6');
+  const fl=f?['...kk...','..kbbk..','..kbwb..','...kk...']:['...k....','..kbk...','..kbwbk.','...kk...']; fl.forEach((row,y)=>[...row].forEach((ch,x)=>{ const col={k:'#4263eb',b:'#74c0fc',w:'#e7f5ff'}[ch]; if(col) PX(g,x+4,y+5,col); }));
+  RC(g,2,16,2,1,'#ffa94d'); return c; }
+function makeCrystal(f, col, dark){ const c=makeCanvas(16,24), g=c.getContext('2d');
+  RC(g,3,21,10,3,INK); RC(g,4,21,8,2,'#a39bb5'); const o=f?0:1;
+  ['...kk...','..kwck..','.kwccck.','.kcccCk.','.kcccCk.','..kcCk..','...kk...'].forEach((row,y)=>[...row].forEach((ch,x)=>{ const cc={k:INK,w:'#ffffff',c:col,C:dark}[ch]; if(cc) PX(g,x+4,y+8+o,cc); }));
+  if (f){ PX(g,2,6,'#fff'); PX(g,13,10,'#fff'); } else { PX(g,3,12,'#fff'); PX(g,12,5,'#fff'); } return c; }
+function makeBoat(){ const c=makeCanvas(32,24), g=c.getContext('2d');
+  RC(g,2,16,28,5,INK); RC(g,3,16,26,4,'#c98a52'); RC(g,3,16,26,1,'#e0aa6e'); RC(g,5,21,22,1,INK);
+  RC(g,15,2,2,14,INK); RC(g,17,3,9,10,'#fff8e7'); RC(g,17,3,9,1,INK); RC(g,25,3,1,10,INK); RC(g,17,12,9,1,INK); RC(g,19,6,4,3,'#74c0fc'); return c; }
+function makeSubway(){ const c=makeCanvas(16,32), g=c.getContext('2d'); RC(g,7,10,2,21,INK); RC(g,1,1,14,11,INK); RC(g,2,2,12,9,'#4dabf7'); drawText(g,'M',4,4,'#ffffff'); RC(g,4,30,8,2,'rgba(40,30,60,.3)'); return c; }
+function makeCircle(f){ const c=makeCanvas(16,16), g=c.getContext('2d');
+  for (let a=0;a<64;a++){ const t=a/64*Math.PI*2; PX(g,Math.round(8+Math.cos(t)*7),Math.round(8+Math.sin(t)*6), (a+f*2)%4<2?'#e5dbff':'#9775fa'); }
+  for (let k=0;k<5;k++){ const t=k/5*Math.PI*2+f*.3; PX(g,Math.round(8+Math.cos(t)*4),Math.round(8+Math.sin(t)*3),'#ffe066'); } PX(g,8,8,'#fff'); return c; }
+function makeBench(top, leg, cols){ const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,1,14,14,2,'rgba(30,20,40,.25)');
+  RC(g,0,8,16,3,INK); RC(g,1,8,14,2,top); RC(g,2,11,2,4,leg); RC(g,12,11,2,4,leg); RC(g,2,11,1,4,INK); RC(g,12,11,1,4,INK);
+  cols.forEach((col,i)=>{ const x=2+i*4; RC(g,x,3,3,5,INK); RC(g,x+1,4,1,3,col); RC(g,x,5,3,3,INK); RC(g,x+1,5,1,2,col); RC(g,x,3,3,1,'#dee2e6'); }); return c; }
+function makeAltar(f){ const c=makeCanvas(16,24), g=c.getContext('2d'); RC(g,1,22,14,2,'rgba(20,10,40,.3)');
+  RC(g,1,13,14,10,INK); RC(g,2,14,12,8,'#7b6aae'); RC(g,2,14,12,2,'#9384c9'); RC(g,0,12,16,2,INK);
+  const o=f?0:1; RC(g,6,4+o,4,6,INK); RC(g,7,5+o,2,4,'#99e9f2'); PX(g,7,5+o,'#fff'); PX(g,3,3,f?'#ffe066':'#e5dbff'); PX(g,12,6,f?'#e5dbff':'#ffe066'); return c; }
+function makeWindmill(f){ const c=makeCanvas(32,48), g=c.getContext('2d'); RC(g,6,44,20,4,'rgba(30,20,40,.25)');
+  for (let y=18;y<46;y++){ const w=8+Math.round((y-18)*.3); RC(g,16-w,y,w*2,1,'#f1e3c8'); PX(g,16-w,y,INK); PX(g,15+w,y,INK); }
+  RC(g,12,36,8,10,INK); RC(g,13,37,6,9,'#a86b3d'); RC(g,13,24,6,5,INK); RC(g,14,25,4,3,'#a5d8ff');
+  const cx=16, cy=16, ang=f*Math.PI/4;
+  for (let k=0;k<4;k++){ const t=ang+k*Math.PI/2; for (let r=2;r<15;r++){ const x=Math.round(cx+Math.cos(t)*r), y=Math.round(cy+Math.sin(t)*r); PX(g,x,y,INK); if (r>4){ PX(g,Math.round(x+Math.cos(t+1.57)*1.5),Math.round(y+Math.sin(t+1.57)*1.5),'#fff8e7'); } } }
+  RC(g,14,14,4,4,INK); RC(g,15,15,2,2,'#ffd43b'); return c; }
+function makeHay(){ const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,1,13,14,3,'rgba(30,20,40,.2)');
+  for (let y=4;y<15;y++){ const w=Math.round(7*Math.sin((y-3)/11*Math.PI))+1; RC(g,8-w,y,w*2,1,y%2?'#f5d76e':'#e8c14a'); PX(g,8-w,y,'#b08a2e'); PX(g,7+w,y,'#b08a2e'); }
+  RC(g,4,8,8,1,'#c98a52'); return c; }
+function makeLighthouse(){ const c=makeCanvas(16,48), g=c.getContext('2d'); RC(g,2,45,12,3,'rgba(30,20,40,.25)');
+  for (let y=10;y<46;y++){ const w=4+Math.round((y-10)*.08); RC(g,8-w,y,w*2,1, Math.floor((y-10)/6)%2?'#ff8fab':'#fff8e7'); PX(g,8-w,y,INK); PX(g,7+w,y,INK); }
+  RC(g,3,2,10,8,INK); RC(g,4,3,8,5,'#fff3bf'); RC(g,5,4,2,2,'#ffffff'); RC(g,2,9,12,2,INK); RC(g,6,0,4,2,INK); return c; }
+function makeCrate(){ const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,2,14,13,2,'rgba(30,20,40,.2)'); RC(g,2,3,12,12,INK); RC(g,3,4,10,10,'#d6a46b');
+  RC(g,3,4,10,1,'#e8c48f'); for (let i=0;i<10;i++){ PX(g,3+i,4+i,'#a8703c'); } RC(g,3,8,10,1,'#a8703c'); return c; }
+function makeCar(col){ const c=makeCanvas(32,16), g=c.getContext('2d'); RC(g,2,14,28,2,'rgba(30,20,40,.25)');
+  RC(g,1,6,30,7,INK); RC(g,2,7,28,5,col); RC(g,7,2,16,5,INK); RC(g,8,3,14,4,'#9cc2ff'); RC(g,15,3,1,4,INK); RC(g,2,7,28,1,shade(col,40));
+  [[5,11],[22,11]].forEach(([x,y])=>{ RC(g,x,y,5,5,INK); RC(g,x+1,y+1,3,3,'#868e96'); }); RC(g,28,8,2,2,'#fff3bf'); return c; }
+function makeVending(){ const c=makeCanvas(16,24), g=c.getContext('2d'); RC(g,2,22,12,2,'rgba(30,20,40,.25)'); RC(g,2,1,12,22,INK); RC(g,3,2,10,20,'#ff6b8a');
+  RC(g,4,4,6,10,'#e7f5ff'); for (let y=5;y<14;y+=3) for (let x=5;x<10;x+=2) PX(g,x,y,['#74c0fc','#ffd43b','#8ce99a'][(x+y)%3]); RC(g,11,6,1,3,'#ffd43b'); RC(g,4,17,8,3,INK); return c; }
+function makeChimney(f){ const c=makeCanvas(16,48), g=c.getContext('2d'); RC(g,2,45,12,3,'rgba(30,20,40,.25)'); RC(g,4,14,8,32,INK); RC(g,5,15,6,31,'#a39bb5');
+  for (let y=18;y<46;y+=6) RC(g,5,y,6,1,'#868e96'); RC(g,5,15,6,2,'#ff8fab');
+  const puffs=f?[[8,10,4],[5,5,3],[10,2,3]]:[[7,11,3],[10,6,4],[6,1,3]]; puffs.forEach(([x,y,r])=>{ for(let yy=-r;yy<=r;yy++) for(let xx=-r;xx<=r;xx++) if (xx*xx+yy*yy<=r*r) PX(g,x+xx,y+yy,(xx+yy)<0?'#e9ecef':'#ced4da'); }); return c; }
+function makeShelf(){ const c=makeCanvas(16,24), g=c.getContext('2d'); RC(g,1,1,14,22,INK); RC(g,2,2,12,20,'#8a5a38');
+  [4,10,16].forEach(y=>{ for (let x=3;x<13;x+=2) RC(g,x,y,1,5,['#ff8fab','#74c0fc','#ffd43b','#8ce99a','#d0bfff'][(x+y)%5]); RC(g,2,y+5,12,1,INK); }); return c; }
+function makeArmorStand(){ const c=makeCanvas(16,24), g=c.getContext('2d'); RC(g,3,22,10,2,'rgba(20,10,40,.3)');
+  RC(g,5,1,6,6,INK); RC(g,6,2,4,4,'#dee2e6'); RC(g,6,4,4,1,INK); RC(g,3,7,10,9,INK); RC(g,4,8,8,7,'#ced4da'); RC(g,4,8,3,2,'#f1f3f5'); RC(g,7,16,2,6,INK); RC(g,5,21,6,2,INK); return c; }
+function makeGold(){ const c=makeCanvas(16,16), g=c.getContext('2d'); RC(g,1,13,14,3,'rgba(30,20,40,.2)');
+  for (let y=6;y<15;y++){ const w=Math.round((y-5)*.8)+1; RC(g,8-w,y,w*2,1,(y%2)?'#ffd43b':'#f59f00'); } [[6,8],[9,10],[5,12],[10,7]].forEach(([x,y])=>PX(g,x,y,'#fff3bf')); RC(g,10,10,3,3,'#e5dbff'); PX(g,11,10,'#fff'); return c; }
+function makeThrone(){ const c=makeCanvas(32,32), g=c.getContext('2d'); RC(g,4,29,24,3,'rgba(20,10,40,.3)');
+  RC(g,6,0,20,30,INK); RC(g,7,1,18,28,'#9775fa'); RC(g,9,3,14,14,'#e8a0bf'); RC(g,7,18,18,4,'#ffd43b'); RC(g,5,18,4,12,INK); RC(g,23,18,4,12,INK); RC(g,6,19,2,10,'#7048e8'); RC(g,24,19,2,10,'#7048e8');
+  PX(g,16,0,'#ffd43b'); PX(g,10,0,'#ffd43b'); PX(g,22,0,'#ffd43b'); return c; }
+function makeWell(){ const c=makeCanvas(16,24), g=c.getContext('2d'); RC(g,1,22,14,2,'rgba(30,20,40,.25)');
+  RC(g,1,14,14,9,INK); RC(g,2,15,12,7,'#a39bb5'); for (let x=2;x<14;x+=4) RC(g,x,15,1,7,'#868e96'); RC(g,3,14,10,2,'#4dabf7');
+  RC(g,2,4,1,10,INK); RC(g,13,4,1,10,INK); RC(g,0,1,16,4,INK); RC(g,1,2,14,2,'#c97a63'); RC(g,7,5,2,4,'#a86b3d'); return c; }
+function makeFountain(f){ const c=makeCanvas(32,32), g=c.getContext('2d'); RC(g,2,28,28,3,'rgba(40,30,60,.2)');
+  for (let y=10;y<30;y++) for (let x=0;x<32;x++){ const dx=(x-15.5)/15, dy=(y-20)/9.5, d=dx*dx+dy*dy; if (d<1) PX(g,x,y, d>.82?INK: d>.6?'#c9c2dc': (y<20?'#74c0fc':'#4dabf7')); }
+  RC(g,14,6,4,14,INK); RC(g,15,6,2,14,'#e9e4f2');
+  (f?[[12,4],[19,5],[10,9],[21,10],[15,2]]:[[13,3],[18,3],[11,7],[20,8],[16,1]]).forEach(([x,y])=>{ PX(g,x,y,'#a5d8ff'); PX(g,x,y+1,'#e7f5ff'); });
+  RC(g,9,18,3,1,'#e7f5ff'); RC(g,20,22,3,1,'#e7f5ff'); return c; }
+function makeChest(open){ const c=makeCanvas(16,16), g=c.getContext('2d');
+  if (!open){ RC(g,1,4,14,11,INK); RC(g,2,5,12,9,'#c98a3b'); RC(g,2,5,12,3,'#e0aa5a'); RC(g,2,8,12,1,INK); RC(g,7,7,2,3,'#ffd43b'); RC(g,2,5,1,9,'#ffd43b'); RC(g,13,5,1,9,'#ffd43b'); }
+  else { RC(g,1,1,14,6,INK); RC(g,2,2,12,4,'#a8703c'); RC(g,1,7,14,8,INK); RC(g,2,8,12,6,'#c98a3b'); RC(g,3,7,10,2,'#fff3bf'); PX(g,5,6,'#ffffff'); PX(g,10,5,'#ffffff'); }
+  return c; }
+/* 元素晶塊 */
+const NODE_CACHE = {};
+function makeNode(id, f){
+  const key=id+f; if (NODE_CACHE[key]) return NODE_CACHE[key];
+  const c=makeCanvas(16,16), g=c.getContext('2d'), col=EL[id]?.color||PTS[id]?.color||CP_COLOR;
+  RC(g,1,1,14,14,f?'#ffffff':INK); RC(g,2,2,12,12,col); RC(g,2,2,12,1,shade(col,40)); RC(g,2,2,1,12,shade(col,30)); RC(g,2,13,12,1,shade(col,-40)); RC(g,13,2,1,12,shade(col,-30));
+  const w=textW(id), hasSub=/\d/.test(id); drawText(g,id,Math.floor((16-w)/2),hasSub?4:5,INK);
+  if (f){ PX(g,0,3,'#fff'); PX(g,15,11,'#fff'); }
+  return NODE_CACHE[key]=c;
+}
+
+/* 2-4. 地圖圖塊 */
+function speckle(g,ox,oy,r,n,cols){ for (let i=0;i<n;i++) PX(g, ox+(r()*16|0), oy+(r()*16|0), cols[r()*cols.length|0]); }
+const GRASSY = new Set(['.',',',';']);
+function tGrass(g,ox,oy,r){ RC(g,ox,oy,16,16,'#94d66d'); speckle(g,ox,oy,r,12,['#a9e383','#82c75f']);
+  if (r()<.5){ const x=ox+2+(r()*11|0), y=oy+4+(r()*10|0); PX(g,x,y,'#6bb24f'); PX(g,x+1,y-1,'#6bb24f'); PX(g,x+2,y,'#6bb24f'); PX(g,x+1,y,'#6bb24f'); PX(g,x+1,y-2,'#b9ec95'); } }
+function tFlowers(g,ox,oy,r){ const cols=['#ffffff','#ffb3c7','#d0bfff','#fff3a3'];
+  for (let i=0;i<2;i++){ const x=ox+3+(r()*10|0), y=oy+3+(r()*10|0), c=cols[r()*cols.length|0]; PX(g,x,y-1,c); PX(g,x-1,y,c); PX(g,x+1,y,c); PX(g,x,y+1,c); PX(g,x,y,'#ffc93c'); PX(g,x+1,y+2,'#6bb24f'); } }
+function tTall(g,ox,oy,r){ RC(g,ox,oy,16,16,'#84cc60'); speckle(g,ox,oy,r,8,['#8ed46a','#72bb51']);
+  for (let i=0;i<8;i++){ const x=ox+1+(r()*13|0), y=oy+4+(r()*11|0); RC(g,x,y-2,1,3,'#57a541'); PX(g,x+1,y-3,'#57a541'); PX(g,x-1,y-1,'#57a541'); PX(g,x,y-3,'#a6e486'); } }
+function fringe(g,ox,oy,r,map,tx,ty){
+  [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy]) => {
+    if (!GRASSY.has(tileAt(map,tx+dx,ty+dy))) return;
+    for (let i=0;i<16;i++){ const d = r()<.5 ? 1 : (r()<.5 ? 2 : 0);
+      for (let k=0;k<d;k++){ const x = dx===0 ? i : (dx<0 ? k : 15-k), y = dy===0 ? i : (dy<0 ? k : 15-k); PX(g,ox+x,oy+y, k===d-1 ? '#82c75f' : '#94d66d'); } }
+  });
+}
+function tPath(g,ox,oy,r,map,tx,ty){ RC(g,ox,oy,16,16,'#e8cc93'); speckle(g,ox,oy,r,14,['#d8b97c','#f4dfb0']);
+  if (r()<.6){ const x=ox+3+(r()*9|0), y=oy+3+(r()*9|0); RC(g,x,y,2,2,'#c9a56b'); PX(g,x,y,'#f4dfb0'); } fringe(g,ox,oy,r,map,tx,ty); }
+function tCobble(g,ox,oy,r,map,tx,ty){ RC(g,ox,oy,16,16,'#a99c8c');
+  for (let j=0;j<4;j++) for (let i=-1;i<4;i++){ const x=ox+i*4+(j%2)*2, y=oy+j*4, cs=['#ddd2c4','#d3c6b6','#e6dccf'][(r()*3)|0];
+    for (let yy=0;yy<3;yy++) for (let xx=0;xx<3;xx++){ const px=x+xx+1, py=y+yy+1; if (px<ox||px>=ox+16) continue; PX(g,px,py,(xx===0&&yy===0)?'#f2ebe2':(xx===2||yy===2)?'#c2b4a2':cs); } }
+  fringe(g,ox,oy,r,map,tx,ty); }
+function tSand(g,ox,oy,r,map,tx,ty){ RC(g,ox,oy,16,16,'#f8e4a8'); speckle(g,ox,oy,r,14,['#ecd38c','#fff1c7']); if (r()<.15){ const x=ox+4+(r()*8|0), y=oy+4+(r()*8|0); PX(g,x,y,'#ffc9de'); PX(g,x+1,y,'#fff0f6'); } fringe(g,ox,oy,r,map,tx,ty); }
+function tWater(g,ox,oy,r,f,map,tx,ty){
+  const W=map.water; RC(g,ox,oy,16,16,W[0]); speckle(g,ox,oy,r,6,[W[1]]);
+  for (let k=0;k<3;k++){ const base=r()*16|0, y=oy+2+k*5+(r()*2|0), x0=(base+f*3)%16; for (let j=0;j<4;j++) PX(g,ox+((x0+j)%16),y,W[2]); }
+  const isW=(x,y)=>{ const c=tileAt(map,x,y); return c===null||c==='~'||c==='b'||c==='k'; };
+  if (!isW(tx,ty-1)){ RC(g,ox,oy,16,2,W[3]); for (let x=f;x<16;x+=3) PX(g,ox+x,oy+2,W[3]); }
+  if (!isW(tx,ty+1)) RC(g,ox,oy+15,16,1,W[4]); if (!isW(tx-1,ty)) RC(g,ox,oy,2,16,W[3]); if (!isW(tx+1,ty)) RC(g,ox+14,oy,2,16,W[3]);
+}
+function tBridge(g,ox,oy,map,tx,ty){
+  const vert=['~','b'].includes(tileAt(map,tx-1,ty)) && ['~','b'].includes(tileAt(map,tx+1,ty));
+  if (vert){ RC(g,ox,oy+1,16,14,'#d6a46b'); for (let x=0;x<16;x+=4) RC(g,ox+x,oy+1,1,14,'#b37d47'); RC(g,ox,oy,16,2,'#8b5a3c'); RC(g,ox,oy+14,16,2,'#8b5a3c'); }
+  else { RC(g,ox+1,oy,14,16,'#d6a46b'); for (let y=0;y<16;y+=4) RC(g,ox+1,oy+y,14,1,'#b37d47'); RC(g,ox,oy,2,16,'#8b5a3c'); RC(g,ox+14,oy,2,16,'#8b5a3c'); }
+}
+function tDock(g,ox,oy){ RC(g,ox,oy,16,16,'#cf9f68'); for (let y=0;y<16;y+=3) RC(g,ox,oy+y,16,1,'#a8763f'); PX(g,ox+3,oy+1,'#7a4d2e'); PX(g,ox+12,oy+1,'#7a4d2e'); }
+function tField(g,ox,oy,r){ RC(g,ox,oy,16,16,'#c99266');
+  for (let y=1;y<16;y+=4){ RC(g,ox,oy+y+2,16,1,'#a8744a'); for (let x=1;x<16;x+=3){ PX(g,ox+x,oy+y,'#7ed957'); PX(g,ox+x,oy+y+1,'#5cbf5a'); if (r()<.25) PX(g,ox+x,oy+y-1,'#ffd43b'); } } }
+function tSidewalk(g,ox,oy,r){ RC(g,ox,oy,16,16,'#dcd8e6'); RC(g,ox,oy,16,1,'#c7c2d6'); RC(g,ox,oy,1,16,'#c7c2d6'); RC(g,ox,oy+8,16,1,'#cfcadd'); RC(g,ox+8,oy,1,16,'#cfcadd'); speckle(g,ox,oy,r,6,['#e8e5ef','#cbc6d8']); }
+function tAsphalt(g,ox,oy,r,map,tx,ty){ RC(g,ox,oy,16,16,'#7f7c95'); speckle(g,ox,oy,r,14,['#8c89a1','#726f88']);
+  const W=c=>c==='W';
+  if (W(tileAt(map,tx,ty+1)) && !W(tileAt(map,tx,ty-1)) && W(tileAt(map,tx-1,ty))) for (let x=0;x<16;x+=8) RC(g,ox+x+1,oy+15,5,1,'#ffe066');
+  if (W(tileAt(map,tx+1,ty)) && !W(tileAt(map,tx-1,ty)) && W(tileAt(map,tx,ty-1))) for (let y=0;y<16;y+=8) RC(g,ox+15,oy+y+1,1,5,'#ffe066');
+  if (!W(tileAt(map,tx,ty-1))) RC(g,ox,oy,16,1,'#5f5c75'); }
+function tCastleFloor(g,ox,oy,r){ RC(g,ox,oy,16,16,'#b6abd4'); RC(g,ox,oy,16,1,'#a397c6'); RC(g,ox,oy,1,16,'#a397c6'); RC(g,ox+8,oy+8,8,1,'#a397c6'); RC(g,ox+8,oy,1,8,'#a397c6'); RC(g,ox+1,oy+1,6,1,'#c9c0e3'); speckle(g,ox,oy,r,6,['#aa9fcb','#c3b9df']); }
+function tCarpet(g,ox,oy,map,tx,ty){ RC(g,ox,oy,16,16,'#e8a0bf'); const K=c=>c==='K';
+  if (!K(tileAt(map,tx,ty-1))){ RC(g,ox,oy,16,2,'#c9779d'); RC(g,ox,oy+2,16,1,'#ffd43b'); }
+  if (!K(tileAt(map,tx,ty+1))){ RC(g,ox,oy+14,16,2,'#c9779d'); RC(g,ox,oy+13,16,1,'#ffd43b'); }
+  if (!K(tileAt(map,tx-1,ty))){ RC(g,ox,oy,2,16,'#c9779d'); RC(g,ox+2,oy,1,16,'#ffd43b'); }
+  if (!K(tileAt(map,tx+1,ty))){ RC(g,ox+14,oy,2,16,'#c9779d'); RC(g,ox+13,oy,1,16,'#ffd43b'); }
+  PX(g,ox+7,oy+6,'#fff0f6'); PX(g,ox+6,oy+7,'#fff0f6'); PX(g,ox+8,oy+7,'#fff0f6'); PX(g,ox+7,oy+8,'#fff0f6'); }
+function tCastleWall(g,ox,oy,map,tx,ty){ const Z=c=>c==='Z';
+  RC(g,ox,oy,16,16,'#7b6aae'); [3,7,11,15].forEach(y=>RC(g,ox,oy+y,16,1,'#6a599b'));
+  for (let j=0;j<4;j++) for (let x=(j%2)*4;x<16;x+=8) RC(g,ox+x,oy+j*4,1,3,'#6a599b'); RC(g,ox,oy,16,1,'#9384c9');
+  if (!Z(tileAt(map,tx,ty+1))){ RC(g,ox,oy+10,16,6,'#5f4f95'); RC(g,ox,oy+10,16,1,'#4d3f78'); RC(g,ox,oy+15,16,1,INK); }
+  if (!Z(tileAt(map,tx,ty-1))){ for (let x=0;x<16;x+=8) RC(g,ox+x,oy,4,3,'#9384c9'); RC(g,ox,oy,16,1,INK); } }
+function tHedge(g,ox,oy,r){ RC(g,ox,oy,16,16,'#4caf50'); for (let i=0;i<14;i++){ const x=ox+(r()*14|0), y=oy+(r()*13|0); RC(g,x,y,2,2,r()<.5?'#6fcf6c':'#3f9a50'); } RC(g,ox,oy,16,1,'#8de06a'); RC(g,ox,oy+14,16,2,'#2f7a43'); }
+function tileAt(map,x,y){ if (x<0||y<0||x>=map.w||y>=map.h) return null; return map.t[y][x]; }
+function paintTile(g,ch,ox,oy,r,f,map,tx,ty){
+  switch (ch){
+    case ',': tGrass(g,ox,oy,r); tFlowers(g,ox,oy,r); break;
+    case ';': tTall(g,ox,oy,r); break;
+    case '=': tPath(g,ox,oy,r,map,tx,ty); break;
+    case 'r': tCobble(g,ox,oy,r,map,tx,ty); break;
+    case 's': tSand(g,ox,oy,r,map,tx,ty); break;
+    case '~': tWater(g,ox,oy,r,f,map,tx,ty); break;
+    case 'b': tWater(g,ox,oy,r,f,map,tx,ty); tBridge(g,ox,oy,map,tx,ty); break;
+    case 'k': tWater(g,ox,oy,r,f,map,tx,ty); tDock(g,ox,oy); break;
+    case 'F': tField(g,ox,oy,r); break;
+    case 'w': tSidewalk(g,ox,oy,r); break;
+    case 'W': tAsphalt(g,ox,oy,r,map,tx,ty); break;
+    case 'Q': tCastleFloor(g,ox,oy,r); break;
+    case 'K': tCarpet(g,ox,oy,map,tx,ty); break;
+    case 'Z': tCastleWall(g,ox,oy,map,tx,ty); break;
+    case 'E': tHedge(g,ox,oy,r); break;
+    default: tGrass(g,ox,oy,r);
+  }
+}
+const MINI_COL = { '.':'#94d66d', ',':'#a9e383', ';':'#84cc60', '=':'#e8cc93', r:'#d3c6b6', s:'#f8e4a8', '~':'#62bff0', b:'#d6a46b', k:'#cf9f68',
+  F:'#c99266', w:'#dcd8e6', W:'#7f7c95', Q:'#b6abd4', K:'#e8a0bf', Z:'#6a599b', E:'#3f9a50' };
+
+/* 2-5. 建立所有圖片 */
+const SPR = {}, URL_ = {}, OBJ = {};
+let SPRITE_DEFS_TABLE;
+function buildAllSprites(){
+  SPR.heroDownA=buildSprite([...HERO_DOWN,...LEGS_A],HERO_PAL); SPR.heroDownB=buildSprite([...HERO_DOWN,...LEGS_B],HERO_PAL); SPR.heroDownC=buildSprite([...HERO_DOWN,...LEGS_C],HERO_PAL);
+  SPR.heroUpA=buildSprite([...HERO_UP,...LEGS_A],HERO_PAL); SPR.heroUpB=buildSprite([...HERO_UP,...LEGS_B],HERO_PAL); SPR.heroUpC=buildSprite([...HERO_UP,...LEGS_C],HERO_PAL);
+  SPR.heroRightA=buildSprite([...HERO_SIDE,...SIDE_A],HERO_PAL); SPR.heroRightB=buildSprite([...HERO_SIDE,...SIDE_B],HERO_PAL);
+  SPR.heroLeftA=flipH(SPR.heroRightA); SPR.heroLeftB=flipH(SPR.heroRightB);
+  for (const [k,d] of Object.entries(SPRITE_DEFS)) SPR[k]=buildSprite(d.rows,d.pal);
+  const S=SPRITE_DEFS;
+  // 每個地區的 NPC
+  SPR.kid      = person('hair','plain',{ H:'#ffe066', h:'#f2b632', b:'#ff8fb1', B:'#f06595', r:'#ffd43b' });
+  SPR.farmer   = person('straw','beard',{ z:'#f5d76e', Z:'#d9b44a', b:'#5c9ded', B:'#3b7dd8', r:'#ff8fab', p:'#6b4630', y:'#8a5a38', Y:'#6b4630' });
+  SPR.aunt     = person('bandana','plain',{ m:'#ff8fab', M:'#f06595', b:'#ffd43b', B:'#f2b632', r:'#ffffff', p:'#845ef7' });
+  SPR.girl     = person('long','long',{ H:'#ffc9de', h:'#f783ac', b:'#ffffff', B:'#dee2e6', r:'#74c0fc', p:'#74c0fc' });
+  SPR.captain  = person('captain','beard',{ q:'#364fc7', b:'#364fc7', B:'#2b3a9e', r:'#ffd43b', y:'#ffffff', Y:'#dee2e6' });
+  SPR.fisher   = person('cap','plain',{ g:'#ffa94d', b:'#ffe066', B:'#f2c94c', r:'#4dabf7', p:'#4dabf7' });
+  SPR.doctor   = person('messy','glasses',{ H:'#f1f3f5', h:'#ced4da', b:'#ffffff', B:'#dee2e6', r:'#74c0fc', y:'#dee2e6', Y:'#ced4da' });
+  SPR.clerk    = person('cap','plain',{ g:'#51cf66', b:'#51cf66', B:'#37b24d', r:'#ffffff', y:'#fff', Y:'#e9ecef' });
+  SPR.lightKnight = person('helmet','plain',{ i:'#f1f3f5', I:'#ced4da', b:'#dee2e6', B:'#adb5bd', r:'#ffd43b', y:'#ffd43b', Y:'#f59f00' });
+  SPR.ghostShop= buildSprite(S.ghost.rows,{ k:INK, w:'#e3fafc', W:'#99e9f2', e:'#0b7285', c:'#ffd43b' });
+  SPR.helper   = buildSprite(S.golem.rows,{ k:INK, g:'#e9ecef', G:'#ced4da', o:'#74c0fc', y:'#8ce99a' });
+  SPR.batKid   = buildSprite(S.bat.rows,{ k:INK, w:'#ffc9de', W:'#f783ac', b:'#f06595', e:'#ffffff', f:'#fff' });
+  // 怪物變色
+  SPR.bubble   = buildSprite(S.slime.rows,{ k:INK, g:'#74c0fc', G:'#4dabf7', w:'#e7f5ff', e:INK, c:'#ffc9d6' });
+  SPR.seaKing  = buildSprite(S.slime.rows,{ k:INK, g:'#5c7cfa', G:'#4263eb', w:'#dbe4ff', e:'#ffe066', c:'#ffc9d6' });
+  SPR.treeKing = buildSprite(S.treant.rows,{ k:INK, l:'#ffd43b', L:'#f59f00', n:'#8a5a38', N:'#6b4630', w:'#ffe066' });
+  SPR.robot    = buildSprite(S.golem.rows,{ k:INK, g:'#a5d8ff', G:'#74c0fc', o:'#4dabf7', y:'#99e9f2' });
+  SPR.mecha    = buildSprite(S.golem.rows,{ k:INK, g:'#dee2e6', G:'#adb5bd', o:'#ff8fab', y:'#ffe066' });
+  SPR.knight   = buildSprite(S.golem.rows,{ k:INK, g:'#9775fa', G:'#7048e8', o:'#d0bfff', y:'#ff8fab' });
+  SPR.smog     = buildSprite(S.ghost.rows,{ k:INK, w:'#ced4da', W:'#adb5bd', e:'#5c5470', c:'#e9ecef' });
+  // 煉金鍋（兩格動畫）
+  const tab = ['........','......w.','....w...','...kkkkk','..kgggGg','..kkkkkk','..kiiiii','.kiiiiii','.kiiIiii','..kiiiii','nnnnnnnn','kNNNNNNN','.kn.....','.kn.....','.kk.....','........'];
+  const tab2= ['.....w..','........','.......w','...kkkkk','..kggGgg','..kkkkkk','..kiiiii','.kiiiiii','.kiiIiii','..kiiiii','nnnnnnnn','kNNNNNNN','.kn.....','.kn.....','.kk.....','........'];
+  const tp = {k:INK,g:'#8ce99a',G:'#51cf66',i:'#7d7a99',I:'#5f5c7a',n:'#c98a52',N:'#9a6436',w:'#e9fff0'};
+  SPRITE_DEFS_TABLE = [buildSprite(tab,tp), buildSprite(tab2,tp)];
+  for (const [k,[shape,pal]] of Object.entries(ICONS)) SPR['i_'+k]=buildSprite(ICON_DEFS[shape],pal,true);
+  SPR.chest=makeChest(false); SPR.chestOpen=makeChest(true);
+  for (const k of Object.keys(SPR)) URL_[k]=SPR[k].toDataURL();
+  // 地圖物件 { f:動畫格, dx, dy:繪製偏移, light:會發光 }
+  ['tree','cherry','pine','palm','dead'].forEach(k => OBJ[k]={ f:[makeTree(k)], dx:0, dy:-8 });
+  Object.assign(OBJ, {
+    stump:{ f:[makeStump()], dx:0, dy:0 }, bush:{ f:[makeBush()], dx:0, dy:0 }, rock:{ f:[makeRock()], dx:0, dy:0 },
+    lamp:{ f:[makeLamp()], dx:0, dy:-16, light:1 }, brazier:{ f:[makeBrazier(0),makeBrazier(1)], dx:0, dy:-8, light:1 },
+    windmill:{ f:[makeWindmill(0),makeWindmill(1)], dx:0, dy:-16 }, hay:{ f:[makeHay()], dx:0, dy:0 },
+    lighthouse:{ f:[makeLighthouse()], dx:0, dy:-32, light:1 }, crate:{ f:[makeCrate()], dx:0, dy:0 },
+    car:{ f:[makeCar('#ff8fab')], dx:0, dy:0 }, carB:{ f:[makeCar('#74c0fc')], dx:0, dy:0 }, vending:{ f:[makeVending()], dx:0, dy:-8 },
+    chimney:{ f:[makeChimney(0),makeChimney(1)], dx:0, dy:-32 }, bookshelf:{ f:[makeShelf()], dx:0, dy:-8 }, armor:{ f:[makeArmorStand()], dx:0, dy:-8 },
+    gold:{ f:[makeGold()], dx:0, dy:0 }, throne:{ f:[makeThrone()], dx:0, dy:0 }, well:{ f:[makeWell()], dx:0, dy:-8 },
+    boatDeco:{ f:[makeBoat()], dx:0, dy:-8 },
+    fountain:{ f:[makeFountain(0),makeFountain(1)], dx:0, dy:0 },
+  });
+  // 設施（每區不同造型）
+  Object.assign(OBJ, {
+    cauldron:{ f:SPRITE_DEFS_TABLE, dx:0, dy:0 }, benchWood:{ f:[makeBench('#c98a52','#8a5a38',['#8ce99a','#ffd43b','#ff8fab'])], dx:0, dy:0 },
+    benchBlue:{ f:[makeBench('#74c0fc','#5c5470',['#e7f5ff','#8ce99a','#ffd43b'])], dx:0, dy:0 }, benchLab:{ f:[makeBench('#f8f9fa','#adb5bd',['#74c0fc','#ff8fab','#8ce99a'])], dx:0, dy:0 },
+    altar:{ f:[makeAltar(0),makeAltar(1)], dx:0, dy:-8, light:1 },
+    campfire:{ f:[makeCampfire(0),makeCampfire(1)], dx:0, dy:0, light:1 }, kiln:{ f:[makeKiln(0),makeKiln(1)], dx:0, dy:-8, light:1 },
+    grill:{ f:[makeGrill(0),makeGrill(1)], dx:0, dy:0 }, bunsen:{ f:[makeBunsen(0),makeBunsen(1)], dx:0, dy:-8 },
+    magicFire:{ f:[makeBrazier(0,['#c2255c','#ff8fab','#fff0f6']),makeBrazier(1,['#c2255c','#ff8fab','#fff0f6'])], dx:0, dy:-8, light:1 },
+    warpA:{ f:[makeCrystal(1,'#99e9f2','#3bc9db'),makeCrystal(0,'#99e9f2','#3bc9db')], dx:0, dy:-8, light:1 },
+    warpB:{ f:[makeCrystal(1,'#b2f2bb','#40c057'),makeCrystal(0,'#b2f2bb','#40c057')], dx:0, dy:-8, light:1 },
+    boat:{ f:[makeBoat()], dx:-8, dy:-6 }, subway:{ f:[makeSubway()], dx:0, dy:-16 },
+    circle:{ f:[makeCircle(0),makeCircle(1)], dx:0, dy:0, light:1 },
+  });
+}
+function objSprite(o){
+  if (o.cut && o.cut > Date.now()) return OBJ.stump;
+  if (o.kind==='house') return o.cv || (o.cv={ f:[makeHouse(o.roof,o.wall||'#f6e2b8',o.sub)], dx:0, dy:-8 });
+  if (o.kind==='building') return o.cv || (o.cv={ f:[makeBuilding(o.col,o.seed)], dx:0, dy:-32 });
+  return OBJ[o.kind];
+}
+
+/* =====================================================================
+   3. 音效與音樂
+   ===================================================================== */
+const midi = m => 440*Math.pow(2,(m-69)/12);
+const Sound = {
+  ctx:null,
+  ensure(){ try{ if(!this.ctx) this.ctx=new (window.AudioContext||window.webkitAudioContext)(); if(this.ctx.state==='suspended') this.ctx.resume(); }catch(e){ this.ctx=null; } },
+  note(freq,t,dur,{type='square',vol=.05,slideTo=null}={}){ const c=this.ctx,o=c.createOscillator(),g=c.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq,t); if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo,t+dur);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+.03); },
+  noise(t,dur,vol=.05){ const c=this.ctx, b=c.createBuffer(1,c.sampleRate*dur,c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+    const s=c.createBufferSource(), g=c.createGain(); s.buffer=b; g.gain.value=vol; s.connect(g).connect(c.destination); s.start(t); },
+  seq(notes,opts){ let t=this.ctx.currentTime+.02; notes.forEach(([m,d])=>{ if(m) this.note(midi(m),t,d*.95,opts); t+=d; }); },
+  play(name){
+    if (!state.sound) return; this.ensure(); if (!this.ctx) return;
+    const t=this.ctx.currentTime+.01;
+    switch(name){
+      case 'click': this.note(midi(81),t,.05,{vol:.03}); break;
+      case 'blip': this.note(midi(76),t,.03,{vol:.012,type:'triangle'}); break;
+      case 'bump': this.note(110,t,.08,{vol:.04,type:'triangle'}); break;
+      case 'mine': this.note(1400,t,.06,{vol:.035,slideTo:700}); this.note(900,t+.03,.1,{vol:.03,type:'triangle'}); break;
+      case 'chop': this.noise(t,.12,.08); this.note(180,t,.1,{vol:.05,type:'triangle'}); break;
+      case 'search': this.note(500,t,.08,{vol:.03,type:'triangle',slideTo:700}); break;
+      case 'get': this.seq([[79,.06],[84,.06],[88,.14]],{vol:.05}); break;
+      case 'chest': this.seq([[67,.06],[72,.06],[76,.06],[79,.06],[84,.06],[88,.3]],{type:'triangle',vol:.08}); break;
+      case 'correct': this.seq([[72,.07],[76,.07],[79,.07],[84,.16]]); break;
+      case 'wrong': this.seq([[64,.14],[60,.22]],{type:'triangle',vol:.08}); break;
+      case 'fire': this.noise(t,.45,.06); this.note(200,t,.4,{vol:.03,type:'sawtooth',slideTo:500}); break;
+      case 'bolt': this.noise(t,.25,.09); this.note(1200,t,.2,{vol:.04,slideTo:200}); break;
+      case 'water': for(let i=0;i<4;i++) this.note(600+i*120,t+i*.06,.08,{vol:.03,type:'sine',slideTo:300}); break;
+      case 'gas': this.noise(t,.6,.035); break;
+      case 'light': this.seq([[84,.05],[88,.05],[91,.05],[96,.2]],{type:'triangle',vol:.05}); break;
+      case 'flash': this.noise(t,.2,.1); this.note(1600,t,.3,{vol:.04,type:'triangle'}); break;
+      case 'earth': for(let i=0;i<3;i++){ this.note(90,t+i*.12,.15,{vol:.07,type:'triangle',slideTo:50}); this.noise(t+i*.12,.1,.05); } break;
+      case 'acid': for(let i=0;i<5;i++) this.note(300+Math.random()*400,t+i*.07,.06,{vol:.03,type:'sine'}); break;
+      case 'ice': this.note(2000,t,.25,{vol:.03,type:'triangle',slideTo:900}); this.note(2600,t+.08,.2,{vol:.02,type:'triangle'}); break;
+      case 'slash': this.noise(t,.15,.07); this.note(900,t,.12,{vol:.03,slideTo:300}); break;
+      case 'hit': this.note(220,t,.22,{vol:.06,slideTo:60}); break;
+      case 'hurt': this.note(330,t,.2,{vol:.05,type:'triangle',slideTo:150}); break;
+      case 'encounter': this.seq([[72,.06],[79,.06],[72,.06],[79,.06],[84,.15]],{vol:.05}); break;
+      case 'victory': this.seq([[72,.12],[76,.12],[79,.12],[84,.28],[0,.06],[79,.12],[84,.45]]); break;
+      case 'levelup': this.seq([[67,.1],[72,.1],[76,.1],[79,.2],[76,.1],[79,.1],[84,.45]]); break;
+      case 'craft': this.seq([[67,.06],[72,.06],[76,.06],[79,.06],[84,.06],[79,.06],[84,.06],[88,.3]],{type:'triangle',vol:.08}); break;
+      case 'buy': this.seq([[84,.06],[88,.12]],{vol:.04}); break;
+      case 'warp': this.note(200,t,.4,{vol:.04,type:'triangle',slideTo:900}); break;
+      case 'heal': this.seq([[72,.08],[76,.08],[79,.08],[84,.08],[88,.2]],{type:'triangle',vol:.07}); break;
+      case 'absorb': this.seq([[76,.05],[83,.05],[88,.12]],{type:'triangle',vol:.06}); break;
+      case 'quest': this.seq([[76,.1],[79,.1],[84,.1],[88,.3]],{vol:.05}); break;
+    }
+  },
+};
+const TRACKS = {
+  village:{ bpm:108, voices:[{ type:'square', vol:.02, notes:[[72,1],[76,1],[79,1],[77,.5],[76,.5],[74,2],[0,2],[71,1],[74,1],[77,1],[76,.5],[74,.5],[72,2],[0,2]] },
+    { type:'triangle', vol:.05, notes:[[48,2],[55,2],[53,2],[55,2],[48,2],[55,2],[53,2],[55,2]] }] },
+  field:{ bpm:120, voices:[{ type:'square', vol:.019, notes:[[69,.5],[72,.5],[76,1],[74,.5],[72,.5],[71,1],[72,.5],[74,.5],[76,1],[79,1],[77,.5],[76,.5],[74,2],[0,2],[76,.5],[74,.5],[72,1],[71,2]] },
+    { type:'triangle', vol:.05, notes:[[45,2],[43,2],[41,2],[43,2],[45,2],[43,2],[41,2],[40,2]] }] },
+  harbor:{ bpm:112, voices:[{ type:'square', vol:.019, notes:[[67,1],[72,1],[74,.5],[76,1.5],[74,1],[72,1],[69,2],[0,1],[67,1],[69,1],[72,1],[74,1],[72,3],[0,1]] },
+    { type:'triangle', vol:.05, notes:[[48,2],[52,2],[53,2],[55,2],[45,2],[48,2],[50,2],[43,2]] }] },
+  city:{ bpm:132, voices:[{ type:'square', vol:.018, notes:[[76,.5],[79,.5],[81,.5],[79,.5],[76,1],[74,1],[72,.5],[74,.5],[76,.5],[74,.5],[72,1],[69,1],[72,.5],[74,.5],[76,1],[79,1],[81,1],[0,1],[79,.5],[76,.5],[74,1]] },
+    { type:'triangle', vol:.05, notes:[[45,.5],[45,.5],[57,.5],[45,.5],[43,.5],[43,.5],[55,.5],[43,.5],[41,.5],[41,.5],[53,.5],[41,.5],[43,.5],[43,.5],[55,.5],[43,.5],[45,.5],[45,.5],[57,.5],[45,.5],[43,.5],[43,.5],[55,.5],[43,.5]] }] },
+  castle:{ bpm:96, voices:[{ type:'square', vol:.018, notes:[[64,1],[67,1],[71,1],[70,1],[69,2],[67,2],[64,1],[62,1],[64,2],[0,4]] },
+    { type:'triangle', vol:.05, notes:[[40,2],[40,2],[43,2],[38,2],[40,2],[40,2],[43,2],[38,2]] }] },
+  battle:{ bpm:150, voices:[{ type:'square', vol:.02, notes:[[76,.5],[76,.5],[79,.5],[76,.5],[81,1],[79,1],[77,.5],[76,.5],[74,.5],[72,.5],[74,2],[72,.5],[74,.5],[76,.5],[79,.5],[77,1],[76,1],[74,.5],[72,.5],[71,.5],[74,.5],[72,2]] },
+    { type:'triangle', vol:.05, notes:[...Array(8)].flatMap(()=>[[45,.5],[57,.5]]).concat([...Array(4)].flatMap(()=>[[43,.5],[55,.5]]),[...Array(2)].flatMap(()=>[[41,.5],[53,.5]]),[...Array(2)].flatMap(()=>[[40,.5],[52,.5]])) }] },
+};
+const Music = {
+  cur:null, timer:null, voices:[],
+  play(name){ if (this.cur===name && this.timer) return; this.stop(); this.cur=name; if (!state.music||!name) return; Sound.ensure(); if (!Sound.ctx) return;
+    const tr=TRACKS[name], spb=60/tr.bpm, t0=Sound.ctx.currentTime+.1; this.voices=tr.voices.map(v=>({...v,i:0,t:t0})); this.timer=setInterval(()=>this.tick(spb),60); this.tick(spb); },
+  tick(spb){ const c=Sound.ctx, ahead=c.currentTime+.25;
+    this.voices.forEach(v=>{ if (v.t<c.currentTime-.1) v.t=c.currentTime+.05; while (v.t<ahead){ const [m,b]=v.notes[v.i], d=b*spb; if (m) Sound.note(midi(m),v.t,d*.9,{type:v.type,vol:v.vol}); v.t+=d; v.i=(v.i+1)%v.notes.length; } }); },
+  stop(){ clearInterval(this.timer); this.timer=null; },
+  restart(){ const n=this.cur; this.cur=null; this.play(n); },
+};
+function speak(text){ try{ if (!('speechSynthesis' in window)) return; speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(speakable(text).replace(/[「」（）()▼□]/g,' ')); u.lang='zh-TW'; u.rate=.85; speechSynthesis.speak(u); }catch(e){} }
+
+/* =====================================================================
+   4. 存檔與能力值
+   ===================================================================== */
+const SAVE_KEY = 'elementHeroRPG_v4';
+function newState(){
+  return { lv:1, xp:0, hp:40, mp:10, gold:30, inv:{ woodSword:1, H2O:2 }, equip:{ weapon:'woodSword', armor:null },
+    codex:[], codexCp:[], reg:{}, cur:null, opened:{}, flags:{}, sound:true, music:true };
+}
+let state = newState();
+function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){} }
+function loadSave(){ try{ const s=JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) return Object.assign(newState(), s); }catch(e){} return null; }
+const maxHp=()=>40+(state.lv-1)*12, maxMp=()=>10+(state.lv-1)*3, xpNeed=lv=>20+lv*15;
+const weapon=()=>state.equip.weapon?GEAR[state.equip.weapon]:null, armor=()=>state.equip.armor?GEAR[state.equip.armor]:null;
+const atkVal=()=>8+(state.lv-1)*3+(weapon()?.atk||0), defVal=()=>(state.lv-1)+(armor()?.def||0);
+const regState = id => state.reg[id] || (state.reg[id] = { talk:false, gather:0, kills:0, boss:false });
+function addItem(id,n=1){ state.inv[id]=(state.inv[id]||0)+n; }
+function removeItem(id,n=1){ state.inv[id]=Math.max(0,(state.inv[id]||0)-n); if (!state.inv[id]) delete state.inv[id]; }
+let quietLearn=false, learnedNow=[];
+function learnEl(sym){ if (!PTS[sym] || state.codex.includes(sym)) return false; state.codex.push(sym); if (quietLearn) learnedNow.push(sym); else toast(`📖 週期表新增：<b class="font-pixel text-xs">${sym}</b> ${PTS[sym].name}`); return true; }
+function learnCp(f){ if (!CP[f] || state.codexCp.includes(f)) return false; state.codexCp.push(f); if (quietLearn) learnedNow.push(fmtU(f)); else toast(`📖 化合物新增：<b>${fmtH(f)}</b> ${CP[f].name}`); return true; }
+function learnAny(id){ if (CP[id]){ learnCp(id); Object.keys(CP[id].parts).forEach(learnEl); } else if (PTS[id]) learnEl(id); }
+function learnQuiet(ids){ quietLearn=true; learnedNow=[]; ids.forEach(learnAny); quietLearn=false; return learnedNow.length ? `<div class="text-[12px] font-black text-[#2b8a3e] mt-1">📖 圖鑑新增：${learnedNow.join('、')}</div>` : ''; }
+function gainXp(n){ state.xp+=n; let ups=0; while (state.xp>=xpNeed(state.lv)){ state.xp-=xpNeed(state.lv); state.lv++; ups++; } if (ups){ state.hp=maxHp(); state.mp=maxMp(); } return ups; }
+function gainXpField(n){ const before=state.lv, ups=gainXp(n);
+  if (ups){ Sound.play('levelup'); toast(`<span class="rainbow font-pixel">LEVEL UP!</span> 勇者升到 Lv.${state.lv}！`);
+    if (before<2 && state.lv>=2) toast('✨ 學會新技能「治癒之光」！');
+    if (before<ALCHEMY_UNLOCK && state.lv>=ALCHEMY_UNLOCK) toast('🔓 煉金設施解鎖了！'); }
+  updateHUD(); }
+
+/* =====================================================================
+   5. 地圖生成：每個地區有自己的佈局
+   ===================================================================== */
+const SOLID_T = new Set(['~','Z','E']);
+const WATERS = { fresh:['#62bff0','#58b2e6','#a7e3ff','#d5f2ff','#4aa3d6'], sea:['#4fa8e8','#4699d6','#9fd8ff','#e3f6ff','#3b88c4'], moat:['#a991f5','#9775fa','#d0bfff','#e5dbff','#845ef7'] };
+function makeNoise(rnd){ const N=24, G=[...Array(N*N)].map(()=>rnd()), at=(x,y)=>G[(((y%N)+N)%N)*N+(((x%N)+N)%N)];
+  return (x,y)=>{ const x0=Math.floor(x), y0=Math.floor(y), fx=x-x0, fy=y-y0, sx=fx*fx*(3-2*fx), sy=fy*fy*(3-2*fy);
+    const a=at(x0,y0), b=at(x0+1,y0), c=at(x0,y0+1), d=at(x0+1,y0+1); return a+(b-a)*sx+(c-a)*sy+(a-b-c+d)*sx*sy; }; }
+/* ---- 共用工具 ---- */
+function newMap(R, w, h, fill, water){ const grid=v=>[...Array(h)].map(()=>Array(w).fill(v));
+  return { R, id:R.id, theme:R.theme, w, h, t:grid(fill), res:grid(0), occ:grid(null), objs:[], ents:[], ground:fill, water, dark:0, pos:{} }; }
+const inb = (m,x,y) => x>=0 && y>=0 && x<m.w && y<m.h;
+function setT(m,x,y,c){ if (inb(m,x,y)) m.t[y][x]=c; }
+function resv(m,x,y,v=1){ if (inb(m,x,y)) m.res[y][x]=Math.max(m.res[y][x],v); }
+function rectT(m,x0,y0,x1,y1,c,rv){ for (let y=y0;y<=y1;y++) for (let x=x0;x<=x1;x++){ if (c) setT(m,x,y,c); if (rv) resv(m,x,y,rv); } }
+function road(m, pts, c, w=1){
+  for (let i=0;i<pts.length-1;i++){ let [x,y]=pts[i]; const [x2,y2]=pts[i+1];
+    const put=(px,py)=>{ for (let k=0;k<w;k++){ const qx = x2!==pts[i][0] ? px : px+k, qy = x2!==pts[i][0] ? py+k : py;
+        if (!inb(m,qx,qy)) continue; const cur=m.t[qy][qx]; setT(m,qx,qy, cur==='~' ? 'b' : c);
+        for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++) resv(m,qx+dx,qy+dy); } };
+    put(x,y); while (x!==x2 || y!==y2){ if (x!==x2) x+=Math.sign(x2-x); else y+=Math.sign(y2-y); put(x,y); } }
+}
+function blobT(m,cx,cy,r,c,noise,skipRes=true){ for (let y=Math.floor(cy-r-2);y<=cy+r+2;y++) for (let x=Math.floor(cx-r-2);x<=cx+r+2;x++)
+  if (inb(m,x,y) && !(skipRes && m.res[y][x]) && Math.hypot(x-cx,y-cy)+noise(x/2,y/2)*.9 < r) setT(m,x,y,c); }
+function addObj(m,kind,x,y,w=1,h=1,extra={}){
+  for (let yy=y;yy<y+h;yy++) for (let xx=x;xx<x+w;xx++) if (!inb(m,xx,yy) || m.occ[yy][xx] || SOLID_T.has(m.t[yy][xx])) return null;
+  const o={ kind,x,y,w,h,...extra }; for (let yy=y;yy<y+h;yy++) for (let xx=x;xx<x+w;xx++) m.occ[yy][xx]=o; m.objs.push(o); return o;
+}
+function borderObj(m, kind, thick=2){ for (let y=0;y<m.h;y++) for (let x=0;x<m.w;x++){ if (!(x<thick||y<thick||x>=m.w-thick||y>=m.h-thick)) continue;
+  if (m.t[y][x]==='~'||m.t[y][x]==='k') continue; if (kind.length===1) setT(m,x,y,kind); else { setT(m,x,y,m.ground==='w'?'w':m.ground); addObj(m,kind,x,y); } } }
+function scatter(m, list, thr, noise, rnd, zone=()=>true, scale=5.5, deco=true){
+  for (let y=2;y<m.h-2;y++) for (let x=2;x<m.w-2;x++){
+    if (m.res[y][x] || m.occ[y][x] || !zone(x,y)) continue;
+    const c=m.t[y][x]; if (c!==m.ground && c!=='.') continue;
+    const n=noise(x/scale,y/scale);
+    if (n>thr && rnd()<.78) addObj(m,wpick(list,rnd),x,y);
+    else if (deco && c==='.' && n>thr-.13 && rnd()<.45) setT(m,x,y,';');
+    else if (deco && c==='.' && rnd()<.05) setT(m,x,y,',');
+  }
+}
+function house(m,x,y,roof,sub,wall){ return addObj(m,'house',x,y,4,3,{ roof, sub, wall }); }
+/* ---- 1. 晨光新手村：中央圓形廣場、四周池塘與花田、東北遺跡 ---- */
+function layoutMeadow(R,rnd,noise){
+  const m=newMap(R,56,36,'.',WATERS.fresh), cx=24, cy=18;
+  for (let y=0;y<m.h;y++) for (let x=0;x<m.w;x++){ const d=Math.hypot(x-cx,(y-cy)*1.15); if (d<=6.2) setT(m,x,y,'='); if (d<=8.6) resv(m,x,y,2); }
+  road(m,[[cx+6,cy],[45,cy],[45,10]],'='); road(m,[[cx-6,cy],[5,cy]],'='); road(m,[[cx,cy+6],[cx,30],[40,30]],'='); road(m,[[cx,cy-6],[cx,4]],'=');
+  blobT(m,9,9,3.3,'~',noise); blobT(m,10,28,3.8,'~',noise); blobT(m,47,27,2.8,'~',noise);
+  for (let y=21;y<29;y++) for (let x=30;x<44;x++) if (m.t[y][x]==='.' && !m.res[y][x] && rnd()<.4) setT(m,x,y,',');
+  for (let a=0;a<Math.PI*2;a+=.42){ const x=Math.round(47+Math.cos(a)*5), y=Math.round(7+Math.sin(a)*3.6); if (m.t[y][x]!=='=' && rnd()<.8) addObj(m,'rock',x,y); }
+  rectT(m,44,4,50,10,null,1);
+  borderObj(m,'tree');
+  house(m,15,8,'#ff9f8f'); house(m,29,8,'#7cc6d9','shop'); house(m,13,24,'#b49cf0'); house(m,31,24,'#8ce99a');
+  addObj(m,'well',19,13);
+  m.pos = { spawn:[24,21], chief:[24,14], shop:[31,19], tips:[17,21], lab:[18,17], fire:[27,22], warp:[24,18], boss:[47,7] };
+  scatter(m,[['tree',5],['cherry',2],['bush',2],['rock',1]],.58,noise,rnd);
+  return m;
+}
+/* ---- 2. 微風村落：一條大河流過、西南小村、田地與風車、東北松樹林 ---- */
+function layoutFarm(R,rnd,noise){
+  const m=newMap(R,60,36,'.',WATERS.fresh);
+  for (let y=0;y<m.h;y++){ const rx=34+Math.round(Math.sin(y/4.2)*2.5); for (let dx=0;dx<3;dx++) setT(m,rx+dx,y,'~'); }
+  rectT(m,4,22,18,31,'=',2); rectT(m,3,17,22,33,null,2);
+  road(m,[[11,22],[11,6],[52,6]],'='); road(m,[[18,28],[56,28]],'='); road(m,[[46,6],[46,28]],'=');
+  [[22,10,30,15],[22,19,29,25],[38,12,43,21],[49,17,55,24],[38,30,45,32]].forEach(([x0,y0,x1,y1]) => { for (let y=y0;y<=y1;y++) for (let x=x0;x<=x1;x++) if (m.t[y][x]==='.' && !m.res[y][x]){ setT(m,x,y,'F'); resv(m,x,y); } });
+  addObj(m,'windmill',24,3,2,2); [[31,11],[31,17],[37,24],[48,16],[24,26]].forEach(([x,y])=>addObj(m,'hay',x,y));
+  rectT(m,49,5,55,11,null,1);
+  borderObj(m,'pine');
+  house(m,5,18,'#ffb366'); house(m,12,18,'#ff8fab','shop'); house(m,19,24,'#d6a46b');
+  m.pos = { spawn:[11,27], chief:[8,24], shop:[15,25], tips:[25,18], lab:[16,30], fire:[6,30], warp:[11,31], boss:[52,8] };
+  scatter(m,[['pine',4],['tree',2],['bush',2]],.62,noise,rnd,(x,y)=>!(x>39&&y<15));
+  scatter(m,[['pine',6],['tree',1]],.36,noise,rnd,(x,y)=>x>39&&y<15,3.5,false);
+  return m;
+}
+/* ---- 3. 港灣城鎮：東邊是大海、西北是石板街城鎮、碼頭通往小島 ---- */
+function layoutHarbor(R,rnd,noise){
+  const m=newMap(R,60,36,'.',WATERS.sea), shore=y=>40+Math.round(Math.sin(y/5)*2);
+  for (let y=0;y<m.h;y++){ const sx=shore(y); for (let x=sx;x<m.w;x++) setT(m,x,y,'~'); for (let x=sx-3;x<sx;x++) setT(m,x,y,'s'); }
+  const island=(cx,cy,r)=>{ for (let y=Math.floor(cy-r-1);y<=cy+r+1;y++) for (let x=Math.floor(cx-r-1);x<=cx+r+1;x++){ const d=Math.hypot(x-cx,(y-cy)*1.2)+noise(x/2,y/2)*.7; if (inb(m,x,y) && d<r) setT(m,x,y, d<r-2.2?'.':'s'); } };
+  island(52,27,5.5); island(51,8,3.4);
+  for (let x=shore(27);x<48;x++){ setT(m,x,27,'k'); resv(m,x,27); }
+  for (let x=shore(9);x<49;x++){ setT(m,x,9,'k'); resv(m,x,9); }
+  for (let x=shore(17);x<shore(17)+4;x++){ setT(m,x,17,'k'); resv(m,x,17); }
+  road(m,[[3,6],[37,6]],'r'); road(m,[[3,13],[37,13]],'r'); [10,24,35].forEach(x=>road(m,[[x,3],[x,20]],'r'));
+  rectT(m,15,8,21,11,'r',2); rectT(m,3,3,37,20,null,2);
+  rectT(m,49,23,55,31,null,1);
+  borderObj(m,'palm');
+  house(m,3,8,'#5c9ded'); house(m,11,8,'#ffffff','shop'); house(m,25,8,'#74c0fc'); house(m,3,15,'#ff9f8f'); house(m,27,15,'#5c9ded');
+  addObj(m,'lighthouse',37,3); [[36,22],[37,24],[35,25]].forEach(([x,y])=>addObj(m,'crate',x,y));
+  addObj(m,'boatDeco',shore(30)+1,30,2,1);
+  m.pos = { spawn:[17,12], chief:[19,9], shop:[13,12], tips:[shore(17)+2,16], lab:[36,7], fire:[36,19], warp:[shore(17)+4,17], boss:[53,27] };
+  scatter(m,[['palm',3],['tree',2],['bush',2],['rock',2]],.6,noise,rnd);
+  return m;
+}
+/* ---- 4. 霓虹都會：棋盤街道、大樓、中央公園、停車場、西北工廠 ---- */
+function layoutCity(R,rnd,noise){
+  const m=newMap(R,56,36,'w',WATERS.fresh);
+  const HY=[5,16,27], VX=[6,20,34,48];
+  HY.forEach(y=>road(m,[[2,y],[53,y]],'W',2)); VX.forEach(x=>road(m,[[x,2],[x,33]],'W',2));
+  const blocks=[]; for (let i=0;i<VX.length-1;i++) for (let j=0;j<HY.length-1;j++) blocks.push([VX[i]+3,HY[j]+3,VX[i+1]-2,HY[j+1]-2]);
+  // 中央公園（第 2 欄第 2 列）
+  const park=[22,19,33,26]; for (let y=park[1];y<=park[3];y++) for (let x=park[0];x<=park[2];x++){ setT(m,x,y,'.'); }
+  addObj(m,'fountain',27,22,2,2); rectT(m,park[0],park[1],park[2],park[3],null,1);
+  // 西北工廠（第 1 欄第 1 列）
+  rectT(m,9,8,18,14,null,1); [[9,8],[12,8],[16,8]].forEach(([x,y])=>addObj(m,'chimney',x,y));
+  // 停車場（第 3 欄第 2 列）
+  [[37,20,'car'],[40,20,'carB'],[43,20,'car'],[37,24,'carB'],[41,24,'car']].forEach(([x,y,k])=>addObj(m,k,x,y,2,1));
+  rectT(m,36,19,46,26,null,1);
+  // 其他街區蓋大樓
+  const cols=['#ffc9de','#c5f6fa','#fff3bf','#d0bfff','#b2f2bb','#ffd8a8'];
+  blocks.forEach(([x0,y0,x1,y1]) => { for (let by=y0;by+2<=y1;by+=4) for (let x=x0;x+2<=x1;x+=4){ let ok=true; for (let y=by;y<by+3;y++) for (let xx=x;xx<x+3;xx++) if (m.res[y]?.[xx]) ok=false;
+    if (ok && rnd()<.85) addObj(m,'building',x,by,3,3,{ col:cols[(x+by)%cols.length], seed:x*100+by }); } });
+  for (let x=8;x<52;x+=6) [HY[1]-1,HY[2]+2].forEach(y=>{ if (m.t[y][x]!=='W') addObj(m,'lamp',x,y); });
+  addObj(m,'vending',30,30); addObj(m,'vending',10,30);
+  borderObj(m,'E');
+  house(m,13,29,'#51cf66','shop');
+  m.pos = { spawn:[27,31], chief:[25,21], shop:[16,33], tips:[31,25], lab:[23,24], fire:[39,31], warp:[27,30], boss:[13,11] };
+  scatter(m,[['tree',3],['bush',2]],.62,noise,rnd,(x,y)=>m.t[y][x]==='.',5.5,false);
+  return m;
+}
+/* ---- 5. 混沌魔王城：南邊庭院、護城河、城內房間迷宮、北邊王座廳 ---- */
+function layoutCastle(R,rnd,noise){
+  const m=newMap(R,50,40,'Q',WATERS.moat); m.dark=.5;
+  for (let x=2;x<48;x++){ setT(m,x,30,'~'); setT(m,x,31,'~'); }
+  rectT(m,2,32,47,37,'.');
+  [10,20].forEach(y=>{ for (let x=2;x<48;x++) setT(m,x,y,'Z'); }); [16,33].forEach(x=>{ for (let y=2;y<30;y++) setT(m,x,y,'Z'); });
+  for (let x=2;x<48;x++) setT(m,x,29,'Z');
+  [[12,10],[12,20],[37,10],[37,20],[16,6],[16,15],[16,25],[33,6],[33,15],[33,25],[8,29],[41,29]].forEach(([x,y])=>{ setT(m,x,y,'Q'); setT(m,x+(y===10||y===20||y===29?1:0),y+(y===10||y===20||y===29?0:1),'Q'); });
+  road(m,[[24,37],[24,3]],'K',2);
+  rectT(m,17,2,32,9,null,1);
+  addObj(m,'throne',24,2,2,2);
+  [[2,3],[3,3],[4,3],[6,3],[7,3],[9,3],[10,3]].forEach(([x,y])=>addObj(m,'bookshelf',x,y));
+  [[3,12],[5,12],[7,12],[9,12],[11,12]].forEach(([x,y])=>addObj(m,'armor',x,y));
+  [[40,3],[42,4],[44,3],[45,6]].forEach(([x,y])=>addObj(m,'gold',x,y));
+  for (let y=22;y<29;y+=3){ addObj(m,'brazier',22,y); addObj(m,'brazier',27,y); }
+  for (let y=12;y<19;y+=3){ addObj(m,'brazier',22,y); addObj(m,'brazier',27,y); }
+  borderObj(m,'Z');
+  m.pos = { spawn:[24,35], chief:[21,34], shop:[40,15], tips:[28,34], lab:[8,25], fire:[40,25], warp:[27,36], boss:[24,5] };
+  scatter(m,[['dead',3],['rock',1]],.55,noise,rnd,(x,y)=>y>31,5,false);
+  scatter(m,[['rock',2],['dead',1]],.7,noise,rnd,(x,y)=>y<29,5,false);
+  return m;
+}
+const LAYOUTS = { meadow:layoutMeadow, farm:layoutFarm, harbor:layoutHarbor, city:layoutCity, castle:layoutCastle };
+const MAPS = {};
+function genMap(R){
+  const rnd=seeded(strHash(R.id+'world2')), noise=makeNoise(rnd), m=LAYOUTS[R.theme](R,rnd,noise);
+  const P=m.pos, ents=m.ents;
+  const solid=(x,y)=>!inb(m,x,y)||SOLID_T.has(m.t[y][x])||!!m.occ[y][x];
+  const taken=(x,y)=>ents.some(e=>e.x===x&&e.y===y);
+  const free=(x,y)=>!solid(x,y)&&!taken(x,y);
+  const findFree=(x,y)=>{ for (let r=0;r<8;r++) for (let dy=-r;dy<=r;dy++) for (let dx=-r;dx<=r;dx++){ if (Math.max(Math.abs(dx),Math.abs(dy))!==r) continue; if (free(x+dx,y+dy)) return [x+dx,y+dy]; } return [x,y]; };
+  const place=(e,exact)=>{ const [x,y]=exact?[e.x,e.y]:findFree(e.x,e.y); ents.push({...e,x,y}); };
+  const c=R.cast;
+  m.spawn={ x:P.spawn[0], y:P.spawn[1] };
+  place({ k:'npc', role:'chief', x:P.chief[0], y:P.chief[1] });
+  place({ k:'npc', role:'shop',  x:P.shop[0],  y:P.shop[1] });
+  place({ k:'npc', role:'tips',  x:P.tips[0],  y:P.tips[1] });
+  place({ k:'lab',  spr:c.lab.spr,  x:P.lab[0],  y:P.lab[1] });
+  place({ k:'fire', spr:c.fire.spr, x:P.fire[0], y:P.fire[1] });
+  place({ k:'warp', spr:c.warp.spr, x:P.warp[0], y:P.warp[1] }, c.warp.spr==='boat');
+  const far=(x,y,d)=>Math.hypot(x-m.spawn.x,y-m.spawn.y)>d && Math.hypot(x-P.boss[0],y-P.boss[1])>5;
+  let tries=0, n=0;
+  while (n<22 && tries++<4000){ const x=2+(rnd()*(m.w-4)|0), y=2+(rnd()*(m.h-4)|0);
+    if (!free(x,y) || m.res[y][x]===2 || ['k','b','W','K','='].includes(m.t[y][x]) || !far(x,y,7)) continue;
+    const id=(R.cpNodes.length&&rnd()<.28)?R.cpNodes[rnd()*R.cpNodes.length|0]:R.nodes[rnd()*R.nodes.length|0];
+    ents.push({ k:'node', id, x, y }); n++; }
+  tries=0; n=0;
+  while (n<12 && tries++<4000){ const x=2+(rnd()*(m.w-4)|0), y=2+(rnd()*(m.h-4)|0);
+    if (!free(x,y) || m.res[y][x]===2 || m.t[y][x]==='k' || !far(x,y,10)) continue;
+    ents.push({ k:'mon', type:R.mons[n%R.mons.length], x, y }); n++; }
+  place({ k:'mon', type:R.boss, x:P.boss[0], y:P.boss[1], still:true, boss:true }, true);
+  // 隱藏寶箱（看不見，要自己調查）
+  m.chests=[]; tries=0;
+  while (m.chests.length<6 && tries++<4000){ const x=3+(rnd()*(m.w-6)|0), y=3+(rnd()*(m.h-6)|0);
+    if (!free(x,y) || m.res[y][x] || !far(x,y,8) || m.chests.some(([a,b])=>Math.hypot(a-x,b-y)<6)) continue; m.chests.push([x,y]); }
+  carveAll(m);
+  m.seed=strHash(R.id);
+  return m;
+}
+function carveAll(map){
+  const { t, occ, w:W, h:H } = map, inb2=(x,y)=>x>=0&&y>=0&&x<W&&y<H;
+  const walk=(x,y)=>inb2(x,y)&&!SOLID_T.has(t[y][x])&&!occ[y][x];
+  const reach=new Uint8Array(W*H);
+  const flood=(sx,sy)=>{ const st=[[sx,sy]]; while (st.length){ const [x,y]=st.pop(); if (!walk(x,y)||reach[y*W+x]) continue; reach[y*W+x]=1; st.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]); } };
+  flood(map.spawn.x,map.spawn.y);
+  const ok=e=> e.k==='mon' ? reach[e.y*W+e.x] : [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>inb2(e.x+dx,e.y+dy)&&reach[(e.y+dy)*W+e.x+dx]);
+  const cost=(x,y)=>{ if (x<2||y<2||x>=W-2||y>=H-2) return 999; if (walk(x,y)) return 1; const o=occ[y][x]; if (o) return (o.w*o.h===1)?5:999; if (t[y][x]==='~') return 7; return 9; };
+  const targets=[...map.ents, ...map.chests.map(([x,y])=>({k:'mon',x,y}))];
+  for (const e of targets){
+    if (ok(e)) continue;
+    const dist=new Float64Array(W*H).fill(Infinity), prev=new Int32Array(W*H).fill(-1), heap=[];
+    const push=(d,i)=>{ heap.push([d,i]); let k=heap.length-1; while (k>0){ const p=(k-1)>>1; if (heap[p][0]<=heap[k][0]) break; [heap[p],heap[k]]=[heap[k],heap[p]]; k=p; } };
+    const pop=()=>{ const top=heap[0], last=heap.pop(); if (heap.length){ heap[0]=last; let k=0; for(;;){ const l=2*k+1, r=l+1; let m=k; if (l<heap.length&&heap[l][0]<heap[m][0]) m=l; if (r<heap.length&&heap[r][0]<heap[m][0]) m=r; if (m===k) break; [heap[m],heap[k]]=[heap[k],heap[m]]; k=m; } } return top; };
+    const s=e.y*W+e.x; dist[s]=0; push(0,s); let goal=-1;
+    while (heap.length){ const [d,i]=pop(); if (d>dist[i]) continue; const x=i%W, y=(i/W)|0; if (reach[i]&&i!==s){ goal=i; break; }
+      for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx, ny=y+dy; if (!inb2(nx,ny)) continue; const j=ny*W+nx, nd=d+cost(nx,ny); if (nd<dist[j]){ dist[j]=nd; prev[j]=i; push(nd,j); } } }
+    if (goal<0) continue;
+    for (let i=prev[goal]; i>=0 && i!==s; i=prev[i]){ const x=i%W, y=(i/W)|0, o=occ[y][x];
+      if (o && o.w*o.h===1){ occ[y][x]=null; map.objs.splice(map.objs.indexOf(o),1); }
+      if (t[y][x]==='~') t[y][x]='b'; else if (SOLID_T.has(t[y][x])) t[y][x]=map.ground; }
+    if (e.k==='mon' && SOLID_T.has(t[e.y][e.x])) t[e.y][e.x]=map.ground;
+    reach.fill(0); flood(map.spawn.x,map.spawn.y);
+  }
+}
+function prerenderMap(map){
+  map.cv=[0,1].map(f=>{ const c=makeCanvas(map.w*16,map.h*16), g=c.getContext('2d');
+    for (let y=0;y<map.h;y++) for (let x=0;x<map.w;x++){ const r=seeded(x*73856093^y*19349663^map.seed); paintTile(g,map.t[y][x],x*16,y*16,r,f,map,x,y); } return c; });
+  const m=makeCanvas(map.w*2,map.h*2), g=m.getContext('2d');
+  for (let y=0;y<map.h;y++) for (let x=0;x<map.w;x++) RC(g,x*2,y*2,2,2,MINI_COL[map.t[y][x]]||'#94d66d');
+  map.objs.forEach(o=>RC(g,o.x*2,o.y*2,o.w*2,o.h*2, o.kind==='house'||o.kind==='building'?'#ff8fab':'#3f8f4c'));
+  map.mini=m;
+  const th=makeCanvas(map.w*4,map.h*4), tg=th.getContext('2d'); tg.imageSmoothingEnabled=false; tg.drawImage(map.cv[0],0,0,th.width,th.height);
+  [...map.objs].sort((a,b)=>(a.y+a.h)-(b.y+b.h)).forEach(o=>{ const s=objSprite(o); tg.drawImage(s.f[0],(o.x*16+s.dx)/4,(o.y*16+s.dy)/4,s.f[0].width/4,s.f[0].height/4); });
+  map.thumb=th.toDataURL();
+}
+
+/* =====================================================================
+   6. 大地圖執行
+   ===================================================================== */
+let VW=400, VH=240, scale=2;
+const DIRS=['up','down','left','right'], DX={up:0,down:0,left:-1,right:1}, DY={up:-1,down:1,left:0,right:0};
+const cv=$('#game'), ctx=cv.getContext('2d');
+const ui={ title:true, regions:false, dialog:false, modal:false, battle:false, busy:false };
+const blocked=()=>ui.title||ui.regions||ui.dialog||ui.modal||ui.battle||ui.busy;
+let world=null, animT=0, graceT=0;
+const player={ x:10, y:17, fx:10, fy:17, dir:'down', moving:false, t:0, step:0, gatherT:0 };
+const nodeTimers={}, particles=[], ambient=[], searchCD={};
+let vignette=null, darkCv=null;
+function resize(){
+  scale=Math.max(1,innerHeight/240); VW=Math.ceil(innerWidth/scale); VH=Math.ceil(innerHeight/scale);
+  cv.width=VW; cv.height=VH; ctx.imageSmoothingEnabled=false;
+  vignette=makeCanvas(VW,VH); const g=vignette.getContext('2d');
+  const gr=g.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.7);
+  gr.addColorStop(0,'rgba(30,20,50,0)'); gr.addColorStop(1,'rgba(30,20,50,.32)'); g.fillStyle=gr; g.fillRect(0,0,VW,VH);
+  darkCv=makeCanvas(VW,VH);
+  $('#rotate').classList.toggle('hidden', !(isTouch && innerHeight>innerWidth && !state.flags.portraitOk));
+  if (world) sizeMinimap();
+}
+function sizeMinimap(){ const mm=$('#minimap'), k=innerHeight<520?2:3; mm.width=world.w*2; mm.height=world.h*2; mm.style.width=(world.w*k)+'px'; mm.style.height=(world.h*k)+'px'; }
+function enterRegion(id,pos){
+  const R=RG[id], map=MAPS[id];
+  nodeTimers[id]=nodeTimers[id]||{}; searchCD[id]=searchCD[id]||{};
+  map.live=map.ents.map((e,i)=>({ ...e, idx:i, hx:e.x, hy:e.y, fx:e.x, fy:e.y, moving:false, t:0, wait:1+Math.random()*2, dead:0 }))
+    .filter(e=>!(e.k==='mon'&&e.boss&&regState(id).boss));
+  world=map; const p=pos||map.spawn;
+  Object.assign(player,{ x:p.x, y:p.y, fx:p.x, fy:p.y, dir:p.dir||'down', moving:false, t:0 });
+  state.cur={ r:id, x:p.x, y:p.y, dir:player.dir };
+  $('#h-area').textContent=R.name; ambient.length=0; sizeMinimap();
+  showBanner(R.name); Music.play(R.music); updateHUD(); save();
+  if (!regState(id).talk) setTimeout(()=>{ if (!blocked()) say([{ who:'sys', text:`（先去找${R.cast.chief.name}說話吧！頭上有「!」的就是可以說話的人。）` }]); },1200);
+}
+const nodeReady=e=>!(nodeTimers[world.id][e.idx]>Date.now());
+function entAt(x,y){ return world.live.find(e=>{ if (e.k==='mon'){ if (e.dead) return false; return (e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y); }
+  if (e.k==='node'&&!nodeReady(e)) return false; return e.x===x&&e.y===y; }); }
+function tileBlocked(x,y){ const c=tileAt(world,x,y); return c===null||SOLID_T.has(c)||!!world.occ[y][x]; }
+function tryMove(dir){
+  player.dir=dir; const nx=player.x+DX[dir], ny=player.y+DY[dir], e=entAt(nx,ny);
+  if (e&&e.k==='mon'){ startBattle(e); return; }
+  if (tileBlocked(nx,ny)||e){ if (!(player.bumpT>0)){ Sound.play('bump'); player.bumpT=.3; } return; }
+  player.fx=player.x; player.fy=player.y; player.x=nx; player.y=ny; player.moving=true; player.t=0;
+}
+function updatePlayer(dt){
+  if (player.bumpT>0) player.bumpT-=dt;
+  if (player.moving){ player.t+=dt*6.5; if (player.t>=1){ player.t=0; player.moving=false; player.step++; state.cur.x=player.x; state.cur.y=player.y; state.cur.dir=player.dir; } else return; }
+  if (blocked()) return; const d=Input.dir(); if (d) tryMove(d);
+}
+function updateMonsters(dt){
+  if (blocked()) return;
+  for (const m of world.live){
+    if (m.k!=='mon') continue;
+    if (m.dead){ if (Date.now()>m.dead && Math.hypot(m.hx-player.x,m.hy-player.y)>7){ m.dead=0; m.x=m.hx; m.y=m.hy; m.fx=m.x; m.fy=m.y; } continue; }
+    if (m.still) continue;
+    if (m.moving){ m.t+=dt*3; if (m.t>=1){ m.t=0; m.moving=false; } continue; }
+    m.wait-=dt; if (m.wait>0) continue; m.wait=1+Math.random()*1.8;
+    const d=pick(DIRS), nx=m.x+DX[d], ny=m.y+DY[d];
+    if (Math.abs(nx-m.hx)>3||Math.abs(ny-m.hy)>3) continue;
+    const hit=(nx===player.x&&ny===player.y)||(player.moving&&nx===player.fx&&ny===player.fy);
+    if (hit){ if (graceT<=0){ startBattle(m); return; } continue; }
+    if (tileBlocked(nx,ny)||entAt(nx,ny)) continue;
+    m.fx=m.x; m.fy=m.y; m.x=nx; m.y=ny; m.moving=true; m.t=0;
+  }
+}
+const frontTile=()=>({ x:player.x+DX[player.dir], y:player.y+DY[player.dir] });
+function interactable(){ if (player.moving) return null; const f=frontTile(), e=entAt(f.x,f.y); return (e&&e.k!=='mon')?e:null; }
+async function interact(){
+  if (ui.dialog){ dialogNext(); return; }
+  if (blocked()) return;
+  const e=interactable();
+  if (e){
+    if (e.k==='npc') return talkTo(e.role);
+    if (e.k==='lab') return openAlchemy();
+    if (e.k==='fire') return openFire();
+    if (e.k==='warp'){ Sound.play('warp'); return openRegions(); }
+    if (e.k==='node') return gather(e);
+  }
+  const f=frontTile(); if (!player.moving && inb(world,f.x,f.y)) return searchSpot(f.x,f.y);
+}
+/* ---------- 採集元素晶塊 ---------- */
+async function gather(node){
+  ui.busy=true; player.gatherT=.6;
+  for (let i=0;i<2;i++){ Sound.play('mine'); burstWorld(node.x*16+8,node.y*16+8,EL[node.id]?.color||CP_COLOR); await sleep(240); }
+  ui.busy=false; player.gatherT=0;
+  const id=node.id, n=['H','O'].includes(id)?rand(2,3):rand(1,2);
+  addItem(id,n); Sound.play('get'); nodeTimers[world.id][node.idx]=Date.now()+45000;
+  regState(world.id).gather++;
+  toast(`${cellHTML(id,40)} 採集到 <b>${itemName(id)}</b> ×${n}${learnQuiet([id])}`);
+  gainXpField(1); checkQuest(); save();
+}
+/* ---------- 「調查」任何地方：砍樹、取水、敲石頭、找寶箱 ---------- */
+async function searchSpot(x,y){
+  const key=x+','+y, cdMap=searchCD[world.id], now=Date.now();
+  const o=world.occ[y][x], tile=world.t[y][x];
+  if (cdMap[key]>now){ toast('這裡剛剛找過了，等一下再來吧～'); return; }
+  ui.busy=true; player.gatherT=.5; Sound.play('search'); await sleep(320); ui.busy=false; player.gatherT=0;
+  // 隱藏寶箱
+  const chestKey=world.id+':'+key, opened=state.opened[world.id]||(state.opened[world.id]=[]);
+  if (world.chests.some(([a,b])=>a===x&&b===y) && !opened.includes(key)){ opened.push(key); return openChest(x,y,true); }
+  cdMap[key]=now+20000;
+  // 樹木
+  if (o && ['tree','cherry','pine'].includes(o.kind)){ if (o.cut>now){ toast('只剩樹樁了。樹要很久才會長回來……'); return; } return chopTree(o); }
+  if (o && o.kind==='palm'){ Sound.play('chop'); if (Math.random()<.7){ addItem('H2O',1); Sound.play('get'); toast(`🥥 摘到椰子！椰子水大部分是水 H₂O。${learnQuiet(['H2O'])}`); gainXpField(1); save(); } else toast('椰子還沒成熟。'); return; }
+  if (o && o.kind==='dead'){ Sound.play('chop'); addItem('wood',1); toast(`${cellHTML('wood',36)} 撿到枯樹枝。枯樹已經不會行光合作用了。`); save(); return; }
+  if (o && ENV_OBJ[o.kind]) return envResult(ENV_OBJ[o.kind], x, y);
+  // 地面
+  if (tile==='~' || tile==='b' || tile==='k'){
+    const env = world.theme==='harbor' ? ENV_TILE.sea : ENV_TILE['~'];
+    if (tile!=='~'){ toast('站在木板上，水太遠了，搆不到……'); return; }
+    cdMap[key]=now+env.cd*1000; return envResult(env,x,y);
+  }
+  if (Math.random()<.04) return openChest(x,y,false);
+  if (ENV_TILE[tile]) return envResult(ENV_TILE[tile],x,y);
+  toast('什麼都沒找到……換個地方試試！');
+}
+function envResult(env,x,y){
+  if (Math.random() < (env.chance??0)){
+    const id=wpick(env.give), n=(id==='Si'||id==='H2O')&&Math.random()<.5?2:1;
+    addItem(id,n); Sound.play('get'); burstWorld(x*16+8,y*16+8,PTS[id]?.color||CP_COLOR);
+    toast(`${cellHTML(id,40)} 得到 <b>${itemName(id)}</b> ×${n}<div class="text-[13px] font-bold mt-1 text-left">💡 ${env.ok}</div>${learnQuiet([id])}`, 4600);
+    regState(world.id).gather++; gainXpField(1); checkQuest(); save();
+  } else if (env.no) toast(env.no);
+  else toast('什麼都沒找到……');
+}
+function chopTree(o){
+  Sound.play('chop'); o.cut=Date.now()+150000;
+  burstWorld(o.x*16+8,o.y*16+4,'#8de06a');
+  let lost='';
+  if ((state.inv.O2||0)>0){ removeItem('O2',1); lost='、失去氧氣 O₂ ×1'; }
+  addItem('CO2',1); const gotWood=Math.random()<.75; if (gotWood) addItem('wood',1);
+  toast(`🪓 砍倒了一棵樹！${gotWood?'得到樹枝 ×1、':''}得到二氧化碳 CO₂ ×1${lost}
+    <div class="text-[13px] font-bold mt-1 text-left">💡 樹會行光合作用：吸收二氧化碳 CO₂、放出氧氣 O₂。少一棵樹，空氣中的 O₂ 變少、CO₂ 變多！</div>${learnQuiet(['CO2'])}`, 5600);
+  gainXpField(1); save();
+}
+async function openChest(x,y,hidden){
+  Sound.play('chest'); burstWorld(x*16+8,y*16+8,'#ffd43b');
+  const R=RG[world.id], gold=rand(15,40)*R.tier, xp=8*R.tier, items=[...Array(rand(1,3))].map(()=>pick(R.nodes));
+  state.gold+=gold; items.forEach(id=>addItem(id,1)); const newNote=learnQuiet(items);
+  openModal('🎁 發現寶箱！', `<div class="text-center">
+    <div class="flex justify-center gap-6 my-2"><img src="${URL_.chestOpen}" class="px w-24" style="animation:bob .8s steps(2) infinite"></div>
+    <p class="text-lg font-black">${hidden?'藏在這裡的秘密寶箱！':'運氣真好，挖到寶箱了！'}</p>
+    <div class="flex justify-center gap-3 flex-wrap my-3">${items.map(id=>cellHTML(id,52)).join('')}</div>
+    <p class="font-black">🪙 金幣 +${gold}　✨ 經驗值 +${xp}</p>${newNote}
+    <button class="pbtn w-64 py-3 mt-4" id="ch-ok">好耶！</button></div>`);
+  $('#ch-ok').onclick=closeModal;
+  gainXpField(xp); updateHUD(); save();
+}
+function burstWorld(x,y,color){ for (let i=0;i<10;i++){ const a=Math.PI*2*i/10; particles.push({ x, y, vx:Math.cos(a)*45, vy:Math.sin(a)*45-25, life:.5, color }); } }
+
+/* ---------- 繪製 ---------- */
+function heroFrame(){ const D={down:'Down',up:'Up',left:'Left',right:'Right'}[player.dir];
+  if (!player.moving) return SPR['hero'+D+'A']; const half=player.t<.5;
+  if (D==='Left'||D==='Right') return SPR['hero'+D+(half?'B':'A')]; return SPR['hero'+D+(half?(player.step%2?'B':'C'):'A')]; }
+const lerpPos=o=>({ x:(o.moving?o.fx+(o.x-o.fx)*o.t:o.x)*16, y:(o.moving?o.fy+(o.y-o.fy)*o.t:o.y)*16 });
+function shadow(x,y,w=10){ ctx.fillStyle='rgba(43,34,56,.22)'; ctx.fillRect(x+8-w/2,y+14,w,2); ctx.fillRect(x+9-w/2,y+13,w-2,4); }
+function npcSprite(role){ return SPR[RG[world.id].cast[role].spr]; }
+function render(){
+  const pp=lerpPos(player), W=world.w*16, H=world.h*16;
+  const camX=clamp(Math.round(pp.x+8-VW/2),0,Math.max(0,W-VW)), camY=clamp(Math.round(pp.y+8-VH/2),0,Math.max(0,H-VH));
+  const offX=W<VW?Math.floor((VW-W)/2):0, offY=H<VH?Math.floor((VH-H)/2):0;
+  const f=Math.floor(animT*2)%2, now=Date.now();
+  ctx.fillStyle='#1e1830'; ctx.fillRect(0,0,VW,VH);
+  ctx.save(); ctx.translate(offX,offY);
+  ctx.drawImage(world.cv[f],camX,camY,Math.min(VW,W),Math.min(VH,H),0,0,Math.min(VW,W),Math.min(VH,H));
+  const list=[], lights=[], inView=(x,y,w,h)=>x+w>camX-16&&y+h>camY-48&&x<camX+VW+16&&y<camY+VH+48;
+  for (const o of world.objs){ if (!inView(o.x*16,o.y*16,o.w*16,o.h*16)) continue;
+    const s=objSprite(o), img=s.f[f%s.f.length];
+    list.push({ y:(o.y+o.h)*16, draw:()=>ctx.drawImage(img,o.x*16+s.dx-camX,o.y*16+s.dy-camY) });
+    if (s.light) lights.push([o.x*16+8-camX,o.y*16-camY,34]); }
+  for (const e of world.live){
+    if (e.k==='node'&&!nodeReady(e)) continue; if (e.k==='mon'&&e.dead) continue;
+    const p=e.k==='mon'?lerpPos(e):{ x:e.x*16, y:e.y*16 }; if (!inView(p.x,p.y,16,16)) continue;
+    list.push({ y:p.y+16, draw:()=>{
+      const sx=Math.round(p.x-camX), sy=Math.round(p.y-camY);
+      if (e.k==='npc'){ shadow(sx,sy); ctx.drawImage(npcSprite(e.role),sx,sy-(Math.floor(animT*1.5+e.x)%2)); }
+      else if (e.k==='mon'){ const M=MONSTERS[e.type], bob=Math.floor(animT*3+e.idx)%2; shadow(sx,sy,M.boss?16:10);
+        if (M.boss) ctx.drawImage(SPR[M.spr],sx-8,sy-16-bob,32,32); else ctx.drawImage(SPR[M.spr],sx,sy-bob); }
+      else if (e.k==='node'){ shadow(sx,sy,10); const bob=Math.floor(animT*2+e.idx)%2; ctx.drawImage(makeNode(e.id,Math.floor(animT*3+e.idx)%6===0?1:0),sx,sy-2-bob); }
+      else { const s=OBJ[e.spr]; ctx.drawImage(s.f[f%s.f.length],sx+s.dx,sy+s.dy); }
+    }});
+    if (['lab','fire','warp'].includes(e.k) && OBJ[e.spr]?.light) lights.push([e.x*16+8-camX,e.y*16-camY,36]);
+  }
+  list.push({ y:pp.y+16, draw:()=>{ const sx=Math.round(pp.x-camX), sy=Math.round(pp.y-camY); shadow(sx,sy);
+    const g=player.gatherT>0&&Math.floor(animT*12)%2?2:0; if (graceT>0&&Math.floor(animT*10)%2) return;
+    ctx.drawImage(heroFrame(),sx+DX[player.dir]*g,sy-1+DY[player.dir]*g); } });
+  lights.push([pp.x+8-camX,pp.y+8-camY,58]);
+  list.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
+  // 可互動提示：NPC、設施、元素晶塊
+  const it=!blocked()&&interactable();
+  if (it){ const bx=it.x*16-camX+4, by=it.y*16-camY-13-(Math.floor(animT*3)%2)-(it.k==='warp'||it.k==='lab'&&OBJ[it.spr].dy<0?8:0);
+    ctx.fillStyle=INK; ctx.fillRect(bx-1,by-1,10,11); ctx.fillStyle='#fff8e7'; ctx.fillRect(bx,by,8,9); ctx.fillStyle=INK; ctx.fillRect(bx+3,by+1,2,4); ctx.fillRect(bx+3,by+6,2,2); }
+  for (const p of particles){ ctx.fillStyle=p.color; ctx.fillRect(Math.round(p.x-camX)-1,Math.round(p.y-camY)-1,3,3); }
+  ctx.restore();
+  for (const a of ambient){ ctx.fillStyle=a.c; ctx.fillRect(Math.round(a.x),Math.round(a.y),2,2); }
+  if (world.dark){ const g=darkCv.getContext('2d'); g.globalCompositeOperation='source-over'; g.clearRect(0,0,VW,VH);
+    g.fillStyle=`rgba(28,16,52,${world.dark})`; g.fillRect(0,0,VW,VH); g.globalCompositeOperation='destination-out';
+    for (const [x,y,r] of lights){ const gr=g.createRadialGradient(x+offX,y+offY,2,x+offX,y+offY,r*(1+Math.sin(animT*6+x)*.04)); gr.addColorStop(0,'rgba(0,0,0,1)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(x+offX-r,y+offY-r,r*2,r*2); }
+    ctx.drawImage(darkCv,0,0); }
+  ctx.drawImage(vignette,0,0);
+  const mm=$('#minimap'), mg=mm.getContext('2d'); mg.imageSmoothingEnabled=false; mg.drawImage(world.mini,0,0);
+  mg.strokeStyle='#fff'; mg.lineWidth=1; mg.strokeRect(camX/8+.5,camY/8+.5,VW/8,VH/8);
+  for (const e of world.live){ if (e.k==='mon'&&e.boss&&!e.dead){ mg.fillStyle='#ff4d8d'; mg.fillRect(e.x*2-1,e.y*2-1,4,4); } if (e.k==='npc'||['lab','fire','warp'].includes(e.k)){ mg.fillStyle='#ffe066'; mg.fillRect(e.x*2,e.y*2,2,2); } }
+  mg.fillStyle=Math.floor(animT*4)%2?'#ffffff':'#4dabf7'; mg.fillRect(player.x*2-1,player.y*2-1,4,4);
+}
+function updateAmbient(dt){
+  const th=world.theme;
+  if (ambient.length<14 && Math.random()<dt*4){
+    if (th==='meadow'||th==='farm') ambient.push({ x:Math.random()*VW, y:-4, vx:12+Math.random()*10, vy:14+Math.random()*8, c:pick(['#ffc9de','#ffffff','#fff3a3']), life:12 });
+    if (th==='castle') ambient.push({ x:Math.random()*VW, y:VH+4, vx:(Math.random()-.5)*8, vy:-(10+Math.random()*12), c:pick(['#d0bfff','#b197fc','#e5dbff']), life:14 });
+    if (th==='harbor') ambient.push({ x:-4, y:Math.random()*VH, vx:18+Math.random()*10, vy:(Math.random()-.5)*4, c:'#ffffff', life:12 });
+    if (th==='city' && Math.random()<.3) ambient.push({ x:Math.random()*VW, y:-4, vx:0, vy:40, c:'rgba(165,216,255,.7)', life:8 });
+  }
+  for (let i=ambient.length-1;i>=0;i--){ const a=ambient[i]; a.x+=a.vx*dt+Math.sin(animT*2+i)*.2; a.y+=a.vy*dt; a.life-=dt; if (a.life<=0||a.x>VW+8||a.y>VH+8||a.y<-12) ambient.splice(i,1); }
+}
+let lastT=performance.now();
+function loop(now){
+  const dt=Math.min(.05,(now-lastT)/1000); lastT=now; animT+=dt;
+  if (graceT>0) graceT-=dt; if (player.gatherT>0) player.gatherT-=dt;
+  for (let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.life-=dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=120*dt; if (p.life<=0) particles.splice(i,1); }
+  if (world&&!ui.regions&&!ui.title){ updatePlayer(dt); updateMonsters(dt); updateAmbient(dt); render(); }
+  if (battle.on) FX.tick(dt);
+  Input.updateButtons(); requestAnimationFrame(loop);
+}
+
+/* =====================================================================
+   7. 輸入
+   ===================================================================== */
+let isTouch=('ontouchstart' in window)||matchMedia('(pointer:coarse)').matches;
+function applyDeviceUI(){
+  document.body.classList.toggle('touch',isTouch);
+  document.querySelectorAll('.kb-only').forEach(el=>el.classList.toggle('hidden',isTouch));
+  document.querySelectorAll('.touch-only').forEach(el=>el.classList.toggle('hidden',!isTouch));
+  const inGame=!ui.title&&!ui.regions;
+  $('#touch').classList.toggle('hidden',!isTouch||!inGame); $('#keyhint').classList.toggle('hidden',isTouch||!inGame);
+}
+window.addEventListener('touchstart',()=>{ if (!isTouch){ isTouch=true; applyDeviceUI(); resize(); } },{ passive:true });
+const Input={ held:[], dir(){ return this.held[this.held.length-1]||null; }, press(d){ if (!this.held.includes(d)) this.held.push(d); }, release(d){ this.held=this.held.filter(x=>x!==d); },
+  updateButtons(){ document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('on',this.held.includes(b.dataset.dir))); } };
+const KEYMAP={ ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right', w:'up', s:'down', a:'left', d:'right', W:'up', S:'down', A:'left', D:'right' };
+window.addEventListener('keydown',e=>{
+  Sound.ensure();
+  if (ui.battle){ battleKey(e); return; }
+  if (KEYMAP[e.key]&&!ui.modal){ e.preventDefault(); Input.press(KEYMAP[e.key]); return; }
+  if (e.repeat) return; const k=e.key.toLowerCase();
+  if (e.key===' '||e.key==='Enter'||k==='e'||k==='j'||k==='z'){ e.preventDefault(); if (!ui.modal&&!ui.title&&!ui.regions) interact(); }
+  else if (e.key==='Escape'||k==='m'||k==='x'){ e.preventDefault(); if (ui.modal) closeModal(); else if (!blocked()) openMenu(); }
+  else if (k==='c'){ if (ui.modal) closeModal(); else if (!blocked()||ui.regions) openCodex(); }
+  else if (k==='f') toggleFullscreen();
+});
+window.addEventListener('keyup',e=>{ if (KEYMAP[e.key]) Input.release(KEYMAP[e.key]); });
+window.addEventListener('blur',()=>{ Input.held=[]; });
+document.querySelectorAll('.dbtn').forEach(b=>{ const d=b.dataset.dir;
+  b.addEventListener('pointerdown',e=>{ e.preventDefault(); Sound.ensure(); b.setPointerCapture?.(e.pointerId); Input.press(d); });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>Input.release(d))); });
+$('#t-act').addEventListener('pointerdown',e=>{ e.preventDefault(); Sound.ensure(); interact(); });
+$('#t-menu').addEventListener('pointerdown',e=>{ e.preventDefault(); if (!blocked()) openMenu(); });
+cv.addEventListener('pointerdown',()=>{ Sound.ensure(); if (ui.dialog) dialogNext(); });
+$('#dialog').addEventListener('pointerdown',e=>{ if (!e.target.closest('#d-speak')) dialogNext(); });
+$('#btn-menu').onclick=()=>{ if (!blocked()) openMenu(); };
+$('#btn-codex').onclick=()=>{ if (!blocked()) openCodex(); };
+$('#btn-full').onclick=toggleFullscreen;
+$('#quest-box').onclick=()=>{ if (!blocked()) openQuest(); };
+function toggleFullscreen(){ try{ if (!document.fullscreenElement){ document.documentElement.requestFullscreen?.().then(()=>screen.orientation?.lock?.('landscape').catch(()=>{})).catch(()=>{}); } else document.exitFullscreen?.(); }catch(e){} }
+window.addEventListener('resize',()=>setTimeout(resize,60));
+
+/* =====================================================================
+   8. 介面
+   ===================================================================== */
+function cellHTML(id,size=44,showName=true){
+  if (CP[id]) return `<span class="cell inline-flex align-middle" style="--c:${CP_COLOR};width:${size*1.3}px;height:${size}px"><span class="nm" style="font-size:${size*.32}px">${fmtH(id)}</span>${showName&&size>=40?`<span class="nm" style="font-size:${size*.2}px">${CP[id].name}</span>`:''}</span>`;
+  const e=PTS[id];
+  if (e) return `<span class="cell inline-flex align-middle" style="--c:${e.color};width:${size}px;height:${size}px;font-size:${size*.34}px"><span class="num" style="font-size:${Math.max(7,size*.18)}px">${e.num}</span><span class="sym">${id}</span>${showName&&size>=40?`<span class="nm" style="font-size:${size*.22}px">${e.name}</span>`:''}</span>`;
+  if (GEAR[id]) return `<img src="${URL_['i_'+GEAR[id].icon]}" class="px inline-block align-middle" style="width:${size}px;height:${size}px">`;
+  if (MISC[id]) return `<img src="${URL_['i_'+MISC[id].icon]}" class="px inline-block align-middle" style="width:${size}px;height:${size}px">`;
+  return '';
+}
+function updateHUD(){
+  $('#h-lv').textContent=state.lv; $('#h-hp').style.width=(state.hp/maxHp()*100)+'%'; $('#h-mp').style.width=(state.mp/maxMp()*100)+'%';
+  $('#h-xp').style.width=(state.xp/xpNeed(state.lv)*100)+'%'; $('#h-hpt').textContent=`${state.hp}/${maxHp()}`; $('#h-gold').textContent=state.gold;
+  if (world) $('#quest-text').innerHTML=questText(world.id);
+}
+function toast(html,ms=2600){ const t=document.createElement('div'); t.className='pbox px-3 py-2 font-black text-[15px] fade-in text-center'; t.innerHTML=html; $('#toast-wrap').appendChild(t);
+  while ($('#toast-wrap').children.length>4) $('#toast-wrap').firstChild.remove(); setTimeout(()=>t.remove(),ms); }
+function showBanner(text){ const b=$('#banner'); b.textContent='～ '+text+' ～'; b.classList.remove('hidden'); clearTimeout(showBanner.t); showBanner.t=setTimeout(()=>b.classList.add('hidden'),1700); }
+
+/* ---------- 對話 ---------- */
+const dlg={ q:[], i:0, timer:null, typing:false, full:'', done:null };
+function speaker(who){ if (who==='sys') return { name:'', img:'heroDownA' }; const c=world?RG[world.id].cast[who]:null; return c?{ name:c.name, img:c.spr }:{ name:'', img:'heroDownA' }; }
+function say(lines){ return new Promise(res=>{ dlg.q=lines.map(l=>typeof l==='string'?{ who:'chief', text:l }:l); dlg.i=0; dlg.done=res;
+  ui.dialog=true; Input.held=[]; $('#dialog').classList.remove('hidden'); showLine(); }); }
+function showLine(){ const l=dlg.q[dlg.i], sp=speaker(l.who);
+  $('#d-name').textContent=sp.name; $('#d-face').innerHTML=`<img src="${URL_[sp.img]}" class="px w-full h-full">`;
+  dlg.full=l.text; const el=$('#d-text'); el.textContent=''; let n=0; dlg.typing=true; clearInterval(dlg.timer);
+  dlg.timer=setInterval(()=>{ n++; el.textContent=dlg.full.slice(0,n); if (n%3===0) Sound.play('blip'); if (n>=dlg.full.length){ clearInterval(dlg.timer); dlg.typing=false; } },30); }
+function dialogNext(){ if (!ui.dialog) return;
+  if (dlg.typing){ clearInterval(dlg.timer); dlg.typing=false; $('#d-text').textContent=dlg.full; return; }
+  Sound.play('click'); dlg.i++;
+  if (dlg.i>=dlg.q.length){ ui.dialog=false; $('#dialog').classList.add('hidden'); const d=dlg.done; dlg.done=null; d&&d(); } else showLine(); }
+$('#d-speak').onclick=e=>{ e.stopPropagation(); speak(dlg.full); };
+
+/* ---------- NPC ---------- */
+async function talkTo(role){
+  Sound.play('click'); const R=RG[world.id], c=R.cast;
+  if (role==='chief') return talkChief();
+  if (role==='shop'){ await say([{ who:'shop', text:'歡迎光臨！要買點什麼嗎？' }]); return openShop(); }
+  if (role==='tips') return say([{ who:'tips', text:pick(c.tips.lines) }]);
+}
+async function talkChief(){
+  const R=RG[world.id], rs=regState(R.id);
+  if (!rs.talk){ await say([...R.intro, `這裡的任務：採集元素、打倒怪物，最後打倒魔王「${MONSTERS[R.boss].name}」！`]); rs.talk=true; checkQuest(); save(); return; }
+  const lines=[];
+  if (state.hp<maxHp()||state.mp<maxMp()){ state.hp=maxHp(); state.mp=maxMp(); Sound.play('heal'); updateHUD(); lines.push('來，我幫你恢復精神！（HP 和 MP 全滿了）'); }
+  lines.push(rs.boss?`你已經制霸這個地區了！可以用${R.cast.warp.name}前往下一個地區。`:`現在的任務：${questText(R.id).replace(/<[^>]+>/g,'')}`);
+  await say(lines);
+}
+
+/* ---------- 地區任務 ---------- */
+const Q_GATHER=6, Q_KILLS=4;
+function questText(id){ const rs=regState(id), R=RG[id];
+  if (!rs.talk) return `和${R.cast.chief.name}說話`;
+  if (rs.gather<Q_GATHER) return `採集元素 <b>${rs.gather}/${Q_GATHER}</b>`;
+  if (rs.kills<Q_KILLS) return `打倒怪物 <b>${rs.kills}/${Q_KILLS}</b>`;
+  if (!rs.boss) return `打倒魔王「${MONSTERS[R.boss].name}」`;
+  return '⭐ 這個地區制霸了！'; }
+function checkQuest(){ if (!world) return; const rs=regState(world.id), key=`${rs.talk}:${rs.gather>=Q_GATHER}:${rs.kills>=Q_KILLS}:${rs.boss}`;
+  if (checkQuest.last && checkQuest.last!==key && checkQuest.lastId===world.id){ Sound.play('quest'); toast(`📜 任務更新：${questText(world.id)}`); }
+  checkQuest.last=key; checkQuest.lastId=world.id; updateHUD(); }
+
+/* ---------- 通用視窗 ---------- */
+let modalOnClose=null;
+function openModal(title,html,onClose){ ui.modal=true; Input.held=[]; $('#m-title').innerHTML=title; $('#m-body').innerHTML=html; $('#modal').classList.remove('hidden'); modalOnClose=onClose||null; }
+function closeModal(){ Sound.play('click'); $('#modal').classList.add('hidden'); ui.modal=false; const f=modalOnClose; modalOnClose=null; f&&f(); }
+$('#m-close').onclick=closeModal;
+const bind=(sel,fn)=>document.querySelectorAll(sel).forEach(b=>b.onclick=()=>fn(b));
+function askYesNo(title,text,yes='好',no='再想想'){ return new Promise(res=>{
+  openModal(title,`<p class="text-lg font-bold">${text}</p><div class="flex gap-3 mt-4"><button class="pbtn flex-1 py-3" id="yn-y">${yes}</button><button class="pbtn flex-1 py-3" id="yn-n" style="--btn:#e9ecef">${no}</button></div>`,()=>res(false));
+  $('#yn-y').onclick=()=>{ modalOnClose=null; closeModal(); res(true); }; $('#yn-n').onclick=()=>{ modalOnClose=null; closeModal(); res(false); }; }); }
+function openMenu(){
+  Sound.play('click');
+  openModal('☰ 選單',`<div class="grid grid-cols-4 gap-3 mt-2">
+      <button class="pbtn py-4 text-lg" data-m="bag" style="--btn:#ffe8cc">🎒 背包</button>
+      <button class="pbtn py-4 text-lg" data-m="status" style="--btn:#d0ebff">📊 狀態</button>
+      <button class="pbtn py-4 text-lg" data-m="codex" style="--btn:#d3f9d8">📖 圖鑑</button>
+      <button class="pbtn py-4 text-lg" data-m="quest" style="--btn:#fff3bf">📜 任務</button>
+      <button class="pbtn py-3" data-m="regions" style="--btn:#c5f6fa">🗺️ 換地區</button>
+      <button class="pbtn py-3" data-m="sound" style="--btn:#e5dbff">${state.sound?'🔊 音效：開':'🔇 音效：關'}</button>
+      <button class="pbtn py-3" data-m="music" style="--btn:#e5dbff">${state.music?'🎵 音樂：開':'🎵 音樂：關'}</button>
+      <button class="pbtn py-3" data-m="title" style="--btn:#e9ecef">🏠 回標題</button></div>
+    <p class="text-sm font-bold opacity-70 mt-3">💾 遊戲會自動存檔。🎒 背包裡的元素可以「吸收」增加經驗值！</p>`);
+  bind('[data-m]',b=>{ const m=b.dataset.m;
+    if (m==='bag') openBag(); if (m==='status') openStatus(); if (m==='codex') openCodex(); if (m==='quest') openQuest();
+    if (m==='regions'){ closeModal(); openRegions(); } if (m==='title'){ closeModal(); goTitle(); }
+    if (m==='sound'){ state.sound=!state.sound; save(); openMenu(); }
+    if (m==='music'){ state.music=!state.music; save(); state.music?Music.restart():Music.stop(); openMenu(); } });
+}
+/* ---------- 背包：元素可以吸收變成經驗值 ---------- */
+const absorbXp = id => CP[id] ? 6+CP[id].tier*2 : 3+(EL[id]?.tier||1)*2;
+function absorb(id,n=1){
+  if (TOXIC[id]){ Sound.play('wrong'); toast(`⚠️ ${TOXIC[id]}`,3600); return false; }
+  const have=state.inv[id]||0; n=Math.min(n,have); if (!n) return false;
+  removeItem(id,n); const xp=absorbXp(id)*n; Sound.play('absorb');
+  const fact = CP[id] ? CP[id].fact : EL[id]?.fact || '';
+  toast(`✨ 吸收了 ${itemName(id)} ×${n}，經驗值 +${xp}！<div class="text-[13px] font-bold mt-1 text-left">💡 ${fact}</div>${learnQuiet([id])}`,3600);
+  gainXpField(xp); save(); return true;
+}
+function openBag(tab='el'){
+  Sound.play('click');
+  const tabs={ el:'⚛️ 元素', cp:'🧪 化合物', etc:'🪵 道具與裝備' };
+  let ids=Object.keys(state.inv).filter(id=>tab==='el'?(!!PTS[id]&&!CP[id]):tab==='cp'?!!CP[id]:(!!GEAR[id]||!!MISC[id]));
+  if (tab==='el') ids.sort((a,b)=>PTS[a].num-PTS[b].num);
+  let body;
+  if (!ids.length) body='<p class="font-bold opacity-60 text-center py-6">這裡還是空的喔～</p>';
+  else if (tab==='el') body=`<p class="text-sm font-bold opacity-70">點「吸收」把元素變成經驗值（有毒的元素不能吸收喔！）</p><div class="flex flex-wrap gap-3 p-2">${ids.map(id=>`<div class="flex flex-col items-center gap-1 bg-white p-2" style="box-shadow:0 0 0 2px var(--ink)">${cellHTML(id,52)}<span class="font-pixel text-[10px]">×${state.inv[id]}</span>
+      <button class="sbtn text-[12px]" data-ab="${id}">${TOXIC[id]?'⚠️ 有毒':`✨ 吸收 +${absorbXp(id)}`}</button></div>`).join('')}</div>`;
+  else body=`<div class="grid-items">${ids.map(id=>{
+    const use=CP_USE[id], g=GEAR[id], eq=g&&state.equip[g.slot]===id;
+    let btn='';
+    if (tab==='cp') btn = use&&!use.dmg ? `<button class="pbtn px-3 py-1 text-sm" data-use="${id}" style="--btn:#b2f2bb">使用</button>` : `<button class="pbtn px-2 py-1 text-[12px]" data-ab="${id}" style="--btn:${TOXIC[id]?'#ffc9c9':'#e5dbff'}">${TOXIC[id]?'⚠️ 危險':`吸收 +${absorbXp(id)}`}</button>`;
+    else if (g) btn = eq ? '<span class="font-black text-[#2b8a3e] text-sm">裝備中</span>' : `<button class="pbtn px-3 py-1 text-sm" data-eq="${id}">裝備</button>`;
+    const desc = tab==='cp' ? (use?.txt || CP[id].fact) : (g?g.desc:MISC[id].desc);
+    return `<div class="row">${cellHTML(id,44)}<div class="flex-1 min-w-0"><div class="font-black">${tab==='cp'?CP[id].name:(g?g.name:MISC[id].name)} <span class="font-pixel text-[10px]">×${state.inv[id]}</span></div><div class="text-[12px] font-bold opacity-75">${desc}</div></div>${btn}</div>`; }).join('')}</div>`;
+  openModal('🎒 背包',`<div class="flex flex-wrap">${Object.entries(tabs).map(([k,v])=>`<button class="tab ${k===tab?'on':''}" data-tab="${k}">${v}</button>`).join('')}</div><div class="mt-2">${body}</div>`);
+  bind('[data-tab]',b=>openBag(b.dataset.tab));
+  bind('[data-ab]',b=>{ absorb(b.dataset.ab); openBag(tab); });
+  bind('[data-use]',b=>{ useItemField(b.dataset.use)&&openBag('cp'); });
+  bind('[data-eq]',b=>{ const g=GEAR[b.dataset.eq]; state.equip[g.slot]=b.dataset.eq; Sound.play('get'); save(); updateHUD(); openBag('etc'); });
+}
+function useItemField(id){ const u=CP_USE[id]; if (!u||!state.inv[id]) return false;
+  if (u.heal&&state.hp>=maxHp()&&!(u.mp&&state.mp<maxMp())){ toast('HP 已經是滿的了！'); return false; }
+  if (!u.heal&&u.mp&&state.mp>=maxMp()){ toast('MP 已經是滿的了！'); return false; }
+  removeItem(id); if (u.heal) state.hp=Math.min(maxHp(),state.hp+u.heal); if (u.mp) state.mp=Math.min(maxMp(),state.mp+u.mp);
+  Sound.play('heal'); toast(`使用了 ${CP[id].name} ${fmtH(id)}！`); updateHUD(); save(); return true; }
+function openStatus(){ Sound.play('click');
+  openModal('📊 勇者狀態',`<div class="flex gap-5 items-center flex-wrap"><img src="${URL_.heroDownA}" class="px w-24 bg-[#e9e1f5] p-2" style="box-shadow:0 0 0 3px var(--ink)">
+    <div class="font-black text-lg leading-relaxed"><div>等級 <span class="font-pixel text-sm">Lv.${state.lv}</span>　<span class="text-sm opacity-70">（再 ${xpNeed(state.lv)-state.xp} 經驗值升級）</span></div>
+    <div>❤️ HP ${state.hp} / ${maxHp()}　💧 MP ${state.mp} / ${maxMp()}</div><div>⚔️ 攻擊 ${atkVal()}　🛡️ 防禦 ${defVal()}</div>
+    <div>⚔️ 武器：${weapon()?.name||'（沒有）'}　🛡️ 防具：${armor()?.name||'（沒有）'}</div>
+    <div class="text-sm">📖 週期表 ${state.codex.length}/${ELS.length}　🧪 化合物 ${state.codexCp.length}/${CPS.length}</div></div></div>
+    <p class="mt-3 font-bold text-sm">✨ 技能：元素之眼（MP 3）${state.lv>=2?'、治癒之光（MP 5）':'（Lv.2 學會治癒之光）'}　⚗️ 煉金：${state.lv>=ALCHEMY_UNLOCK?'已解鎖':`Lv.${ALCHEMY_UNLOCK} 解鎖`}</p>`); }
+function openQuest(){ Sound.play('click');
+  openModal('📜 任務',`<p class="font-bold mb-1">每個地區：和長老說話 → 採集 ${Q_GATHER} 次元素 → 打倒 ${Q_KILLS} 隻怪物 → 打倒魔王</p>${REGIONS.map(R=>`<div class="row"><b class="w-28">${R.name}</b><span class="flex-1 font-bold">${questText(R.id)}</span>${regState(R.id).boss?'⭐':''}</div>`).join('')}`); }
+/* ---------- 週期表圖鑑 ---------- */
+function openCodex(tab='pt'){
+  Sound.play('click');
+  if (tab==='cp'){
+    openModal(`📖 化合物圖鑑　${state.codexCp.length}/${CPS.length}`,`<div class="flex"><button class="tab" data-ct="pt">⚛️ 元素週期表</button><button class="tab on" data-ct="cp">🧪 化合物</button></div>
+      <div class="grid-items mt-2">${CPS.map(f=>{ const c=CP[f], on=state.codexCp.includes(f);
+        return on?`<button class="row text-left" data-cp="${f}" style="cursor:pointer">${cellHTML(f,44)}<div><div class="font-black">${c.name}</div><div class="text-[12px] font-bold opacity-70">${Object.entries(c.parts).map(([e,n])=>`${PTS[e].name}×${n}`).join('＋')}</div></div></button>`
+                 :`<div class="row opacity-40"><span class="cell" style="width:57px;height:44px">？</span><div class="font-black">？？？</div></div>`; }).join('')}</div>`);
+    bind('[data-ct]',b=>openCodex(b.dataset.ct)); bind('[data-cp]',b=>showCpDetail(b.dataset.cp)); return;
+  }
+  const cs=Math.floor(clamp(Math.min((innerWidth-90)/18,(innerHeight-210)/10.4),24,54)); let cells=''; const at={}; PT.forEach(e=>at[e.pos[0]+','+e.pos[1]]=e);
+  for (let r=1;r<=10;r++) for (let g=1;g<=18;g++){
+    if (r===8){ cells+='<div class="gap"></div>'; continue; } const e=at[r+','+g];
+    if (!e){ if (r===6&&g===3) cells+=`<div class="cell" style="--c:${CAT.lanth.c};font-size:${cs*.22}px">57-71</div>`; else if (r===7&&g===3) cells+=`<div class="cell" style="--c:${CAT.actin.c};font-size:${cs*.22}px">89-103</div>`; else cells+='<div class="gap"></div>'; continue; }
+    const got=state.codex.includes(e.sym), inGame=!!EL[e.sym];
+    cells+=`<div class="cell ${got?'on':'off'}" ${got?`data-el="${e.sym}"`:''} style="--c:${e.color}" title="${e.sym} ${e.name}"><span class="num">${e.num}</span><span class="sym">${e.sym}</span><span class="nm">${got?e.name:(inGame?'？':e.name)}</span></div>`; }
+  const legend=Object.values(CAT).map(c=>`<span class="inline-flex items-center gap-1 mr-3"><span class="inline-block w-3 h-3" style="background:${c.c};box-shadow:0 0 0 1px var(--ink)"></span>${c.n}</span>`).join('');
+  openModal(`📖 元素週期表　已收集 ${state.codex.length}/${ELS.length}`,`<div class="flex items-center justify-between flex-wrap"><div class="flex"><button class="tab on" data-ct="pt">⚛️ 元素週期表</button><button class="tab" data-ct="cp">🧪 化合物</button></div>
+      <span class="text-[13px] font-bold opacity-70">亮起來的格子＝已收集，點一下看小知識；「？」是冒險中還能找到的元素</span></div>
+    <div id="ptable" style="--cs:${cs}px">${cells}</div><div class="text-[12px] font-bold flex flex-wrap justify-center">${legend}</div>`);
+  bind('[data-ct]',b=>openCodex(b.dataset.ct)); bind('#ptable [data-el]',b=>showElDetail(b.dataset.el));
+}
+function showElDetail(sym){ Sound.play('click'); const e=EL[sym], [row,grp]=PTS[sym].pos;
+  openModal('📖 '+e.name,`<div class="flex gap-5 items-center flex-wrap"><div class="cell" style="--c:${e.color};width:150px;height:150px"><span class="num" style="font-size:16px;left:8px;top:6px">${e.num}</span><span class="sym" style="font-size:44px">${sym}</span><span class="nm" style="font-size:26px;margin-top:8px">${e.name}</span></div>
+    <div class="flex-1 min-w-[220px]"><p class="font-black">第 ${row} 週期 ・ 第 ${grp} 族 ・ ${CAT[e.cat].n}</p><p class="text-lg font-bold leading-relaxed mt-2">💡 ${e.fact}</p></div></div>
+    <div class="flex gap-2 mt-4"><button class="pbtn flex-1 py-3" id="el-speak" style="--btn:#e5dbff">🔊 唸給我聽</button><button class="pbtn flex-1 py-3" id="el-back" style="--btn:#e9ecef">◀ 回週期表</button></div>`);
+  $('#el-speak').onclick=()=>speak(`${e.name}，符號是 ${sym.split('').join(' ')}。${e.fact}`); $('#el-back').onclick=()=>openCodex('pt'); }
+function showCpDetail(f){ Sound.play('click'); const c=CP[f];
+  openModal('🧪 '+c.name,`<div class="flex gap-5 items-center flex-wrap"><div class="cell" style="--c:${CP_COLOR};width:180px;height:130px"><span class="nm" style="font-size:34px">${fmtH(f)}</span><span class="nm" style="font-size:22px;margin-top:8px">${c.name}</span></div>
+    <div class="flex-1 min-w-[220px]"><p class="font-black">組成：</p><div class="flex gap-2 flex-wrap mt-1">${Object.entries(c.parts).map(([e,n])=>`<span class="inline-flex items-center gap-1 font-black">${cellHTML(e,40)} ×${n}</span>`).join('')}</div>
+    <p class="text-lg font-bold leading-relaxed mt-3">💡 ${c.fact}</p></div></div>
+    <div class="flex gap-2 mt-4"><button class="pbtn flex-1 py-3" id="cp-speak" style="--btn:#e5dbff">🔊 唸給我聽</button><button class="pbtn flex-1 py-3" id="cp-back" style="--btn:#e9ecef">◀ 回化合物</button></div>`);
+  $('#cp-speak').onclick=()=>speak(`${c.name}，化學式 ${fmtU(f)}。${c.fact}`); $('#cp-back').onclick=()=>openCodex('cp'); }
+/* ---------- 商店（每區賣的東西不同）---------- */
+function openShop(){ const S=RG[world.id].cast.shop;
+  openModal(`🏪 ${S.name}`,`<p class="font-bold">你的金幣：🪙 <b>${state.gold}</b></p><div class="grid-items">${S.items.map(([id,price])=>`<div class="row">${cellHTML(id,44)}<div class="flex-1"><div class="font-black">${itemName(id)}</div><div class="text-[12px] font-bold opacity-70">有 ${state.inv[id]||0} 個</div></div>
+      <button class="pbtn px-3 py-2 text-sm whitespace-nowrap" data-buy="${id}" data-p="${price}" ${state.gold<price?'disabled':''}>🪙${price}</button></div>`).join('')}</div>`);
+  bind('[data-buy]',b=>{ const p=+b.dataset.p; if (state.gold<p) return; state.gold-=p; addItem(b.dataset.buy); Sound.play('buy'); toast(`買了 ${itemName(b.dataset.buy)}！`); save(); updateHUD(); openShop(); }); }
+/* ---------- 煉金 ---------- */
+const outHTML = out => Object.entries(out).map(([id,n])=>`${cellHTML(id,46)}${n>1?`<b class="font-pixel text-[10px]">×${n}</b>`:''}`).join(' ');
+const outName = out => Object.entries(out).map(([id,n])=>`${itemName(id)}${n>1?`×${n}`:''}`).join('、');
+function openAlchemy(){
+  Sound.play('click'); const L=RG[world.id].cast.lab;
+  if (state.lv<ALCHEMY_UNLOCK){ toast(`${L.name}需要 Lv.${ALCHEMY_UNLOCK} 才能使用喔！（現在 Lv.${state.lv}）`,3000); return; }
+  const rows=RECIPES.map((r,i)=>{ const locked=state.lv<r.lv, ok=!locked&&Object.entries(r.need).every(([id,n])=>(state.inv[id]||0)>=n)&&(!r.cat||(state.inv[r.cat]||0)>0);
+    const mats=Object.entries(r.need).map(([id,n])=>{ const have=state.inv[id]||0; return `<span class="inline-flex items-center gap-1 mr-2 ${have>=n?'':'text-[#e8590c]'}">${cellHTML(id,26,false)} ${have}/${n}</span>`; }).join('')
+      + (r.cat?`<span class="inline-flex items-center gap-1 ${(state.inv[r.cat]||0)>0?'':'text-[#e8590c]'}">＋催化劑 ${cellHTML(r.cat,26,false)}（不會用掉）</span>`:'');
+    const first=Object.keys(r.out)[0], desc=r.eq||(CP[first]?(CP_USE[first]?.txt||CP[first].fact):GEAR[first].desc);
+    return `<div class="row" style="${locked?'opacity:.5':''}">${outHTML(r.out)}<div class="flex-1 min-w-0"><div class="font-black">${outName(r.out)} ${locked?`<span class="text-xs">🔒 Lv.${r.lv}</span>`:''}</div>
+      <div class="text-[12px] font-bold opacity-75">${fmtTxt(desc)}</div><div class="text-[13px] font-black mt-1 flex flex-wrap items-center">${mats}</div></div>
+      <button class="pbtn px-3 py-2 text-sm" data-craft="${i}" ${ok?'':'disabled'}>煉製</button></div>`; }).join('');
+  openModal(`⚗️ ${L.name}`,`<p class="text-sm font-bold opacity-70">化學式右下角的數字＝需要的原子個數。例如 H₂O 要 2 個 H、1 個 O。</p><div class="grid-items" style="grid-template-columns:repeat(auto-fill,minmax(380px,1fr))">${rows}</div>`);
+  bind('[data-craft]',b=>craftQuiz(RECIPES[+b.dataset.craft]));
+}
+function craftQuiz(r){
+  Sound.play('click'); const opts=shuffle(r.quiz.opts), L=RG[world.id].cast.lab;
+  openModal('⚗️ 煉製：'+outName(r.out),`<div class="flex items-center gap-4"><img src="${OBJ[L.spr].f[0].toDataURL()}" class="px w-20" style="animation:bob .8s steps(2) infinite"><div class="pbox p-3 font-black text-lg flex-1">${r.quiz.q} <button class="sbtn" id="cq-speak">🔊</button></div></div>
+    <div id="cq-hint" class="pbox p-2 font-bold hidden" style="background:#fff3bf"></div>
+    <div class="grid grid-cols-3 gap-3 mt-3">${opts.map(o=>`<button class="pbtn py-4 text-2xl" data-o="${o}">${o}</button>`).join('')}</div>`,openAlchemy);
+  $('#cq-speak').onclick=()=>speak(r.quiz.q);
+  bind('[data-o]',b=>{ if (b.disabled) return;
+    if (b.dataset.o!==r.quiz.ans){ Sound.play('wrong'); b.disabled=true; b.classList.add('opt-wrong'); const h=$('#cq-hint'); h.classList.remove('hidden'); h.innerHTML='💡 沒關係，再試一次！答案是正在發光的那一個～'; document.querySelector(`[data-o="${r.quiz.ans}"]`).classList.add('opt-glow'); return; }
+    Object.entries(r.need).forEach(([id,n])=>removeItem(id,n)); Object.entries(r.out).forEach(([id,n])=>{ addItem(id,n); learnAny(id); }); Sound.play('craft');
+    let extra=''; const first=Object.keys(r.out)[0];
+    if (GEAR[first]){ const g=GEAR[first], cur=state.equip[g.slot]?GEAR[state.equip[g.slot]]:null; if (!cur||(g.atk||g.def||0)>(cur.atk||cur.def||0)){ state.equip[g.slot]=first; extra='<p class="font-black text-[#2b8a3e] mt-2">已經自動裝備上了！</p>'; } }
+    modalOnClose=null; gainXpField(5);
+    openModal('✨ 煉金成功！',`<div class="text-center"><div class="my-3 flex justify-center gap-3">${outHTML(r.out)}</div><p class="text-xl font-black">做出了 ${outName(r.out)}！</p>
+      ${r.eq?`<p class="font-black mt-1">${r.eq}</p>`:''}<p class="font-bold mt-1">${fmtTxt(CP[first]?(CP_USE[first]?.txt||CP[first].fact):GEAR[first].desc)}</p>${extra}<button class="pbtn w-64 py-3 mt-4" id="cq-ok">好耶！</button></div>`,openAlchemy);
+    $('#cq-ok').onclick=closeModal; save(); updateHUD(); });
+}
+/* ---------- 火爐（加熱與燃燒）---------- */
+function openFire(){
+  Sound.play('click'); const F=RG[world.id].cast.fire;
+  const rows=FIRE.map((r,i)=>{ const ok=Object.entries(r.need).every(([id,n])=>(state.inv[id]||0)>=n);
+    const mats=Object.entries(r.need).map(([id,n])=>{ const have=state.inv[id]||0; return `<span class="inline-flex items-center gap-1 mr-2 ${have>=n?'':'text-[#e8590c]'}">${cellHTML(id,26,false)} ${have}/${n}</span>`; }).join('');
+    return `<div class="row"><div class="flex-1 min-w-0"><div class="font-black text-[16px]">${r.eq}</div><div class="text-[12px] font-bold opacity-75">${r.txt}</div><div class="text-[13px] font-black mt-1 flex flex-wrap items-center">${mats}</div></div>
+      <button class="pbtn px-3 py-2 text-sm" data-fire="${i}" ${ok?'':'disabled'}>🔥 加熱</button></div>`; }).join('');
+  openModal(`🔥 ${F.name}`,`<p class="text-sm font-bold opacity-70">把東西放進火裡加熱或燃燒，看看會變成什麼！（燃燒需要氧氣 O₂，可以用煉金做，或在草地上找）</p><div class="grid-items" style="grid-template-columns:repeat(auto-fill,minmax(380px,1fr))">${rows}</div>`);
+  bind('[data-fire]',b=>{ const r=FIRE[+b.dataset.fire];
+    Object.entries(r.need).forEach(([id,n])=>removeItem(id,n)); Object.entries(r.out).forEach(([id,n])=>{ addItem(id,n); learnAny(id); });
+    Sound.play('fire'); gainXpField(4); save();
+    openModal('🔥 反應完成！',`<div class="text-center"><div class="my-3 flex justify-center gap-3">${outHTML(r.out)}</div><p class="text-xl font-black">${r.eq}</p><p class="font-bold mt-2 text-lg">💡 ${r.txt}</p>
+      <button class="pbtn w-64 py-3 mt-4" id="fi-ok">好！</button></div>`,openFire); $('#fi-ok').onclick=closeModal; });
+}
+
+/* =====================================================================
+   9. 戰鬥
+   9-1. 出題：題庫（國中理化題型）＋ 基礎題（元素/化學式）
+   ===================================================================== */
+const recentQ=[];
+function genQuestion(R){
+  if (Math.random()<R.bankW){
+    let pool=QBANK.filter(q=>q.tier<=R.tier && q.tier>=R.tier-1 && !recentQ.includes('b'+q.id));
+    if (!pool.length) pool=QBANK.filter(q=>q.tier<=R.tier);
+    const b=pick(pool); recentQ.push('b'+b.id); if (recentQ.length>12) recentQ.shift();
+    return { text:b.q, ans:b.a, opts:shuffle([b.a,...b.o]), show:'text', hint:b.h, explain:b.x, fx:b.fx, learn:b.learn };
+  }
+  const type=wpick(R.gen), elPool=R.els, cpPool=R.cps.length?R.cps:cps(3);
+  const fresh=(pool)=>{ const f=pool.filter(v=>!recentQ.slice(-Math.min(6,pool.length-2)).includes(v)); return f.length?f:pool; };
+  const pickEl=()=>pick(fresh(elPool)), pickCp=()=>pick(fresh(cpPool));
+  const otherEls=(a,n)=>shuffle(elPool.filter(s=>s!==a)).slice(0,n), otherCps=(a,n)=>shuffle(cpPool.filter(f=>f!==a)).slice(0,n);
+  let q;
+  switch (type){
+    case 'e_n2s': { const s=pickEl(); q={ text:`「${EL[s].name}」的元素符號是哪一個？`, ans:s, opts:[s,...otherEls(s,3)], show:'sym', learn:['el',s], hint:`「${EL[s].name}」的符號是 ${s} 喔！` }; break; }
+    case 'e_s2n': { const s=pickEl(); q={ text:`元素符號「${s}」代表哪一個元素？`, ans:s, opts:[s,...otherEls(s,3)], show:'name', learn:['el',s], hint:`${s} 就是「${EL[s].name}」喔！` }; break; }
+    case 'e_life':{ const s=pickEl(); q={ text:EL[s].life, ans:s, opts:[s,...otherEls(s,3)], show:'cell', learn:['el',s], hint:`答案是「${EL[s].name}」，符號 ${s}。` }; break; }
+    case 'c_n2f': { const f=pickCp(); q={ text:`「${CP[f].name}」的化學式是哪一個？`, ans:f, opts:[f,...otherCps(f,3)], show:'f', learn:['cp',f], hint:`「${CP[f].name}」的化學式是 ${fmtU(f)} 喔！` }; break; }
+    case 'c_f2n': { const f=pickCp(); q={ text:`化學式 ${fmtU(f)} 是什麼物質？`, ans:f, opts:[f,...otherCps(f,3)], show:'cname', learn:['cp',f], hint:`${fmtU(f)} 就是「${CP[f].name}」喔！` }; break; }
+    case 'c_life':{ const f=pickCp(); q={ text:CP[f].life, ans:f, opts:[f,...otherCps(f,3)], show:'fboth', learn:['cp',f], hint:`答案是「${CP[f].name}」${fmtU(f)}。` }; break; }
+    case 'c_comp':{ const f=pickCp(), parts=Object.keys(CP[f].parts), key=parts.join('、'), wrong=new Set(); let g=0;
+      while (wrong.size<3 && g++<40){ const p=[...parts], k=rand(0,2);
+        if (k===0&&p.length>1) p.splice(rand(0,p.length-1),1); else if (k===1) p.push(pick(ELS.filter(e=>!p.includes(e)))); else p[rand(0,p.length-1)]=pick(ELS.filter(e=>!p.includes(e)));
+        const s=p.join('、'); if (s!==key) wrong.add(s); }
+      q={ text:`${fmtU(f)}（${CP[f].name}）是由哪些元素組成的？`, ans:key, opts:[key,...wrong], show:'text', learn:['cp',f], hint:`看大寫字母！${fmtU(f)} 裡有：${parts.map(e=>`${e}（${PTS[e].name}）`).join('、')}。` }; break; }
+    case 'c_count':{ const f=pickCp(), [e,n]=pick(Object.entries(CP[f].parts)), opts=new Set([n]);
+      [n+1,n*2,Math.max(1,n-1),n+2,1,3].forEach(v=>{ if (opts.size<4&&v>0) opts.add(v); });
+      q={ text:`一個 ${fmtU(f)}（${CP[f].name}）分子裡，有幾個「${PTS[e].name} ${e}」原子？`, ans:String(n), opts:[...opts].map(String), show:'num', learn:['cp',f], hint:`看 ${e} 右下角的小數字${n===1?'——沒寫數字就是 1 個！':`，是 ${n}！`}` }; break; }
+  }
+  recentQ.push(q.ans); if (recentQ.length>12) recentQ.shift();
+  q.opts=shuffle(q.opts); return q;
+}
+function optHTML(v,show){
+  const e=PTS[v], c=CP[v];
+  switch (show){
+    case 'sym': return `<span class="big">${v}</span>`;
+    case 'name': return `<span class="big2">${EL[v].name}</span>`;
+    case 'cell': return `<span class="big">${v}</span><span class="sm">${e.name}</span>`;
+    case 'f': return `<span class="big2">${fmtH(v)}</span>`;
+    case 'cname': return `<span class="txt">${c.name}</span>`;
+    case 'fboth': return `<span class="big2">${fmtH(v)}</span><span class="sm">${c.name}</span>`;
+    case 'num': return `<span class="big">${v}</span><span class="sm">個</span>`;
+    default: return `<span class="txt">${fmtTxt(v)}</span>`;
+  }
+}
+const optColor=(v,show)=> (show==='sym'||show==='name'||show==='cell') ? PTS[v].color : (show==='f'||show==='cname'||show==='fboth') ? CP_COLOR : '#fff3bf';
+
+/* 9-2. 招式特效：依照學到的元素決定（焰色反應、金屬導電、氣體……）*/
+const FLAME = { Li:['#ff6b6b','紅色'], Na:['#ffd43b','黃色'], K:['#b197fc','紫色'], Ca:['#ff922b','磚紅色'], Cu:['#51cf66','綠色'] };
+const NOBLE = { He:'#ffc9de', Ne:'#ff922b', Ar:'#b197fc' };
+const FXNAME = { fire:'🔥 焰色火焰', bolt:'⚡ 導電雷擊', water:'💧 水流衝擊', gas:'🌪️ 氣體旋風', light:'✨ 元素光芒', flash:'💥 鎂光閃爆', earth:'🪨 岩石墜落', acid:'🧪 酸液泡泡', ice:'❄️ 乾冰冰刺', slash:'⚔️ 元素劍擊' };
+function moveFor(q){
+  const [kind,id]=q.learn||[]; let fx=q.fx, color=null, note='';
+  if (kind==='el'&&FLAME[id]&&(!fx||fx==='fire')){ fx='fire'; color=FLAME[id][0]; note=`焰色反應：${PTS[id].name}燒起來是${FLAME[id][1]}火焰！`; }
+  else if (!fx && kind==='el'){
+    const cat=PTS[id].cat;
+    if (id==='S'){ fx='fire'; color='#748ffc'; note='硫燃燒時是藍紫色的火焰！'; }
+    else if (id==='P'){ fx='fire'; color='#ffa94d'; note='磷很容易燃燒，火柴就是靠它點火！'; }
+    else if (NOBLE[id]){ fx='light'; color=NOBLE[id]; note=`${PTS[id].name}是惰性氣體，通電會發光！`; }
+    else if (id==='Mg'){ fx='flash'; }
+    else if (['transition','post','alkaline','alkali'].includes(cat)){ fx='bolt'; note='金屬能導電！'; }
+    else if (['H','N','O','F','Cl'].includes(id)) fx='gas';
+    else fx='earth';
+  } else if (!fx && kind==='cp'){
+    fx = { H2O:'water', H2O2:'water', NaCl:'water', CO2:'ice', HCl:'acid', H2SO4:'acid', SO2:'acid', CH4:'fire', H2:'fire', MgO:'flash', CuO:'fire', Fe2O3:'earth', CaCO3:'earth', CaO:'earth', C6H12O6:'light' }[id] || 'gas';
+  }
+  if (!fx) fx='slash';
+  if (fx==='light'&&!color&&kind==='el'&&NOBLE[id]) color=NOBLE[id];
+  return { fx, color, note };
+}
+const FX = { P:[], L:[], flash:0, cv:null, g:null, W:320, H:180,
+  init(){ this.cv=$('#b-fxc'); const s=$('#b-scene'); this.W=Math.max(60,Math.ceil(s.clientWidth/4)); this.H=Math.max(45,Math.ceil(s.clientHeight/4)); this.cv.width=this.W; this.cv.height=this.H; this.g=this.cv.getContext('2d'); this.P=[]; this.L=[]; this.flash=0; },
+  pos(el){ const s=$('#b-scene').getBoundingClientRect(), r=el.getBoundingClientRect(); return { x:(r.left-s.left+r.width/2)/4, y:(r.top-s.top+r.height/2)/4, w:r.width/4, h:r.height/4 }; },
+  add(p){ this.P.push({ life:.6, size:2, g:0, drag:1, ...p, max:p.life||.6 }); },
+  tick(dt){
+    if (!this.g) return; const g=this.g; g.clearRect(0,0,this.W,this.H);
+    for (let i=this.P.length-1;i>=0;i--){ const p=this.P[i];
+      if (p.delay>0){ p.delay-=dt; continue; }
+      p.life-=dt; if (p.life<=0){ this.P.splice(i,1); continue; }
+      if (p.orbit){ p.ang+=p.w*dt; p.rad+=p.dr*dt; p.x=p.cx+Math.cos(p.ang)*p.rad; p.y=p.cy+Math.sin(p.ang)*p.rad*.6; }
+      else { p.vy+=p.g*dt; p.vx*=p.drag; p.vy*=p.drag; p.x+=p.vx*dt; p.y+=p.vy*dt; }
+      g.globalAlpha=Math.min(1,p.life/p.max*1.6); g.fillStyle=p.color; const s=p.size; g.fillRect(Math.round(p.x-s/2),Math.round(p.y-s/2),s,p.h||s);
+      if (p.glow){ g.fillStyle='#ffffff'; g.fillRect(Math.round(p.x),Math.round(p.y),1,1); } }
+    g.globalAlpha=1;
+    for (let i=this.L.length-1;i>=0;i--){ const l=this.L[i]; l.life-=dt; if (l.life<=0){ this.L.splice(i,1); continue; }
+      g.globalAlpha=Math.min(1,l.life*4); for (let k=0;k<l.pts.length-1;k++){ const [x1,y1]=l.pts[k], [x2,y2]=l.pts[k+1], n=Math.max(Math.abs(x2-x1),Math.abs(y2-y1))|0;
+        for (let j=0;j<=n;j++){ const x=Math.round(x1+(x2-x1)*j/Math.max(1,n)), y=Math.round(y1+(y2-y1)*j/Math.max(1,n)); g.fillStyle=l.color; g.fillRect(x-1,y,l.w||3,1); g.fillStyle='#fff'; g.fillRect(x,y,1,1); } } }
+    g.globalAlpha=1;
+    if (this.flash>0){ g.fillStyle=`rgba(255,255,255,${Math.min(1,this.flash)})`; g.fillRect(0,0,this.W,this.H); this.flash-=dt*3; }
+  },
+};
+async function playFx(type,color){
+  const h=FX.pos($('#b-hero')), m=FX.pos($('#b-mon')), R=Math.random;
+  Sound.play(type==='heal'||type==='eye'?'heal':type);
+  const travel=(n,col,size,speed,spread=6,extra={})=>{ for (let i=0;i<n;i++){ const sx=h.x+h.w*.3, sy=h.y-h.h*.1, tx=m.x+(R()-.5)*spread, ty=m.y+(R()-.5)*spread, d=Math.hypot(tx-sx,ty-sy), t=d/speed;
+    FX.add({ x:sx, y:sy, vx:(tx-sx)/t, vy:(ty-sy)/t, life:t, color:pick(col), size, delay:i*.02, ...extra }); } };
+  switch (type){
+    case 'fire': { const c=color||'#ff922b'; travel(14,[c,'#fff3bf'],3,160,4,{ glow:true }); await sleep(320);
+      for (let i=0;i<46;i++) FX.add({ x:m.x+(R()-.5)*m.w*.8, y:m.y+m.h*.35, vx:(R()-.5)*14, vy:-25-R()*45, life:.5+R()*.5, color:pick([c,c,shade(c,50),'#fff3bf']), size:2+(R()*2|0), delay:R()*.25 }); break; }
+    case 'bolt': for (let k=0;k<3;k++){ const pts=[[m.x+(R()-.5)*20,0]]; let y=0; while (y<m.y){ y+=6+R()*8; pts.push([m.x+(R()-.5)*18, Math.min(y,m.y)]); }
+        setTimeout(()=>{ FX.L.push({ pts, life:.25, color:color||'#ffe066' }); FX.flash=.35; for (let i=0;i<12;i++){ const a=R()*6.28; FX.add({ x:m.x, y:m.y, vx:Math.cos(a)*50, vy:Math.sin(a)*50, life:.35, color:'#ffe066', size:2 }); } }, k*140); } await sleep(150); break;
+    case 'water': for (let i=0;i<36;i++){ const sx=h.x+h.w*.3, sy=h.y, tx=m.x+(R()-.5)*8, ty=m.y, t=.45; FX.add({ x:sx, y:sy, vx:(tx-sx)/t, vy:(ty-sy)/t-60, g:260, life:t, color:pick(['#74c0fc','#a5d8ff','#e7f5ff']), size:3, delay:i*.012 }); }
+      await sleep(450); for (let i=0;i<24;i++){ const a=-R()*3.14; FX.add({ x:m.x, y:m.y+m.h*.2, vx:Math.cos(a)*50, vy:Math.sin(a)*60, g:180, life:.5, color:pick(['#74c0fc','#e7f5ff']), size:2 }); } break;
+    case 'gas': { const c=color||'#c5f6fa'; for (let i=0;i<60;i++) FX.add({ orbit:true, cx:m.x, cy:m.y, ang:R()*6.28, rad:m.w*.7+R()*6, w:5+R()*3, dr:-m.w*.8, life:.8+R()*.3, color:pick([c,'#e3fafc','#ffffff',shade(c,-30)]), size:2+(R()*2|0), delay:R()*.2 }); break; }
+    case 'light': { const c=color||'#ffe066'; for (let k=0;k<12;k++){ const a=k/12*6.28; FX.L.push({ pts:[[m.x,m.y],[m.x+Math.cos(a)*m.w,m.y+Math.sin(a)*m.w]], life:.45, color:c, w:2 }); }
+      for (let i=0;i<30;i++){ const a=R()*6.28, s=20+R()*40; FX.add({ x:m.x, y:m.y, vx:Math.cos(a)*s, vy:Math.sin(a)*s, life:.7, color:pick([c,'#ffffff','#fff3bf']), size:2, glow:true }); } FX.flash=.3; break; }
+    case 'flash': FX.flash=1.2; for (let i=0;i<40;i++){ const a=R()*6.28, s=30+R()*60; FX.add({ x:m.x, y:m.y, vx:Math.cos(a)*s, vy:Math.sin(a)*s, life:.8, color:pick(['#ffffff','#f8f9fa','#dee2e6']), size:2 }); } break;
+    case 'earth': for (let i=0;i<14;i++) FX.add({ x:m.x+(R()-.5)*m.w, y:-6-R()*20, vx:0, vy:60, g:420, life:(m.y+10)/140, color:pick(['#a8916f','#c4ae8f','#6b5a48']), size:4+(R()*3|0), delay:i*.04 });
+      await sleep(420); for (let i=0;i<20;i++){ const a=-R()*3.14; FX.add({ x:m.x+(R()-.5)*m.w*.6, y:m.y+m.h*.35, vx:Math.cos(a)*40, vy:Math.sin(a)*30, g:120, life:.5, color:'#dccab0', size:2 }); } break;
+    case 'acid': for (let i=0;i<22;i++){ const sx=h.x+h.w*.3, sy=h.y, tx=m.x+(R()-.5)*m.w*.6, ty=m.y-m.h*.2, t=.5; FX.add({ x:sx, y:sy, vx:(tx-sx)/t, vy:(ty-sy)/t-50, g:200, life:t, color:pick(['#8ce99a','#b2f2bb','#69db7c']), size:3, delay:i*.02 }); }
+      await sleep(500); for (let i=0;i<30;i++) FX.add({ x:m.x+(R()-.5)*m.w*.7, y:m.y+(R()-.5)*m.h*.6, vx:0, vy:-10-R()*10, life:.6, color:pick(['#d3f9d8','#8ce99a']), size:2+(R()*2|0), delay:R()*.3 }); break;
+    case 'ice': travel(22,['#e7f5ff','#a5d8ff','#ffffff'],2,260,10,{ h:5 }); await sleep(260);
+      for (let i=0;i<24;i++){ const a=R()*6.28; FX.add({ x:m.x, y:m.y, vx:Math.cos(a)*45, vy:Math.sin(a)*45, life:.5, color:pick(['#e7f5ff','#c5f6fa']), size:2, h:4 }); } break;
+    case 'slash': for (let k=0;k<3;k++) setTimeout(()=>{ const a=-.8+k*.8, L=m.w*.9; FX.L.push({ pts:[[m.x-Math.cos(a)*L,m.y-Math.sin(a)*L],[m.x+Math.cos(a)*L,m.y+Math.sin(a)*L]], life:.25, color:'#ffffff', w:2 }); }, k*110); break;
+    case 'heal': for (let i=0;i<26;i++) FX.add({ x:h.x+(R()-.5)*h.w, y:h.y+h.h*.3, vx:0, vy:-30-R()*20, life:.8, color:pick(['#8ce99a','#d3f9d8','#ffffff']), size:3, delay:R()*.3 }); break;
+    case 'eye': for (let i=0;i<40;i++){ const a=i/40*6.28; FX.add({ orbit:true, cx:m.x, cy:m.y, ang:a, rad:4, w:2, dr:m.w*1.2, life:.6, color:pick(['#d0bfff','#ffffff']), size:2 }); } break;
+    case 'claw': for (let k=0;k<3;k++) FX.L.push({ pts:[[h.x-6+k*5,h.y-h.h*.4],[h.x-2+k*5,h.y+h.h*.3]], life:.3, color:'#ff8fab', w:2 }); break;
+  }
+  await sleep(520);
+}
+function showMove(name){ const el=$('#b-move'); el.textContent=name; el.classList.remove('hidden','pop'); void el.offsetWidth; el.classList.add('pop'); setTimeout(()=>el.classList.add('hidden'),1300); }
+
+/* 9-3. 戰鬥流程 */
+const battle={ on:false };
+const bPanel=(html,cols=4)=>{ const p=$('#b-panel'); p.style.gridTemplateColumns=`repeat(${cols},1fr)`; p.innerHTML=html; };
+const bMsg=html=>{ $('#b-msg').innerHTML=html.trim().startsWith('<div')?html:`<div>${html}</div>`; };
+function bWait(html,label='繼續 ▶'){ bMsg(html); bPanel(`<button class="pbtn" id="b-go" style="grid-column:1/-1">${label}</button>`,1);
+  return new Promise(res=>{ $('#b-go').onclick=()=>{ Sound.play('click'); res(); }; }); }
+function bBars(){ $('#b-mhp').style.width=(battle.hp/battle.max*100)+'%'; $('#b-hp').style.width=(state.hp/maxHp()*100)+'%'; $('#b-mp').style.width=(state.mp/maxMp()*100)+'%';
+  $('#b-hpt').textContent=`HP ${state.hp}/${maxHp()}　MP ${state.mp}`; $('#b-lv').textContent=state.lv; }
+function battleKey(e){ const btns=[...document.querySelectorAll('#b-panel button:not([disabled])')];
+  if (/^[1-9]$/.test(e.key)){ const b=document.querySelectorAll('#b-panel button')[+e.key-1]; if (b&&!b.disabled) b.click(); e.preventDefault(); }
+  else if (e.key===' '||e.key==='Enter'){ e.preventDefault(); if (btns.length===1) btns[0].click(); }
+  else if (e.key==='Escape'){ const back=$('#b-back'); if (back) back.click(); } }
+function replay(el,cls,ms){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls),ms); }
+function floatNum(txt,el,color='#fff'){ const s=$('#b-scene').getBoundingClientRect(), r=el.getBoundingClientRect(), f=document.createElement('div');
+  f.className='float-num'; f.textContent=txt; f.style.color=color; f.style.left=(r.left-s.left+r.width/2-20)+'px'; f.style.top=(r.top-s.top+r.height*.25)+'px'; $('#b-fx').appendChild(f); setTimeout(()=>f.remove(),1000); }
+const BG_CACHE={};
+function battleBG(theme){
+  if (BG_CACHE[theme]) return BG_CACHE[theme];
+  const c=makeCanvas(320,180), g=c.getContext('2d'), rnd=seeded(strHash(theme));
+  const skies={ meadow:['#bde0fe','#e3f6ff'], farm:['#ffd8a8','#fff3bf'], harbor:['#a5d8ff','#e7f5ff'], city:['#9775fa','#ffc9de'], castle:['#3b2f66','#6f5f9e'] };
+  const [s1,s2]=skies[theme]; for (let y=0;y<110;y++){ g.fillStyle=y<55?s1:(y%2?s1:s2); if (y>=80) g.fillStyle=s2; g.fillRect(0,y,320,1); }
+  if (theme==='castle'){ RC(g,250,18,16,16,'#fff3bf'); RC(g,254,18,12,12,'#3b2f66'); for (let i=0;i<30;i++) PX(g,rnd()*320|0,rnd()*80|0,'#e5dbff'); }
+  else for (let i=0;i<3;i++){ const x=rnd()*280|0, y=10+(rnd()*40|0); RC(g,x,y,30,6,'#ffffff'); RC(g,x+6,y-4,16,4,'#ffffff'); RC(g,x,y+6,30,1,'#dbe4ff'); }
+  const hill=(base,col,amp,fr)=>{ for (let x=0;x<320;x++){ const h=base+Math.sin(x/fr+base)*amp+Math.sin(x/(fr/2.3))*amp*.4; RC(g,x,h,1,120-h,col); } };
+  if (theme==='meadow'||theme==='farm'){ hill(70,'#a9dc8f',8,30); hill(84,'#82c75f',6,22); }
+  if (theme==='farm'){ RC(g,40,52,4,32,'#fff8e7'); [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy])=>RC(g,42+dx*9-(dx?4:1),58+dy*9-(dy?4:1),dx?9:2,dy?9:2,'#c98a52')); }
+  if (theme==='harbor'){ RC(g,0,80,320,30,'#4fa8e8'); for (let i=0;i<20;i++) RC(g,rnd()*310|0,82+(rnd()*26|0),8,1,'#9fd8ff'); RC(g,220,64,26,10,'#fff8e7'); RC(g,232,44,2,20,'#8a5a38'); RC(g,234,46,12,14,'#ffffff'); }
+  if (theme==='city'){ for (let x=0;x<320;x+=22){ const h=40+(rnd()*50|0), col=['#5f3dc4','#7048e8','#845ef7'][(rnd()*3)|0]; RC(g,x,110-h,20,h,col); for (let y=110-h+4;y<106;y+=7) for (let wx=x+3;wx<x+18;wx+=5) if (rnd()<.5) RC(g,wx,y,2,3,'#fff3bf'); } }
+  if (theme==='castle'){ RC(g,110,40,100,70,'#4d3f78'); for (let x=110;x<210;x+=10) RC(g,x,34,6,6,'#4d3f78'); RC(g,90,20,24,90,'#5f4f95'); RC(g,206,20,24,90,'#5f4f95'); RC(g,150,70,20,40,'#2b2238'); RC(g,96,40,6,8,'#ffe066'); RC(g,214,40,6,8,'#ffe066'); }
+  const tile={ meadow:'.', farm:'F', harbor:'s', city:'w', castle:'Q' }[theme];
+  const dummy={ w:20, h:5, t:[...Array(5)].map(()=>Array(20).fill(tile)), water:WATERS.fresh };
+  for (let y=0;y<5;y++) for (let x=0;x<20;x++) paintTile(g,tile,x*16,110+y*16,seeded(x*31+y*7),0,dummy,x,y);
+  RC(g,0,110,320,2,'rgba(43,34,56,.25)');
+  return BG_CACHE[theme]=c.toDataURL();
+}
+async function startBattle(ent){
+  if (battle.on||graceT>0) return;
+  const d=MONSTERS[ent.type], R=RG[world.id];
+  Object.assign(battle,{ on:true, ent, d, R, hp:d.hp, max:d.hp, eye:false, lowWarned:false });
+  ui.battle=true; Input.held=[]; player.moving=false; player.t=0; Music.stop(); Sound.play('encounter');
+  const fl=$('#flash'); fl.style.transition=''; fl.style.background='#fff'; fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+  await sleep(600); fl.classList.remove('go'); fl.style.opacity='0';
+  $('#b-scene').style.backgroundImage=`url(${battleBG(world.theme)})`;
+  $('#b-mon').src=URL_[d.spr]; $('#b-mon').className='mon'+(d.boss?' boss':''); $('#b-hero').src=URL_.heroRightA; $('#b-hero').className='bhero';
+  $('#b-mname').textContent=d.name; $('#b-mlv').textContent=d.boss?'BOSS':'';
+  $('#b-fx').innerHTML=''; ['#b-hint','#b-fact','#b-move'].forEach(s=>$(s).classList.add('hidden')); bBars();
+  $('#battle').classList.remove('hidden'); applyDeviceUI(); FX.init();
+  Music.play('battle');
+  await bWait(`${d.boss?'⚠️ 魔王 ':''}<b>${d.name}</b> 出現了！`); bCommands();
+}
+function bCommands(){
+  ['#b-hint','#b-fact'].forEach(s=>$(s).classList.add('hidden'));
+  bMsg(`要怎麼做呢？<span class="block text-[13px] opacity-70 mt-1">⚔️ 攻擊＝回答題目，答對就能使出元素招式！</span>`);
+  bPanel(`<button class="pbtn opt" data-c="atk" style="--btn:#ffd166"><span class="k">1</span>⚔️ 攻擊</button>
+    <button class="pbtn opt" data-c="skill" style="--btn:#d0bfff"><span class="k">2</span>✨ 技能</button>
+    <button class="pbtn opt" data-c="item" style="--btn:#b2f2bb"><span class="k">3</span>🧪 道具</button>
+    <button class="pbtn opt" data-c="run" style="--btn:#e9ecef"><span class="k">4</span>🏃 逃跑</button>`);
+  bind('[data-c]',b=>{ Sound.play('click'); const c=b.dataset.c; if (c==='atk') bQuestion(); if (c==='skill') bSkills(); if (c==='item') bItems(); if (c==='run') bRun(); });
+}
+function bQuestion(){
+  const q=genQuestion(battle.R); battle.q=q; battle.wrong=0; battle.busy=false;
+  if (battle.eye){ const wr=q.opts.filter(o=>o!==q.ans); q.opts=shuffle([q.ans,wr[0]]); }
+  const usedEye=battle.eye; battle.eye=false; $('#b-hint').classList.add('hidden');
+  bMsg(`<div class="flex-1">❓ ${fmtTxt(q.text)}</div><div class="flex gap-2 pt-1 flex-wrap">
+      <button class="sbtn" id="b-speak">🔊 唸題目</button>
+      ${!usedEye?`<button class="sbtn" id="b-eye" ${state.mp<3?'disabled':''}>✨ 元素之眼 MP3</button>`:'<span class="text-[13px] text-[#7048e8]">✨ 只剩兩個選項！</span>'}
+      <button class="sbtn" id="b-back">◀ 返回</button></div>`);
+  bPanel(q.opts.map((o,i)=>`<button class="pbtn opt" data-o="${o}" style="--btn:${optColor(o,q.show)}"><span class="k">${i+1}</span>${optHTML(o,q.show)}</button>`).join(''),q.opts.length);
+  $('#b-speak').onclick=()=>speak(q.text+'。'+q.opts.map((o,i)=>`${i+1}，${q.show==='name'?EL[o].name:q.show==='cname'?CP[o].name:o}`).join('。'));
+  $('#b-back').onclick=()=>{ Sound.play('click'); bCommands(); };
+  if ($('#b-eye')) $('#b-eye').onclick=async()=>{ if (state.mp<3) return; state.mp-=3; bBars(); playFx('eye');
+    const wr=[...document.querySelectorAll('#b-panel [data-o]')].filter(b=>b.dataset.o!==q.ans&&!b.disabled); wr.slice(0,Math.max(0,wr.length-1)).forEach(b=>b.remove());
+    $('#b-panel').style.gridTemplateColumns=`repeat(${document.querySelectorAll('#b-panel [data-o]').length},1fr)`; $('#b-eye').remove(); };
+  bind('#b-panel [data-o]',b=>bAnswer(b));
+}
+async function bAnswer(btn){
+  if (battle.busy||btn.disabled) return; const q=battle.q;
+  if (btn.dataset.o!==q.ans){
+    battle.wrong++; btn.disabled=true; btn.classList.add('opt-wrong'); Sound.play('wrong'); replay($('#b-mon'),'shake',400);
+    let html=`💡 沒關係，再試一次！<br>${fmtTxt(q.hint||'')}`;
+    if (battle.wrong>=2){ [...document.querySelectorAll('#b-panel [data-o]')].find(b=>b.dataset.o===q.ans)?.classList.add('opt-glow'); html+='<br><span style="color:#1c7ed6">✨ 看看正在發光的那一個！</span>'; }
+    const h=$('#b-hint'); h.innerHTML=html; h.classList.remove('hidden'); replay(h,'fade-in',300); return;
+  }
+  battle.busy=true; btn.classList.add('opt-right'); $('#b-hint').classList.add('hidden');
+  document.querySelectorAll('#b-panel button, #b-msg button').forEach(b=>{ if (b!==btn) b.disabled=true; }); btn.disabled=true; Sound.play('correct');
+  const perfect=battle.wrong===0; let dmg=atkVal()+rand(0,3); if (perfect) dmg=Math.floor(dmg*1.5);
+  const mv=moveFor(q);
+  showMove(FXNAME[mv.fx]); replay($('#b-hero'),'hero-atk',400); await sleep(250);
+  await playFx(mv.fx,mv.color);
+  Sound.play('hit'); replay($('#b-mon'),'hurt',450); floatNum('-'+dmg,$('#b-mon'),perfect?'#ffd43b':'#fff'); battle.hp=Math.max(0,battle.hp-dmg); bBars();
+  let isNew=false; const [kind,id]=q.learn||[];
+  if (kind==='el') isNew=learnEl(id); else if (kind==='cp'){ isNew=learnCp(id); Object.keys(CP[id].parts).forEach(learnEl); }
+  bMsg(`${perfect?'🌟 完美一擊！':'⭐ 答對了！'} ${FXNAME[mv.fx]}造成 <b>${dmg}</b> 點傷害！${mv.note?`<span class="block text-[14px] text-[#e8590c] mt-1">${mv.note}</span>`:''}`);
+  let fact='';
+  if (q.explain) fact=`<div class="flex items-center gap-4">${id?cellHTML(id,72):''}<div><div class="text-xl font-black">✅ ${fmtTxt(q.ans)}</div><p class="font-bold mt-1 text-[17px] leading-relaxed">💡 ${fmtTxt(q.explain)}</p>${isNew?'<p class="text-sm font-black text-[#2b8a3e]">📖 新收集到圖鑑！</p>':''}</div></div>`;
+  else if (kind==='el') fact=`<div class="flex items-center gap-4">${cellHTML(id,72)}<div><div class="text-2xl font-black">${EL[id].name} ${id}</div><p class="font-bold mt-1 text-[17px] leading-relaxed">💡 ${EL[id].fact}</p>${isNew?'<p class="text-sm font-black text-[#2b8a3e]">📖 新收集到週期表！</p>':''}</div></div>`;
+  else if (kind==='cp') fact=`<div class="flex items-center gap-4">${cellHTML(id,72)}<div><div class="text-2xl font-black">${CP[id].name} ${fmtH(id)}</div><p class="font-bold text-[15px] mt-1">${Object.entries(CP[id].parts).map(([e,n])=>`${PTS[e].name} ${e}×${n}`).join('＋')}</p><p class="font-bold mt-1 text-[17px] leading-relaxed">💡 ${CP[id].fact}</p>${isNew?'<p class="text-sm font-black text-[#2b8a3e]">📖 新收集到化合物圖鑑！</p>':''}</div></div>`;
+  if (fact){ const fe=$('#b-fact'); fe.innerHTML=fact; fe.classList.remove('hidden'); replay(fe,'fade-in',300); }
+  await new Promise(res=>{ bPanel(`<button class="pbtn" id="b-go" style="grid-column:1/-1">繼續 ▶</button>`,1); $('#b-go').onclick=()=>{ Sound.play('click'); res(); }; });
+  $('#b-fact').classList.add('hidden');
+  if (battle.hp<=0) return bVictory();
+  await bMonsterTurn(); if (battle.on) bCommands();
+}
+async function bMonsterTurn(){
+  const d=battle.d; bPanel('',1); bMsg(`${d.name} 的攻擊！`);
+  replay($('#b-mon'),'lunge',450); await sleep(300); playFx('claw');
+  const dmg=Math.max(1,d.atk-defVal()+rand(-1,1)); state.hp=Math.max(0,state.hp-dmg); Sound.play('hurt'); replay($('#b-scene'),'shake',400);
+  floatNum('-'+dmg,$('#b-hero'),'#ff8fab'); bBars(); updateHUD(); bMsg(`勇者受到 ${dmg} 點傷害。`); await sleep(800);
+  if (state.hp<=0) return bDefeat();
+  if (state.hp<maxHp()*.35&&!battle.lowWarned){ battle.lowWarned=true; await bWait('💡 HP 有點少了！可以用「🧪 道具」喝水 H₂O，或用「✨ 治癒之光」。'); }
+}
+function bSkills(){
+  bMsg('要用哪一個技能？');
+  bPanel(`<button class="pbtn opt" data-k="eye" style="--btn:#d0bfff" ${state.mp<3?'disabled':''}><span class="k">1</span>✨ 元素之眼<span class="sm">MP 3：選項只剩 2 個</span></button>
+    <button class="pbtn opt" data-k="heal" style="--btn:#b2f2bb" ${state.mp<5||state.lv<2?'disabled':''}><span class="k">2</span>💚 治癒之光<span class="sm">${state.lv>=2?'MP 5：回復 30 HP':'Lv.2 學會'}</span></button>
+    <button class="pbtn opt" data-k="back" style="--btn:#e9ecef"><span class="k">3</span>◀ 返回</button>`,3);
+  bind('[data-k]',async b=>{ const k=b.dataset.k; Sound.play('click');
+    if (k==='back') return bCommands();
+    if (k==='eye'){ state.mp-=3; bBars(); battle.eye=true; playFx('eye'); return bQuestion(); }
+    if (k==='heal'){ state.mp-=5; state.hp=Math.min(maxHp(),state.hp+30); bBars(); updateHUD(); showMove('💚 治癒之光'); await playFx('heal'); floatNum('+30',$('#b-hero'),'#8ce99a');
+      await bWait('💚 治癒之光！回復了 30 HP。'); await bMonsterTurn(); if (battle.on) bCommands(); } });
+}
+function bItems(){
+  const ids=Object.keys(state.inv).filter(id=>CP_USE[id]).slice(0,5);
+  bMsg(ids.length?'要用哪一個道具？':'沒有可以用的道具……可以去商店買，或用煉金做喔！');
+  bPanel(ids.map((id,i)=>`<button class="pbtn opt" data-u="${id}" style="--btn:${CP_COLOR}"><span class="k">${i+1}</span><span class="big2">${fmtH(id)}</span><span class="sm">${CP[id].name} ×${state.inv[id]}</span></button>`).join('')
+    +`<button class="pbtn opt" id="b-back" style="--btn:#e9ecef"><span class="k">${ids.length+1}</span>◀ 返回</button>`,ids.length+1);
+  $('#b-back').onclick=()=>{ Sound.play('click'); bCommands(); };
+  bind('[data-u]',async b=>{ const id=b.dataset.u, u=CP_USE[id]; removeItem(id);
+    if (u.dmg){ showMove(FXNAME.ice); await playFx('ice'); Sound.play('hit'); replay($('#b-mon'),'hurt',450); floatNum('-'+u.dmg,$('#b-mon'),'#99e9f2');
+      battle.hp=Math.max(0,battle.hp-u.dmg); bBars(); await bWait(`❄️ 丟出乾冰彈（${fmtH(id)}，固態二氧化碳）！造成 ${u.dmg} 點傷害！`); if (battle.hp<=0) return bVictory(); }
+    else { if (u.heal) state.hp=Math.min(maxHp(),state.hp+u.heal); if (u.mp) state.mp=Math.min(maxMp(),state.mp+u.mp);
+      await playFx('heal'); bBars(); updateHUD(); floatNum(u.heal?'+HP':'+MP',$('#b-hero'),'#8ce99a'); await bWait(`使用了 ${CP[id].name} ${fmtH(id)}！${u.txt}。`); }
+    await bMonsterTurn(); if (battle.on) bCommands(); });
+}
+async function bRun(){ await bWait(battle.d.boss?'🏃 先撤退，準備好再回來挑戰魔王！':'🏃 成功逃跑了！'); endBattle(); }
+async function bVictory(){
+  const d=battle.d, R=battle.R, rs=regState(R.id);
+  $('#b-mon').classList.add('defeated'); Music.stop(); Sound.play('victory');
+  await bWait(`🎉 打倒了 <b>${d.name}</b>！`); state.gold+=d.gold;
+  await bWait(`獲得 <b>${d.xp}</b> 經驗值、🪙 <b>${d.gold}</b> 金幣！`);
+  const drops=d.boss?[pick(R.nodes),pick(R.nodes),pick(R.nodes)]:(Math.random()<.65?[pick(R.nodes)]:[]);
+  for (const id of drops){ addItem(id); learnEl(id); await bWait(`${cellHTML(id,46)} ${d.name} 掉落了元素 <b>${PTS[id].name} ${id}</b>！`); }
+  const before=state.lv, ups=gainXp(d.xp);
+  if (ups){ Sound.play('levelup'); bBars(); await bWait(`<span class="rainbow font-pixel">LEVEL UP!</span><br>勇者升到 Lv.${state.lv} 了！HP 和 MP 全部恢復！`);
+    if (before<2&&state.lv>=2) await bWait('✨ 學會新技能「治癒之光」！');
+    if (before<ALCHEMY_UNLOCK&&state.lv>=ALCHEMY_UNLOCK) await bWait('🔓 煉金設施解鎖了！'); }
+  if (d.boss){ rs.boss=true; battle.ent.dead=Infinity; await bWait(`⭐ 恭喜！你制霸了「${R.name}」！用${R.cast.warp.name}可以前往下一個地區。`); }
+  else { rs.kills++; battle.ent.dead=Date.now()+60000; }
+  endBattle(); checkQuest(); save();
+  if (d.boss&&R.id==='r5'&&!state.flags.ending){ state.flags.ending=true; save(); await say(['你打倒了混沌魔王，把所有元素水晶都找回來了！','從今天起，你就是真正的「元素勇者」！','記得常常打開週期表圖鑑複習喔！']); }
+}
+async function bDefeat(){
+  await bWait('勇者累倒了……'); await bWait(`（別擔心！${battle.R.cast.chief.name}把你救回來了，不會失去任何東西。）`);
+  state.hp=maxHp(); state.mp=maxMp(); endBattle(true);
+  ui.busy=true; await fade(true); enterRegion(world.id); await fade(false); ui.busy=false;
+  await say(['你回來啦！我已經幫你治好了。','下次記得多帶幾瓶水 H₂O，或先升級再去挑戰喔！']);
+}
+function endBattle(skipMusic){ $('#battle').classList.add('hidden'); battle.on=false; ui.battle=false; graceT=1.5; applyDeviceUI(); updateHUD(); if (!skipMusic) Music.play(RG[world.id].music); save(); }
+async function fade(out){ const f=$('#flash'); f.classList.remove('go'); f.style.background='#2b2238'; f.style.transition='opacity .25s steps(4)'; f.style.opacity=out?'1':'0'; await sleep(270); if (!out) f.style.background='#fff'; }
+
+/* =====================================================================
+   10. 標題、地區選擇、開始
+   ===================================================================== */
+function goTitle(){ ui.title=true; ui.regions=false; $('#title').classList.remove('hidden'); $('#regions').classList.add('hidden'); $('#hud').classList.add('hidden');
+  const saved=loadSave(); $('#t-new').classList.toggle('hidden',!saved); $('#t-start').textContent=saved?'▶ 繼續冒險':'▶ 開始冒險'; Music.stop(); applyDeviceUI(); }
+function openRegions(){
+  ui.regions=true; ui.title=false; $('#title').classList.add('hidden'); $('#regions').classList.remove('hidden'); $('#hud').classList.add('hidden');
+  $('#rs-hero').src=URL_.heroDownA; $('#rs-lv').textContent=state.lv; $('#rs-gold').textContent=state.gold; $('#rs-codex').textContent=`${state.codex.length}/${ELS.length}`;
+  $('#region-cards').innerHTML=REGIONS.map(R=>{ const rs=regState(R.id), c=R.cast;
+    return `<button class="rcard pbox" data-r="${R.id}"><img src="${MAPS[R.id].thumb}" class="px">
+      <div class="flex justify-between items-center mt-2"><b class="text-lg">${R.name}</b>${rs.boss?'<span title="已制霸">⭐</span>':''}</div>
+      <div class="stars text-sm">${'★'.repeat(R.stars)}${'☆'.repeat(5-R.stars)}</div>
+      <div class="text-[13px] font-black mt-1">建議 Lv.${R.rec}${state.lv<R.rec?'　<span style="color:#e8590c">（有點難）</span>':''}</div>
+      <div class="text-[13px] font-bold mt-1 leading-snug">${R.learn}</div>
+      <div class="flex gap-1 mt-2">${['chief','shop','tips'].map(k=>`<img src="${URL_[c[k].spr]}" class="px w-7" title="${c[k].name}">`).join('')}</div>
+      <div class="text-[12px] font-bold mt-1 opacity-70">${questText(R.id)}</div></button>`; }).join('');
+  bind('[data-r]',async b=>{ const R=RG[b.dataset.r]; Sound.ensure(); Sound.play('click');
+    if (state.lv<R.rec-2){ if (!(await askYesNo('⚠️ 小心！',`「${R.name}」的怪物比較強（建議 Lv.${R.rec}），你現在是 Lv.${state.lv}。<br>還是要去嗎？`,'出發！'))) return; }
+    startRegion(R.id); });
+  Music.play('village'); applyDeviceUI();
+}
+function startRegion(id,pos){ ui.regions=false; $('#regions').classList.add('hidden'); $('#hud').classList.remove('hidden'); Sound.play('warp'); enterRegion(id,pos); applyDeviceUI(); resize(); }
+$('#t-start').onclick=()=>{ Sound.ensure(); const saved=loadSave(); state=saved||newState(); $('#title').classList.add('hidden'); ui.title=false;
+  if (state.cur&&RG[state.cur.r]) startRegion(state.cur.r,state.cur); else openRegions(); };
+$('#t-new').onclick=async()=>{ Sound.ensure(); if (!(await askYesNo('重新開始','確定要重新開始嗎？舊的進度會被清除喔！','重新開始'))) return;
+  state=newState(); save(); $('#title').classList.add('hidden'); ui.title=false; openRegions(); };
+$('#rs-title').onclick=goTitle; $('#rs-codex-btn').onclick=()=>openCodex();
+$('#rotate-ok').onclick=()=>{ state.flags.portraitOk=true; $('#rotate').classList.add('hidden'); };
+
+buildAllSprites();
+REGIONS.forEach(R=>{ MAPS[R.id]=genMap(R); prerenderMap(MAPS[R.id]); });
+$('#t-hero').src=URL_.heroDownA; $('#t-slime').src=URL_.slime; $('#t-elder').src=URL_.elder;
+$('#title').style.backgroundImage=`linear-gradient(rgba(30,24,48,.35),rgba(30,24,48,.55)), url(${MAPS.r1.thumb})`;
+resize(); goTitle(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
+
+</body></html>

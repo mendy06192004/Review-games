@@ -1,0 +1,1191 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>根式魔法學院</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 森林魔法學院：粉彩馬卡龍色、大字大按鈕、單欄卡片流（刻意採單一淺色主題，避免視覺刺激） */
+:root{
+  color-scheme:light;
+  --bg1:#EAF6E3; --bg2:#FBF5E6;
+  --ink:#3D4A3E; --ink2:#6B7A6C;
+  --mint:#BDE8CF; --mint2:#8FD3AE;
+  --pink:#FFD3DD; --pink2:#FFB3C6;
+  --lav:#DCD3FF; --lav2:#B9A8F5;
+  --peach:#FFE1C2; --peach2:#FFC79A;
+  --butter:#FFF3B0; --butter2:#EBD873;
+  --sky:#CDEBFF; --sky2:#9DD3F7;
+  --purple:#7A4FD6; --orange:#D9692E;
+  --card:#FFFFFF; --shadow:0 8px 24px rgba(80,110,80,.13);
+  --gray-robe:#77737F; --gray-hat:#5B5764;
+  --stone:#B7B0C6; --stone2:#9A92AD;
+  --r:26px;
+  --font:"PingFang TC","Noto Sans TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif;
+  --mathfont:"Times New Roman","STIX Two Text",Georgia,serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{
+  font-family:var(--font);font-size:22px;color:var(--ink);line-height:1.6;
+  background:
+    radial-gradient(circle at 10% 20%,rgba(189,232,207,.55) 0 120px,transparent 121px),
+    radial-gradient(circle at 92% 70%,rgba(255,211,221,.45) 0 150px,transparent 151px),
+    radial-gradient(circle at 80% 8%,rgba(220,211,255,.45) 0 100px,transparent 101px),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  background-color:var(--bg1);
+  background-attachment:fixed;min-height:100vh;
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;
+}
+button{font-family:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:4px solid var(--purple);outline-offset:3px}
+
+/* ---------- 數學排版（純 CSS） ---------- */
+.m{font-family:var(--mathfont);display:inline-flex;align-items:center;white-space:nowrap;font-weight:500;line-height:1.2}
+.m i{font-style:italic;padding-right:.04em}
+.op{margin:0 .22em}
+.fs{display:inline-flex;align-items:stretch;margin:0 .03em}
+.rad{width:.62em;flex:none;overflow:visible;display:block}
+.rad polyline{fill:none;stroke:currentColor;stroke-width:.075em;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+.fs-in{border-top:.075em solid currentColor;padding:.1em .1em 0 .06em;display:inline-flex;align-items:center}
+.ff{display:inline-flex;flex-direction:column;align-items:center;font-size:.82em;margin:0 .12em;line-height:1.15}
+.ff>span{display:inline-flex;align-items:center;padding:0 .15em}
+.ff-d{border-top:.09em solid currentColor}
+
+/* ---------- HUD ---------- */
+.hud{
+  position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:12px;
+  padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 4px 16px rgba(80,110,80,.10);
+}
+.hbtn{width:58px;height:58px;border-radius:18px;border:none;background:var(--mint);font-size:28px;flex:none;box-shadow:0 3px 0 var(--mint2)}
+.hbtn:active{transform:translateY(2px);box-shadow:none}
+.hbtn.off{opacity:.45;filter:grayscale(.6)}
+.hstar{display:flex;align-items:center;gap:6px;background:var(--butter);border-radius:20px;padding:6px 16px;font-weight:900;font-size:28px;flex:none;font-variant-numeric:tabular-nums}
+#starIco{display:inline-block}
+#starIco.bump{animation:bump .5s}
+.hlv{flex:1;min-width:0}
+.hlvtxt{font-weight:700;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:16px;border-radius:10px;background:#EEF2EA;overflow:hidden;margin-top:2px}
+.fill{height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,var(--mint2),var(--sky2),var(--lav2));transition:width .6s}
+
+/* ---------- 版面 ---------- */
+#app{max-width:980px;margin:0 auto;padding-block:100px 210px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:24px;margin:16px 0}
+.title{font-size:40px;font-weight:900;text-align:center;margin:12px 0 0;text-wrap:balance}
+.subtitle{text-align:center;color:var(--ink2);margin:4px 0 12px}
+.pill{display:inline-block;background:var(--sky);border-radius:999px;padding:4px 18px;font-weight:700;font-size:20px}
+.pill.dark{background:#4B4458;color:#fff}
+.pill.warm{background:var(--peach)}
+.explain{font-size:24px;background:#F7FBF4;border-radius:20px;padding:16px 20px;margin:14px 0}
+.explain.small{font-size:20px}
+.hl{background:var(--butter);border-radius:8px;padding:0 6px;font-weight:700}
+.prompt{font-size:26px;font-weight:700;margin:14px 0 6px;text-align:center;text-wrap:balance}
+.math{text-align:center}
+.math.big{font-size:42px;margin:10px 0;overflow-x:auto}
+.math.mid{font-size:34px}
+.center{text-align:center}
+.actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+.gtitle{font-size:30px;font-weight:900;text-align:center}
+.toprow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;align-items:center}
+
+.btn{min-height:68px;padding:10px 30px;border:none;border-radius:22px;font-size:26px;font-weight:700;background:var(--mint);box-shadow:0 5px 0 var(--mint2);transition:transform .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--mint2)}
+.btn.primary{background:var(--peach);box-shadow:0 5px 0 var(--peach2)}
+.btn.ghost{background:#F3F6F0;box-shadow:0 4px 0 #DDE5D8}
+.btn.small{min-height:56px;font-size:22px;padding:6px 20px}
+.btn:disabled{opacity:.35;pointer-events:none}
+.btn.ready{animation:pulse 1.4s ease-in-out infinite}
+
+/* ---------- 首頁 ---------- */
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:16px}
+.lvcard{border:none;border-radius:var(--r);padding:22px;text-align:left;box-shadow:var(--shadow);position:relative;min-height:240px;display:flex;flex-direction:column;gap:4px}
+.lvcard:active{transform:scale(.98)}
+.lvcard .ico{font-size:56px;line-height:1}
+.lvcard .nm{font-size:26px;font-weight:900}
+.lvcard .ds{font-size:19px;color:var(--ink2)}
+.lvcard .gm{font-size:19px;font-weight:700;background:rgba(255,255,255,.7);border-radius:12px;padding:2px 10px;align-self:flex-start}
+.lvcard .df{font-size:24px;color:#C98F00;letter-spacing:2px}
+.lvcard .badge{position:absolute;top:14px;right:14px;background:#fff;border-radius:999px;padding:2px 14px;font-size:18px;font-weight:700}
+.lvcard.next{outline:5px solid #fff;animation:pulse 2s infinite}
+.resetrow{text-align:center;margin-top:30px}
+
+/* ---------- 關卡標頭 ---------- */
+.lvhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lvtitle{font-size:28px;font-weight:900;flex:1;min-width:0}
+.diff{color:#C98F00;font-size:24px}
+.chips{display:flex;align-items:center;justify-content:center;gap:6px;margin:14px 0;flex-wrap:wrap}
+.chip{border:none;border-radius:999px;padding:10px 20px;font-size:22px;font-weight:700;background:#F0F3EC;min-height:56px}
+.chip.on{background:var(--peach);box-shadow:0 4px 0 var(--peach2)}
+.chip.past{background:var(--mint)}
+.arrow{color:var(--ink2)}
+.batchbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}
+.bchip{border:none;border-radius:16px;padding:6px 14px;font-size:18px;font-weight:700;background:#F0F3EC;min-height:48px}
+.bchip.on{background:var(--butter);box-shadow:0 3px 0 var(--butter2)}
+.bchip.past{background:var(--mint)}
+
+/* ---------- 選項 ---------- */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.opt{min-height:100px;border:4px solid transparent;border-radius:24px;background:#F6F4FF;font-size:32px;padding:10px;box-shadow:0 5px 0 #E2DCFA;transition:all .2s;min-width:0;overflow-x:auto}
+.opt:active{transform:translateY(3px)}
+.otxt{font-size:24px;font-weight:700;font-family:var(--font)}
+.opt.good{background:var(--mint);border-color:#fff;box-shadow:0 0 0 6px var(--mint2),0 0 30px var(--mint2);transform:scale(1.04)}
+.opt.nope{opacity:.42;background:#F1F1F1;box-shadow:none;animation:wobble .5s}
+.opt.dim{opacity:.35}
+.opt.glow{animation:glow 1.2s ease-in-out infinite}
+.hintbox{margin-top:16px;background:#FFFBE6;border:4px dashed var(--butter2);border-radius:22px;padding:14px 16px;animation:popin .45s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.hintbox .ht{font-weight:900}
+.hintbox .math{font-size:30px}
+
+/* ---------- 魔法變身列 ---------- */
+.magic{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#FBF9FF;border-radius:22px;padding:14px 18px;margin:12px 0;flex-wrap:wrap}
+.magic .lab{font-size:18px;color:var(--ink2);width:100%}
+.magic .m-expr{flex:1;min-width:0;overflow-x:auto}
+.m-expr.poof{animation:poof .6s}
+.reveal{margin-top:14px;background:var(--butter);border-radius:20px;padding:14px 18px;font-size:24px;text-align:center;animation:popin .45s}
+.reveal .math{font-size:32px;overflow-x:auto}
+
+/* ---------- 簡記咒語大作戰（史萊姆） ---------- */
+.arena{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(180deg,#F3FBEF,#E3F4DA);border-radius:24px;padding:14px;margin-top:10px}
+.hp{font-size:30px;letter-spacing:4px;min-height:42px}
+.slime{width:190px;max-width:60%;animation:jiggle 1.8s ease-in-out infinite}
+.slime svg{width:100%;height:auto;display:block}
+.slime.hit{animation:hitflash .5s}
+.slime.giggle{animation:giggle .6s}
+.slime.pop{animation:popout .7s forwards}
+.seal{background:#fff;border-radius:18px;padding:6px 18px;box-shadow:0 3px 10px rgba(0,0,0,.08);font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;max-width:100%}
+.seal .math{font-size:36px;overflow-x:auto;max-width:100%}
+.dmg{position:absolute;top:30%;left:50%;transform:translateX(-50%);font-size:30px;font-weight:900;color:var(--purple);background:#fff;border-radius:16px;padding:2px 14px;animation:floatup 1.2s forwards;pointer-events:none;white-space:nowrap}
+.proj{position:fixed;z-index:120;font-size:40px;pointer-events:none;transition:left .45s ease-in,top .45s ease-in,transform .45s;filter:drop-shadow(0 0 8px #FFE066)}
+
+/* ---------- 短除法 ---------- */
+.sd{display:flex;flex-direction:column;align-items:center;gap:14px}
+.sd-q{font-size:26px;font-weight:700;text-align:center}
+.sd-q .big{font-size:34px;color:var(--purple)}
+.sd-ladder{display:flex;flex-direction:column;align-items:flex-start;font-family:var(--mathfont);font-size:40px;font-variant-numeric:tabular-nums;background:#FBF9FF;border-radius:20px;padding:14px 28px}
+.sd-ladder.small{font-size:30px;padding:8px 18px}
+.sd-row{display:flex;align-items:stretch;line-height:1.3}
+.sd-d{width:64px;text-align:right;padding-right:10px;color:var(--orange);font-weight:700}
+.sd-ladder.small .sd-d{width:48px}
+.sd-n{padding:2px 18px 2px 14px;min-width:84px}
+.sd-row.br .sd-n{border-left:5px solid var(--ink);border-bottom:5px solid var(--ink);border-bottom-left-radius:12px}
+.sd-ladder.small .sd-row.br .sd-n{border-width:4px}
+.sd-row.newrow{animation:popin .4s}
+.qm{display:inline-block;color:var(--lav2);animation:pulse 1.2s infinite;font-family:var(--font);font-weight:900}
+.sd-keys{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.key{width:92px;height:92px;border:none;border-radius:26px;background:var(--peach);box-shadow:0 6px 0 var(--peach2);font-size:42px;font-weight:900}
+.key:active{transform:translateY(3px)}
+.key.wiggle{animation:wobble .5s}
+.key.glow{animation:glow 1s ease-in-out infinite}
+.sd-keys-lbl{font-size:19px;color:var(--ink2)}
+
+/* ---------- 根號監獄 / 寶石盤 ---------- */
+.jail{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.jlabels{display:flex;gap:12px;font-weight:700;font-size:20px}
+.jlabels span:first-child{min-width:150px}
+.jrow{display:flex;align-items:stretch}
+.outside{flex:none;min-width:110px;max-width:45%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;border:4px dashed var(--mint2);border-radius:22px;background:linear-gradient(180deg,#F1FBEA,#DFF3D2);padding:8px;margin-right:6px}
+.outside .ph{font-size:34px;color:var(--mint2);font-weight:900}
+.freechip{width:70px;height:70px;border-radius:50%;background:#FFE066;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;box-shadow:0 4px 0 #E0B400,inset 0 0 0 5px #FFF3B0;animation:popin .5s}
+.tx{font-size:28px;color:var(--ink2)}
+.root-hook{width:60px;flex:none}
+.root-hook svg{width:100%;height:100%;display:block}
+.cell{flex:1;min-width:0;border-top:7px solid var(--purple);min-height:130px;padding:16px 8px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;
+  background:#F7F3FF repeating-linear-gradient(90deg,transparent 0 54px,rgba(122,79,214,.16) 54px 62px);border-radius:0 0 20px 0}
+.tile{width:80px;height:80px;border-radius:50%;border:4px solid #fff;background:var(--peach);font-size:34px;font-weight:900;position:relative;box-shadow:0 5px 0 var(--peach2);display:flex;align-items:center;justify-content:center;padding-top:12px;transition:transform .2s}
+.tile .eyes{position:absolute;top:8px;left:0;right:0;font-size:15px;letter-spacing:10px;text-align:center;line-height:1}
+.tile.gem{border-radius:22px;transform:rotate(0);background:linear-gradient(135deg,#E9E2FF,#C7B8FF);box-shadow:0 5px 0 var(--lav2);padding-top:0}
+.tile.gem.g3{background:linear-gradient(135deg,#DDF7EA,#9EDFC0);box-shadow:0 5px 0 var(--mint2)}
+.tile.gem.g5{background:linear-gradient(135deg,#FFE6EC,#FFB3C6);box-shadow:0 5px 0 var(--pink2)}
+.tile.gem.g7{background:linear-gradient(135deg,#FFEEDB,#FFC79A);box-shadow:0 5px 0 var(--peach2)}
+.tile.sel{border-color:var(--purple);transform:scale(1.12);box-shadow:0 0 0 5px var(--lav2)}
+.tile.hint{animation:glow .8s ease-in-out infinite}
+.tile.wiggle{animation:wobble .5s}
+.tile.escape{animation:flyleft .7s forwards}
+.hintbtn{align-self:center}
+
+/* ---------- 根號魔像大作戰 ---------- */
+.golem-area{display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;background:linear-gradient(180deg,#F1ECFF,#E6F2E0);border-radius:24px;padding:14px;margin-top:10px;position:relative}
+.golem{position:relative;width:200px;max-width:55%}
+.golem svg{width:100%;height:auto;display:block}
+.golem .gnum{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;padding:0 14px;font-size:38px;font-weight:900;font-family:var(--mathfont);box-shadow:0 3px 8px rgba(0,0,0,.12);transition:transform .2s}
+.golem .gnum.bump{animation:popin .4s}
+.golem.idle{animation:sway 2.6s ease-in-out infinite}
+.golem.hit{animation:hitflash .5s}
+.golem.giggle{animation:giggle .6s}
+.golem.crumble{animation:crumble .9s forwards}
+.golem .crack{opacity:0;transition:opacity .3s}
+.golem[data-h="1"] .c1,.golem[data-h="2"] .c1,.golem[data-h="2"] .c2,.golem[data-h="3"] .c1,.golem[data-h="3"] .c2,.golem[data-h="3"] .c3{opacity:1}
+.scroll{background:#FFF8E8;border:3px solid #EBD3A8;border-radius:18px;padding:8px 10px;min-width:150px}
+.scroll .st{font-size:18px;font-weight:700;text-align:center}
+.runes{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.rune{width:96px;height:96px;border-radius:50%;border:5px solid #fff;background:radial-gradient(circle at 35% 30%,#fff 0 12%,var(--lav) 13% 100%);box-shadow:0 6px 0 var(--lav2),0 0 0 4px var(--lav2);font-size:44px;font-weight:900;font-family:var(--mathfont);color:var(--purple)}
+.rune:active{transform:translateY(3px)}
+.rune.fizz{animation:fizz .5s}
+.rune.glow{animation:glow 1s ease-in-out infinite}
+.gemrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:70px;align-items:center;background:#FBF9FF;border-radius:18px;padding:8px}
+.gemrow .ph{color:var(--ink2);font-size:19px}
+.gemrow .tile{width:62px;height:62px;font-size:28px;animation:popin .4s}
+
+/* ---------- 精靈 ---------- */
+.forest{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:14px 0;min-height:170px}
+.elf{border:none;background:transparent;width:120px;display:flex;flex-direction:column;align-items:center;padding:4px;transition:transform .3s,opacity .3s}
+.elf:active{transform:scale(.95)}
+.elfsvg{width:84px;height:104px}
+.elfsvg .robe,.elfsvg .hat{transition:fill 1.2s}
+.cursed .elfsvg .robe{fill:var(--gray-robe)}
+.cursed .elfsvg .hat{fill:var(--gray-hat)}
+.elftag{background:#fff;border-radius:14px;padding:2px 10px;font-size:28px;box-shadow:0 3px 8px rgba(0,0,0,.08)}
+.elf.picked{opacity:.25;transform:scale(.85);pointer-events:none}
+.elf.wiggle{animation:wobble .5s}
+.elf.hint{animation:glowr .8s ease-in-out infinite;border-radius:20px}
+.ring{min-height:160px;border:5px dashed var(--lav2);border-radius:80px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;padding:12px;background:rgba(255,255,255,.6)}
+.ring .ph{color:var(--ink2);font-size:20px}
+.ring.party{border-style:solid;animation:ringglow 1.2s ease-in-out infinite}
+.ring .elf{width:auto;pointer-events:none;animation:popin .4s}
+.ring .elfsvg{width:60px;height:74px}
+.curse{background:#4B4458;color:#fff;border-radius:20px;padding:14px 18px;text-align:center;font-size:24px;font-weight:700;animation:popin .5s}
+.curse small{display:block;font-weight:500;font-size:20px;opacity:.9}
+
+/* ---------- 角蛙老師 ---------- */
+.helper-wrap{position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:70;width:120px}
+.helper{width:120px;height:104px;border:none;background:transparent;padding:0;animation:breathe 3s ease-in-out infinite}
+.helper.talk{animation:hop .5s ease 2}
+.helpername{text-align:center;font-size:16px;font-weight:700;background:#fff;border-radius:999px;margin-top:-6px}
+.bubble{position:absolute;left:4px;bottom:128px;width:max-content;max-width:min(480px,calc(100vw - 30px));background:#fff;border:4px solid var(--mint2);border-radius:24px;padding:14px 18px;font-size:23px;font-weight:700;box-shadow:var(--shadow);opacity:0;transform:translateY(10px) scale(.95);transform-origin:bottom left;transition:all .25s;pointer-events:none}
+.bubble.show{opacity:1;transform:none;pointer-events:auto}
+.btail{position:absolute;left:44px;bottom:-16px;width:24px;height:24px;background:#fff;border-right:4px solid var(--mint2);border-bottom:4px solid var(--mint2);transform:rotate(45deg)}
+
+/* ---------- 特效、彈窗 ---------- */
+.pt{position:fixed;pointer-events:none;font-size:26px;z-index:999;animation:pt .95s ease-out forwards}
+.flystar{position:fixed;z-index:998;font-size:34px;pointer-events:none;transition:all .75s cubic-bezier(.5,-0.3,.6,1)}
+.modal{position:fixed;inset:0;z-index:200;background:rgba(61,74,62,.35);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadein .3s}
+.mbox{background:#fff;border-radius:32px;padding:30px;max-width:560px;width:100%;text-align:center;animation:popin .45s}
+.mbox .big{font-size:76px;line-height:1.1}
+.mbox h2{margin:8px 0;font-size:32px}
+.mbtns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes bump{0%,100%{transform:scale(1)}40%{transform:scale(1.6) rotate(-15deg)}}
+@keyframes wobble{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-2deg)}75%{transform:translateX(8px) rotate(2deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 4px var(--butter)}50%{box-shadow:0 0 0 12px var(--butter),0 0 26px #FFE066}}
+@keyframes glowr{0%,100%{background:transparent}50%{background:var(--butter)}}
+@keyframes poof{0%{transform:scale(1)}40%{transform:scale(.6) rotate(-6deg);opacity:.2}100%{transform:scale(1);opacity:1}}
+@keyframes popin{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes flyleft{0%{transform:scale(1)}40%{transform:scale(1.3) rotate(-15deg)}100%{transform:translate(-120px,-40px) scale(.2);opacity:0}}
+@keyframes jiggle{0%,100%{transform:scale(1,1)}50%{transform:scale(1.06,.94) translateY(4px)}}
+@keyframes hitflash{0%{filter:brightness(1)}20%{filter:brightness(2.2);transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}100%{filter:brightness(1);transform:none}}
+@keyframes giggle{0%,100%{transform:translateY(0)}30%{transform:translateY(-18px) rotate(-6deg)}60%{transform:translateY(0) rotate(6deg)}}
+@keyframes popout{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(0) rotate(30deg);opacity:0}}
+@keyframes floatup{0%{opacity:0;transform:translate(-50%,10px)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-60px)}}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes crumble{0%{transform:none}30%{transform:translateY(-6px) rotate(-4deg)}100%{transform:translateY(40px) scale(.3) rotate(18deg);opacity:0}}
+@keyframes fizz{0%,100%{transform:none}30%{transform:rotate(-12deg) scale(.9)}60%{transform:rotate(10deg)}}
+@keyframes pt{from{transform:translate(-50%,-50%) scale(1);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.4) rotate(200deg);opacity:0}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes ringglow{0%,100%{box-shadow:0 0 0 0 var(--lav2)}50%{box-shadow:0 0 0 10px var(--lav)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+
+@media (max-width:620px){
+  body{font-size:20px}
+  .opts{grid-template-columns:1fr}
+  .math.big{font-size:32px}
+  .hlvtxt{font-size:16px}
+  .hstar{font-size:22px;padding:4px 10px}
+  .hbtn{width:50px;height:50px;font-size:24px}
+  .tile{width:64px;height:64px;font-size:28px}
+  .freechip{width:58px;height:58px;font-size:28px}
+  .outside{min-width:80px}
+  .jlabels span:first-child{min-width:100px}
+  .key,.rune{width:76px;height:76px;font-size:36px}
+  .sd-ladder{font-size:34px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}
+</style>
+
+<header class="hud">
+  <button class="hbtn" id="homeBtn" aria-label="回到地圖">🏠</button>
+  <div class="hstar"><span id="starIco">⭐</span><span id="starNum">0</span></div>
+  <div class="hlv">
+    <div class="hlvtxt"><span id="lvNum">Lv.1</span>　<span id="lvName">小種子魔法師</span></div>
+    <div class="bar"><div class="fill" id="lvFill"></div></div>
+  </div>
+  <button class="hbtn" id="sndBtn" aria-label="音效開關">🔊</button>
+  <button class="hbtn" id="voiceBtn" aria-label="語音開關">🗣️</button>
+</header>
+
+<main id="app"></main>
+
+<div class="helper-wrap">
+  <div class="bubble" id="bubble"><span id="bubbleTxt"></span><span class="btail"></span></div>
+  <button class="helper" id="helper" aria-label="角蛙老師">
+    <svg viewBox="0 0 120 100" width="120" height="100" aria-hidden="true">
+      <ellipse cx="60" cy="94" rx="44" ry="5" fill="rgba(0,0,0,.08)"/>
+      <path d="M26 32 L34 12 L44 30Z" fill="#F4B183"/>
+      <path d="M76 30 L86 12 L94 32Z" fill="#F4B183"/>
+      <ellipse cx="60" cy="62" rx="52" ry="32" fill="#A8D88E"/>
+      <ellipse cx="60" cy="74" rx="34" ry="17" fill="#FFF1B8"/>
+      <circle cx="18" cy="56" r="5" fill="#8CC673"/><circle cx="102" cy="58" r="6" fill="#8CC673"/><circle cx="60" cy="40" r="4" fill="#8CC673"/>
+      <circle cx="36" cy="36" r="14" fill="#A8D88E"/><circle cx="84" cy="36" r="14" fill="#A8D88E"/>
+      <circle cx="36" cy="36" r="10" fill="#fff"/><circle cx="84" cy="36" r="10" fill="#fff"/>
+      <circle cx="37" cy="37" r="5.5" fill="#3D4A3E"/><circle cx="83" cy="37" r="5.5" fill="#3D4A3E"/>
+      <circle cx="39" cy="35" r="1.8" fill="#fff"/><circle cx="85" cy="35" r="1.8" fill="#fff"/>
+      <path d="M30 58 Q60 80 90 58" stroke="#3D4A3E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="24" cy="64" rx="7" ry="4" fill="#FFB3C6"/><ellipse cx="96" cy="64" rx="7" ry="4" fill="#FFB3C6"/>
+    </svg>
+  </button>
+  <div class="helpername">角蛙老師</div>
+</div>
+
+<script>
+/* ================= 基本工具 ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.prototype.slice.call(r.querySelectorAll(s));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const center=el=>{const r=el.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2];};
+const last=a=>a[a.length-1];
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const isPrime=n=>{if(n<2)return false;for(let d=2;d*d<=n;d++)if(n%d===0)return false;return true;};
+function primeFactors(n){const f=[];let d=2;while(n>1){while(n%d===0){f.push(d);n/=d;}d++;}return f;}
+const app=$('#app');
+
+/* ================= 狀態（存在這台平板） ================= */
+const S={stars:0,done:{},sound:true,voice:true};
+try{Object.assign(S,JSON.parse(localStorage.getItem('radicalAcademy3')||'{}'));}catch(e){}
+function save(){try{localStorage.setItem('radicalAcademy3',JSON.stringify(S));}catch(e){}}
+
+/* ================= 數學排版：迷你 LaTeX → HTML/CSS ================= */
+const RADSVG='<svg class="rad" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="2,60 16,52 38,97 66,4 100,4"/></svg>';
+function esc(c){return ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]||c;}
+function fb(s){
+  let i=0,out='';
+  const skip=()=>{while(s[i]===' ')i++;};
+  function group(){
+    skip();
+    if(s[i]!=='{')return s[i++]||'';
+    let d=1,st=++i;
+    while(i<s.length&&d>0){if(s[i]==='{')d++;else if(s[i]==='}')d--;i++;}
+    return s.slice(st,i-1);
+  }
+  while(i<s.length){
+    const c=s[i];
+    if(c==='\\'){
+      let j=i+1;while(j<s.length&&/[a-zA-Z]/.test(s[j]))j++;
+      const cmd=s.slice(i+1,j);i=j;
+      if(!cmd){i++;out+='&ensp;';continue;}
+      if(cmd==='sqrt')out+=`<span class="fs">${RADSVG}<span class="fs-in">${fb(group())}</span></span>`;
+      else if(cmd==='frac'){const a=group(),b=group();out+=`<span class="ff"><span>${fb(a)}</span><span class="ff-d">${fb(b)}</span></span>`;}
+      else if(cmd==='textcolor'){const col=group(),g=group();out+=`<span style="color:${col};display:inline-flex;align-items:center">${fb(g)}</span>`;}
+      else if(cmd==='text')out+=`<span style="font-family:var(--font)">${group()}</span>`;
+      else{const sym={times:'×',div:'÷',rightarrow:'→',neq:'≠'}[cmd];if(sym)out+=`<span class="op">${sym}</span>`;}
+    }else if(c==='{'){out+=fb(group());}
+    else if(c===' '){i++;}
+    else if(c==='-'){const prev=s.slice(0,i).replace(/\s+$/,'');const unary=prev===''||/[(=]$/.test(prev)||/\\times$|\\div$/.test(prev);out+=unary?'−':'<span class="op">−</span>';i++;}
+    else if(c==='+'||c==='='){out+=`<span class="op">${c}</span>`;i++;}
+    else if(/[a-z]/.test(c)){out+=`<i>${c}</i>`;i++;}
+    else{out+=esc(c);i++;}
+  }
+  return out;
+}
+const T=s=>'<span class="m">'+fb(s)+'</span>';
+const plain=s=>s.replace(/\\sqrt\{([^}]*)\}/g,'√$1').replace(/\\times/g,' × ').replace(/\\div/g,' ÷ ').replace(/\\,/g,' ').replace(/-/g,'−').replace(/[{}\\]/g,'');
+
+/* ================= 音效（Web Audio，柔和不刺耳） ================= */
+let actx=null;
+function ac(){
+  if(!actx){const C=window.AudioContext||window.webkitAudioContext;if(C)actx=new C();}
+  if(actx&&actx.state==='suspended')actx.resume();
+  return actx;
+}
+function tone(f,t0,dur,type,vol){
+  if(!S.sound)return;const a=ac();if(!a)return;
+  const o=a.createOscillator(),g=a.createGain();
+  o.type=type||'sine';o.frequency.value=f;
+  const t=a.currentTime+t0;
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol||.15,t+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.05);
+}
+const SFX={
+  tap:()=>tone(660,0,.08,'sine',.08),
+  star:()=>[1047,1319,1568].forEach((f,i)=>tone(f,i*.08,.28,'triangle',.14)),
+  soft:()=>{tone(523,0,.18,'sine',.07);tone(466,.16,.28,'sine',.06);},
+  pop:()=>{tone(880,0,.07,'sine',.08);tone(1320,.05,.14,'sine',.1);},
+  magic:()=>[784,988,1175,1568,1976].forEach((f,i)=>tone(f,i*.05,.2,'sine',.08)),
+  zap:()=>{tone(1400,0,.08,'square',.04);tone(900,.06,.12,'triangle',.1);tone(600,.14,.18,'sine',.1);},
+  boing:()=>{tone(300,0,.12,'sine',.08);tone(420,.1,.16,'sine',.07);},
+  rumble:()=>{for(let k=0;k<6;k++)tone(90+Math.random()*60,k*.08,.16,'triangle',.08);},
+  curse:()=>[392,370,349,330].forEach((f,i)=>tone(f,i*.18,.35,'triangle',.07)),
+  win:()=>[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,i*.12,.32,'triangle',.15))
+};
+function sfx(n){try{SFX[n]&&SFX[n]();}catch(e){}}
+
+/* ================= 角蛙老師 ================= */
+let lastSay='',bubbleTimer=null;
+function speak(t){
+  if(!S.voice||!('speechSynthesis' in window))return;
+  try{
+    speechSynthesis.cancel();
+    const txt=t.replace(/√/g,'根號').replace(/([\d√)])\s*−\s*/g,'$1 減 ').replace(/−/g,'負').replace(/×/g,'乘').replace(/÷/g,'除以').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu,'');
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang='zh-TW';u.rate=.9;u.pitch=1.2;
+    const v=speechSynthesis.getVoices().find(v=>/zh[-_]TW/i.test(v.lang));
+    if(v)u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function say(t,keep){
+  lastSay=t;
+  $('#bubbleTxt').textContent=t;
+  const b=$('#bubble');b.classList.add('show');
+  const f=$('#helper');f.classList.remove('talk');void f.offsetWidth;f.classList.add('talk');
+  speak(t);
+  clearTimeout(bubbleTimer);
+  if(!keep)bubbleTimer=setTimeout(()=>b.classList.remove('show'),9000);
+}
+$('#helper').onclick=()=>{sfx('tap');say(lastSay||'我是角蛙老師！卡住的時候點我，我再說一次給你聽～');};
+$('#bubble').onclick=()=>$('#bubble').classList.remove('show');
+const PRAISE=['太棒了！','你好厲害！','答對了，魔法成功！','哇～你真聰明！','好棒喔，繼續加油！','完全正確！'];
+const ENC=['沒關係，慢慢來，再試一次喔！','差一點點了，換一個試試看！','別擔心，我們一起再想想～'];
+
+/* ================= 星星、等級、特效 ================= */
+const TITLES=['小種子魔法師','嫩芽魔法師','小樹魔法師','森林魔法師','根號魔法大師'];
+const lvOf=s=>Math.floor(s/10)+1;
+function updHUD(){
+  $('#starNum').textContent=S.stars;
+  const lv=lvOf(S.stars);
+  $('#lvNum').textContent='Lv.'+lv;
+  $('#lvName').textContent=TITLES[Math.min(lv-1,TITLES.length-1)];
+  $('#lvFill').style.width=((S.stars%10)/10*100)+'%';
+  $('#sndBtn').textContent=S.sound?'🔊':'🔇';
+  $('#sndBtn').classList.toggle('off',!S.sound);
+  $('#voiceBtn').classList.toggle('off',!S.voice);
+}
+function burst(x,y,n){
+  n=n||16;
+  const cols=['#FFB3C6','#8FD3AE','#B9A8F5','#FFC79A','#9DD3F7','#F5C800'];
+  for(let k=0;k<n;k++){
+    const p=document.createElement('span');p.className='pt';
+    p.textContent=pick(['★','✦','❀','●','✿']);
+    const a=Math.random()*Math.PI*2,d=60+Math.random()*100;
+    p.style.left=x+'px';p.style.top=y+'px';
+    p.style.setProperty('--dx',Math.cos(a)*d+'px');p.style.setProperty('--dy',Math.sin(a)*d+'px');
+    p.style.color=pick(cols);
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1000);
+  }
+}
+function addStar(n,el){
+  n=n||1;
+  const before=lvOf(S.stars);
+  const c=el?center(el):[innerWidth/2,innerHeight/2];
+  burst(c[0],c[1],14+n*4);sfx('star');
+  const fs=document.createElement('span');fs.className='flystar';fs.textContent='⭐';
+  fs.style.left=(c[0]-17)+'px';fs.style.top=(c[1]-17)+'px';document.body.appendChild(fs);
+  const tc=center($('#starIco'));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{fs.style.left=(tc[0]-17)+'px';fs.style.top=(tc[1]-17)+'px';fs.style.transform='scale(.6)';}));
+  setTimeout(()=>{
+    fs.remove();S.stars+=n;save();updHUD();
+    const ico=$('#starIco');ico.classList.remove('bump');void ico.offsetWidth;ico.classList.add('bump');
+    if(lvOf(S.stars)>before){
+      sfx('win');burst(innerWidth/2,90,40);
+      setTimeout(()=>say(`升級了！你現在是「${TITLES[Math.min(lvOf(S.stars)-1,TITLES.length-1)]}」！`),400);
+    }
+  },780);
+}
+// 魔法彈：從 a 飛到 b
+function shoot(a,b,ch){
+  return new Promise(res=>{
+    const p=document.createElement('span');p.className='proj';p.textContent=ch||'✨';
+    const ca=center(a),cb=center(b);
+    p.style.left=(ca[0]-20)+'px';p.style.top=(ca[1]-24)+'px';
+    document.body.appendChild(p);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{p.style.left=(cb[0]-20)+'px';p.style.top=(cb[1]-24)+'px';p.style.transform='scale(1.5) rotate(180deg)';}));
+    setTimeout(()=>{p.remove();burst(cb[0],cb[1],12);res();},470);
+  });
+}
+function modal(html,btns){
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div class="mbox">${html}<div class="mbtns"></div></div>`;
+  btns.forEach(b0=>{
+    const b=document.createElement('button');b.className='btn '+(b0[1]||'');b.innerHTML=b0[0];
+    b.onclick=()=>{sfx('tap');m.remove();b0[2]&&b0[2]();};
+    $('.mbtns',m).appendChild(b);
+  });
+  document.body.appendChild(m);
+}
+
+/* ================= 短除法圖 ================= */
+function ladderRows(n){
+  const rows=[];let cur=n;
+  while(!isPrime(cur)&&cur>1){const p=[2,3,5,7,11,13].find(x=>cur%x===0);rows.push({d:p,n:cur});cur/=p;}
+  rows.push({d:null,n:cur});return rows;
+}
+function ladderHTML(rows,opt){
+  opt=opt||{};
+  return `<div class="sd-ladder ${opt.small?'small':''}">`+rows.map((r,i)=>{
+    const isLast=i===rows.length-1;
+    const br=!isLast||opt.open;
+    const d=r.d!==null?r.d:(isLast&&opt.open?'<span class="qm">?</span>':'');
+    return `<div class="sd-row ${br?'br':''} ${opt.fresh&&isLast?'newrow':''}"><span class="sd-d">${d}</span><span class="sd-n">${r.n}</span></div>`;
+  }).join('')+'</div>';
+}
+// 角蛙老師的短除法提示（化簡題答錯時出現）
+function sdHintHTML(n){
+  const rows=ladderRows(n),f=primeFactors(n);
+  const cnt={};f.forEach(p=>cnt[p]=(cnt[p]||0)+1);
+  let c=1,r=1;Object.keys(cnt).forEach(p=>{c*=Math.pow(+p,Math.floor(cnt[p]/2));r*=Math.pow(+p,cnt[p]%2);});
+  const pairs=Object.keys(cnt).filter(p=>cnt[p]>=2).map(p=>Math.floor(cnt[p]/2)>1?`${Math.floor(cnt[p]/2)} 對 ${p}`:`兩個 ${p}`).join('、');
+  return `<div class="hintbox"><div class="ht">🐸 角蛙老師的短除法提示</div>${ladderHTML(rows,{small:true})}
+    <div class="math">${T(`\\sqrt{${n}}=\\sqrt{${f.join('\\times ')}}`)}</div>
+    <div>${pairs?`找到雙胞胎：<b>${pairs}</b>，它們會派一個出來站到根號<b>左邊</b>！`:'沒有雙胞胎，不能再化簡。'}</div></div>`;
+}
+
+/* ================= 共用元件 ================= */
+// 選擇題：o[0] 為正確答案（畫面上會打亂）；以 @ 開頭的選項為純文字；q.sd = 答錯時顯示短除法提示的數
+function askOne(box,q,onOk){
+  const opts=shuffle(q.o.map((t,k)=>({t,ok:k===0})));
+  const w=document.createElement('div');
+  w.innerHTML=`${q.p?`<div class="prompt">${q.p}</div>`:''}${q.q?`<div class="math big">${T(q.q)}</div>`:''}
+    <div class="opts">${opts.map((o,k)=>`<button class="opt" data-k="${k}">${o.t[0]==='@'?`<span class="otxt">${o.t.slice(1)}</span>`:T(o.t)}</button>`).join('')}</div>`;
+  box.appendChild(w);
+  let done=false,wrong=0;
+  $$('.opt',w).forEach(b=>b.addEventListener('click',()=>{
+    if(done)return;
+    const o=opts[b.dataset.k];
+    if(o.ok){
+      done=true;b.classList.remove('glow');b.classList.add('good');
+      $$('.opt',w).forEach(x=>{if(x!==b)x.classList.add('dim');});
+      onOk&&onOk(b);
+    }else{
+      if(b.classList.contains('nope'))return;
+      b.classList.add('nope');wrong++;sfx('soft');
+      if(q.onWrong)q.onWrong(wrong);
+      if(q.sd&&!$('.hintbox',w)){
+        w.insertAdjacentHTML('beforeend',sdHintHTML(q.sd));
+        say(`沒關係！看看我畫的短除法：${q.sd} = ${primeFactors(q.sd).join(' × ')}。找出雙胞胎就知道答案囉！`);
+        setTimeout(()=>{const h=$('.hintbox',w);if(h)h.scrollIntoView({behavior:'smooth',block:'nearest'});},200);
+      }else say(q.h||pick(ENC));
+      if(wrong>=2){const c=$$('.opt',w).find(x=>opts[x.dataset.k].ok);c.classList.add('glow');setTimeout(()=>{if(!done)say('看！發亮的那個就是答案，點它試試看～');},3500);}
+    }
+  }));
+  return w;
+}
+function reveal(box,html){const d=document.createElement('div');d.className='reveal';d.innerHTML=html;box.appendChild(d);return d;}
+function magicRow(label,before,after,onDone){
+  const d=document.createElement('div');d.className='magic';
+  d.innerHTML=`${label?`<div class="lab">${label}</div>`:''}<div class="math mid m-expr">${T(before)}</div><button class="btn primary wand">🪄 變！</button>`;
+  $('.wand',d).onclick=()=>{
+    const m=$('.m-expr',d);m.classList.add('poof');sfx('magic');
+    const c=center($('.wand',d));burst(c[0],c[1],10);
+    $('.wand',d).style.visibility='hidden';
+    setTimeout(()=>{m.innerHTML=T(`${before}=\\textcolor{#7A4FD6}{${after}}`);onDone&&onDone();},300);
+  };
+  return d;
+}
+function magicGroup(b,rows,ok,doneMsg){
+  let n=0;
+  rows.forEach(r=>b.appendChild(magicRow(r[0],r[1],r[2],()=>{if(++n===rows.length){if(doneMsg)say(doneMsg);ok();}})));
+}
+function runSteps(el,steps,done){
+  let i=0;
+  function show(){
+    el.innerHTML=`<div class="card"><div class="pill">步驟 ${i+1} / ${steps.length}</div><div class="sbody"></div>
+      <div class="actions"><button class="btn primary next" disabled>${i<steps.length-1?'下一步 ➜':'去練習 ➜'}</button></div></div>`;
+    const body=$('.sbody',el),nb=$('.next',el);let ok=false;
+    steps[i](body,src=>{if(ok)return;ok=true;addStar(1,src||nb);nb.disabled=false;nb.classList.add('ready');});
+    nb.onclick=()=>{sfx('tap');i++;if(i<steps.length){show();scrollTo({top:0,behavior:'smooth'});}else done();};
+  }
+  show();
+}
+// 分批練習：batches=[{name,intro,qs:[...]}]
+function runQuiz(el,batches,done){
+  const flat=[];batches.forEach((b,bi)=>b.qs.forEach((q,qi)=>flat.push({q:q,bi:bi,qi:qi})));
+  let i=0,lastB=-1;
+  function show(){
+    const it=flat[i],B=batches[it.bi];
+    el.innerHTML=`<div class="card">
+      <div class="batchbar">${batches.map((b,k)=>`<button class="bchip ${k===it.bi?'on':''} ${k<it.bi?'past':''}" data-b="${k}">${k+1}. ${b.name}</button>`).join('')}</div>
+      <div class="center"><span class="pill warm">第 ${it.bi+1} 批・第 ${it.qi+1} / ${B.qs.length} 題</span></div>
+      <div class="qbox"></div><div class="actions"></div></div>`;
+    $$('.bchip',el).forEach(c=>c.onclick=()=>{sfx('tap');i=flat.findIndex(f=>f.bi===+c.dataset.b);show();});
+    if(it.bi!==lastB){lastB=it.bi;if(B.intro)say(B.intro);}
+    askOne($('.qbox',el),it.q,b=>{
+      addStar(1,b);say(pick(PRAISE)+(it.q.why?' '+it.q.why:''));
+      const nb=document.createElement('button');nb.className='btn primary ready';
+      const nxt=flat[i+1];
+      nb.textContent=!nxt?'去玩遊戲 🎮':(nxt.bi!==it.bi?`下一批：${batches[nxt.bi].name} ➜`:'下一題 ➜');
+      nb.onclick=()=>{sfx('tap');i++;if(i<flat.length){show();scrollTo({top:0,behavior:'smooth'});}else done();};
+      $('.actions',el).appendChild(nb);
+    });
+  }
+  show();
+}
+function nextBtn(box,label,fn){
+  const nb=document.createElement('button');nb.className='btn primary ready';nb.textContent=label;
+  nb.onclick=()=>{sfx('tap');fn();};box.appendChild(nb);return nb;
+}
+
+/* ================= 概念 1：根式的意義與簡記 ================= */
+const SLIME=(col,king)=>`<svg viewBox="0 0 160 140" aria-hidden="true">
+  <ellipse cx="80" cy="132" rx="62" ry="7" fill="rgba(0,0,0,.08)"/>
+  <path d="M14 128 Q4 70 80 26 Q156 70 146 128 Q80 138 14 128Z" fill="${col}"/>
+  <ellipse cx="54" cy="58" rx="14" ry="9" fill="#fff" opacity=".55"/>
+  <circle cx="60" cy="86" r="9" fill="#3D4A3E"/><circle cx="100" cy="86" r="9" fill="#3D4A3E"/>
+  <circle cx="63" cy="83" r="3" fill="#fff"/><circle cx="103" cy="83" r="3" fill="#fff"/>
+  <path d="M68 106 Q80 116 92 106" stroke="#3D4A3E" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <ellipse cx="46" cy="102" rx="8" ry="5" fill="#FFB3C6" opacity=".8"/><ellipse cx="114" cy="102" rx="8" ry="5" fill="#FFB3C6" opacity=".8"/>
+  ${king?'<path d="M56 30 L62 8 L74 22 L80 4 L86 22 L98 8 L104 30Z" fill="#FFD84D" stroke="#E0B400" stroke-width="3" stroke-linejoin="round"/>':''}
+</svg>`;
+const C1={
+  learn:(el,next)=>runSteps(el,[
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain"><b>√2 就像未知數 x 一樣</b>，都代表「一個數」。<br>數字乘它們時，<span class="hl">乘號 × 可以省略</span>，<span class="hl">數字寫在前面</span>！</div>`;
+      say('√2 就像未知數 x 一樣喔！點魔法棒，看看乘號會不會消失。');
+      magicGroup(b,[['① 未知數 x 的寫法','3\\times x','3x'],['② 根號的寫法（跟上面一模一樣！）','3\\times\\sqrt{2}','3\\sqrt{2}']],ok,'看到了嗎？x 和 √2 的簡記方法一模一樣！');
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">⚠️ 數字<b>一定要寫在根號前面</b>！<br>${T('\\sqrt{2}\\times 3=3\\sqrt{2}')}　不能寫成　${T('\\sqrt{2}\\,3')}（會看不清楚）<br>負數也一樣：${T('-2\\times\\sqrt{5}=-2\\sqrt{5}')}</div>`;
+      say('記住！數字要站在根號的前面，不可以寫在根號後面喔。負號也跟著數字站前面。');
+      magicGroup(b,[['① 根號在前也要換位置','\\sqrt{5}\\times 4','4\\sqrt{5}'],['② 負數','-2\\times\\sqrt{3}','-2\\sqrt{3}']],ok,'很好！數字和負號都站到根號前面了！');
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">如果是 <b>除以 ÷</b> 呢？<br>除以 3，<span class="hl">3 就跑到下面當分母</span>，變成分數！</div>`;
+      say('除法會變成分數喔，除以的數字放在下面。');
+      magicGroup(b,[['① 未知數 x 的寫法','x\\div 3','\\frac{x}{3}'],['② 根號的寫法','\\sqrt{2}\\div 3','\\frac{\\sqrt{2}}{3}']],ok,'好棒！除法變成分數了！');
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">🌟 <b>括號魔法（分配律）</b><br>括號外的數字，要<span class="hl">分別乘</span>括號裡的<b>每一個</b>！就像 ${T('4(x+y)=4x+4y')}</div>`;
+      say('括號外面的 4，要分別去乘括號裡面的每一個喔！');
+      magicGroup(b,[
+        ['① 兩個根號','4\\times(\\sqrt{2}+\\sqrt{3})','4\\sqrt{2}+4\\sqrt{3}'],
+        ['② 有減號','3\\times(\\sqrt{2}-\\sqrt{3})','3\\sqrt{2}-3\\sqrt{3}'],
+        ['③ 數字遇到數字要乘出來','3\\times(\\sqrt{3}+5)','3\\sqrt{3}+15']
+      ],ok,'太厲害了！記得 3 × 5 = 15，數字和數字要乘出答案喔！');
+    }
+  ],next),
+  qs:[
+    {name:'簡記寫法',intro:'第 1 批：簡記寫法！記得數字要站在根號前面。',qs:[
+      {p:'選出正確的簡記寫法',q:'5\\times\\sqrt{3}',o:['5\\sqrt{3}','\\sqrt{3}\\,5','\\sqrt{15}','5+\\sqrt{3}'],h:'數字寫在根號「前面」，中間的乘號拿掉就好！'},
+      {p:'選出正確的簡記寫法',q:'\\sqrt{7}\\times 4',o:['4\\sqrt{7}','\\sqrt{7}\\,4','\\sqrt{74}','47'],h:'就像 x × 4 = 4x，數字要搬到根號的前面喔！'},
+      {p:'選出正確的簡記寫法',q:'-2\\times\\sqrt{5}',o:['-2\\sqrt{5}','\\sqrt{5}\\,(-2)','2\\sqrt{5}','-\\sqrt{10}'],h:'負號跟著 2 一起站到根號前面，寫成 −2√5。'},
+      {p:'選出正確的簡記寫法',q:'1\\times\\sqrt{6}',o:['\\sqrt{6}','\\sqrt{6}\\,1','\\sqrt{16}','\\sqrt{7}'],h:'1 乘任何數都不會變，1 可以不寫喔！'},
+      {p:'選出正確的簡記寫法',q:'-1\\times\\sqrt{3}',o:['-\\sqrt{3}','\\sqrt{3}\\,(-1)','-3','\\sqrt{2}'],h:'乘 −1 只要留下負號，1 不用寫：−√3。'},
+      {p:'選出正確的分數寫法',q:'\\sqrt{5}\\div 2',o:['\\frac{\\sqrt{5}}{2}','\\frac{2}{\\sqrt{5}}','2\\sqrt{5}','\\sqrt{5}\\,2'],h:'除以 2，2 就跑到分數的下面當分母。'}
+    ]},
+    {name:'括號魔法',intro:'第 2 批：括號魔法！括號外的數字要分別乘裡面的每一個。',qs:[
+      {p:'算算看',q:'4\\times(\\sqrt{2}+\\sqrt{3})',o:['4\\sqrt{2}+4\\sqrt{3}','4\\sqrt{2}+\\sqrt{3}','\\sqrt{2}\\,4+\\sqrt{3}\\,4','4\\sqrt{5}'],h:'4 要分別乘 √2 和 √3，兩個都要乘到喔！'},
+      {p:'算算看',q:'3\\times(\\sqrt{2}-\\sqrt{3})',o:['3\\sqrt{2}-3\\sqrt{3}','3\\sqrt{2}-\\sqrt{3}','3\\sqrt{2}+3\\sqrt{3}','\\sqrt{2}\\,3-\\sqrt{3}\\,3'],h:'3 乘 √2，也要乘 √3，中間的減號留著。'},
+      {p:'算算看',q:'3\\times(\\sqrt{3}+5)',o:['3\\sqrt{3}+15','3\\sqrt{3}+5','\\sqrt{3}\\,3+15','8\\sqrt{3}'],h:'3 × √3 = 3√3，3 × 5 = 15，數字和數字要乘出來！'},
+      {p:'算算看',q:'2\\times(\\sqrt{5}+\\sqrt{7})',o:['2\\sqrt{5}+2\\sqrt{7}','2\\sqrt{12}','2\\sqrt{5}+\\sqrt{7}','\\sqrt{5}\\,2+\\sqrt{7}\\,2'],h:'2 要分別乘 √5 和 √7。'},
+      {p:'挑戰題 ⭐（有負數）',q:'-2\\times(\\sqrt{5}-3)',o:['-2\\sqrt{5}+6','-2\\sqrt{5}-6','2\\sqrt{5}+6','-2\\sqrt{5}+3'],h:'−2 × √5 = −2√5；−2 × (−3) = +6，負負得正喔！',why:'−2 × (−3) = +6，負負得正！'}
+    ]}
+  ],
+  game:(el,next)=>{
+    const SL=[
+      {name:'小綠史萊姆',lv:'簡單',col:'#A8E6BE',qs:[
+        {q:'3\\times\\sqrt{2}',o:['3\\sqrt{2}','\\sqrt{2}\\,3','\\sqrt{6}'],h:'數字要站在根號前面喔！'},
+        {q:'\\sqrt{5}\\times 4',o:['4\\sqrt{5}','\\sqrt{5}\\,4','\\sqrt{20}'],h:'4 要搬到根號前面！'},
+        {q:'1\\times\\sqrt{7}',o:['\\sqrt{7}','\\sqrt{7}\\,1','7'],h:'乘 1 不用寫 1 喔！'}]},
+      {name:'藍色史萊姆',lv:'中等',col:'#A9D8F7',qs:[
+        {q:'\\sqrt{2}\\div 3',o:['\\frac{\\sqrt{2}}{3}','\\frac{3}{\\sqrt{2}}','3\\sqrt{2}'],h:'除以 3，3 到下面當分母。'},
+        {q:'-2\\times\\sqrt{3}',o:['-2\\sqrt{3}','\\sqrt{3}\\,(-2)','2\\sqrt{3}'],h:'負號跟著 2 站到根號前面。'},
+        {q:'\\sqrt{6}\\div 5',o:['\\frac{\\sqrt{6}}{5}','5\\sqrt{6}','\\frac{5}{\\sqrt{6}}'],h:'除以 5，5 到下面當分母。'}]},
+      {name:'紫色史萊姆王',lv:'困難',col:'#CBBDFF',king:true,qs:[
+        {q:'2\\times(\\sqrt{3}+\\sqrt{5})',o:['2\\sqrt{3}+2\\sqrt{5}','2\\sqrt{3}+\\sqrt{5}','2\\sqrt{8}'],h:'2 要分別乘括號裡的每一個！'},
+        {q:'3\\times(\\sqrt{2}-1)',o:['3\\sqrt{2}-3','3\\sqrt{2}-1','\\sqrt{2}\\,3-3'],h:'3 × 1 = 3，別忘了數字也要乘！'},
+        {q:'-2\\times(\\sqrt{5}+3)',o:['-2\\sqrt{5}-6','-2\\sqrt{5}+6','2\\sqrt{5}-6'],h:'−2 乘 √5，也乘 3：−2 × 3 = −6。'}]}
+    ];
+    let s=0,i=0;
+    function show(fresh){
+      const M=SL[s],q=M.qs[i],hp=M.qs.length-i;
+      el.innerHTML=`<div class="card"><div class="gtitle">🪄 簡記咒語大作戰</div>
+        <div class="center"><span class="pill">第 ${s+1} / ${SL.length} 隻・${M.lv}</span></div>
+        <div class="arena"><div class="hp">${'💚'.repeat(hp)}${'🤍'.repeat(i)}</div>
+          <div class="slime">${SLIME(M.col,M.king)}</div>
+          <div class="seal">🔒 封印咒語 <span class="math">${T(q.q)}</span></div></div>
+        <div class="prompt">選出正確的「簡記咒語」，發射魔法！</div>
+        <div class="qb"></div><div class="actions"></div></div>`;
+      if(fresh)say(s===0?`${M.name}出現了！它身上有 3 個封印咒語，用正確的簡記寫法打敗它！`:`${M.name}出現了！難度變高囉，加油！`);
+      const slime=$('.slime',el);
+      askOne($('.qb',el),{o:q.o,h:q.h,onWrong:()=>{slime.classList.remove('giggle');void slime.offsetWidth;slime.classList.add('giggle');sfx('boing');}},async btn=>{
+        sfx('zap');await shoot(btn,slime,'✨');
+        slime.classList.remove('hit');void slime.offsetWidth;slime.classList.add('hit');
+        const d=document.createElement('div');d.className='dmg';d.innerHTML=T(q.q+'='+q.o[0]);$('.arena',el).appendChild(d);
+        $('.hp',el).innerHTML='💚'.repeat(hp-1)+'🤍'.repeat(i+1);
+        addStar(1,slime);say(pick(PRAISE));
+        await wait(1400);
+        i++;
+        if(i<M.qs.length){show(false);return;}
+        slime.classList.add('pop');sfx('win');const c=center(slime);burst(c[0],c[1],36);
+        say(`打敗${M.name}了！你的簡記魔法好強！`);
+        nextBtn($('.actions',el),s<SL.length-1?'迎戰下一隻 ➜':'完成關卡 🎉',()=>{s++;i=0;if(s<SL.length){show(true);scrollTo({top:0,behavior:'smooth'});}else next();});
+      });
+    }
+    show(true);
+  }
+};
+
+/* ================= 概念 2：乘除、短除法、化簡 ================= */
+const ROOT_SVG='<svg viewBox="0 0 64 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="4,62 16,54 32,96 60,3.5 64,3.5" fill="none" stroke="#7A4FD6" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+
+// 互動式短除法：學生點質數按鈕，一層一層除下去
+function shortDiv(box,n,onDone){
+  const rows=[{d:null,n:n}];let wrong=0,done=false;
+  box.innerHTML=`<div class="sd"><div class="sd-q"></div><div class="lad"></div>
+    <div class="sd-keys-lbl">點一個質數來除：</div>
+    <div class="sd-keys">${[2,3,5,7].map(p=>`<button class="key" data-p="${p}">${p}</button>`).join('')}</div></div>`;
+  const lad=$('.lad',box),q=$('.sd-q',box);
+  function draw(fresh){
+    lad.innerHTML=ladderHTML(rows,{open:!done,fresh:fresh});
+    q.innerHTML=done?'🎉 拆到質數了，完成！':`用哪一個<b>質數</b>去除 <span class="big">${last(rows).n}</span>？`;
+  }
+  $$('.key',box).forEach(kb=>kb.onclick=()=>{
+    if(done)return;
+    const p=+kb.dataset.p,cur=last(rows).n;
+    if(cur%p===0){
+      last(rows).d=p;const nn=cur/p;rows.push({d:null,n:nn});
+      wrong=0;$$('.key',box).forEach(x=>x.classList.remove('glow'));
+      sfx('pop');const c=center(kb);burst(c[0],c[1],8);
+      if(isPrime(nn)||nn===1){
+        done=true;draw(true);$('.sd-keys',box).style.display='none';$('.sd-keys-lbl',box).style.display='none';
+        const f=rows.filter(r=>r.d!==null).map(r=>r.d).concat(nn>1?[nn]:[]).sort((a,b)=>a-b);
+        say(`${cur} ÷ ${p} = ${nn}，${nn} 是質數，拆完了！${n} = ${f.join(' × ')}`);
+        reveal(box,`<div class="math">${T(n+'='+f.join('\\times '))}</div>`);
+        onDone(f);
+      }else{draw(true);say(`${cur} ÷ ${p} = ${nn}！${nn} 還可以再拆，繼續除！`);}
+    }else{
+      wrong++;sfx('soft');kb.classList.remove('wiggle');void kb.offsetWidth;kb.classList.add('wiggle');
+      const ok=[2,3,5,7].find(x=>cur%x===0);
+      if(wrong>=2){say(`${cur} 不能被 ${p} 整除喔～試試看 ${ok}！`);$(`.key[data-p="${ok}"]`,box).classList.add('glow');}
+      else say(`${cur} 不能被 ${p} 整除喔～換一個試試，從最小的 2 開始想！`);
+    }
+  });
+  draw(false);
+}
+
+// 成對的質因數跑到根號「左邊」，剩下的自動由小排到大
+function jail(box,factors,onDone,opt){
+  opt=opt||{};
+  let tiles=factors.slice().sort((a,b)=>a-b).map((v,k)=>({v:v,id:k}));
+  const out=[];let sel=null,busy=false;
+  box.innerHTML=`<div class="jail"><div class="jlabels"><span>${opt.left||'🌿 自由區'}</span><span>${opt.right||'🏰 根號監獄'}</span></div>
+    <div class="jrow"><div class="outside"><span class="ph">?</span></div><div class="root-hook">${ROOT_SVG}</div><div class="cell"></div></div>
+    <button class="btn ghost small hintbtn">🐸 給我提示</button></div>`;
+  const cell=$('.cell',box),outBox=$('.outside',box);
+  function draw(){
+    cell.innerHTML='';
+    tiles.forEach((t,i)=>{
+      if(i>0){const x=document.createElement('span');x.className='tx';x.textContent='×';cell.appendChild(x);}
+      const b=document.createElement('button');b.className='tile'+(opt.gem?' gem g'+t.v:'');b.dataset.id=t.id;
+      b.setAttribute('aria-label','數字 '+t.v);
+      b.innerHTML=(opt.gem?'':'<span class="eyes">• •</span>')+t.v;
+      b.onclick=()=>tap(t,b);cell.appendChild(b);
+    });
+  }
+  function drawOut(){outBox.innerHTML=out.map(v=>`<div class="freechip">${v}</div>`).join('<span class="tx">×</span>');}
+  function tap(t,b){
+    if(busy)return;
+    if(sel===null){sel=t.id;b.classList.add('sel');sfx('tap');return;}
+    if(sel===t.id){sel=null;b.classList.remove('sel');return;}
+    const a=tiles.find(x=>x.id===sel),ab=$(`.tile[data-id="${sel}"]`,cell);
+    if(a.v===t.v){
+      busy=true;sel=null;sfx('magic');
+      ab.classList.add('escape');b.classList.add('escape');
+      const c=center(b);burst(c[0],c[1],12);
+      setTimeout(()=>{
+        tiles=tiles.filter(x=>x.id!==a.id&&x.id!==t.id).sort((p,q)=>p.v-q.v);
+        out.push(t.v);drawOut();draw();busy=false;sfx('pop');
+        const vals=tiles.map(x=>x.v);
+        const hasPair=vals.some((v,i)=>vals.indexOf(v)!==i);
+        const what=opt.gem?`兩顆 ${t.v} 寶石合成一枚金幣 ${t.v}`:`兩個 ${t.v} 變成一個 ${t.v}`;
+        if(hasPair)say(`${what}，跑到根號左邊了！裡面還有一對，再找找！`);
+        else{
+          say(`${what}，跑到根號左邊了！裡面沒有成對的了，剩下的數字已經由小排到大囉！`);
+          onDone({coef:out.reduce((p,v)=>p*v,1),rem:vals.reduce((p,v)=>p*v,1),outside:out.slice()});
+        }
+      },700);
+    }else{
+      sfx('soft');
+      [ab,b].forEach(x=>{x.classList.remove('sel','wiggle');void x.offsetWidth;x.classList.add('wiggle');});
+      sel=null;say(`${a.v} 和 ${t.v} 不一樣喔！要找兩個一模一樣的。`);
+    }
+  }
+  $('.hintbtn',box).onclick=()=>{
+    const vals=tiles.map(x=>x.v);const v=vals.find((x,i)=>vals.indexOf(x)!==i);
+    if(v===undefined)return;
+    tiles.filter(x=>x.v===v).slice(0,2).forEach(t=>{const e=$(`.tile[data-id="${t.id}"]`,cell);e.classList.add('hint');setTimeout(()=>e.classList.remove('hint'),2400);});
+    say(`看！發亮的兩個 ${v} 是一對，把它們都點一下！`);
+  };
+  draw();
+}
+function simpTex(n,r){
+  const res=((r.coef>1?r.coef:'')+(r.rem>1?`\\sqrt{${r.rem}}`:''))||'1';
+  if(r.outside.length>1)return `\\sqrt{${n}}=${r.outside.join('\\times ')}\\sqrt{${r.rem}}=${res}`;
+  return `\\sqrt{${n}}=${res}`;
+}
+const GOLEM=`<svg viewBox="0 0 200 190" aria-hidden="true">
+  <ellipse cx="100" cy="182" rx="70" ry="7" fill="rgba(0,0,0,.08)"/>
+  <rect x="58" y="146" width="30" height="34" rx="10" fill="#9A92AD"/><rect x="112" y="146" width="30" height="34" rx="10" fill="#9A92AD"/>
+  <rect x="8" y="78" width="36" height="66" rx="16" fill="#A79FBA"/><rect x="156" y="78" width="36" height="66" rx="16" fill="#A79FBA"/>
+  <rect x="36" y="64" width="128" height="96" rx="30" fill="#B7B0C6"/>
+  <rect x="58" y="8" width="84" height="62" rx="22" fill="#C4BDD3"/>
+  <circle cx="82" cy="38" r="9" fill="#FFE066"/><circle cx="118" cy="38" r="9" fill="#FFE066"/>
+  <path d="M86 56 Q100 50 114 56" stroke="#6E6585" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="64" cy="20" r="5" fill="#8FD3AE"/><circle cx="134" cy="24" r="4" fill="#8FD3AE"/><circle cx="148" cy="140" r="5" fill="#8FD3AE"/>
+  <path class="crack c1" d="M60 80 L72 96 L64 110" stroke="#6E6585" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path class="crack c2" d="M140 74 L128 92 L138 104 L130 120" stroke="#6E6585" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path class="crack c3" d="M90 14 L100 30 L94 44" stroke="#6E6585" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>`;
+const C2={
+  learn:(el,next)=>runSteps(el,[
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">第 1 批：<b>數字 × 根式</b><br>數字只和<span class="hl" style="color:#D9692E">根號外面的數字</span>相乘，根號裡面<b>不變</b>！</div>`;
+      say('數字只跟根號外面的數字相乘，根號裡面不要動喔！');
+      magicGroup(b,[['① 外乘外','3\\times\\textcolor{#D9692E}{2}\\sqrt{5}','(3\\times 2)\\sqrt{5}=6\\sqrt{5}'],['② 有負數','-4\\times\\textcolor{#D9692E}{3}\\sqrt{2}','(-4\\times 3)\\sqrt{2}=-12\\sqrt{2}']],ok,'對！根號裡的數字都沒有變。');
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">第 2 批：<b>根式 × 根式</b><br>根號裡面<span class="hl" style="color:#7A4FD6">內乘內</span>，乘在同一個根號裡！</div>`;
+      say('根號乘根號，裡面的數字乘在一起。');
+      magicGroup(b,[['① 內乘內','\\sqrt{2}\\times\\sqrt{3}','\\sqrt{2\\times 3}=\\sqrt{6}'],['② 有負數','-\\sqrt{5}\\times\\sqrt{7}','-\\sqrt{5\\times 7}=-\\sqrt{35}']],ok,'很好！裡面乘裡面。');
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">第 3 批：<b>有外面數字的根式 × 根式</b><br><span class="hl" style="color:#D9692E">外乘外</span>、<span class="hl" style="color:#7A4FD6">內乘內</span>，分開算！</div>`;
+      say('外面的乘外面的，裡面的乘裡面的，分開算！');
+      magicGroup(b,[['① 外乘外、內乘內','\\textcolor{#D9692E}{2}\\sqrt{3}\\times\\textcolor{#D9692E}{3}\\sqrt{5}','(2\\times 3)\\sqrt{3\\times 5}=6\\sqrt{15}'],['② 有負數','\\textcolor{#D9692E}{-4}\\sqrt{2}\\times\\sqrt{3}','-4\\sqrt{2\\times 3}=-4\\sqrt{6}']],ok,'好厲害！外乘外、內乘內。');
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">第 4 批：<b>除法也一樣</b>：<span class="hl" style="color:#D9692E">外除外</span>、<span class="hl" style="color:#7A4FD6">內除內</span>！</div>`;
+      say('除法也一樣：外面除外面，裡面除裡面。');
+      magicGroup(b,[['① 內除內','\\sqrt{15}\\div\\sqrt{3}','\\sqrt{15\\div 3}=\\sqrt{5}'],['② 外除外、內除內','\\textcolor{#D9692E}{6}\\sqrt{10}\\div\\textcolor{#D9692E}{2}\\sqrt{5}','(6\\div 2)\\sqrt{10\\div 5}=3\\sqrt{2}']],ok,'對！外面 6 ÷ 2 = 3，裡面 10 ÷ 5 = 2！');
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">第 5 批：<b>化簡</b>！先用<span class="hl">短除法</span>把 <b>12</b> 拆成質數。<br><small>質數：2、3、5、7…只能被 1 和自己整除的數。從最小的 2 開始試！</small></div><div class="sdbox"></div>`;
+      say('我們用短除法來拆 12！先點 2 試試看。',true);
+      shortDiv($('.sdbox',b),12,()=>ok());
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">${T('\\sqrt{12}=\\sqrt{2\\times 2\\times 3}')}<br>根號裡有一對<span class="hl">雙胞胎 2</span>！點兩個 2，它們會<b>變成一個 2</b>，跑到<b>根號的左邊</b>！</div><div class="jb"></div>`;
+      say('找到兩個一樣的 2，把它們都點一下！',true);
+      jail($('.jb',b),[2,2,3],()=>{reveal(b,'2 跑到根號<b>左邊</b>了！根號裡只剩下 <b>3</b>');ok();});
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">跑出來的 <b>2</b> 站在根號<b>左邊</b>，裡面剩下 <b>3</b>。合起來要怎麼寫？</div>`;
+      askOne(b,{q:'\\sqrt{12}=?',o:['2\\sqrt{3}','\\sqrt{3}\\,2','4\\sqrt{3}','2\\sqrt{6}'],h:'跑出來的 2 一定要站在根號的「左邊」喔！而且兩個 2 只派一個 2 出來。'},btn=>{
+        reveal(b,`<div class="math">${T('\\sqrt{12}=\\sqrt{2\\times 2\\times 3}=2\\sqrt{3}')}</div>`);say('完美！根號 12 化簡成 2 根號 3！');ok(btn);
+      });
+    }
+  ],next),
+  qs:[
+    {name:'數字×根式',intro:'第 1 批：數字乘根式！只乘外面的數字，根號裡面不動。',qs:[
+      {p:'算算看',q:'3\\times 2\\sqrt{5}',o:['6\\sqrt{5}','6\\sqrt{15}','5\\sqrt{6}','\\sqrt{30}'],h:'3 × 2 = 6，根號 5 不變！'},
+      {p:'算算看（有負數）',q:'-4\\times 3\\sqrt{2}',o:['-12\\sqrt{2}','12\\sqrt{2}','-12\\sqrt{8}','-7\\sqrt{2}'],h:'−4 × 3 = −12，根號 2 不變。'},
+      {p:'算算看（有負數）',q:'5\\times(-\\sqrt{3})',o:['-5\\sqrt{3}','5\\sqrt{3}','-\\sqrt{15}','-15'],h:'5 × (−1) = −5，根號 3 不變。'}
+    ]},
+    {name:'根式×根式',intro:'第 2 批：根式乘根式！裡面乘裡面。',qs:[
+      {p:'算算看',q:'\\sqrt{3}\\times\\sqrt{5}',o:['\\sqrt{15}','\\sqrt{8}','15','2\\sqrt{15}'],h:'根號乘根號，裡面的 3 和 5 相乘喔！'},
+      {p:'算算看',q:'\\sqrt{2}\\times\\sqrt{7}',o:['\\sqrt{14}','\\sqrt{9}','14','2\\sqrt{7}'],h:'裡面 2 × 7 = 14。'},
+      {p:'算算看（有負數）',q:'-\\sqrt{2}\\times\\sqrt{5}',o:['-\\sqrt{10}','\\sqrt{10}','-\\sqrt{7}','-10'],h:'負號留著，裡面 2 × 5 = 10。'}
+    ]},
+    {name:'含外數的根式相乘',intro:'第 3 批：外乘外、內乘內！',qs:[
+      {p:'算算看',q:'2\\sqrt{3}\\times 4\\sqrt{2}',o:['8\\sqrt{6}','6\\sqrt{5}','8\\sqrt{5}','6\\sqrt{6}'],h:'外面 2 × 4，裡面 3 × 2，分開算喔！'},
+      {p:'算算看（有負數）',q:'-3\\sqrt{5}\\times 2\\sqrt{2}',o:['-6\\sqrt{10}','6\\sqrt{10}','-6\\sqrt{7}','-\\sqrt{10}'],h:'外面 −3 × 2 = −6，裡面 5 × 2 = 10。'},
+      {p:'算算看（有負數）',q:'4\\sqrt{3}\\times(-\\sqrt{7})',o:['-4\\sqrt{21}','4\\sqrt{21}','-4\\sqrt{10}','-21\\sqrt{4}'],h:'外面 4 × (−1) = −4，裡面 3 × 7 = 21。'}
+    ]},
+    {name:'除法',intro:'第 4 批：除法！外除外、內除內。',qs:[
+      {p:'算算看',q:'\\sqrt{15}\\div\\sqrt{3}',o:['\\sqrt{5}','5','\\sqrt{12}','3\\sqrt{5}'],h:'根號除以根號，裡面的 15 ÷ 3 就好！'},
+      {p:'算算看（有負數）',q:'-6\\sqrt{10}\\div 2\\sqrt{5}',o:['-3\\sqrt{2}','3\\sqrt{2}','-3\\sqrt{5}','-4\\sqrt{2}'],h:'外面 −6 ÷ 2 = −3，裡面 10 ÷ 5 = 2。'}
+    ]},
+    {name:'化簡',intro:'第 5 批：化簡！選錯的話，我會畫短除法給你看。',qs:[
+      {p:'化簡',q:'\\sqrt{18}',o:['3\\sqrt{2}','9\\sqrt{2}','2\\sqrt{3}','\\sqrt{2}\\,3'],sd:18},
+      {p:'化簡',q:'\\sqrt{20}',o:['2\\sqrt{5}','4\\sqrt{5}','5\\sqrt{2}','\\sqrt{5}\\,2'],sd:20},
+      {p:'化簡（有負數）',q:'-\\sqrt{12}',o:['-2\\sqrt{3}','2\\sqrt{3}','-4\\sqrt{3}','-3\\sqrt{2}'],sd:12},
+      {p:'化簡',q:'\\sqrt{50}',o:['5\\sqrt{2}','2\\sqrt{5}','25\\sqrt{2}','10\\sqrt{5}'],sd:50},
+      {p:'化簡 ⭐',q:'\\sqrt{48}',o:['4\\sqrt{3}','2\\sqrt{12}','16\\sqrt{3}','3\\sqrt{4}'],sd:48,why:'有兩對 2，所以外面是 2 × 2 = 4。'}
+    ]},
+    {name:'乘完再化簡',intro:'第 6 批：先乘、再化簡！',qs:[
+      {p:'先乘再化簡',q:'\\sqrt{6}\\times\\sqrt{3}',o:['3\\sqrt{2}','\\sqrt{18}','9\\sqrt{2}','2\\sqrt{3}'],sd:18,why:'√6 × √3 = √18 = 3√2。'},
+      {p:'先乘再化簡（有負數）',q:'-2\\sqrt{2}\\times\\sqrt{10}',o:['-4\\sqrt{5}','-2\\sqrt{20}','4\\sqrt{5}','-8\\sqrt{5}'],sd:20,why:'−2√20，而 √20 = 2√5，所以 −2 × 2√5 = −4√5。'}
+    ]}
+  ],
+  game:(el,next)=>{
+    const W=[{lv:'簡單',ns:[8,12]},{lv:'中等',ns:[18,20,27]},{lv:'困難',ns:[45,50,72]}];
+    const rounds=[];W.forEach((w,wi)=>w.ns.forEach(n=>rounds.push({n:n,lv:w.lv,wi:wi})));
+    let k=0;
+    function show(){
+      const R=rounds[k],n=R.n;let cur=n,hits=0,wrong=0,busy=false;
+      const rows=[{d:null,n:n}],gems=[];
+      el.innerHTML=`<div class="card"><div class="gtitle">🗿 根號魔像大作戰</div>
+        <div class="toprow"><span class="pill">第 ${k+1} / ${rounds.length} 隻・${R.lv}</span><span class="math mid">${T('\\sqrt{'+n+'}')}</span></div>
+        <div class="golem-area"><div class="golem idle" data-h="0">${GOLEM}<div class="gnum">${cur}</div></div>
+          <div class="scroll"><div class="st">📜 短除法卷軸</div><div class="lad"></div></div></div>
+        <div class="phase"><div class="prompt pq"></div>
+          <div class="runes">${[2,3,5,7].map(p=>`<button class="rune" data-p="${p}">${p}</button>`).join('')}</div>
+          <div class="prompt" style="font-size:20px">💎 收集到的質數寶石</div><div class="gemrow"><span class="ph">打中魔像就會掉出寶石</span></div></div>
+        <div class="res"></div><div class="actions"></div></div>`;
+      const golem=$('.golem',el),gnum=$('.gnum',el);
+      const drawLad=f=>{$('.lad',el).innerHTML=ladderHTML(rows,{open:cur>1&&!isPrime(cur),small:true,fresh:f});};
+      const pq=()=>{$('.pq',el).innerHTML=`選一顆<b>質數符文</b>攻擊！哪個質數能整除 <span style="color:var(--purple);font-size:32px">${cur}</span>？`;};
+      drawLad(false);pq();
+      say(k===0?'根號魔像擋住了路！用質數符文攻擊它，每打中一次，它就會變小，還會掉出質數寶石！':`第 ${k+1} 隻魔像：根號 ${n}！選能整除 ${n} 的質數符文。`);
+      $$('.rune',el).forEach(rb=>rb.onclick=async()=>{
+        if(busy)return;
+        const p=+rb.dataset.p;
+        if(cur%p===0){
+          busy=true;wrong=0;$$('.rune',el).forEach(x=>x.classList.remove('glow'));
+          sfx('zap');await shoot(rb,golem,'✦');
+          golem.classList.remove('hit','idle');void golem.offsetWidth;golem.classList.add('hit');
+          hits++;golem.dataset.h=Math.min(3,hits);sfx('rumble');
+          last(rows).d=p;cur=cur/p;rows.push({d:null,n:cur});gems.push(p);
+          gnum.textContent=cur;gnum.classList.remove('bump');void gnum.offsetWidth;gnum.classList.add('bump');
+          const gr=$('.gemrow',el);const ph=$('.ph',gr);if(ph)ph.remove();
+          gr.insertAdjacentHTML('beforeend',`<span class="tile gem g${p}">${p}</span>`);
+          drawLad(true);
+          if(isPrime(cur)){
+            gems.push(cur);
+            gr.insertAdjacentHTML('beforeend',`<span class="tile gem g${cur}">${cur}</span>`);
+            say(`${cur} 是質數，魔像被打碎了！寶石：${gems.slice().sort((a,b)=>a-b).join('、')}`);
+            await wait(500);golem.classList.add('crumble');sfx('win');const c=center(golem);burst(c[0],c[1],30);
+            await wait(1100);phase2();
+          }else{
+            say(`打中了！${cur*p} ÷ ${p} = ${cur}，魔像變小了，繼續攻擊！`);
+            setTimeout(()=>{golem.classList.add('idle');},500);pq();busy=false;
+          }
+        }else{
+          wrong++;rb.classList.remove('fizz');void rb.offsetWidth;rb.classList.add('fizz');sfx('boing');
+          golem.classList.remove('giggle','idle');void golem.offsetWidth;golem.classList.add('giggle');
+          setTimeout(()=>{golem.classList.remove('giggle');golem.classList.add('idle');},650);
+          const okp=[2,3,5,7].find(x=>cur%x===0);
+          if(wrong>=2){say(`魔像擋住了！${cur} 不能被 ${p} 整除。試試看 ${okp}！`);$(`.rune[data-p="${okp}"]`,el).classList.add('glow');}
+          else say(`魔像擋住了！${cur} 不能被 ${p} 整除，換一顆符文，從最小的 2 開始想！`);
+        }
+      });
+      function phase2(){
+        const ph=$('.phase',el);
+        ph.innerHTML=`<div class="prompt">✨ 煉金時間！點兩顆<b>一樣的寶石</b>，合成一枚<b>金幣</b>放到根號<b>左邊</b>。</div><div class="jb"></div>`;
+        say('煉金時間！兩顆一樣的寶石可以合成一枚金幣，金幣要放在根號的左邊喔！',true);
+        jail($('.jb',ph),gems,r=>{
+          setTimeout(()=>{
+            reveal($('.res',el),`🎉 打倒魔像！<div class="math">${T(simpTex(n,r))}</div>`);
+            addStar(1,$('.res',el));
+            if(r.outside.length>1)setTimeout(()=>say(`根號左邊有 ${r.outside.join(' 和 ')} 兩枚金幣，要乘起來變成 ${r.coef} 喔！`),1400);
+            const nx=rounds[k+1];
+            nextBtn($('.actions',el),!nx?'完成關卡 🎉':(nx.wi!==R.wi?`進入${nx.lv}關卡 ➜`:'下一隻魔像 ➜'),()=>{k++;if(k<rounds.length){show();scrollTo({top:0,behavior:'smooth'});}else next();});
+          },500);
+        },{left:'🪙 根號左邊',right:'💎 根號裡的寶石',gem:true});
+        $('.jb',ph).scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    }
+    show();
+  }
+};
+
+/* ================= 概念 3：同類方根與加減 ================= */
+const FAM={2:'#FFB3C6',3:'#8FD3AE',5:'#B9A8F5',7:'#FFC79A'};
+function elfSVG(col){
+  return `<svg viewBox="0 0 80 100" class="elfsvg" aria-hidden="true"><path class="hat" d="M40 2 L62 38 L18 38Z" fill="${col}" stroke="#fff" stroke-width="2"/><circle cx="40" cy="4" r="5" fill="#FFF3B0"/>
+  <path class="robe" d="M20 98 Q22 64 40 62 Q58 64 60 98Z" fill="${col}"/><circle cx="40" cy="47" r="16" fill="#FFE8D6"/>
+  <circle cx="34" cy="46" r="2.4" fill="#3D4A3E"/><circle cx="46" cy="46" r="2.4" fill="#3D4A3E"/>
+  <path d="M35 53 Q40 57 45 53" stroke="#3D4A3E" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="29" cy="51" r="3" fill="#FFB3C6" opacity=".8"/><circle cx="51" cy="51" r="3" fill="#FFB3C6" opacity=".8"/></svg>`;
+}
+function term(c,r,first){
+  const a=Math.abs(c),body=(a===1?'':a)+`\\sqrt{${r}}`;
+  return first?(c<0?'-':'')+body:(c<0?'-':'+')+body;
+}
+function normElf(e){
+  if(Array.isArray(e))return {c:e[0],r:e[1],raw:null};
+  const f=primeFactors(e.raw);let c=1,r=1;const cnt={};
+  f.forEach(p=>cnt[p]=(cnt[p]||0)+1);
+  Object.keys(cnt).forEach(p=>{c*=Math.pow(+p,Math.floor(cnt[p]/2));r*=Math.pow(+p,cnt[p]%2);});
+  return {c:c,r:r,raw:c>1?e.raw:null};
+}
+const elfLabel=e=>e.raw?`\\sqrt{${e.raw}}`:term(e.c,e.r,true);
+const elfHTML=e=>`${elfSVG(FAM[e.r]||'#FFE1C2')}<div class="elftag">${T(elfLabel(e))}</div>`;
+
+const C3={
+  learn:(el,next)=>runSteps(el,[
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">根號<b>化簡之後</b>，<span class="hl">根號裡面數字相同</span>的，就是同一個家族，叫做<b>同類方根</b>。</div>
+        <div class="forest">${[[3,2],[4,2],[2,3]].map(e=>`<div class="elf">${elfHTML(normElf(e))}</div>`).join('')}</div>`;
+      say('看看每個精靈的根號裡面住著什麼數字？');
+      askOne(b,{p:'3√2 和 4√2 是同一個家族嗎？',o:['@是！根號裡都住著 2','@不是'],h:'看看根號裡面，是不是都住著 2 呢？'},btn=>{say('對！根號裡都是 2，所以是同類方根！');ok(btn);});
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">同一家族可以加減！<br>根號<b>不變</b>，只要把<span class="hl">前面的數字</span>加減起來。</div><div class="math big">${T('3\\sqrt{2}+4\\sqrt{2}=(3+4)\\sqrt{2}')}</div>`;
+      say('√2 不變，只要把前面的 3 和 4 加起來！');
+      askOne(b,{p:'3 + 4 = ?',o:['7','12','1'],h:'3 加 4，用手指頭數數看～'},btn=>{
+        reveal(b,`<div class="math">${T('3\\sqrt{2}+4\\sqrt{2}=(3+4)\\sqrt{2}=7\\sqrt{2}')}</div>`);say('答對了！答案是 7√2！');ok(btn);
+      });
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">⚠️ 不是同一家族，就<b>不能</b>合併喔！</div><div class="math big">${T('3\\sqrt{2}+4')}</div>`;
+      askOne(b,{p:'3√2 和 4 可以合併嗎？',o:['@不行！4 沒有根號，不是同一家','@可以，變成 7√2'],h:'4 的身上沒有 √2，不是同一個家族，不能一起加喔！'},btn=>{
+        reveal(b,`答案<b>保持原樣</b>：<div class="math">${T('3\\sqrt{2}+4')}</div>`);say('沒錯！不同家族不能合併，保持原樣就好。');ok(btn);
+      });
+    },
+    (b,ok)=>{
+      b.innerHTML=`<div class="explain">🔍 有些根式要<b>先化簡</b>，才看得出是哪一家！</div><div class="math big">${T('\\sqrt{8}+\\sqrt{2}')}</div>`;
+      say('√8 看起來跟 √2 不一樣，先化簡看看！');
+      askOne(b,{p:'先化簡：√8 = ?',q:'\\sqrt{8}',o:['2\\sqrt{2}','4\\sqrt{2}','8\\sqrt{2}'],sd:8},btn=>{
+        reveal(b,`化簡後變成同一家了！<div class="math">${T('\\sqrt{8}+\\sqrt{2}=2\\sqrt{2}+\\sqrt{2}=3\\sqrt{2}')}</div>`);say('答對了！√8 化簡成 2√2，跟 √2 是同一家，合起來是 3√2！');ok(btn);
+      });
+    }
+  ],next),
+  qs:[
+    {name:'同類方根加減',intro:'第 1 批：同類方根加減！根號不變，只算前面的數字。',qs:[
+      {p:'算算看',q:'2\\sqrt{5}+3\\sqrt{5}',o:['5\\sqrt{5}','5\\sqrt{10}','6\\sqrt{5}','5'],h:'根號 5 不變，只要把 2 和 3 加起來。'},
+      {p:'算算看',q:'6\\sqrt{3}-\\sqrt{3}',o:['5\\sqrt{3}','6','5','7\\sqrt{3}'],h:'√3 前面偷偷藏著一個 1 喔！6 − 1 = ?'},
+      {p:'算算看（有負數）',q:'-2\\sqrt{7}+5\\sqrt{7}',o:['3\\sqrt{7}','-7\\sqrt{7}','7\\sqrt{7}','3\\sqrt{14}'],h:'−2 + 5 = 3，根號 7 不變。'},
+      {p:'算算看（有負數）',q:'-\\sqrt{3}-4\\sqrt{3}',o:['-5\\sqrt{3}','-3\\sqrt{3}','5\\sqrt{3}','-5\\sqrt{6}'],h:'−1 − 4 = −5，根號 3 不變。'}
+    ]},
+    {name:'判斷能不能合併',intro:'第 2 批：先看是不是同一家族！',qs:[
+      {p:'算算看',q:'4\\sqrt{2}+\\sqrt{3}',o:['@不能合併，保持 4√2 + √3','5\\sqrt{5}','5\\sqrt{2}','4\\sqrt{5}'],h:'√2 和 √3 根號裡面不一樣，是不同家族！'},
+      {p:'算算看',q:'3\\sqrt{2}+5-\\sqrt{2}',o:['2\\sqrt{2}+5','7\\sqrt{2}','4\\sqrt{2}+5','8-\\sqrt{2}'],h:'先找出 √2 家族：3√2 和 −√2，3 − 1 = 2。5 自己留著。'}
+    ]},
+    {name:'先化簡再合併',intro:'第 3 批：挑戰！先化簡，再看是不是同一家。',qs:[
+      {p:'先化簡再合併 ⭐',q:'\\sqrt{12}+\\sqrt{3}',o:['3\\sqrt{3}','\\sqrt{15}','2\\sqrt{3}','4\\sqrt{3}'],sd:12,why:'√12 = 2√3，2√3 + √3 = 3√3。'},
+      {p:'先化簡再合併 ⭐（有負數）',q:'\\sqrt{18}-4\\sqrt{2}',o:['-\\sqrt{2}','\\sqrt{2}','-\\sqrt{16}','7\\sqrt{2}'],sd:18,why:'√18 = 3√2，3√2 − 4√2 = −√2。'}
+    ]}
+  ],
+  game:(el,next)=>{
+    const R=[
+      {curse:false,lv:'簡單',e:[[3,2],[4,2],[2,3],[1,5]]},
+      {curse:false,lv:'簡單',e:[[5,3],[-2,3],[2,2],[4,7]]},
+      {curse:true,first:true,lv:'中等',e:[[1,5],[2,5],[3,5],[6,2],[1,3]]},
+      {curse:true,lv:'中等',e:[[6,2],[-1,2],[-2,2],[3,3],[2,7]]},
+      {curse:true,simp:true,lv:'困難',e:[{raw:8},[1,2],{raw:18},[1,3],[1,5]]},
+      {curse:true,simp:true,lv:'困難',e:[{raw:12},[-4,3],[1,3],{raw:20},[2,7]]}
+    ];
+    let k=0;
+    function show(){
+      const r=R[k];
+      const elves=r.e.map(normElf);
+      const cnt={};elves.forEach(e=>cnt[e.r]=(cnt[e.r]||0)+1);
+      const fam=+Object.keys(cnt).find(x=>cnt[x]>1);
+      const members=elves.filter(e=>e.r===fam);let got=0;
+      el.innerHTML=`<div class="card"><div class="gtitle">🧚 精靈家族聚會</div>
+        <div class="center"><span class="pill ${r.curse?'dark':''}">${r.curse?'階段 2・巫妖詛咒':'階段 1・基礎'}・${r.lv}　第 ${k+1} / ${R.length} 場</span></div>
+        ${r.first?'<div class="curse">☠️ 巫妖施了詛咒！<small>精靈們的衣服全都變成灰黑色了，只能仔細看根號裡面的數字！</small></div>':''}
+        <div class="prompt">找找看：哪些精靈的根號裡面，住著<b>相同的數字</b>？<br><small>把它們點進聚會圈！</small></div>
+        <div class="forest ${r.curse&&!r.first?'cursed':''}"></div>
+        <div class="ring ${r.curse?'cursed':''}"><span class="ph">🎪 聚會圈</span></div>
+        <div class="actions hintrow"><button class="btn ghost small hintbtn">🐸 給我提示</button></div>
+        <div class="qb"></div><div class="actions nx"></div></div>`;
+      const forest=$('.forest',el),ring=$('.ring',el);
+      if(r.first){
+        say('糟糕！巫妖施了詛咒，精靈們的衣服都變成灰黑色了！現在要仔細看根號裡面的數字，才能找到真正的家人喔！');
+        setTimeout(()=>{forest.classList.add('cursed');sfx('curse');},1300);
+      }else if(r.simp)say('最難的關卡！有些精靈要先化簡，才看得出是哪一家喔！');
+      else if(k===0)say('找找看哪些精靈的根號裡面住著相同的數字呢？把它們圈在一起吧！');
+      else say('新的聚會！仔細看看每位精靈的根號裡面住著誰。');
+      const els=[];
+      shuffle(elves).forEach(e=>{
+        const b=document.createElement('button');b.className='elf';b.innerHTML=elfHTML(e);
+        b.setAttribute('aria-label','精靈 '+plain(elfLabel(e)));
+        els.push([b,e]);
+        b.onclick=()=>{
+          if(e.r===fam){
+            b.classList.add('picked');b.classList.remove('hint');sfx('pop');const c=center(b);burst(c[0],c[1],8);
+            const ph=$('.ph',ring);if(ph)ph.remove();
+            const m=document.createElement('div');m.className='elf';
+            m.innerHTML=elfSVG(FAM[e.r])+`<div class="elftag">${T(e.raw?`\\sqrt{${e.raw}}=${term(e.c,e.r,true)}`:elfLabel(e))}</div>`;
+            ring.appendChild(m);
+            if(e.raw)say(`√${e.raw} 化簡後是 ${e.c}√${e.r}，也是這一家！`);
+            else if(got===0)say(`這位的根號裡住著 ${e.r}！還有誰的根號裡也住著 ${e.r} 呢？`);
+            if(++got===members.length){$('.hintrow',el).remove();setTimeout(party,600);}
+          }else{
+            b.classList.remove('wiggle');void b.offsetWidth;b.classList.add('wiggle');sfx('soft');
+            say(e.raw?`√${e.raw} 化簡後是 ${e.c}√${e.r}，可是根號裡住著 ${e.r} 的家人只有它自己喔。再找找看！`:`這位精靈的根號裡住著 ${e.r}，好像沒有其他精靈的根號裡也住著 ${e.r}。再找找看！`);
+          }
+        };
+        forest.appendChild(b);
+      });
+      $('.hintbtn',el).onclick=()=>{
+        const h=els.find(p=>p[1].r===fam&&!p[0].classList.contains('picked'));
+        if(!h)return;h[0].classList.add('hint');
+        say(h[1].raw?`看看發亮的 √${h[1].raw}，化簡後根號裡住著 ${fam} 喔！`:`看看發亮的精靈，它的根號裡住著 ${fam}。找找根號裡也是 ${fam} 的家人！`);
+      };
+      function party(){
+        ring.classList.add('party');sfx('magic');const c=center(ring);burst(c[0],c[1],20);
+        const expr=members.map((e,i)=>term(e.c,e.r,i===0)).join('');
+        const sum=members.reduce((s,e)=>s+e.c,0),sa=members.reduce((s,e)=>s+Math.abs(e.c),0);
+        const fmt=c=>(c===1?'':c===-1?'-':c)+`\\sqrt{${fam}}`;
+        const coefStr=members.map((e,i)=>i===0?String(e.c):(e.c<0?' − '+Math.abs(e.c):' + '+e.c)).join('').replace(/^-/,'−');
+        say(`家族到齊了！手牽手圍圈圈～根號裡都是 ${fam}，把前面的數字算一算：${coefStr}`);
+        const opts=[fmt(sum),fmt(sa!==sum?sa:sum+1),String(sum)];
+        askOne($('.qb',el),{p:'聚會魔法！合併起來是多少？',q:expr+'=?',o:opts,h:`根號裡都是 ${fam}，根號不變！只要算前面的數字：${coefStr}`},btn=>{
+          addStar(1,btn);say(`${pick(PRAISE)} (${coefStr})√${fam} = ${sum===1?'':sum===-1?'−':sum}√${fam}`);
+          reveal($('.qb',el),`<div class="math">${T(`${expr}=(${coefStr.replace(/−/g,'-')})\\sqrt{${fam}}=${fmt(sum)}`)}</div>`);
+          nextBtn($('.nx',el),k<R.length-1?'下一場聚會 ➜':'完成關卡 🎉',()=>{k++;if(k<R.length){show();scrollTo({top:0,behavior:'smooth'});}else next();});
+        });
+      }
+    }
+    show();
+  }
+};
+
+/* ================= 關卡資料與畫面切換 ================= */
+const LV={
+  1:{name:'根式的意義與簡記',diff:1,icon:'🪄',bg:'var(--pink)',desc:'√a 就像未知數 x；數字寫在根號前面',game:'簡記咒語大作戰',data:C1},
+  2:{name:'根式的乘除與化簡',diff:2,icon:'🗿',bg:'var(--sky)',desc:'外乘外、內乘內；短除法化簡',game:'根號魔像大作戰',data:C2},
+  3:{name:'同類方根與加減',diff:3,icon:'🧚',bg:'var(--lav)',desc:'化簡後根號裡相同才能合併',game:'精靈家族聚會',data:C3}
+};
+let cur={lv:1,st:0};
+function stageFn(lv,st){
+  const d=LV[lv].data;
+  return [d.learn,(el,nx)=>runQuiz(el,d.qs,nx),d.game][st];
+}
+function renderHome(){
+  const nextLv=[1,2,3].find(i=>!S.done[i]);
+  app.innerHTML=`<div class="title">🌳 根式魔法學院 🌳</div>
+    <div class="subtitle">依照順序，一個概念一個概念學！</div>
+    <div class="levels">${[1,2,3].map(i=>{const L=LV[i];return `
+      <button class="lvcard ${i===nextLv?'next':''}" data-lv="${i}" style="background:${L.bg}">
+        ${S.done[i]?'<span class="badge">✅ 完成</span>':''}
+        <span class="ico">${L.icon}</span><span class="nm">概念 ${i}</span><span class="nm" style="font-size:23px">${L.name}</span>
+        <span class="df">${'★'.repeat(L.diff)}${'☆'.repeat(3-L.diff)}</span><span class="ds">${L.desc}</span>
+        <span class="gm">🎮 ${L.game}</span></button>`;}).join('')}</div>
+    <div class="resetrow"><button class="btn ghost small" id="resetBtn">🔁 重新開始（清除星星）</button></div>`;
+  $$('.lvcard').forEach(b=>b.onclick=()=>{sfx('tap');openLevel(+b.dataset.lv);});
+  $('#resetBtn').onclick=()=>modal('<div class="big">🔁</div><h2>確定要重新開始嗎？</h2><p>星星和完成紀錄會被清除。</p>',[
+    ['留著就好','ghost'],['重新開始','primary',()=>{S.stars=0;S.done={};save();updHUD();renderHome();}]]);
+  say(nextLv?`歡迎來到根式魔法學院！我是角蛙老師，我們從概念 ${nextLv} 開始吧！`:'你已經完成所有概念了！想再玩哪一關都可以喔！');
+}
+function openLevel(lv){cur={lv:lv,st:0};renderLevel();}
+function renderLevel(){
+  const L=LV[cur.lv];
+  app.innerHTML=`<div class="lvhead"><button class="btn ghost small back">⬅ 地圖</button>
+      <div class="lvtitle">${L.icon} 概念 ${cur.lv}：${L.name} <span class="diff">${'★'.repeat(L.diff)}${'☆'.repeat(3-L.diff)}</span></div></div>
+    <div class="chips">${['📖 學一學','✏️ 練一練','🎮 '+L.game].map((t,k)=>`<button class="chip ${k===cur.st?'on':''} ${k<cur.st?'past':''}" data-k="${k}">${t}</button>`).join('<span class="arrow">➜</span>')}</div>
+    <div id="stage"></div>`;
+  $('.back',app).onclick=()=>{sfx('tap');renderHome();};
+  $$('.chip',app).forEach(c=>c.onclick=()=>{sfx('tap');cur.st=+c.dataset.k;renderLevel();});
+  scrollTo({top:0});
+  stageFn(cur.lv,cur.st)($('#stage'),()=>{
+    if(cur.st<2){cur.st++;renderLevel();}else finishLevel(cur.lv);
+  });
+}
+function finishLevel(lv){
+  S.done[lv]=true;save();
+  sfx('win');burst(innerWidth/2,innerHeight/2,50);
+  addStar(3);
+  say(`恭喜你完成概念 ${lv}！角蛙老師以你為榮！`);
+  const btns=[['回到地圖 🗺️','ghost',renderHome]];
+  if(lv<3)btns.push([`前往概念 ${lv+1} ➜`,'primary',()=>openLevel(lv+1)]);
+  setTimeout(()=>modal(`<div class="big">🎉🐸🎉</div><h2>概念 ${lv} 完成！</h2><p>額外獎勵 <b>+3 ⭐</b></p>`,btns),400);
+}
+
+/* ================= 啟動 ================= */
+$('#homeBtn').onclick=()=>{sfx('tap');renderHome();};
+$('#sndBtn').onclick=()=>{S.sound=!S.sound;save();updHUD();sfx('tap');};
+$('#voiceBtn').onclick=()=>{S.voice=!S.voice;save();updHUD();if(!S.voice&&'speechSynthesis' in window)speechSynthesis.cancel();else say('語音開啟囉！');};
+document.addEventListener('pointerdown',()=>ac(),{once:true});
+if('speechSynthesis' in window)speechSynthesis.getVoices();
+updHUD();
+renderHome();
+</script>
+
+</body></html>

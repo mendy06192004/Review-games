@@ -1,65 +1,194 @@
 # 國英數複習平台
 
-老師把題目以 JSON 檔放在資料夾（可以是 Google Drive / OneDrive / Dropbox 同步資料夾），學生在網頁上選版本、範圍，系統隨機出題、作答後由伺服器判斷對錯。
+老師把考卷丟進資料夾 → Claude 整理成題目草稿 → 老師在審核頁面確認 → 學生在網頁（電腦、平板、手機）選範圍玩遊戲複習。
+題庫是一般的資料夾與 JSON 檔，可以放在 Google Drive / OneDrive / Dropbox 同步資料夾，老師在任何電腦更新，學生下一次出題就看得到。
 
-## 為什麼選 Node.js + Express
+```
+待匯入/ ──npm run import──▶ 待審核/ ──/admin 通過──▶ 題目/ ──▶ 學生端遊戲
+  (PDF/Word/圖片)   Claude 整理       老師審核         正式題庫
+        └─原檔移到 來源/版本/年級/，紀錄寫入 老師/投稿紀錄.json
+```
 
-| 考量 | Node.js + Express | Python + FastAPI |
+## 快速開始
+
+需要 Node.js 18.17 以上（建議 22 LTS）。
+
+```bash
+npm install          # 安裝套件
+npm run validate     # 檢查題庫格式
+npm start            # 學生端 http://localhost:3000 ，老師審核 http://localhost:3000/admin
+npm test             # 自動測試
+```
+
+同一個網路的平板要連線時，用電腦的區網 IP，例如 `http://192.168.1.20:3000`（電腦防火牆需允許 3000 埠）。
+
+## 一、連結題庫資料夾（執行步驟）
+
+### 1. 建立資料夾結構
+
+在雲端硬碟（或本機）建立一個題庫資料夾，例如 `國英數題庫`，裡面放這幾個子資料夾（沒有的話程式會自動建立）：
+
+```
+國英數題庫/
+├── 待匯入/            ← 老師把考卷、講義丟這裡
+│   ├── 數學/南一/國二/段考一.pdf      （建議：科目/版本/年級/檔名）
+│   └── 翰林/國一/英文第一課講義.docx  （科目可省略，Claude 會從內容判斷）
+├── 待審核/            ← 匯入後的草稿（程式產生，到 /admin 審核）
+├── 題目/              ← 正式題庫（審核通過才會出現在這裡）
+│   ├── 國文/  英文/  數學/
+├── 圖片/              ← 題目圖片（匯入切出的圖在 圖片/匯入/）
+├── 來源/              ← 處理過的原檔，自動依 版本/年級 歸檔
+├── 老師/投稿紀錄.json  ← 每次匯入的紀錄
+└── 索引/              ← 自動產生，不用理它
+```
+
+**放檔與命名建議**
+- 資料夾名稱會被當成可信的資訊：科目用 `國文`／`英文`／`數學`；年級用 `國一`～`國三`（也接受 `七年級`～`九年級`、`小一`～`小六`、`高一`～`高三`）；其他名稱視為版本（`南一`、`翰林`、`康軒`…）。
+- 檔名會變成草稿檔名（`段考一.pdf` → `待審核/段考一.json`），用看得懂的中文名稱即可，例如 `南一國二數學第一次段考.pdf`。同名檔案會自動加 `(2)`。
+- 一份考卷一個檔案；題目很多（超過 6 頁）的 PDF 會自動分段交給 Claude。
+- 考卷若附參考答案，請一起放進同一個檔案，Claude 才會填入答案；沒有答案的題目會標示「需審核」，不會亂猜。
+- 支援 `.pdf`（有文字層的直接抽文字；掃描檔交給 Claude 視覺辨識）、`.docx`（含內嵌圖片）、`.png`、`.jpg`。
+
+### 2. 讓電腦同步這個資料夾
+
+- **Google Drive**：安裝「Google 雲端硬碟電腦版」，把 `國英數題庫` 設成「鏡像檔案」（或在檔案上按右鍵「可離線使用」）。資料夾路徑通常是
+  macOS：`/Users/你的帳號/Library/CloudStorage/GoogleDrive-帳號@gmail.com/我的雲端硬碟/國英數題庫`
+  Windows：`G:\我的雲端硬碟\國英數題庫`
+- **OneDrive**：路徑通常是 `C:\Users\你的帳號\OneDrive\國英數題庫`，在資料夾上按右鍵選「一律保留在此裝置上」。
+- **Dropbox**：`~/Dropbox/國英數題庫`。
+
+> 一定要設定成「保留在本機」，否則雲端只有捷徑，程式讀不到檔案內容。
+
+### 3. 修改 config.json
+
+```json
+{
+  "dataDir": "/Users/你的帳號/Library/CloudStorage/GoogleDrive-帳號@gmail.com/我的雲端硬碟/國英數題庫"
+}
+```
+
+Windows 路徑要把 `\` 寫成 `\\` 或 `/`，例如 `"G:/我的雲端硬碟/國英數題庫"`。改完執行 `npm run validate` 確認讀得到題目，再 `npm start`。
+
+多位老師共用時：每位老師的電腦都同步同一個雲端資料夾即可；只需要一台電腦執行 `npm start` 給學生連線。若多台電腦同時開伺服器，雲端可能產生 `索引/` 的衝突副本，不影響使用（可把 `indexFile` 改成本機路徑避免）。
+
+### 4. 設定 Claude API 金鑰（匯入功能需要）
+
+到 Anthropic Console 建立 API 金鑰，**設定成環境變數，不要寫進任何檔案**：
+
+```bash
+# macOS / Linux（寫進 ~/.zshrc 或 ~/.bashrc 可永久生效）
+export ANTHROPIC_API_KEY=sk-ant-...
+# Windows PowerShell
+$env:ANTHROPIC_API_KEY="sk-ant-..."
+# Windows 永久設定：setx ANTHROPIC_API_KEY "sk-ant-..."（重開終端機後生效）
+```
+
+模型與設定在 `config.json` 的 `claude`：預設 `claude-opus-5-5`、`effort: high`、每次最多 6 頁，並開啟伺服器端備援（主模型拒答時自動改用備援模型，`fallbacks: false` 可關閉）。
+
+## 二、題目匯入
+
+```bash
+npm run import                  # 列出 待匯入/ 的檔案 → 輸入 y 確認 → 開始處理
+npm run import -- --list        # 只列清單，不處理
+npm run import -- --offline     # 不呼叫 Claude（只解析有文字層的 PDF，測試流程用）
+```
+
+每次都會先列出將處理的檔案，**輸入 `y` 才會執行**。處理流程：
+
+1. **抽取內容**：PDF 先抽文字層，平均每頁少於 20 字視為掃描檔；同時把每頁轉成圖片。Word 抽出文字與內嵌圖片（以 `[圖1]` 標記位置）。圖片檔直接當成頁面。
+2. **交給 Claude**：送出頁面圖、抽取文字與資料夾提示，以 JSON Schema 結構化輸出要求 Claude 逐題整理。規則：題幹選項照抄、答案只有文件明確提供才填（並寫出依據）、版本年級冊章不確定就留 `null`、不確定的欄位列進「不確定」。掃描檔的 OCR 由 Claude 的視覺辨識完成，不需安裝 Tesseract。
+3. **整理草稿**：依「科目-年級-流水號」自動編號（接續 題目/ 與 待審核/ 已用的號碼）；圖表依 Claude 回報的位置從頁面切圖，存成 `圖片/匯入/<隨機名稱>.png`（檔名不含來源檔名，學生看不出出處）。缺答案、缺冊章、需確認圖片等都會標記 `needs_review: true` 與 `待確認欄位`。
+4. **輸出** `待審核/<來源檔名>.json`，原檔移到 `來源/<版本>/<年級>/`（無法判斷時放 `未分類/`），並在 `老師/投稿紀錄.json` 記錄處理時間、來源檔、產生題數、需審核題數。
+5. 失敗時（例如沒有金鑰、檔案損毀）原檔留在 待匯入/，錯誤也會寫進投稿紀錄。
+
+**絕對不會寫入 題目/**：只有在審核頁按「通過」才會。
+
+### 範例示範
+
+`test/fixtures/sample-exam.pdf`（有文字層、含一張三角形圖、附 1～3 題答案）與 `test/fixtures/sample-scanned.pdf`（同一份的掃描版）可用來試跑：
+
+```bash
+mkdir -p 題庫/待匯入/數學/南一/國二
+cp test/fixtures/sample-exam.pdf 題庫/待匯入/數學/南一/國二/南一國二數學第一次段考.pdf
+cp test/fixtures/sample-scanned.pdf 題庫/待匯入/掃描版考卷.pdf
+npm run import
+```
+
+## 三、審核頁面 /admin
+
+- 列出 待審核/ 所有草稿，`needs_review` 的排最前面，需要確認的欄位以黃框標示；顯示來源檔、原檔位置、抽取方式、答案依據。
+- 所有欄位都能編輯：科目、id（可按「自動編號」）、題幹、選項（可增刪，點圓圈設定答案）、難度、圖片（可上傳或替換）、解析、歸屬（可新增多個，讓同一題出現在不同版本或章節）。
+- **通過**：驗證格式 → 寫入 `題目/<科目>/<id>.json` → 從草稿移除 → 立即更新索引。欄位不完整會列出原因，不會通過。
+- **退回**：必須填寫原因，題目保留在待審核並標示「已退回」。
+- `config.json` 的 `admin_password` 預留給登入驗證：目前為空字串（不需登入）；填入密碼後，瀏覽 /admin 會要求輸入（帳號隨意、密碼為設定值）。**沒有設定密碼時，請勿把伺服器開放到網際網路。**
+
+## 四、學生端
+
+流程：**科目 → 版本 → 年級與冊（可多選）→ 章節（可勾整章或單節）→ 遊戲模式 → 開始**。版面針對平板設計，手機直式也能操作；學生端不會顯示檔名、資料夾或題目歸屬路徑，答案只在作答後由伺服器回傳。
+
+### 遊戲
+
+| 遊戲 | 題目來源 | 說明 |
 |---|---|---|
-| 與前端同語言 | ✅ 前後端都是 JavaScript，維護者只要會一種語言 | ❌ 需同時維護 Python 與 JS |
-| 題庫格式 | JSON 是 JS 原生格式，中文欄位名稱直接用 `q.題幹` | 也很方便 |
-| 安裝 | 裝 Node.js 後 `npm install`，唯一依賴是 express | 需要 Python、venv、fastapi、uvicorn |
-| 型別驗證 | 手寫驗證（本專案為了中文錯誤訊息本來就要自己寫） | Pydantic 很強，但預設錯誤訊息是英文 |
-| 效能 | 這個用途主要是讀檔（I/O），兩者都綽綽有餘 | 同左 |
+| 🎯 單題闖關（範例遊戲） | 平台題庫 | 答對加分、連對加成，答錯顯示正確答案與解析 |
+| 🏫 救救校長！校園大修繕 | 平台題庫 | 原遊戲功能保留；答題科目只顯示所選科目 |
+| ⚔️ 國文生存大作戰 | 平台題庫 | 原本的課次選擇改為使用平台範圍，其餘玩法、技能、地圖保留（雖名為國文，國英數題目都能用） |
+| 🥊 數學齊打交 | 平台題庫（僅數學） | 原本的題型產生器改為使用平台題目；直接開啟遊戲檔仍可用原本的自動出題 |
+| 🧪 元素勇者 | 內建題目 | 國中理化（元素、化合物、化學反應），題目與遊戲機制綁定，維持獨立遊戲 |
+| 📓 吃作業！ | 自動產生 | 國一數學（絕對值、正負數四則、根號），玩法是「答案幾就點幾下」，需要 1～10 的整數答案，無法換成選擇題 |
+| 🪄 根式魔法學院 | 教學關卡 | 國二數學根式教學，內容與教學步驟綁定 |
 
-前端維持純 HTML/CSS/JS、後端用同一種語言、依賴最少，所以選 Node.js。
+後三個遊戲出現在首頁「其他練習遊戲」，並標示範圍。「像素單字對決」（1BDxACyTfLTjUK3wcDKiSb）不是你帳號的作品，無法取得與修改原始碼，因此沒有收錄。
+
+前三個改造的遊戲直接開啟 `/games/<名稱>/index.html` 時仍使用原本的內建題目；由平台啟動時（網址帶 `?bank=1`）才切換成題庫模式。改動處都標有 `[題庫模式]` 註解。
+
+### 新增遊戲
+
+每個遊戲是 `public/games/<名稱>/game.js` 的 ES 模組，預設匯出 `createGame(host)`：
+
+```js
+export default function createGame(host) {
+  return {
+    start(questions) { /* 收到題目（不含答案）：{ id, 科目, 題幹, 選項, 難度, 圖片 } */ },
+    render() { /* 把畫面畫到 host.root */ },
+    async onAnswer(questionId, choice) {
+      const r = await host.check(questionId, choice); // { correct, 答案, 解析 }
+      return r;
+    },
+    destroy() { /* 選填：離開時清理 */ },
+  };
+}
+// host.finish({ score, correct, total, 紀錄 }) 結束並顯示成績；host.exit() 不計分離開
+```
+
+然後在 `public/games/registry.json` 加一筆（`科目` 限定適用科目、`預設題數`、`全版面` 等）。遊戲不可內嵌題目，一律使用傳入的 questions。
+已有的單檔 HTML 遊戲可用 `iframeGame()` 包裝（見 `public/games/principal/game.js`），遊戲內引用 `/games/_shared/bridge.js`，用 `GameBridge.questions()` 取題、`GameBridge.check()` 驗證答案。
+
+## 技術選擇
+
+後端 Node.js + Express、前端純 HTML/CSS/JavaScript（ES 模組，不需編譯）。前後端同一種語言、JSON 是原生格式、安裝只需 `npm install`。匯入功能使用 `pdfjs-dist`（PDF 文字與頁面圖）、`@napi-rs/canvas`（繪圖與切圖，免編譯）、`mammoth`（Word）、`@anthropic-ai/sdk`（Claude API）。
 
 ## 專案結構
 
 ```
-config.json            設定檔（題庫路徑、科目代碼、年級代碼、題數上限）
+config.json            設定（題庫路徑、科目/年級代碼、Claude 模型、admin_password）
 server.js              啟動伺服器
 src/
-  config.js            讀取設定、解析路徑
-  schema.js            單題格式驗證規則（伺服器與驗證腳本共用）
-  loader.js            掃描 / 讀取 JSON 檔、ID 重複檢查、錯誤訊息格式化
-  indexer.js           指紋比對、索引建立與自動重建
-  app.js               API 路由
-  util.js              中文數字排序、洗牌
-scripts/
-  validate.js          題庫驗證腳本
-  build-index.js       手動重建索引（通常不需要）
-public/                前端（index.html / style.css / app.js）
-題庫/                   預設題庫資料夾（可在 config.json 改成雲端同步資料夾）
-  題目/                 題目 JSON，可任意分子資料夾
-  圖片/                 題目圖片
-  索引/題目索引.json     自動產生，不需手動編輯（已加入 .gitignore）
-test/                  自動測試（node:test，不需額外套件）
+  app.js               學生端 API 與靜態檔
+  admin.js             審核 API（/api/admin）
+  drafts.js            草稿讀寫、題號分配
+  schema.js            題目格式驗證（伺服器、驗證腳本、審核共用）
+  loader.js / indexer.js  讀檔與索引
+  import/extract.js    PDF/Word/圖片內容抽取、切圖
+  import/claude.js     Claude 請求（結構化輸出）與離線規則解析
+  import/importer.js   匯入流程
+scripts/               validate.js、import.js、build-index.js
+public/                學生端（index.html、app.js、style.css）
+public/admin/          審核頁面
+public/games/          遊戲模組、registry.json、_shared/（host 橋接）
+題庫/                   範例題庫（可改指向雲端資料夾）
+test/                  自動測試（含範例考卷 PDF）
 ```
-
-## 啟動
-
-需要 Node.js 18.17 以上（建議 20 或 22 LTS）。
-
-```bash
-npm install        # 安裝 express
-npm run validate   # 檢查題庫
-npm start          # 啟動，開啟 http://localhost:3000
-```
-
-- 換連接埠：`PORT=8080 npm start`
-- 使用其他設定檔：`node server.js /path/to/config.json` 或 `REVIEW_CONFIG=/path/to/config.json npm start`
-
-### 指向雲端同步資料夾
-
-修改 `config.json` 的 `dataDir`（相對路徑以 config.json 所在位置為準，也可以用絕對路徑）：
-
-```json
-{ "dataDir": "/Users/teacher/Google Drive/題庫" }
-```
-
-該資料夾內需要有 `題目/`，`圖片/`、`索引/` 不存在時會自動處理。
-注意：如果多台電腦同時用同一個雲端資料夾開伺服器，它們都會寫入 `索引/題目索引.json`。這不會出錯（索引記錄指紋，不一致時會自動重建），但雲端可能產生「衝突副本」。若要避免，可把 `indexFile` 改成絕對路徑，指到本機資料夾。
 
 ## 題目格式
 
@@ -156,7 +285,9 @@ node scripts/validate.js other.json    # 使用其他設定檔
 npm test
 ```
 
-測試會把 `題庫/` 複製到暫存資料夾，不會動到真正的題庫。內容包括：驗證規則與錯誤位置、API 不洩漏答案、多範圍去重、科目篩選、作答驗證、新增 / 修改 / 刪除題目後立即反映、索引損毀自動重建。
+測試會把 `題庫/` 複製到暫存資料夾，不會動到真正的題庫。內容包括：驗證規則與錯誤位置、API 不洩漏答案、多範圍去重、科目篩選、作答驗證、新增 / 修改 / 刪除題目後立即反映、索引損毀自動重建；匯入流程（以假的 Claude 回應測試切圖、編號、移檔、紀錄，確認不寫入 題目/）；審核流程（排序、退回、通過、編號衝突、密碼、圖片上傳）。測試不會呼叫 Claude API。
+
+本機手動測試學生端：`npm start` 後用瀏覽器開 `http://localhost:3000`，按 F12 開啟裝置模擬（iPad / iPhone）可檢查平板與手機版面。
 
 手動測試：
 
@@ -168,5 +299,8 @@ curl -s -X POST localhost:3000/api/check -H 'Content-Type: application/json' -d 
 
 ## 已知限制
 
-- 答案在作答後才由伺服器回傳，開發者工具看不到尚未作答的答案；但學生仍可以對同一題反覆呼叫 `/api/check` 試出答案。若要計分或考試，需要加上「出題 session + 每題只能作答一次」的機制。
-- 每次請求都會掃描題目資料夾的檔案資訊（不讀內容）。幾千個檔案以內都很快；若題庫變得非常大，可改為以檔案監看（fs.watch）觸發重建。
+- 答案在作答後才由伺服器回傳，開發者工具看不到尚未作答的答案；但學生仍可對同一題反覆呼叫 `/api/check` 試出答案。若要正式計分，需要加上「每題只能作答一次」的機制。
+- Claude 回報的圖表位置是估計值，切圖可能偏大或偏小，所以有圖的題目一律標示需審核，可在審核頁上傳替換。
+- 每題只支援一張圖片；一題有多張圖時只自動切出第一張，並在備註提示。
+- Word 中的 EMF/WMF 向量圖無法轉成圖片給 Claude 看，建議先另存為 PDF 再匯入。
+- 離線模式只是規則解析，僅適用格式整齊、有文字層的考卷，正式使用請設定 API 金鑰。

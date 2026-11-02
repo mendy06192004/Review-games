@@ -16,5 +16,6 @@ ensureIndex(cfg)
     createApp(cfg).listen(cfg.port, () => {
       console.log(`題庫資料夾：${cfg.dataDir}`);
       console.log(`國英數複習平台已啟動：http://localhost:${cfg.port}`);
+      console.log(`老師審核頁面：http://localhost:${cfg.port}/admin${cfg.adminPassword ? '（需要密碼）' : ''}`);
     });
   });

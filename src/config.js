@@ -16,6 +16,13 @@ function resolveConfig(raw, baseDir) {
     questionDir: path.resolve(dataDir, raw.questionDir || '題目'),
     imageDir: path.resolve(dataDir, raw.imageDir || '圖片'),
     indexFile: path.resolve(dataDir, raw.indexFile || '索引/題目索引.json'),
+    importDir: path.resolve(dataDir, raw.importDir || '待匯入'),
+    reviewDir: path.resolve(dataDir, raw.reviewDir || '待審核'),
+    sourceDir: path.resolve(dataDir, raw.sourceDir || '來源'),
+    teacherDir: path.resolve(dataDir, raw.teacherDir || '老師'),
+    claude: { model: 'claude-opus-5-5', effort: 'high', pagesPerRequest: 6, fallbacks: true, ...(raw.claude || {}) },
+    // 預留：之後要加審核頁登入驗證時使用（空字串＝不驗證）
+    adminPassword: raw.admin_password || '',
     defaultCount: Number(raw.defaultCount || 10),
     maxCount: Number(raw.maxCount || 50),
     subjects: raw.subjects || { C: '國文', E: '英文', M: '數學' },

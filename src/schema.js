@@ -88,6 +88,7 @@ function validateQuestion(q, cfg, opts = {}) {
 
   // --- 答案 ---
   if (!('答案' in q)) err('答案', '缺少欄位');
+  else if (q.答案 === null) err('答案', '尚未設定正確答案');
   else if (!Number.isInteger(q.答案)) {
     err('答案', `必須是整數（選項索引，從 0 開始），實際為 ${JSON.stringify(q.答案)}`);
   } else if (optionCount !== null && (q.答案 < 0 || q.答案 >= optionCount)) {
@@ -96,6 +97,7 @@ function validateQuestion(q, cfg, opts = {}) {
 
   // --- 難度 ---
   if (!('難度' in q)) err('難度', '缺少欄位');
+  else if (q.難度 === null) err('難度', '尚未填寫（1、2 或 3）');
   else if (!Number.isInteger(q.難度) || q.難度 < 1 || q.難度 > 3) {
     err('難度', `必須是整數 1、2 或 3，實際為 ${JSON.stringify(q.難度)}`);
   }
@@ -151,6 +153,7 @@ function validateQuestion(q, cfg, opts = {}) {
 }
 
 function checkScopeName(v, field, err) {
+  if (v === null || v === undefined) { err(field, '尚未填寫'); return false; }
   if (typeof v !== 'string') { err(field, `必須是字串，實際為${typeName(v)}`); return false; }
   if (!v.trim()) { err(field, '不可為空字串'); return false; }
   if (v.includes('/')) { err(field, `「${v}」不可包含「/」（「/」用來分隔範圍路徑），可改用全形「／」`); return false; }

@@ -4,6 +4,7 @@ const express = require('express');
 const { ensureIndex, nodeMap } = require('./indexer');
 const { readQuestionFile } = require('./loader');
 const { shuffle } = require('./util');
+const { createAdminRouter, adminAuth } = require('./admin');
 
 class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -91,6 +92,8 @@ function createApp(cfg) {
   app.disable('x-powered-by');
   app.use(express.json({ limit: '100kb' }));
   app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
+  app.use('/api/admin', createAdminRouter(cfg));
+  app.use('/admin', adminAuth(cfg));
 
   // 版本與範圍樹（只有題數，不含題目內容與 ID）
   app.get('/api/tree', async (req, res) => {

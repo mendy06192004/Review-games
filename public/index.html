@@ -2,64 +2,99 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>國英數複習平台</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
-    <h1>國英數複習平台</h1>
-    <span id="updated" class="muted"></span>
+    <a href="#" id="home-link" class="brand">📚 國英數複習平台</a>
+    <ol class="steps" id="steps" aria-label="步驟"></ol>
   </header>
 
-  <main>
-    <!-- 選擇範圍 -->
-    <section id="setup" class="panel">
-      <h2>1. 選擇科目</h2>
-      <div id="subjects" class="chips"></div>
-
-      <h2>2. 選擇範圍 <small class="muted">（可多選，勾選上層會包含底下全部）</small></h2>
-      <div id="tree" class="tree">載入中…</div>
-
-      <h2>3. 題數</h2>
-      <div class="row">
-        <input id="count" type="number" min="1" max="50" value="10">
-        <button id="start" class="primary">開始練習</button>
+  <main id="main">
+    <!-- 1 科目 -->
+    <section class="step" data-step="subject">
+      <h1>今天想複習哪一科？</h1>
+      <div class="cards big" id="subject-cards"></div>
+      <div id="standalone-box" hidden>
+        <h2 class="sub">其他練習遊戲 <small>（內建題目，不需要選範圍）</small></h2>
+        <div class="cards" id="standalone-cards"></div>
       </div>
-      <p id="setup-msg" class="msg" role="alert"></p>
     </section>
 
-    <!-- 作答 -->
-    <section id="quiz" class="panel" hidden>
-      <div class="progress">
-        <span id="progress-text"></span>
-        <div class="bar"><div id="progress-bar"></div></div>
+    <!-- 2 版本 -->
+    <section class="step" data-step="version" hidden>
+      <h1>你的課本是哪一個版本？</h1>
+      <div class="cards" id="version-cards"></div>
+      <div class="nav"><button class="btn ghost" data-back>← 上一步</button></div>
+    </section>
+
+    <!-- 3 年級與冊 -->
+    <section class="step" data-step="volume" hidden>
+      <h1>選擇年級與冊別 <small>（可多選）</small></h1>
+      <div id="volume-groups"></div>
+      <div class="nav">
+        <button class="btn ghost" data-back>← 上一步</button>
+        <button class="btn primary" id="volume-next" disabled>下一步 →</button>
       </div>
-      <article class="card">
-        <div class="meta"><span id="q-subject" class="tag"></span><span id="q-difficulty" class="muted"></span></div>
-        <p id="q-stem" class="stem"></p>
-        <img id="q-image" alt="題目圖片" hidden>
-        <ol id="q-options" class="options"></ol>
-        <div id="feedback" class="feedback" hidden></div>
-      </article>
-      <div class="row end">
-        <button id="quit">結束</button>
-        <button id="next" class="primary" hidden>下一題</button>
+    </section>
+
+    <!-- 4 章節 -->
+    <section class="step" data-step="chapter" hidden>
+      <h1>選擇章節</h1>
+      <p class="tip">勾選整章，或展開後只勾選某幾節。</p>
+      <div class="toolbar"><button class="btn small ghost" id="check-all">全選</button><button class="btn small ghost" id="check-none">全部取消</button></div>
+      <div id="chapter-tree" class="tree"></div>
+      <div class="nav">
+        <button class="btn ghost" data-back>← 上一步</button>
+        <button class="btn primary" id="chapter-next" disabled>下一步 →</button>
       </div>
+    </section>
+
+    <!-- 5 遊戲模式 -->
+    <section class="step" data-step="mode" hidden>
+      <h1>選擇遊戲模式</h1>
+      <div class="cards" id="mode-cards"></div>
+      <div class="nav"><button class="btn ghost" data-back>← 上一步</button></div>
+    </section>
+
+    <!-- 6 開始 -->
+    <section class="step" data-step="ready" hidden>
+      <h1>準備好了嗎？</h1>
+      <div class="summary" id="summary"></div>
+      <label class="count-row">題數
+        <select id="count"></select>
+      </label>
+      <p class="msg" id="ready-msg" role="alert"></p>
+      <div class="nav">
+        <button class="btn ghost" data-back>← 上一步</button>
+        <button class="btn primary huge" id="start">開始遊戲 ▶</button>
+      </div>
+    </section>
+
+    <!-- 遊戲進行 -->
+    <section class="step play" data-step="play" hidden>
+      <div class="play-bar">
+        <button class="btn small ghost" id="quit">✕ 離開</button>
+        <span id="play-title"></span>
+      </div>
+      <div id="game-root" class="game-root"></div>
     </section>
 
     <!-- 結果 -->
-    <section id="result" class="panel" hidden>
-      <h2>練習結束</h2>
-      <p id="score" class="score"></p>
-      <ol id="review" class="review"></ol>
-      <div class="row">
-        <button id="retry" class="primary">同範圍再練一次</button>
-        <button id="back">重新選擇範圍</button>
+    <section class="step" data-step="result" hidden>
+      <h1 id="result-title">完成！</h1>
+      <div class="score-box" id="score-box"></div>
+      <ol class="review" id="review"></ol>
+      <div class="nav wrap">
+        <button class="btn primary" id="again">同範圍再玩一次</button>
+        <button class="btn" id="other-mode">換個遊戲</button>
+        <button class="btn ghost" id="restart">重新選範圍</button>
       </div>
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

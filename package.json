@@ -11,9 +11,14 @@
     "start": "node server.js",
     "validate": "node scripts/validate.js",
     "build-index": "node scripts/build-index.js",
-    "test": "node --test"
+    "test": "node --test",
+    "import": "node scripts/import.js"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "@anthropic-ai/sdk": "^1.3.0",
+    "@napi-rs/canvas": "^1.1.0",
+    "express": "^5.1.0",
+    "mammoth": "^1.13.0",
+    "pdfjs-dist": "^6.5.438"
   }
 }

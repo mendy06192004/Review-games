@@ -8,6 +8,7 @@ const { resolveConfig } = require('../src/config');
 function makeTempBank() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'review-bank-'));
   fs.cpSync(path.join(__dirname, '..', '題庫'), dir, { recursive: true });
+  for (const sub of ['待匯入', '待審核', '來源', '老師']) fs.rmSync(path.join(dir, sub), { recursive: true, force: true });
   for (const f of fs.readdirSync(path.join(dir, '索引'))) {
     if (f.endsWith('.json')) fs.rmSync(path.join(dir, '索引', f));
   }

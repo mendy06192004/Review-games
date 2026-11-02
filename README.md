@@ -11,6 +11,10 @@
 
 ## 快速開始
 
+**最簡單的方式**：安裝 Node.js（https://nodejs.org ，選 LTS 版）後，在專案資料夾點兩下 `啟動平台-Windows.bat`（Windows）或 `啟動平台-Mac.command`（Mac；第一次請按右鍵 →「打開」）。第一次會自動安裝套件，接著瀏覽器會打開平台。
+
+用指令啟動：
+
 需要 Node.js 18.17 以上（建議 22 LTS）。
 
 ```bash

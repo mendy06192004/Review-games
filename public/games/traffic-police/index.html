@@ -1,0 +1,423 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>臺灣交警執勤日常</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* Layout: full-bleed 3D street; HUD strips top/bottom styled like a police duty PDA; ticket screen styled like a 紅單 */
+:root{
+  --navy:#0f2347; --navy2:#1c3768; --panel:rgba(11,26,54,.9); --line:rgba(160,185,230,.22);
+  --vest:#ffd21f; --red:#e0252e; --paper:#f7f4ec; --ink:#17223b; --ok:#27b86a; --muted:#a3b3d2;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"Chakra Petch","Noto Sans TC",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%;margin:0;background:#0b1830;color:#fff;font-family:var(--f-body);overflow:hidden}
+body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#app{position:fixed;inset:0}
+#app canvas{display:block;width:100%;height:100%}
+button{font-family:var(--f-body);cursor:pointer;border:0;color:inherit}
+button:focus-visible{outline:3px solid var(--vest);outline-offset:2px}
+
+/* top HUD */
+.hud{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top,0px) + 8px) 12px 8px;display:flex;gap:8px;align-items:center;pointer-events:none;z-index:5;flex-wrap:wrap}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px;display:flex;flex-direction:column;line-height:1.1;min-width:0}
+.chip small{font-size:10px;color:var(--muted);letter-spacing:.08em}
+.chip b{font-family:var(--f-num);font-size:18px;font-variant-numeric:tabular-nums}
+.chip.clock b{color:var(--vest)}
+.dots{display:flex;gap:4px;padding-top:3px}
+.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--red);display:block}
+.dots i.on{background:var(--red)}
+.hud .sp{flex:1}
+.iconbtn{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:6px;height:40px;min-width:40px;padding:0 10px;font-size:14px;font-weight:700}
+
+/* scan brackets */
+#scan{position:fixed;pointer-events:none;z-index:3;border:0;transform:translate(-50%,-50%)}
+#scan{--c:var(--vest);background:
+ linear-gradient(var(--c),var(--c)) 0 0/16px 3px no-repeat,linear-gradient(var(--c),var(--c)) 0 0/3px 16px no-repeat,
+ linear-gradient(var(--c),var(--c)) 100% 0/16px 3px no-repeat,linear-gradient(var(--c),var(--c)) 100% 0/3px 16px no-repeat,
+ linear-gradient(var(--c),var(--c)) 0 100%/16px 3px no-repeat,linear-gradient(var(--c),var(--c)) 0 100%/3px 16px no-repeat,
+ linear-gradient(var(--c),var(--c)) 100% 100%/16px 3px no-repeat,linear-gradient(var(--c),var(--c)) 100% 100%/3px 16px no-repeat}
+#scan span{position:absolute;left:0;top:-22px;font:700 12px var(--f-num);color:#111;background:var(--vest);padding:1px 6px;white-space:nowrap}
+
+/* bottom target card */
+#target{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);max-width:460px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:center;z-index:6}
+#target .info{flex:1;min-width:0}
+#target .k{font-size:11px;color:var(--muted);letter-spacing:.08em}
+#target .n{font-size:17px;font-weight:900}
+#target .p{font-family:var(--f-num);color:var(--vest);font-size:14px}
+.btn{border-radius:8px;padding:12px 16px;font-weight:900;font-size:16px;background:var(--navy2)}
+.btn.primary{background:var(--vest);color:#1a1a1a}
+.btn.red{background:var(--red);color:#fff}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+#pip{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 104px);width:min(280px,48vw);aspect-ratio:4/3;max-width:100%;border:3px solid var(--vest);border-radius:8px;z-index:4;pointer-events:none;box-shadow:0 0 0 3px rgba(0,0,0,.35)}
+#pip span{position:absolute;left:-3px;top:-3px;background:var(--vest);color:#111;font:700 11px var(--f-body);padding:2px 8px;border-radius:6px 0 6px 0;letter-spacing:.1em}
+@media (min-width:900px){#pip{width:340px;bottom:auto;top:calc(env(safe-area-inset-top,0px) + 70px)}}
+.iconbtn.sup{background:#1d4fd6;border-color:#4d7bff}.iconbtn.sup.lock{background:var(--panel);border-color:var(--line);color:var(--muted)}.iconbtn.sup.on{background:var(--ok);border-color:var(--ok)}
+#btnZoom.on{background:var(--vest);color:#111}
+#accBar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 100px);z-index:6;display:flex;gap:10px;background:#ff8a00;color:#111;padding:6px 14px;border-radius:6px;font-size:14px;white-space:nowrap;pointer-events:none;font-weight:700}
+#accBar em{font:700 15px var(--f-num);font-style:normal}
+.dlg{width:100%;max-width:440px;background:var(--paper);color:var(--ink);border-radius:14px;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.5);max-height:calc(100% - 20px);overflow:auto}
+.dlg h3{margin:0 0 6px;font-size:19px;font-weight:900}
+.dlg p{margin:0 0 12px;font-size:14px;line-height:1.6;white-space:pre-line;color:#3a3f4c}
+.dlg-btns{display:flex;flex-direction:column;gap:8px}
+.dlg .btn.ghost{color:var(--ink);border-color:#c9c2b2;background:#fff}
+.gauge{display:flex;align-items:center;gap:10px;margin:4px 0 14px}
+.g-track{position:relative;flex:1;height:16px;border-radius:8px;background:#e2dccd;overflow:hidden}
+.g-track i{display:block;height:100%;width:0;background:var(--ok);transition:background .2s}
+.g-track i.bad{background:var(--red)}
+.g-line{position:absolute;top:0;bottom:0;left:18.75%;width:2px;background:var(--ink)}
+.gauge b{font:700 16px var(--f-num);white-space:nowrap}.gauge em{font-style:normal}
+.acc-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.acc-head span{font:700 14px var(--f-num);color:var(--red)}.acc-head em{font-style:normal}
+.acc-who{margin:0 0 4px!important}.acc-tip{font-size:12px!important;color:#6b6556!important}
+.acc-done{list-style:none;margin:0 0 12px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:13px}
+.acc-done li{color:#a39c8c}.acc-done li.ok{color:var(--ok);font-weight:700}.acc-done li.cur{color:var(--ink);font-weight:900}
+.acc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.acc-btns .btn{padding:12px 8px;font-size:14px}
+.shake{animation:shk .3s}@keyframes shk{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.tk-list .law{font:700 11px var(--f-num);color:#fff;background:var(--ink);padding:2px 6px;border-radius:4px;white-space:nowrap;flex:none}
+#thiefBar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 64px);z-index:6;display:flex;gap:12px;align-items:center;background:var(--red);color:#fff;padding:6px 14px;border-radius:6px;font-size:14px;white-space:nowrap;pointer-events:none;animation:blink 1s steps(2) infinite}
+#thiefBar em{font:700 15px var(--f-num);font-style:normal}
+#thiefArrow{position:fixed;z-index:6;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;color:var(--red);font-weight:900;font-size:12px;text-shadow:0 1px 0 #fff}
+#thiefArrow i{font-style:normal;font-size:30px;line-height:1;display:block;filter:drop-shadow(0 2px 0 #fff)}
+#toasts{top:calc(env(safe-area-inset-top,0px) + 104px)!important}
+#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);background:var(--panel);border:1px solid var(--line);padding:8px 14px;border-radius:20px;font-size:13px;color:var(--muted);z-index:4;white-space:nowrap;pointer-events:none}
+
+/* toasts + bubbles */
+#toasts{position:fixed;top:calc(env(safe-area-inset-top,0px) + 70px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:9;pointer-events:none}
+.toast{background:var(--panel);border-left:5px solid var(--vest);padding:8px 14px;border-radius:6px;font-weight:700;font-size:15px;max-width:88vw;animation:tin .25s ease-out}
+.toast.bad{border-color:var(--red)} .toast.good{border-color:var(--ok)}
+@keyframes tin{from{transform:translateY(-8px);opacity:0}}
+.bubble{position:fixed;z-index:4;transform:translate(-50%,-100%);background:#fff;color:var(--ink);font-weight:700;font-size:14px;padding:7px 11px;border-radius:12px;max-width:220px;pointer-events:none;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:#fff;border-bottom:0}
+.bubble.angry{background:var(--red);color:#fff}.bubble.angry::after{border-top-color:var(--red)}
+
+/* PDA ticket */
+.modal{position:fixed;inset:0;z-index:10;background:rgba(5,12,26,.55);display:flex;align-items:flex-end;justify-content:center;padding:12px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)}
+@media (min-width:700px){.modal{align-items:center}}
+.pda{width:100%;max-width:440px;max-height:calc(100% - 20px);display:flex;flex-direction:column;background:#22262e;border-radius:18px;padding:12px;box-shadow:0 10px 40px rgba(0,0,0,.5);border:2px solid #3a404c}
+.pda-top{display:flex;justify-content:space-between;align-items:center;font:700 11px var(--f-num);color:#8a93a6;padding:0 6px 8px;letter-spacing:.1em}
+.pda-top .led{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;margin-right:6px}
+.screen{background:var(--paper);color:var(--ink);border-radius:8px;overflow:auto;min-height:0}
+.tk-head{background:var(--red);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tk-head h2{margin:0;font-size:18px;font-weight:900;letter-spacing:.06em}
+.tk-head span{font:700 13px var(--f-num)}
+.tk-meta{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:10px 14px;font-size:13px;border-bottom:1px dashed #b9b3a3}
+.tk-meta dt{color:#6b6556}.tk-meta dd{margin:0;font-weight:700}
+.plea{margin:10px 14px;padding:8px 10px;background:#fff;border-radius:8px;font-size:14px;border:1px solid #e2dccd}
+.plea::before{content:"民眾：";color:var(--red);font-weight:900}
+.tk-list{padding:4px 10px 10px;display:flex;flex-direction:column;gap:6px}
+.tk-list label{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:#fff;border:2px solid #e2dccd;font-size:15px;font-weight:700;cursor:pointer}
+.tk-list label.on{border-color:var(--red);background:#fff3f2}
+.tk-list input{width:20px;height:20px;accent-color:var(--red);flex:none}
+.tk-list .fine{margin-left:auto;font:700 13px var(--f-num);color:#6b6556;white-space:nowrap}
+.esc-tk{margin:10px 14px 0;padding:10px 12px;border:2px dashed var(--red);background:#fff3f2;border-radius:8px;display:flex;align-items:center;gap:10px;font-size:13px}
+.esc-tk div{flex:1;min-width:0;display:flex;flex-direction:column}
+.esc-tk b{color:var(--red);font-size:12px;letter-spacing:.04em}
+.esc-tk em{font:700 15px var(--f-num);font-style:normal;white-space:nowrap}
+.esc-tk .stamp{width:38px;height:38px;flex:none;border:3px solid var(--red);color:var(--red);border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:20px;transform:rotate(-12deg)}
+.tk-q{padding:8px 14px 0;font-size:12px;color:#6b6556}
+.pda-btns{display:flex;gap:8px;padding-top:10px}
+.pda-btns .btn{flex:1}
+
+/* chase HUD */
+#chase{position:fixed;inset:0;z-index:5;pointer-events:none}
+.ch-top{z-index:1;position:absolute;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;flex-direction:column;gap:6px;align-items:center}
+.ch-title{font-weight:900;font-size:22px;color:#fff;background:var(--red);padding:2px 14px;border-radius:4px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{background:#1d4fd6}}
+.ch-bar{width:min(420px,100%);height:14px;background:var(--panel);border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.ch-bar i{display:block;height:100%;background:var(--vest);width:50%}
+.ch-stats{display:flex;gap:8px}
+.ch-ctrl{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;align-items:flex-end;padding:0 14px;gap:10px}
+.ch-ctrl button{pointer-events:auto;background:var(--panel);border:2px solid var(--line);border-radius:14px;font-weight:900;position:relative}
+.ch-ctrl .lr{width:68px;height:68px;font-size:26px;flex:none}
+.ch-mid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(200px,48vw)}
+.ch-mid button{height:48px;font-size:15px;padding:0 6px}
+.ch-mid .wide{grid-column:1/-1;height:58px;font-size:18px}
+#btnBoost .meter{position:absolute;left:8px;right:8px;bottom:6px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+#btnBoost .meter b{display:block;height:100%;width:0;background:#38d6ff}
+#btnBoost.full{border-color:#38d6ff;color:#38d6ff}
+#btnBoost.on{background:#38d6ff;color:#06202b}
+#btnFire.ready{background:var(--vest);color:#111;border-color:var(--vest);animation:pulse .5s infinite alternate}
+@keyframes pulse{to{transform:scale(1.06)}}
+#btnSiren.cd{opacity:.45}
+.ret{position:absolute;width:58px;height:58px;margin:-29px 0 0 -29px;border:2px solid rgba(255,255,255,.55);border-radius:50%;pointer-events:none}
+.ret::before,.ret::after{content:"";position:absolute;background:rgba(255,255,255,.7)}
+.ret::before{left:50%;top:-8px;bottom:-8px;width:2px;margin-left:-1px}.ret::after{top:50%;left:-8px;right:-8px;height:2px;margin-top:-1px}
+.ret.in{border-color:var(--red);animation:pulse .5s infinite alternate}.ret.in::before,.ret.in::after{background:var(--red)}
+.speedfx{position:absolute;inset:0;opacity:0;background:repeating-conic-gradient(from var(--a,0deg) at 50% 40%,transparent 0deg 3.4deg,rgba(255,255,255,.4) 3.4deg 4deg);-webkit-mask:radial-gradient(circle at 50% 40%,transparent 30%,#000 75%);mask:radial-gradient(circle at 50% 40%,transparent 30%,#000 75%)}
+.hitfx{position:absolute;inset:0;opacity:0;background:radial-gradient(circle,transparent 35%,rgba(224,37,46,.75))}
+.lb{position:absolute;left:0;right:0;height:0;background:#000;transition:height .45s}
+.lb.top{top:0}.lb.bot{bottom:0}
+#chase.cin .lb{height:11vh}
+#chase.cin .ch-ctrl,#chase.cin .ch-top,#chase.cin .keys,#chase.cin .speedfx{display:none}
+.ch-pop{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-weight:900;font-size:clamp(24px,6.5vw,38px);color:#fff;text-shadow:0 3px 0 #000,0 0 12px rgba(0,0,0,.5);white-space:nowrap;opacity:0}
+.ch-pop.show{animation:popa .9s ease-out forwards}
+.ch-pop.good{color:#5fe3ff}.ch-pop.bad{color:#ff6b70}
+@keyframes popa{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}70%{opacity:1;transform:translate(-50%,-55%) scale(1)}100%{opacity:0;transform:translate(-50%,-90%)}}
+.cap-banner{position:absolute;left:50%;top:18%;transform:translateX(-50%) rotate(-4deg);background:var(--vest);color:#111;font-weight:900;font-size:clamp(32px,9vw,58px);padding:4px 24px;box-shadow:6px 6px 0 #000;white-space:nowrap;animation:stamp .35s ease-out}
+@keyframes stamp{from{transform:translateX(-50%) rotate(-4deg) scale(2.4);opacity:0}}
+.keys{position:absolute;bottom:110px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted)}
+
+/* screens */
+.screen-full{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;padding-block:calc(env(safe-area-inset-top,0px) + 16px) calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(180deg,rgba(9,22,48,.92),rgba(9,22,48,.97));overflow:auto}
+.card{width:100%;max-width:520px;margin:auto}
+.badge{display:inline-flex;align-items:center;gap:8px;font:700 12px var(--f-num);letter-spacing:.2em;color:var(--vest)}
+.badge::before{content:"";width:22px;height:4px;background:repeating-linear-gradient(90deg,var(--vest) 0 6px,transparent 6px 9px)}
+.card h1{font-size:clamp(34px,9vw,52px);font-weight:900;line-height:1.05;margin:10px 0 6px;text-wrap:balance;letter-spacing:.02em}
+.card h1 em{font-style:normal;color:var(--vest)}
+.card p.lead{color:var(--muted);margin:0 0 16px;font-size:15px}
+.rules{display:grid;gap:8px;margin:0 0 16px;padding:0;list-style:none}
+.rules li{display:flex;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.45}
+.rules li b.n{font:700 16px var(--f-num);color:var(--vest);flex:none;width:18px}
+.look{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
+.look span{font-size:12px;border:1px solid var(--line);border-radius:14px;padding:4px 10px;color:#dfe7f7}
+.card .btn{width:100%;padding:16px;font-size:18px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 18px}
+.stats div{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.stats small{display:block;color:var(--muted);font-size:12px}
+.stats b{font:700 24px var(--f-num);font-variant-numeric:tabular-nums}
+.rank{font-size:22px;font-weight:900;color:var(--vest)}
+.bd-head{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 8px;font-weight:900;letter-spacing:.06em}
+.bd-head b{font:700 15px var(--f-num);color:var(--vest)}
+.badges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 18px}
+@media (min-width:520px){.badges{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.medal{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:10px 6px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--line);opacity:.42;filter:grayscale(1)}
+.medal i{font-style:normal;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:900;background:#3a4a6a;color:#cfd8ea;border:3px double #8a9bbf}
+.medal b{font-size:13px;line-height:1.2}
+.medal small{font-size:11px;color:var(--muted);line-height:1.3}
+.medal.got{opacity:1;filter:none;border-color:rgba(255,210,31,.45);background:rgba(255,210,31,.07)}
+.medal.got i{background:radial-gradient(circle at 35% 30%,#fff3a8,var(--vest) 45%,#c99700);color:#4a2a00;border-color:#fff1a0;box-shadow:0 0 0 2px #8a6500,0 4px 10px rgba(255,210,31,.35)}
+.medal em{position:absolute;top:4px;right:4px;font:700 9px var(--f-num);font-style:normal;background:var(--red);color:#fff;padding:1px 5px;border-radius:3px;letter-spacing:.08em}
+.card.start{text-align:left}
+.menu{display:flex;flex-direction:column;gap:10px;margin:22px 0 4px;max-width:340px}
+.menu.row{flex-direction:row;max-width:none;margin-top:18px}.menu.row .btn{flex:1;width:auto}
+.menu .btn{width:100%}
+.btn.ghost{border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.tut-h{font-size:28px;font-weight:900;margin:8px 0 14px}
+.tut-sub{font-size:12px;letter-spacing:.14em;color:var(--vest);font-weight:700;margin:4px 0 8px}
+.keys-tut{font-size:13px;color:var(--muted);line-height:1.7;margin:0}
+#coach{position:fixed;inset:0;z-index:40;pointer-events:none}
+#coachBlock{position:absolute;inset:0;pointer-events:auto;background:transparent}
+#coachBlock.dim{background:rgba(5,12,26,.62)}
+#coachRing{position:absolute;border:3px solid var(--vest);border-radius:12px;box-shadow:0 0 0 200vmax rgba(5,12,26,.62),0 0 18px 4px rgba(255,210,31,.55);pointer-events:none;animation:ringp 1s ease-in-out infinite alternate}
+@keyframes ringp{to{border-color:#fff;box-shadow:0 0 0 200vmax rgba(5,12,26,.62),0 0 26px 8px rgba(255,210,31,.8)}}
+#coachMsg{position:absolute;width:min(360px,calc(100vw - 24px));background:var(--paper);color:var(--ink);border-radius:12px;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.45);pointer-events:auto;border-top:5px solid var(--vest)}
+.cm-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cm-head b{font-size:14px}.cm-head small{margin-left:auto;font:700 11px var(--f-num);color:#8a8473}
+.cm-ava{width:28px;height:28px;border-radius:50%;background:var(--navy2);color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px;border:2px solid var(--vest)}
+#coachText{margin:0 0 10px;font-size:15px;line-height:1.6;white-space:pre-line}
+.cm-btns{display:flex;align-items:center;gap:10px}
+.cm-btns .btn{margin-left:auto;padding:10px 16px;font-size:15px}
+.cm-skip{background:none;color:#8a8473;font-size:13px;text-decoration:underline;padding:6px 0}
+.linkbtn{background:none;color:var(--muted);font-size:14px;text-decoration:underline;padding:6px 0;text-align:left}
+.small{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+
+<div id="app"></div>
+
+<div class="hud" id="hud" hidden>
+  <div class="chip clock"><small>執勤時間</small><b id="hClock">08:00</b></div>
+  <div class="chip"><small>考績</small><b id="hScore">0</b></div>
+  <div class="chip"><small>警告</small><div class="dots" id="hWarn"><i></i><i></i><i></i></div></div>
+  <div class="chip"><small>罰單</small><b id="hTickets">0</b></div>
+  <div class="sp"></div>
+  <button class="iconbtn sup" id="btnSupport" aria-label="請求支援">請求支援</button>
+  <button class="iconbtn" id="btnZoom" aria-label="望遠鏡">望遠</button>
+  <button class="iconbtn" id="btnLook" aria-label="視角回正">回正</button>
+  <button class="iconbtn" id="btnMute" aria-label="音效開關">音效</button>
+  <button class="iconbtn" id="btnPause" aria-label="暫停">暫停</button>
+</div>
+
+<div id="scan" hidden><span id="scanTag">SCAN</span></div>
+<div id="pip" hidden><span>特寫鏡頭</span></div>
+<div id="hint" hidden>點選用路人鎖定，再點一次開槍攔停</div>
+
+<div id="target" hidden>
+  <div class="info">
+    <div class="k" id="tKind">鎖定目標</div>
+    <div class="n" id="tName">機車</div>
+    <div class="p" id="tPlate">ABC-123</div>
+  </div>
+  <button class="btn ghost" id="btnCancel">取消</button>
+  <button class="btn primary" id="btnWhistle">開槍攔停</button>
+</div>
+
+<div id="accBar" hidden><b>車禍</b><span>點紅色三角形處理・剩 <em id="accTime">40</em> 秒</span></div>
+<div id="thiefBar" hidden><b>大樓竊案</b><span>剩 <em id="thTime">30</em> 秒</span><span>網彈 <em id="thAmmo">●●●</em></span></div>
+<div id="thiefArrow" hidden><i>➤</i><span>小偷</span></div>
+<div id="toasts"></div>
+<div id="bubbles"></div>
+
+<div class="modal" id="pda" hidden>
+  <div class="pda" role="dialog" aria-label="開單">
+    <div class="pda-top"><span><i class="led"></i>M-POLICE 執法 PDA</span><span id="pdaTime">08:00</span></div>
+    <div class="screen">
+      <div class="tk-head"><h2>舉發違反道路交通管理事件</h2><span id="pdaNo">No.</span></div>
+      <dl class="tk-meta">
+        <dt>對象</dt><dd id="pdaWho">機車</dd>
+        <dt>車牌/身分</dt><dd id="pdaPlate">—</dd>
+        <dt>地點</dt><dd>中正路與民生路口</dd>
+      </dl>
+      <div class="esc-tk" id="pdaEsc" hidden>
+        <span class="stamp">逃</span>
+        <div><b>第二張・已自動開立 <span id="pdaEscNo"></span></b><span>拒絕停車受檢逃逸（道交條例第 60 條）</span></div>
+        <em>NT$10,000～30,000</em>
+      </div>
+      <div class="plea" id="pdaPlea">長官放過我啦</div>
+      <div class="tk-q">勾選所有你看到的違規（1～3 項），勾錯整張作廢</div>
+      <div class="tk-list" id="pdaList"></div>
+    </div>
+    <div class="pda-btns">
+      <button class="btn ghost" id="pdaWarn">口頭勸導放行</button>
+      <button class="btn red" id="pdaIssue">開立罰單</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="dlg" hidden>
+  <div class="dlg" role="dialog" aria-labelledby="dlgTitle">
+    <h3 id="dlgTitle">標題</h3>
+    <p id="dlgText"></p>
+    <div class="gauge" id="dlgGauge" hidden><div class="g-track"><i id="dlgBar"></i><span class="g-line"></span></div><b><em id="dlgVal">0.00</em> mg/L</b></div>
+    <div class="dlg-btns" id="dlgBtns"></div>
+  </div>
+</div>
+
+<div class="modal" id="accModal" hidden>
+  <div class="dlg acc" role="dialog" aria-labelledby="accTitle">
+    <div class="acc-head"><h3 id="accTitle">車禍現場處理</h3><span>剩 <em id="accLeft">40</em> 秒</span></div>
+    <p class="acc-who">肇事車輛：<b id="accWho">—</b></p>
+    <p class="acc-tip">依照正確的處理順序點選，按錯扣 3 秒。處理期間路口照常運轉。</p>
+    <ol class="acc-done" id="accDone"></ol>
+    <div class="acc-btns" id="accBtns"></div>
+  </div>
+</div>
+
+<div id="chase" hidden>
+  <div class="speedfx" id="chFx"></div>
+  <div class="hitfx" id="chHit"></div>
+  <div class="lb top"></div><div class="lb bot"></div>
+  <div class="ch-top">
+    <div class="ch-title" id="chTitle">逃逸中！</div>
+    <div class="ch-bar" aria-label="與嫌犯距離"><i id="chBar"></i></div>
+    <div class="ch-stats">
+      <div class="chip"><small>時速</small><b id="chSpd">108</b></div>
+      <div class="chip"><small>距離</small><b id="chDist">40m</b></div>
+      <div class="chip"><small>剩餘</small><b id="chTime">35</b></div>
+      <div class="chip"><small>車況</small><b id="chHp">♥♥♥</b></div>
+      <div class="chip"><small>輪胎</small><b id="chTire">○○○</b></div>
+    </div>
+  </div>
+  <div class="ret" id="chRet" hidden></div>
+  <div class="ch-pop" id="chPop"></div>
+  <div class="cap-banner" id="chCap" hidden>壓制成功！</div>
+  <div class="keys" id="chKeys">← → 換車道　↑ 衝刺　S 警笛　點擊畫面瞄準射擊（空白鍵自動瞄準）</div>
+  <div class="ch-ctrl">
+    <button class="lr" id="btnL" aria-label="左">◀</button>
+    <div class="ch-mid">
+      <button id="btnSiren">警笛</button>
+      <button id="btnBoost">衝刺<i class="meter"><b id="chNitro"></b></i></button>
+      <button id="btnFire" class="wide">射擊輪胎</button>
+    </div>
+    <button class="lr" id="btnR" aria-label="右">▶</button>
+  </div>
+</div>
+
+<div id="coach" hidden>
+  <div id="coachBlock"></div>
+  <div id="coachRing" hidden></div>
+  <div id="coachMsg" role="dialog" aria-live="polite">
+    <div class="cm-head"><span class="cm-ava">明</span><b>學長阿明</b><small id="coachStep">1 / 17</small></div>
+    <p id="coachText"></p>
+    <div class="cm-btns"><button class="cm-skip" id="coachSkip">跳過教學</button><button class="btn primary" id="coachNext">下一步</button></div>
+  </div>
+</div>
+
+<div class="screen-full" id="startScreen">
+  <div class="card start">
+    <div class="badge">TRAFFIC DUTY · 早班 08:00–12:00</div>
+    <h1>臺灣交警<br><em>執勤日常</em></h1>
+    <p class="lead">中正路與民生路口。抓違規、追逃犯、網小偷，別誤抓好市民。</p>
+    <div class="menu">
+      <button class="btn primary" id="btnStart">開始執勤</button>
+      <button class="btn ghost" id="btnTut">遊戲教學（新手必玩）</button>
+      <button class="linkbtn" id="btnManual">翻閱執勤手冊</button>
+    </div>
+    <div class="small">手機請橫放遊玩</div>
+  </div>
+</div>
+
+<div class="screen-full" id="tutScreen" hidden>
+  <div class="card">
+    <div class="badge">勤前教育</div>
+    <h2 class="tut-h">執勤手冊</h2>
+    <ul class="rules">
+      <li><b class="n">1</b><span><b>看路口</b>：你站在右下角的交通崗哨上，<b>左右拖曳畫面</b>轉頭，「望遠」可以放大。</span></li>
+      <li><b class="n">2</b><span><b>鎖定</b>：點一下用路人，旁邊會跳出<b>特寫鏡頭</b>，看清楚安全帽、載了什麼、幾個人。違規的人常常會自己喊出來。</span></li>
+      <li><b class="n">3</b><span><b>開槍攔停</b>：再點一次目標（或按按鈕／空白鍵）把人定住，在 PDA 勾選<b>所有</b>違規項目。勾錯一項整張作廢。</span></li>
+      <li><b class="n">4</b><span><b>別誤抓</b>：攔到守法民眾考績 −200、警告 +1，<b>3 次警告</b>就調去山區吹冷風。</span></li>
+      <li><b class="n">5</b><span><b>追車</b>：有人拒捕就開警車追，<b>點畫面射輪胎</b>，打爆就逼停壓制，再加開一張<b>逃逸罰單</b>。閃過車流集氮氣可以衝刺。</span></li>
+      <li><b class="n">6</b><span><b>大樓小偷</b>：警鈴響起時，找頭上有紅色箭頭的小偷，點他附近就會射出<b>追蹤網</b>，共 5 發。</span></li>
+      <li><b class="n">7</b><span><b>請求支援</b>：考績 250 以上可以叫同仁來對面路口幫你抓 30 秒。</span></li>
+      <li><b class="n">8</b><span><b>尖峰時段</b>：剛上班車少，越接近中午下班人車越多。</span></li>
+      <li><b class="n">9</b><span><b>車禍</b>：危險駕駛沒被及時攔下，可能在路口出車禍。點紅色三角形前往現場，照順序處理：警示 → 救護 → 拍照 → 測繪 → 酒測 → 移車。</span></li>
+      <li><b class="n">10</b><span><b>打錯人？</b>攔到守法的駕駛時，可以選擇<b>順勢酒測</b>。約三成機率抓到酒駕，就能將功贖罪；測出來合格就扣更多。</span></li>
+    </ul>
+    <div class="tut-sub">常見違規（罰單依道交條例條款分類，例如站著騎、撐傘、牽狗、蛇行都算第 43 條危險駕駛）</div>
+    <div class="look">
+      <span>沒戴安全帽（湯鍋、西瓜皮、塑膠袋、電鍋…）</span><span>機車三貼</span><span>載冰箱、載機車、竹竿橫放</span>
+      <span>站著騎車</span><span>騎車撐傘、牽狗、滑手機</span><span>騎上人行道</span>
+      <span>闖紅燈（看路口相機閃光）</span><span>紅燈右轉</span><span>右轉未禮讓行人</span>
+      <span>紅線停車</span><span>併排停車</span><span>汽車停人行道</span><span>機車停斑馬線</span><span>汽機車蛇行</span><span>沒走斑馬線</span><span>滑手機走車道</span><span>行人闖紅燈</span>
+    </div>
+    <div class="tut-sub">電腦操作</div>
+    <p class="keys-tut">A／D 轉頭 · Z 望遠 · R 回正 · 空白鍵 開槍 · Q 請求支援<br>追車：← → 換車道 · ↑ 衝刺 · S 警笛 · 點擊畫面射擊</p>
+    <div class="menu row">
+      <button class="btn ghost" id="btnTutBack">返回</button>
+      <button class="btn primary" id="btnTutStart">開始執勤</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen-full" id="endScreen" hidden>
+  <div class="card">
+    <div class="badge" id="endBadge">SHIFT REPORT</div>
+    <h1 id="endTitle">下班囉</h1>
+    <div class="rank" id="endRank">路口守護神</div>
+    <div class="stats" id="statsGrid">
+      <div><small>考績</small><b id="eScore">0</b></div>
+      <div><small>開出罰單</small><b id="eTickets">0</b></div>
+      <div><small>全對罰單</small><b id="ePerfect">0</b></div>
+      <div><small>罰鍰總額</small><b id="eFines">0</b></div>
+      <div><small>追緝成功</small><b id="eChase">0</b></div>
+      <div><small>誤抓民眾</small><b id="eWrong">0</b></div>
+    </div>
+    <div class="bd-head"><span>成就徽章</span><b id="badgeCount">0 / 12</b></div>
+    <div class="badges" id="badges"></div>
+    <button class="btn primary" id="btnAgain">再值一班</button>
+  </div>
+</div>
+
+<div class="screen-full" id="pauseScreen" hidden>
+  <div class="card" style="text-align:center">
+    <div class="badge">PAUSED</div>
+    <h1>休息一下</h1>
+    <p class="lead">喝口水，路口還在等你。</p>
+    <button class="btn primary" id="btnResume">回到崗位</button>
+  </div>
+</div>
+
+<script src="/games/_shared/vendor/three-r128.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/models.js"></script>
+<script src="js/world.js"></script>
+<script src="js/npc.js"></script>
+<script src="js/thief.js"></script>
+<script src="js/chase.js"></script>
+<script src="js/main.js"></script>
+
+</body></html>

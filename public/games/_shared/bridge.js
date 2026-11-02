@@ -29,6 +29,23 @@
       });
     },
     finish: function (summary) { if (active) post({ type: 'finish', summary: summary || {} }); },
+    /* 題目一律來自題庫資料夾：直接開啟遊戲檔（沒有經過平台選範圍）時，顯示提示並引導回平台 */
+    requireBank: function (gameName) {
+      if (active) return true;
+      var show = function () {
+        var d = document.createElement('div');
+        d.setAttribute('role', 'dialog');
+        d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(20,24,36,.86);font-family:system-ui,"PingFang TC","Microsoft JhengHei",sans-serif';
+        d.innerHTML = '<div style="max-width:420px;background:#fff;color:#1f2a37;border-radius:18px;padding:24px;text-align:center;line-height:1.7">'
+          + '<div class="gb-title" style="font-size:22px;font-weight:800;margin-bottom:8px"></div>'
+          + '<p style="margin:0 0 16px">這個遊戲的題目來自老師的題庫資料夾，請從平台選好科目與範圍後再開始。</p>'
+          + '<a href="/" style="display:inline-block;background:#ff7a45;color:#fff;text-decoration:none;font-weight:700;padding:10px 22px;border-radius:12px">回到平台選範圍</a></div>';
+        d.querySelector('.gb-title').textContent = gameName || '複習遊戲';
+        document.body.appendChild(d);
+      };
+      if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
+      return false;
+    },
   };
   if (active) post({ type: 'ready' });
 })();

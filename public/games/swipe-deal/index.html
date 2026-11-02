@@ -1,0 +1,695 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>好康滑滑樂</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@700&display=swap">
+<style>
+/* Layout: one-screen phone app. Sticker-style cards with thick ink borders, hard offset shadows and hand-drawn sticker illustrations; single deliberate light look. */
+:root{
+  --paper:#EFE9FB;
+  --paper-2:#E2D9F7;
+  --ink:#1E1633;
+  --card:#FFFFFF;
+  --yes:#FF4F79;
+  --no:#22A99A;
+  --gold:#FFC43D;
+  --alarm:#E8352B;
+  --gray:#8F7BD6;
+  --muted:#6B6285;
+  --f-display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);margin:0;overflow:hidden;
+  background-image:radial-gradient(var(--paper-2) 1.2px,transparent 1.2px);background-size:18px 18px}
+.app{height:100%;display:flex;flex-direction:column;max-width:460px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;box-sizing:border-box;gap:9px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{font-family:var(--f-display);font-size:22px;letter-spacing:.02em;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.logo b{background:var(--yes);color:#fff;border:2.5px solid var(--ink);border-radius:10px;padding:0 7px;box-shadow:3px 3px 0 var(--ink);font-weight:400}
+.hr{display:flex;gap:6px;align-items:center;min-width:0}
+.week{font-size:12.5px;font-weight:900;background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:3px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mute{width:34px;height:34px;border-radius:50%;background:var(--card);font-size:15px;box-shadow:2px 2px 0 var(--ink);flex:none;padding:0}
+.prog{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.prog i{height:6px;border-radius:3px;background:var(--paper-2);border:1.5px solid var(--ink)}
+.prog i.on{background:var(--yes)}.prog i.done{background:var(--ink)}
+.stats{display:grid;grid-template-columns:1.25fr 1.25fr 1fr .8fr;gap:6px}
+.stat{background:var(--card);border:2.5px solid var(--ink);border-radius:12px;padding:5px 8px;box-shadow:3px 3px 0 var(--ink);min-width:0}
+.stat small{display:block;font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.stat span{font-family:var(--f-num);font-size:14.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hp{height:6px;border:1.5px solid var(--ink);border-radius:4px;margin-top:3px;overflow:hidden}
+.hp i{display:block;height:100%;background:var(--no);transition:width .5s}
+.stat.bump{animation:bump .5s}
+.stat.hurt{animation:hurt .6s}
+@keyframes bump{40%{transform:scale(1.08);background:var(--gold)}}
+@keyframes hurt{20%,60%{transform:translateX(-5px);background:#FFD5D2}40%,80%{transform:translateX(5px)}}
+
+.stage{flex:1;position:relative;min-height:0}
+.card{position:absolute;inset:0;background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);
+  display:flex;flex-direction:column;padding:15px;box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;overflow:hidden}
+.card.under{transform:scale(.95) translateY(10px);filter:saturate(.6);box-shadow:3px 3px 0 var(--ink)}
+.card.fly{transition:transform .35s ease-in}
+.card.back{transition:transform .25s cubic-bezier(.3,1.6,.6,1)}
+.card.event{background:var(--gold)}
+.who{display:flex;align-items:center;gap:12px}
+.ava{width:48px;height:48px;border-radius:50%;border:2.5px solid var(--ink);display:grid;place-items:center;font-family:var(--f-display);font-size:22px;flex:none}
+.who h2{margin:0;font-family:var(--f-display);font-size:20px;font-weight:400}
+.who .rel{font-size:12px;font-weight:700;color:var(--muted)}
+.bubble{margin-top:12px;background:var(--paper);border:2px solid var(--ink);border-radius:4px 18px 18px 18px;padding:12px 14px;font-size:17px;line-height:1.6;font-weight:500;flex:none}
+.card.event .bubble{background:#fff}
+.ill{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px 0}
+.ill svg{height:100%;max-height:180px;width:auto;max-width:100%;overflow:visible}
+.ill svg *{stroke:var(--ink);stroke-width:3.5;stroke-linejoin:round;stroke-linecap:round}
+.ill svg .bg{stroke:none;opacity:.55}
+.ill svg text{stroke:none;fill:var(--ink);font-family:var(--f-display);font-weight:400}
+.fy{fill:var(--gold)}.fp{fill:var(--yes)}.ft{fill:var(--no)}.fw{fill:#fff}.fl{fill:var(--paper-2)}.fr{fill:var(--alarm)}.fk{fill:var(--ink)}.fn{fill:none}.fg{fill:var(--gray)}
+.foot-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.reward{background:var(--gold);border:2.5px solid var(--ink);border-radius:999px;padding:5px 13px;font-weight:900;font-size:15.5px;box-shadow:3px 3px 0 var(--ink);min-width:0}
+.reward.neg{background:#FFD5D2}
+.reward .n{font-family:var(--f-num)}
+.count{font-family:var(--f-num);font-size:12px;color:var(--muted);flex:none}
+.stamp{position:absolute;top:20px;font-family:var(--f-display);font-size:36px;border:4px solid;border-radius:12px;padding:0 12px;opacity:0;pointer-events:none;background:#fff;z-index:2}
+.stamp.y{right:16px;color:var(--yes);transform:rotate(12deg)}
+.stamp.n{left:16px;color:var(--no);transform:rotate(-12deg)}
+.toast{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:5;background:var(--no);color:#fff;border:3px solid var(--ink);border-radius:14px;
+  padding:10px 16px;font-weight:900;font-size:16px;box-shadow:4px 4px 0 var(--ink);text-align:center;pointer-events:none;animation:pop 1.8s both;width:max-content;max-width:86%}
+.toast.y{background:var(--gold);color:var(--ink)}
+.toast.s{background:var(--ink);top:22%}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.7)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}20%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%)}}
+
+.controls{display:flex;justify-content:center;gap:28px;padding-bottom:2px}
+.btn{font:inherit;font-weight:900;cursor:pointer;border:3px solid var(--ink);border-radius:999px;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s;color:var(--ink)}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn:focus-visible{outline:3px solid var(--yes);outline-offset:3px}
+.round{width:70px;height:70px;font-size:16px;display:grid;place-items:center;line-height:1.1}
+.round.no{background:var(--no);color:#fff}
+.round.yes{background:var(--yes);color:#fff}
+.round i{font-style:normal;font-size:25px;display:block}
+
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:rgba(30,22,51,.6);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:6px 6px 0 var(--ink);padding:20px;max-width:420px;width:100%;box-sizing:border-box;max-height:88vh;overflow:auto}
+.start h1{font-family:var(--f-display);font-weight:400;font-size:40px;margin:0 0 6px;text-wrap:balance}
+.start p{font-size:16px;line-height:1.7;margin:0 0 8px}
+.howto{display:flex;gap:10px;margin:14px 0 16px}
+.howto div{flex:1;border:2px solid var(--ink);border-radius:12px;padding:10px;text-align:center;font-weight:700;font-size:14px}
+.howto .l{background:#D3F3EE}.howto .r{background:#FFE0E8}
+.wide{width:100%;padding:13px;font-size:19px;background:var(--yes);color:#fff}
+
+.noti{animation:drop .45s cubic-bezier(.2,1.4,.5,1)}
+.noti .bar{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.noti .bar b{background:var(--alarm);color:#fff;border-radius:6px;padding:1px 6px}
+.noti.g .bar b{background:var(--gray)}
+.noti h3{font-family:var(--f-display);font-weight:400;font-size:27px;margin:0 0 8px;color:var(--alarm)}
+.noti.g h3{color:var(--gray)}
+.noti p{font-size:16px;line-height:1.7;margin:0 0 12px}
+.loss{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.loss span{border:2px solid var(--ink);border-radius:8px;padding:3px 9px;font-weight:900;font-size:14px;background:#FFE3E0}
+.dark{background:var(--ink);color:#fff;width:100%;padding:12px;font-size:17px}
+@keyframes drop{0%{transform:translateY(-120%) rotate(-4deg)}100%{transform:none}}
+.shake{animation:hurt .5s}
+
+.later{font-family:var(--f-display);color:#fff;font-size:40px;text-align:center;animation:fade 2s both;line-height:1.4}
+.later small{display:block;font-size:18px;font-family:var(--f-body);font-weight:700}
+@keyframes fade{0%{opacity:0;transform:scale(.9)}25%,75%{opacity:1;transform:none}100%{opacity:0}}
+
+.result h1{font-family:var(--f-display);font-weight:400;font-size:30px;margin:0;text-wrap:balance}
+.result .rank{display:inline-block;margin:8px 0 14px;background:var(--gold);border:2.5px solid var(--ink);border-radius:10px;padding:4px 12px;font-weight:900;font-size:17px;box-shadow:3px 3px 0 var(--ink)}
+.sum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.sum div{border:2px solid var(--ink);border-radius:10px;padding:7px 4px;text-align:center;min-width:0}
+.sum small{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.sum b{font-family:var(--f-num);font-size:13.5px;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.semh{font-family:var(--f-display);font-size:18px;margin:14px 0 0;padding:4px 10px;background:var(--ink);color:#fff;border-radius:8px;display:inline-block}
+.match{border-top:2px dashed var(--ink);padding:12px 0;display:grid;grid-template-columns:40px 1fr;gap:10px}
+.semh + .match{border-top:none}
+.match .ava{width:38px;height:38px;font-size:17px}
+.match > div{min-width:0}
+.match h4{margin:0 0 4px;font-size:15px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag{font-size:11px;font-weight:900;border:1.5px solid var(--ink);border-radius:6px;padding:0 6px;white-space:nowrap}
+.tag.bad{background:var(--alarm);color:#fff}.tag.good{background:var(--no);color:#fff}.tag.dodge{background:#D3F3EE}.tag.miss{background:var(--gold)}.tag.gray{background:var(--gray);color:#fff}
+.match p{margin:0 0 5px;font-size:14px;line-height:1.65}
+.match .law{background:var(--paper);border-radius:8px;padding:6px 9px;font-size:13.5px}
+.match .stat-law{border:2px solid var(--alarm);border-radius:8px;padding:6px 9px;font-size:13.5px;background:#FFF4F3;margin:0 0 5px;line-height:1.65}
+.match .stat-law b{color:var(--alarm)}
+.match .stat-law ul{margin:4px 0;padding-left:18px}
+.match .news{font-size:12.5px;color:var(--muted)}
+.foot{font-size:12px;color:var(--muted);margin:12px 0 14px;line-height:1.6}
+@media (max-height:640px){.ill svg{max-height:110px}.bubble{font-size:16px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <header>
+    <div class="logo"><b>好康</b>滑滑樂</div>
+    <div class="hr"><div class="week" id="week">國一上・12 歲</div><button class="btn mute" id="mute" aria-label="關閉聲音">♪</button></div>
+  </header>
+  <div class="prog" id="prog"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="stats">
+    <div class="stat" id="sMoney"><small>我的零用錢</small><span id="money">$0</span></div>
+    <div class="stat" id="sParents"><small>爸媽存款</small><span id="parents">$200,000</span></div>
+    <div class="stat" id="sHealth"><small>健康</small><span id="health">100</span><div class="hp"><i id="hpbar" style="width:100%"></i></div></div>
+    <div class="stat" id="sRec"><small>紀錄</small><span id="rec">0</span></div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="controls">
+    <button class="btn round no" id="bNo" aria-label="拒絕"><span><i>✕</i>不要</span></button>
+    <button class="btn round yes" id="bYes" aria-label="接受"><span><i>♥</i>要！</span></button>
+  </div>
+</div>
+<div class="overlay" id="ov"></div>
+
+<script>
+/* ===== 插圖 ===== */
+const IMG={
+ package:'<path class="fy" d="M18 44 60 26l42 18v46l-42 18-42-18z"/><path class="fn" d="M18 44l42 18 42-18M60 62v46"/><path class="fw" d="M38 35l42 18v12l-10 4V57L28 39z"/>',
+ chat:'<rect class="fw" x="10" y="16" width="70" height="42" rx="14"/><rect class="fp" x="40" y="56" width="70" height="40" rx="14"/><circle class="fk" cx="60" cy="76" r="3.5"/><circle class="fk" cx="75" cy="76" r="3.5"/><circle class="fk" cx="90" cy="76" r="3.5"/><path class="fn" d="M24 32h40M24 44h26"/>',
+ atm:'<rect class="fl" x="22" y="12" width="76" height="96" rx="8"/><rect class="ft" x="32" y="22" width="56" height="28" rx="4"/><rect class="fk" x="38" y="60" width="44" height="7" rx="3.5"/><rect class="fy" x="44" y="66" width="32" height="34"/><text x="60" y="91" text-anchor="middle" font-size="18">$</text>',
+ card:'<rect class="fp" x="12" y="30" width="96" height="62" rx="10"/><rect class="fk" x="12" y="44" width="96" height="11"/><rect class="fy" x="24" y="66" width="22" height="15" rx="3"/><path class="fn" d="M60 74h34"/>',
+ ebike:'<path class="fn" d="M28 88h26l14-32h18l6 32M86 56l-6-24h14"/><path class="fy" d="M40 80h42l-6-20H50z"/><rect class="fk" x="40" y="44" width="28" height="9" rx="4.5"/><circle class="fw" cx="28" cy="88" r="15"/><circle class="fw" cx="92" cy="88" r="15"/>',
+ vape:'<circle class="fl" cx="30" cy="30" r="11"/><circle class="fl" cx="18" cy="50" r="7"/><circle class="fl" cx="42" cy="16" r="6"/><g transform="rotate(25 60 60)"><rect class="fp" x="48" y="24" width="24" height="80" rx="12"/><rect class="fk" x="54" y="10" width="12" height="18" rx="4"/><circle class="fw" cx="60" cy="82" r="5"/></g>',
+ ticket:'<path class="fy" d="M10 38h100v14a9 9 0 0 0 0 18v14H10V70a9 9 0 0 0 0-18z"/><path class="fn" d="M80 42v38" stroke-dasharray="5 7"/><path class="fp" d="M42 48l5 10 11 1-8 7 3 11-11-6-10 6 3-11-8-7 11-1z"/>',
+ coin:'<circle class="fy" cx="52" cy="64" r="34"/><circle class="fn" cx="52" cy="64" r="23"/><text x="52" y="76" text-anchor="middle" font-size="32">$</text><circle class="fy" cx="96" cy="32" r="14"/><circle class="fy" cx="96" cy="94" r="10"/>',
+ food:'<path class="fy" d="M26 98V54c-10 0-12-28 10-28h48c22 0 20 28 10 28v44z"/><ellipse class="fw" cx="60" cy="74" rx="20" ry="15"/><circle class="fy" cx="60" cy="74" r="7"/>',
+ game:'<path class="ft" d="M30 40h60c14 0 20 18 20 34 0 14-12 18-20 8l-10-12H40L30 82c-8 10-20 6-20-8 0-16 6-34 20-34z"/><path class="fn" d="M34 50v20M24 60h20"/><circle class="fy" cx="82" cy="54" r="5"/><circle class="fp" cx="93" cy="66" r="5"/>',
+ wallet:'<rect class="fw" x="38" y="16" width="46" height="32" rx="3" transform="rotate(-10 62 32)"/><rect class="ft" x="14" y="36" width="92" height="64" rx="10"/><rect class="fy" x="76" y="56" width="32" height="24" rx="8"/><circle class="fk" cx="88" cy="68" r="4"/>',
+ dog:'<ellipse class="fy" cx="30" cy="50" rx="12" ry="22" transform="rotate(20 30 50)"/><ellipse class="fy" cx="90" cy="50" rx="12" ry="22" transform="rotate(-20 90 50)"/><circle class="fw" cx="60" cy="64" r="34"/><circle class="fk" cx="47" cy="58" r="4"/><circle class="fk" cx="73" cy="58" r="4"/><ellipse class="fk" cx="60" cy="72" rx="7" ry="5"/><path class="fp" d="M54 82h12v8a6 6 0 0 1-12 0z"/>',
+ dish:'<circle class="fl" cx="28" cy="30" r="9"/><circle class="fl" cx="46" cy="18" r="6"/><ellipse class="fw" cx="56" cy="76" rx="44" ry="24"/><ellipse class="fn" cx="56" cy="76" rx="26" ry="13"/><rect class="fy" x="76" y="24" width="30" height="20" rx="5" transform="rotate(20 91 34)"/>',
+ paper:'<rect class="fw" x="20" y="12" width="66" height="92" rx="4"/><path class="fn" d="M32 32h42M32 46h42M32 60h28"/><path class="fn" d="M32 86c8-12 12 8 18-4s8 6 14-2"/><path class="fp" d="M98 32l10 10-38 38-14 4 4-14z"/>',
+ photo:'<rect class="fw" x="12" y="22" width="96" height="76" rx="6"/><path class="ft" d="M14 86l28-30 22 22 14-12 28 22v8H14z"/><circle class="fy" cx="82" cy="44" r="10"/><path class="fp" d="M32 30l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>',
+ cake:'<rect class="fp" x="20" y="62" width="80" height="40" rx="6"/><path class="fw" d="M20 62h80v8c-8 8-18 8-26 0-8 8-18 8-26 0-8 8-20 8-28 0z"/><path class="fn" d="M42 62V46M60 62V42M78 62V46"/><path class="fy" d="M42 44c-6-6 0-14 0-14s6 8 0 14zM60 40c-6-6 0-14 0-14s6 8 0 14zM78 44c-6-6 0-14 0-14s6 8 0 14z"/>',
+ sim:'<rect class="fk" x="34" y="10" width="52" height="100" rx="10"/><rect class="fw" x="40" y="22" width="40" height="72" rx="3"/><path class="fy" d="M48 38h18l6 6v30H48z"/><path class="fn" d="M54 52h12M54 62h12"/>',
+ burst:'<path class="fr" d="M60 8l11 26 27-12-10 27 28 11-28 11 10 27-27-12-11 26-11-26-27 12 10-27-28-11 28-11-10-27 27 12z"/><text x="60" y="78" text-anchor="middle" font-size="42" style="fill:#fff">!</text>',
+ cart:'<path class="fy" d="M34 40h70l-10 36H42z"/><path class="fn" d="M10 26h16l12 50h56"/><circle class="fw" cx="46" cy="94" r="8"/><circle class="fw" cx="88" cy="94" r="8"/>',
+ mega:'<path class="fw" d="M30 70l8 32h14l-8-32"/><path class="fy" d="M22 46h20l50-26v78L42 72H22z"/><path class="fn" d="M102 46c6 8 6 22 0 30"/>',
+ lock:'<path class="fn" d="M38 54V38a22 22 0 0 1 44 0v16"/><rect class="fy" x="26" y="52" width="68" height="54" rx="8"/><circle class="fk" cx="60" cy="74" r="6"/><path class="fn" d="M60 78v12"/>',
+ shoe:'<path class="fw" d="M12 84V54l20-6 12 12c10 8 24 10 40 12 16 2 26 6 26 14v8H12z"/><rect class="fp" x="12" y="88" width="98" height="10" rx="3"/><path class="fn" d="M40 60l-6 8M50 66l-6 8M60 70l-4 8"/>',
+ dice:'<rect class="fw" x="14" y="40" width="52" height="52" rx="8" transform="rotate(-12 40 66)"/><rect class="fy" x="58" y="28" width="48" height="48" rx="8" transform="rotate(14 82 52)"/><circle class="fk" cx="30" cy="60" r="4"/><circle class="fk" cx="40" cy="68" r="4"/><circle class="fk" cx="50" cy="76" r="4"/><circle class="fk" cx="76" cy="44" r="4"/><circle class="fk" cx="88" cy="60" r="4"/>',
+ cap:'<path class="fk" d="M30 52v22c10 12 50 12 60 0V52l-30 12z"/><path class="fk" d="M60 22l50 20-50 20-50-20z"/><path class="fn" d="M98 46v26"/><circle class="fy" cx="98" cy="78" r="6"/>',
+ book:'<path class="fw" d="M60 30C46 20 26 20 12 26v68c14-6 34-6 48 4z"/><path class="fl" d="M60 30c14-10 34-10 48-4v68c-14-6-34-6-48 4z"/><path class="fn" d="M22 44h26M22 56h26M22 68h18M72 44h26M72 56h20"/>',
+ moon:'<path class="fy" d="M76 18a42 42 0 1 0 26 66A34 34 0 0 1 76 18z"/><text x="20" y="42" font-size="22">Z</text><text x="8" y="66" font-size="15">z</text>',
+ chart:'<rect class="fw" x="12" y="16" width="96" height="84" rx="6"/><path class="fn" d="M24 84l18-18 14 8 24-38"/><path class="fr" d="M80 36l18 44-16-4-6 14z"/>',
+ cup:'<path class="fn" d="M72 6l-8 32"/><path class="fw" d="M30 36h60l-8 72H38z"/><path class="fy" d="M33 58h54l-5 50H38z"/><circle class="fk" cx="48" cy="96" r="4"/><circle class="fk" cx="60" cy="100" r="4"/><circle class="fk" cx="72" cy="94" r="4"/><circle class="fk" cx="54" cy="84" r="4"/><circle class="fk" cx="67" cy="82" r="4"/>',
+ receipt:'<path class="fw" d="M28 10h64v96l-8-6-8 6-8-6-8 6-8-6-8 6-8-6-8 6z"/><path class="fn" d="M40 28h40M40 42h40M40 56h24"/><circle class="fy" cx="70" cy="78" r="12"/><text x="70" y="84" text-anchor="middle" font-size="16">$</text>',
+ shop:'<rect class="fw" x="18" y="48" width="84" height="58"/><path class="fp" d="M12 26h96l-6 24H18z"/><path class="fn" d="M36 26l-4 24M60 26v24M84 26l4 24"/><rect class="fy" x="48" y="70" width="24" height="36"/>',
+ bills:'<rect class="ft" x="14" y="50" width="84" height="44" rx="4" transform="rotate(-8 56 72)"/><rect class="fy" x="22" y="38" width="84" height="44" rx="4"/><circle class="fn" cx="64" cy="60" r="11"/>',
+ pin:'<path class="fp" d="M60 108S26 70 26 46a34 34 0 0 1 68 0c0 24-34 62-34 62z"/><circle class="fw" cx="60" cy="46" r="13"/>',
+ bag:'<path class="fk" d="M28 48h64l10 58H18z"/><path class="fn" d="M44 48c0-24 32-24 32 0"/><text x="60" y="92" text-anchor="middle" font-size="34" style="fill:#fff">?</text>',
+ can:'<rect class="fl" x="42" y="10" width="36" height="12" rx="4"/><rect class="ft" x="38" y="18" width="44" height="90" rx="8"/><path class="fy" d="M66 36l-16 28h13l-6 26 19-34H63z"/>',
+ rocket:'<path class="fp" d="M48 82l-16 18 4-30zM72 82l16 18-4-30z"/><path class="fy" d="M50 84h20l-10 24z"/><path class="fw" d="M60 10c22 18 22 52 12 72H48C38 62 38 28 60 10z"/><circle class="ft" cx="60" cy="44" r="9"/>',
+ trophy:'<path class="fn" d="M36 24H20c0 18 10 24 18 24M84 24h16c0 18-10 24-18 24"/><path class="fy" d="M36 14h48v32a24 24 0 0 1-48 0z"/><rect class="fw" x="50" y="68" width="20" height="16"/><rect class="fy" x="34" y="84" width="52" height="16" rx="3"/>',
+ shirt:'<path class="fw" d="M40 16l-28 16 10 22 12-6v58h52V48l12 6 10-22-28-16c-4 10-36 10-40 0z"/><path class="fp" d="M52 22l8 14 8-14"/>',
+ redenv:'<rect class="fr" x="28" y="10" width="64" height="100" rx="6"/><path class="fy" d="M28 34c16 14 48 14 64 0"/><circle class="fy" cx="60" cy="64" r="14"/><text x="60" y="71" text-anchor="middle" font-size="18">福</text>',
+ video:'<rect class="fk" x="30" y="8" width="60" height="104" rx="10"/><rect class="fl" x="36" y="20" width="48" height="76" rx="3"/><circle class="fp" cx="60" cy="58" r="16"/><path class="fw" d="M55 49l13 9-13 9z"/><path class="fr" d="M14 22l20 20M34 22 14 42"/>',
+ cam:'<rect class="fl" x="14" y="38" width="78" height="56" rx="10"/><rect class="fk" x="40" y="28" width="26" height="12" rx="3"/><circle class="fw" cx="53" cy="66" r="18"/><circle class="fk" cx="53" cy="66" r="8"/><circle class="fr" cx="100" cy="30" r="8"/><text x="100" y="58" text-anchor="middle" font-size="13">REC</text>',
+ wheel:'<circle class="fw" cx="60" cy="62" r="42"/><circle class="fl" cx="60" cy="62" r="10"/><path class="fn" d="M60 20v84M18 62h84M30 32l60 60M90 32l-60 60"/><path class="fr" d="M96 16l6 14-12-4 10 14"/>',
+ mask:'<path class="fw" d="M18 40c0-12 84-12 84 0 0 30-18 56-42 56S18 70 18 40z"/><ellipse class="fk" cx="42" cy="52" rx="10" ry="6"/><ellipse class="fk" cx="78" cy="52" rx="10" ry="6"/><path class="fn" d="M48 78c8 5 16 5 24 0"/><text x="98" y="26" font-size="26">?</text>',
+ hand:'<path class="fy" d="M40 108V58l-12-16c-6-8 4-16 10-8l10 12V20c0-9 12-9 12 0v28-34c0-9 12-9 12 0v34-28c0-9 12-9 12 0v32-20c0-9 12-9 12 0v46c0 18-10 30-28 30z"/><path class="fr" d="M10 14l100 92"/>',
+ ear:'<path class="fw" d="M30 28c-14 0-18 18-18 30s4 30 18 30 14-8 14-30-0-30-14-30z"/><path class="fw" d="M90 28c14 0 18 18 18 30s-4 30-18 30-14-8-14-30 0-30 14-30z"/><path class="fn" d="M30 28c0-26 60-26 60 0"/><path class="fr" d="M48 96l24-24M48 72l24 24"/>'
+};
+const ill=(k,c)=>`<svg viewBox="0 0 120 120" aria-hidden="true"><circle class="bg" cx="60" cy="62" r="56" style="fill:${c}"/>${IMG[k]||""}</svg>`;
+
+/* ===== 卡片資料 =====
+ t: legal 正常賺錢 / crime 犯法 / gray 有事但不犯法 / miss 左滑會吃虧的權利 / keep 左滑才犯法
+ kind: criminal 刑事 / admin 行政罰
+ s: 可出現的學期 [起,迄]（0=國一上 … 5=國三下），沒寫就是都可以 */
+const POOL=[
+ // ---------- 犯法 ----------
+ {id:"pkg",t:"crime",kind:"criminal",img:"package",from:"阿傑學長",rel:"熱舞社學長",c:"#B9E4FF",
+  text:"寒暑假打工！日薪 3,000，只要去超商幫公司領包裹，再轉寄到台中。不用面試，當天現領。",money:3000,delay:3,
+  cons:{title:"警察找上門了",body:"你領的包裹裡是 7 張詐騙被害人的提款卡。你被當成詐騙集團的一員移送。",money:-3000,parents:-50000,rec:1},
+  laws:["刑法第 339-4 條：三人以上共同詐欺取財","洗錢防制法"],civil:true,
+  law:"「只是領包裹」是詐團最常用的招募話術。日薪異常高、不用面試、包裹要轉寄，三個條件同時出現就是警訊。",
+  news:"真實案例：2025 年新北一名女子替詐團到貨運站領包裹再轉寄，裡面是被害人的提款卡，被判刑 10 個月。"},
+ {id:"sign",t:"crime",kind:"criminal",img:"paper",from:"小凱",rel:"同班同學",c:"#C9F2C2",
+  text:"校外教學同意書我忘了給我爸簽，你幫我簽他的名字啦，我請你喝珍奶！",money:0,label:"+1 杯珍奶",delay:2,
+  cons:{title:"學務處找你",body:"老師打電話跟小凱爸爸確認，發現簽名是你寫的。冒用別人名字簽文件，可能構成偽造私文書。",rec:1},
+  laws:["刑法第 210 條：偽造私文書"],
+  law:"簽名代表「我本人同意」。幫別人簽，就是假冒他表示意見，就算只是一張同意書也一樣。"},
+ {id:"ebike",s:[0,2],t:"crime",kind:"admin",img:"ebike",from:"阿豪",rel:"隔壁班同學",c:"#FFE38A",
+  text:"我的電動車 3,000 賣你！只是沒掛牌而已，你還沒 14 歲騎也沒人會管。每天省公車錢。",money:600,label:"+$600 省下的公車錢",delay:2,
+  cons:{title:"被警察攔下來",body:"未滿 14 歲騎微型電動二輪車，車子又沒掛牌、沒保強制險。罰單寄到家裡，車子當場被拖走。",parents:-4800},
+  laws:["道路交通管理處罰條例：微型電動二輪車須掛牌、投保強制險","未滿 14 歲騎乘處 600 至 1,200 元罰鍰，當場禁止駕駛、車輛移置"],
+  law:"微電車要滿 14 歲才能騎，車要掛牌、保強制險，不能載人、不能改裝，時速上限 25 公里。",
+  news:"真實數字：屏東 2025 年 1 到 5 月，學生騎微電車發生事故 99 件，比前一年同期多了將近一倍。"},
+ {id:"acct",t:"crime",kind:"criminal",img:"card",from:"小雨",rel:"IG 網友・認識 3 週",c:"#FFC2D4",
+  text:"我在辦團購，可以借你的帳戶幫忙收款嗎？每一筆分你 10%，你什麼都不用做。",money:1500,delay:3,
+  cons:{title:"帳戶被凍結",body:"匯進你帳戶的錢全是詐騙贓款。你的帳戶變成警示帳戶，不能提款轉帳，被害人還找上你家求償。",money:-1500,parents:-30000,rec:1},
+  laws:["洗錢防制法：無正當理由交付帳戶給他人使用","刑法第 30 條、第 339 條：可能成立幫助詐欺"],civil:true,
+  law:"帳戶、存摺、提款卡、網銀密碼都不能借人。就算你說「不知道他拿去做什麼」，法院通常也不採信。",
+  news:"真實數字：2024 年 1 到 8 月就有將近 3,000 名少年涉詐，幾乎都是車手或提供人頭帳戶。"},
+ {id:"insult",t:"crime",kind:"criminal",img:"chat",from:"全年級群組",rel:"LINE 群組・512 人",c:"#D0D4FF",
+  text:"有人丟了同學上課睡覺流口水的照片。要不要配一句「這頭豬」轉發出去？大家一定笑翻。",money:0,label:"+87 個讚",delay:2,
+  cons:{title:"你被提告了",body:"同學爸媽報警。你轉發時加的那句話構成公然侮辱，最後爸媽出面和解賠錢。",parents:-20000,rec:1},
+  laws:["刑法第 309 條：公然侮辱"],civil:true,
+  law:"在群組、留言區罵人一樣算「公然」。轉發再加一句嘲笑，責任就是你的。"},
+ {id:"atm",s:[3,5],t:"crime",kind:"criminal",img:"atm",from:"阿傑學長",rel:"已畢業的學長",c:"#B9E4FF",
+  text:"公司缺人跑腿！幫忙去 ATM 領一筆客戶的錢，再交給來找你的同事。一趟 5,000。",money:5000,delay:2,
+  cons:{title:"在 ATM 旁被逮捕",body:"埋伏的便衣警察當場抓住你。你成了詐騙集團的「車手」，叫你去的學長早就換帳號消失了。",money:-5000,parents:-120000,rec:1},
+  laws:["刑法第 339-4 條：三人以上共同詐欺取財（1 年以上 7 年以下）","洗錢防制法"],civil:true,
+  law:"車手是詐騙集團最底層、最容易被抓的角色，用完就丟。上面的人永遠不會出面。",
+  news:"真實數字：2024 年全台青少年刑案嫌疑人達 4.7 萬多人，詐欺躍升第一，多半是車手或人頭帳戶。"},
+ {id:"ai",s:[2,5],t:"crime",kind:"criminal",img:"photo",from:"阿翔",rel:"同班同學",c:"#FFB59A",
+  text:"我用 AI 把班上女生的臉合成到不雅照片上，超像的！你要不要轉傳給隔壁班？",money:0,label:"+ 一堆人回「哈哈哈」",delay:2,
+  cons:{title:"警察和學校同時找上你",body:"被合成的同學報警。就算照片是假的，轉傳不實性影像一樣違法，而且受害者是未成年人，罪更重。",parents:-80000,rec:1},
+  laws:["刑法第 319-4 條：製作、散布不實性影像","兒童及少年性剝削防制條例：散布兒少性影像"],civil:true,
+  law:"「AI 做的、是假的」不是藉口。製作和轉傳都犯法；收到這種圖，正確做法是不轉傳、不存檔，直接告訴老師或家長。",
+  news:"真實案例：2026 年 5 月，台中兩名高中生用 AI 合成女同學性影像並散布，受害者近 20 人，警方與學校介入調查。"},
+ {id:"scalp",s:[2,5],t:"crime",kind:"admin",img:"ticket",from:"網友 Ken",rel:"粉絲社團",c:"#BDE7FF",
+  text:"你搶到 2 張演唱會門票（每張 2,800）？我出 3 倍價錢收，一張 8,400！",money:11200,label:"+$11,200 淨賺",delay:3,
+  cons:{title:"收到罰單",body:"有人檢舉你加價轉售。黃牛票按每張票價處 10 到 50 倍罰鍰，2 張最少罰 56,000 元。",money:-11200,parents:-56000},
+  laws:["文化創意產業發展法第 10-1 條：超過票面價格轉售藝文表演票券，按每張票價處 10 至 50 倍罰鍰"],
+  law:"票不能去了，可以用原價轉讓，或照售票系統的規則退票。加價就是黃牛。"},
+ {id:"vape",t:"crime",kind:"admin",img:"vape",from:"芷晴學姊",rel:"社團學姊",c:"#C8F0EA",
+  text:"這是水蜜桃口味的，吸一口就好，跟糖果一樣。這支送你。",money:0,label:"+1 支免費電子煙",delay:2,
+  cons:{title:"教官查到了",body:"你被送去上戒菸教育，學校通知家長。檢驗後發現，學姊給的煙彈裡摻了依托咪酯（俗稱喪屍煙彈），你得配合毒品調查。",parents:-2000,health:-30,rec:1},
+  laws:["菸害防制法：電子煙等類菸品全面禁止使用；未滿 20 歲不得吸菸，應接受戒菸教育","毒品危害防制條例：依托咪酯為列管毒品，施用、持有都會被追究"],
+  law:"電子煙在台灣不論幾歲都禁止。來路不明的煙彈可能摻毒，外觀做得像文具、飾品，就是要讓你放下戒心。",
+  news:"真實數字：校園電子煙通報從 112 年 237 件暴增到 114 年 1,692 件；2026 年衛福部推動修法，連「持有」電子煙都要罰。"},
+ {id:"bag",s:[3,5],t:"crime",kind:"criminal",img:"bag",from:"不認識的學長",rel:"在校門口攔住你",c:"#E3E3E3",
+  text:"學弟，幫我把這包東西帶進學校給三年級的阿哲，不要打開。辛苦費 500。",money:500,delay:2,
+  cons:{title:"書包被搜出毒品",body:"教官在你書包找到那包東西，裡面是喪屍煙彈。你說不知道是什麼，但你收了錢、被交代不要打開，很難解釋。",money:-500,parents:-30000,health:-10,rec:1},
+  laws:["毒品危害防制條例：轉讓、運輸毒品"],
+  law:"跑腿模糊地帶的判斷法：不知道內容、被要求不要打開、報酬高得不合理，這種忙不要幫。",
+  news:"2026 年依托咪酯（喪屍煙彈）多次在校園被查獲，政府提出 14 項新措施，並研議升列為一級毒品。"},
+ {id:"fight",t:"crime",kind:"criminal",img:"burst",from:"大頭學長",rel:"籃球隊學長",c:"#FFB3B3",
+  text:"阿宏很囂張，放學在公園一起去「教訓」他。你不用動手，站旁邊壯聲勢就好。",money:0,label:"+ 被學長當自己人",delay:2,
+  cons:{title:"監視器拍到你",body:"阿宏被打到骨折送醫。你雖然沒動手，但在場助勢一樣被移送，還要分攤醫藥費和解。",parents:-60000,rec:1},
+  laws:["刑法第 150 條：在公共場所聚集三人以上施強暴，在場助勢者也處罰","刑法第 277 條：傷害"],civil:true,
+  law:"「我只是站在旁邊」不能免責。法律有「在場助勢」的規定，人多壯聲勢本身就是參與。"},
+ {id:"steal",t:"crime",kind:"criminal",img:"cart",from:"超商自助結帳機",rel:"店員在忙",c:"#FFE38A",
+  text:"有一包洋芋片沒刷到條碼，店員也沒注意。直接帶走？",money:45,label:"+$45 的洋芋片",delay:2,
+  cons:{title:"店長調了監視器",body:"超商每天會對帳，監視器清楚拍到你。店長報警，爸媽來店裡道歉和解。",parents:-3000,rec:1},
+  laws:["刑法第 320 條：竊盜"],
+  law:"金額再小都是竊盜。自助結帳少刷，最好的做法是回去補刷，店家通常會感謝你。"},
+ {id:"piracy",t:"crime",kind:"criminal",img:"book",from:"你的漫畫粉專",rel:"追蹤 2,100 人",c:"#E7DDFF",
+  text:"付費漫畫 App 剛出新一話。截圖整話上傳到粉專，追蹤數一定暴衝！",money:0,label:"+3,000 追蹤",delay:3,
+  cons:{title:"出版社提告",body:"出版社檢舉，粉專被下架。對方依著作權法提告並求償，爸媽出面談和解。",parents:-50000,rec:1},
+  laws:["著作權法第 92 條：擅自公開傳輸他人著作"],civil:true,
+  law:"自己付費看是合法的，把整話貼到網路上給大家看，就是侵害著作權。分享心得、推薦作品沒問題。"},
+ {id:"hack",t:"crime",kind:"criminal",img:"lock",from:"你的手機",rel:"你知道阿凱的 IG 密碼",c:"#FFE38A",
+  text:"偷偷登入阿凱的 IG，用他的名義發一篇告白文整他？",money:0,label:"+ 全班笑翻",delay:2,
+  cons:{title:"阿凱報警了",body:"IG 有登入紀錄，查得到是從你的手機登入的。阿凱很受傷，家長決定提告。",parents:-10000,rec:1},
+  laws:["刑法第 358 條：無故輸入他人帳號密碼，入侵他人電腦或相關設備"],
+  law:"知道別人的密碼不等於可以用。未經同意登入別人的帳號就是入侵，不管是不是開玩笑。"},
+ {id:"doxx",t:"crime",kind:"criminal",img:"pin",from:"匿名討論版",rel:"有人在罵某同學",c:"#FFC2D4",
+  text:"大家都討厭那個同學。把他的電話和住址貼上來，讓大家去「問候」他？",money:0,label:"+ 大家說你超讚",delay:2,
+  cons:{title:"他家接到上百通騷擾電話",body:"同學家長報警，平台交出 IP 紀錄找到你。",parents:-30000,rec:1},
+  laws:["個人資料保護法第 41 條：意圖損害他人利益，非法利用他人個資"],civil:true,
+  law:"電話、住址、班級、照片都是個資。公開別人的個資讓人去騷擾，是刑事責任。"},
+ {id:"threat",t:"crime",kind:"criminal",img:"burst",from:"你的限時動態",rel:"好友 300 人可見",c:"#FFB3B3",
+  text:"阿宏今天惹到你。在限動寫「明天放學堵你，你死定了」嚇嚇他？",money:0,label:"+ 出一口氣",delay:2,
+  cons:{title:"阿宏不敢來上學",body:"阿宏家長截圖報警。你說只是開玩笑，但對方真的感到害怕。",parents:-5000,rec:1},
+  laws:["刑法第 305 條：恐嚇危害安全"],
+  law:"恐嚇看的是對方有沒有感到害怕，不是你有沒有真的要做。氣頭上的話不要發到網路上。"},
+ {id:"bomb",t:"crime",kind:"criminal",img:"mega",from:"學校匿名留言板",rel:"大家在抱怨段考",c:"#FFE38A",
+  text:"開個玩笑，留言「明天要帶刀來學校，誰都別想考試」？",money:0,label:"+ 大家說好好笑",delay:2,
+  cons:{title:"警察到學校搜查",body:"學校報警，全校進行安全檢查。警方依網路紀錄找到你，你被移送。",parents:-10000,rec:1},
+  laws:["刑法第 151 條：以加害生命、身體、財產之事恐嚇公眾，致生危害於公安"],
+  law:"恐嚇的對象是不特定的大眾時，就算只是玩笑，也會動用大量警力處理，法律責任很重。"},
+ {id:"rumor",t:"crime",kind:"admin",img:"mega",from:"朋友小傑",rel:"颱風前一晚",c:"#BDE7FF",
+  text:"我 P 了一張「明天停班停課」的縣府公告，超像的。你幫我轉到各班群組？",money:0,label:"+ 大家狂謝你",delay:2,
+  cons:{title:"縣府發新聞稿澄清",body:"很多家長信以為真，臨時取消安排。警方依轉傳紀錄找到你們，依社會秩序維護法處罰。",parents:-3000},
+  laws:["社會秩序維護法第 63 條：散布謠言，足以影響公眾之安寧"],
+  law:"轉傳前先查證：停班停課以縣市政府官網和人事行政總處公告為準。"},
+ {id:"shoes",t:"crime",kind:"criminal",img:"shoe",from:"朋友阿偉",rel:"說有「管道」",c:"#D3F3EE",
+  text:"我有一批名牌球鞋，一雙 800 拿給你，你轉賣給同學 2,000，賺的都是你的。",money:3600,label:"+$3,600（賣 3 雙）",delay:3,
+  cons:{title:"品牌商檢舉",body:"鞋子全是仿冒品。買到的同學爸媽要求退錢，品牌商也報警。",money:-3600,parents:-10000,rec:1},
+  laws:["商標法第 97 條：販賣仿冒商標商品"],
+  law:"自己買到仿冒品通常不罰，但拿來賣就犯法。價格便宜到不合理，多半就是假貨。"},
+ {id:"gamble",s:[3,5],t:"crime",kind:"criminal",img:"dice",from:"同學阿強",rel:"拉你進群組",c:"#FFE38A",
+  text:"這個網站可以押 NBA，押中一賠二！我上週贏了 2,000，你也來一起玩。",money:1000,label:"+$1,000（第一把贏了）",delay:3,
+  cons:{title:"後面一直輸",body:"之後你越押越大，輸光零用錢。警方查獲賭博網站，會員名單裡有你的帳號。",money:-3000,rec:1},
+  laws:["刑法第 266 條：賭博（透過網路賭博也算）"],
+  law:"台灣合法的只有運動彩券，而且未滿 18 歲不能買。網路賭盤一開始讓你贏，就是要你越押越大。"},
+ {id:"scooter",s:[4,5],t:"crime",kind:"admin",img:"ebike",from:"表哥",rel:"家人",c:"#FFD7A8",
+  text:"我的機車借你騎去夜市啦，騎慢一點就好，警察不會攔你。",money:200,label:"+$200 省下的車錢",delay:2,
+  cons:{title:"臨檢被攔",body:"你沒有駕照。你被開無照駕駛罰單，表哥身為車主也一起被罰，機車被扣。",parents:-12000},
+  laws:["道路交通管理處罰條例第 21 條：無照駕駛處罰鍰；車主允許無照者駕駛也一併處罰"],
+  law:"機車要滿 18 歲考到駕照才能騎。微電車滿 14 歲不用駕照，但機車不行。"},
+
+ // ---------- 有事但不犯法 ----------
+ {id:"work13",s:[0,4],t:"gray",img:"cup",from:"飲料店老闆",rel:"巷口飲料店",c:"#FFE0B3",
+  text:"國中生也可以來打工啦！時薪 120，現金給，不用簽約。週末來 8 小時。",money:960,delay:2,
+  cons:{title:"勞動局來檢查",body:"老闆被勞動局開罰，你也不能再上班。你拿到的時薪連法定基本時薪 196 元都不到。",health:-5},
+  law:"你沒有犯法，是老闆違法：勞基法第 45 條規定雇主不得僱用未滿 15 歲的人（國中畢業等例外），而且工資不能低於基本工資。"},
+ {id:"breakfast",t:"gray",img:"food",from:"你自己",rel:"內心的聲音",c:"#FFF1A8",
+  text:"每天不吃早餐，一週可以省下 350 元，拿去買遊戲點數。",money:350,delay:2,
+  cons:{title:"胃痛到被送保健室",body:"連續好幾週沒吃早餐，上課頭暈、胃痛，爸媽帶你去看醫生。",parents:-800,health:-25},
+  law:"不犯法，但身體會記帳。發育中的國中生不吃早餐，影響專注力和成長。"},
+ {id:"late",t:"gray",img:"moon",from:"遊戲網友",rel:"Discord 好友",c:"#C7C9FF",
+  text:"幫我代練帳號到凌晨 3 點，一晚 300。反正你也很愛玩。",money:900,label:"+$900（3 個晚上）",delay:2,
+  cons:{title:"段考炸裂，帳號還被封",body:"連續熬夜，上課一直睡。遊戲公司偵測到代練，把網友的帳號封了，他說不付後面的錢。",health:-25},
+  law:"代練本身不犯法，但通常違反遊戲使用條款，被封號是你們自己承擔。熬夜則是直接傷身。"},
+ {id:"gacha",t:"gray",img:"game",from:"手遊公告",rel:"限定卡池倒數 2 天",c:"#FFC8F0",
+  text:"限定角色只出現 48 小時！要不要把 3,000 元壓歲錢全部拿去抽？",money:-3000,label:"花 $3,000 抽 30 抽",delay:1,
+  cons:{title:"什麼都沒抽到",body:"30 抽全部是重複的角色。公告上寫的限定角色機率是 0.6%。",health:-5},
+  law:"不犯法。遊戲依規定要公布抽獎機率，抽之前先算算：0.6% 代表平均要抽很多次才中一次。"},
+ {id:"lend",t:"gray",img:"bills",from:"阿明",rel:"同班同學",c:"#C9F2C2",
+  text:"借我 1,000，下禮拜一定還你！拜託，我們是好朋友吧？",money:-1000,label:"借出 $1,000",delay:3,
+  cons:{title:"阿明一直沒還",body:"一個月過去，阿明已讀不回。你拿 LINE 對話給他爸媽看，最後只要回 500。",money:500},
+  law:"借錢是合法的借貸（民法第 474 條），LINE 對話可以當證據。但朋友之間要回來很難，借之前先想好拿不回來也沒關係的金額。"},
+ {id:"card",t:"gray",img:"card",from:"手機跳出提示",rel:"媽媽的卡已綁定",c:"#FFD1C1",
+  text:"媽媽的信用卡綁在你手機的遊戲帳號裡。偷偷買一包 3,000 點，她應該不會發現吧？",money:0,label:"+3,000 遊戲點數",delay:2,
+  cons:{title:"帳單寄來了",body:"媽媽看到信用卡帳單，手機被沒收一個月。爸媽向遊戲公司申訴退款，只退回一部分。",parents:-2000},
+  law:"未成年人未經爸媽同意的高額消費，爸媽可以拒絕承認、要求退款（民法第 77、79 條）。但偷用家人的卡也可能涉及刑法詐欺，只是家人之間要告才會辦。"},
+ {id:"hw",t:"gray",img:"paper",from:"隔壁班阿凱",rel:"同年級",c:"#D3F3EE",
+  text:"幫我寫數學作業，一次 200。反正你寫一份也是寫，寫兩份也是寫。",money:600,label:"+$600（3 次）",delay:2,
+  cons:{title:"被老師抓包",body:"兩份作業錯在同一題、錯得一模一樣。你們兩個都被記警告，還要重寫。",health:-5},
+  law:"不犯法，但違反校規和學習誠信。代寫作業被抓到，處分的是兩個人。"},
+ {id:"group",t:"gray",img:"food",from:"班長",rel:"班上團購",c:"#FFE38A",
+  text:"你當這次雞排團購的負責人吧？先幫大家墊錢買 20 份，每份 60，之後再收。",money:-1200,label:"先墊 $1,200",delay:2,
+  cons:{title:"有 3 個人一直不付錢",body:"他們說「我沒有說要買啊」。你只收回 1,020 元，賠了 180 元。",money:1020},
+  law:"幫人代墊是合法的，但對方不付錢你要自己追討。下次先收錢再訂，或在群組裡留下誰點了什麼的紀錄。"},
+ {id:"sim",t:"gray",victim:true,img:"sim",from:"抖音私訊",rel:"自稱遊戲客服",c:"#FFB3C7",
+  text:"恭喜！免費送你熱門射擊遊戲的頂級帳號。只要把手機的 SIM 卡寄來認證就好。",money:0,label:"+1 個頂級帳號（？）",delay:2,
+  cons:{title:"你的門號被停話了",body:"詐團用你的門號打電話騙人，被害人打 165 檢舉，電信公司把你的號碼停了。爸媽陪你去警局說明。",parents:-500},
+  law:"你是受害者，但門號被拿去犯罪，你也可能被叫去說明。身分證、帳戶、SIM 卡都不能寄給任何人；警察不會用 LINE 辦案。",
+  news:"真實案例：2026 年 6 月，高雄一名 13 歲國中生被「免費送遊戲帳號」騙走 SIM 卡，門號被詐團用來打詐騙電話後遭停話。"},
+ {id:"onepage",t:"gray",img:"ear",from:"IG 廣告",rel:"贊助內容",c:"#D0D4FF",
+  text:"全新無線藍牙耳機，限時只要 499！貨到付款，超商取貨。",money:-499,label:"付 $499",delay:2,
+  cons:{title:"收到一副玩具耳機",body:"包裝裡是根本不能用的塑膠耳機。網站已經消失，客服電話打不通。",health:-5},
+  law:"這叫一頁式廣告詐騙。網購本來有 7 天猶豫期，但找不到賣家就退不了。價格便宜到不合理、只有一頁網頁、只能貨到付款，就要小心。遇到可打 165。"},
+ {id:"task",t:"gray",img:"chat",from:"兼職群組",rel:"被陌生人拉進群",c:"#C8F0EA",
+  text:"幫商品按讚、留言，一則 10 元！做滿任務還有獎金，學生也能做。",money:200,label:"+$200（前兩天）",delay:2,
+  cons:{title:"錢轉出去就被封鎖",body:"第三天，他們說要先儲值 2,000 元才能解鎖「高階任務」。你一轉帳，群組就把你踢掉了。",money:-2000},
+  law:"這是刷單詐騙：先給一點甜頭，再要你先付錢。真正的工作不會要你先付錢。"},
+ {id:"invest",t:"gray",img:"chart",from:"IG 投資老師",rel:"粉絲 8.7 萬",c:"#FFE0B3",
+  text:"跟著老師買虛擬貨幣穩賺！國中生也能月入 5 萬。先投 3,000 試試看？",money:-3000,label:"投入 $3,000",delay:2,
+  cons:{title:"錢領不出來",body:"App 上顯示你賺了兩倍。你想領出來時，對方說要先繳「保證金」，之後就再也聯絡不上。",health:-5},
+  law:"保證獲利、穩賺不賠的投資都是詐騙。未成年人也不能自己開證券或交易帳戶。"},
+ {id:"storeret",t:"gray",img:"shop",from:"服飾店",rel:"你昨天買的褲子",c:"#FFC2D4",
+  text:"褲子回家發現不喜歡。要回店裡說「我有 7 天鑑賞期」要求退貨嗎？",money:0,label:"+ 想拿回 $890",delay:1,
+  cons:{title:"店員說不能退",body:"店員說實體店沒有 7 天鑑賞期，只能換尺寸。你白跑一趟。",health:-3},
+  law:"消保法的 7 天猶豫期只適用網購、郵購、到府推銷。實體店能不能退，看店家政策，買之前可以先問清楚。"},
+ {id:"contract",t:"gray",img:"paper",from:"補習班業務",rel:"在校門口發傳單",c:"#E7DDFF",
+  text:"同學，你自己簽 12 期分期就好，不用跟爸媽講，每期才 1,500！",money:0,label:"+1 份分期合約",delay:2,
+  cons:{title:"帳單寄到家了",body:"爸媽看到帳單，依法拒絕承認這份合約，合約不生效。但業務一直打電話來，家裡吵了一架。",health:-10},
+  law:"未滿 18 歲簽約，要有爸媽事先允許或事後承認才有效（民法第 77、79 條）。業者叫你「不用跟爸媽講」，本身就是警訊。"},
+ {id:"loc",t:"gray",img:"pin",from:"你的限時動態",rel:"公開帳號",c:"#FFB3C7",
+  text:"拍一張穿制服在家樓下的自拍，打卡地點，發到公開帳號？",money:0,label:"+52 人看過",delay:2,
+  cons:{title:"陌生人私訊你",body:"一個不認識的網友傳訊息說「我知道你住哪裡喔」。爸媽陪你去報案，你把帳號改成私人。",health:-10},
+  law:"不犯法，但制服、校名、門牌、打卡地點加起來，陌生人就能找到你。限動可以設成摯友限定。"},
+ {id:"energy",t:"gray",img:"can",from:"你自己",rel:"段考前一週",c:"#C9F2C2",
+  text:"每天灌兩罐能量飲料熬夜讀書，應該可以多讀好幾章？",money:-300,label:"花 $300",delay:1,
+  cons:{title:"考試時睡著了",body:"心悸、睡不著，考數學時直接趴在桌上睡著。",health:-20},
+  law:"不犯法。能量飲料含大量咖啡因，青少年喝多了容易心悸、失眠，讀書效果反而變差。"},
+ {id:"tip",t:"gray",img:"rocket",from:"直播主",rel:"你最喜歡的實況主",c:"#FFC8F0",
+  text:"小禮物也是愛！要不要刷一支 1,000 元的火箭，讓他唸你的名字？",money:-1000,label:"花 $1,000",delay:1,
+  cons:{title:"他唸了你的名字 0.5 秒",body:"然後就繼續玩遊戲了。一千塊沒了。",health:-3},
+  law:"不犯法。未成年人大額打賞，爸媽可以主張未經同意要求退款（民法第 79 條），但不保證平台會退。"},
+
+ // ---------- 性影像、網路言論、恐嚇與常見少年犯罪 ----------
+ {id:"fwdvid",t:"crime",kind:"criminal",img:"video",from:"籃球隊群組",rel:"LINE 群組・38 人",c:"#FFB3B3",
+  text:"有人丟了一段隔壁班女生的私密影片，大家都在傳。要不要轉給你其他朋友？",money:0,label:"+ 朋友說你消息超靈通",delay:2,
+  cons:{title:"警察來學校約談",body:"影片裡的同學報警，警方從轉傳紀錄一路查到你。被拍的同學已經好幾週不敢來上學。",parents:-60000,rec:1},
+  laws:["兒童及少年性剝削防制條例：散布兒少性影像（2023 年修法後提高為 1 年以上 7 年以下有期徒刑）"],civil:true,
+  law:"只要影片裡的人未滿 18 歲，轉傳一次就是散布。就算你不是拍的人，就算對方當初是自願拍的，也一樣。收到時：不看、不轉、不存，直接告訴老師或家長，也可以向 iWIN 網路內容防護機構檢舉。",
+  news:"真實數字：兒少性剝削通報從 2017 年 1,184 件增加到 2023 年 4,310 件，超過一半跟網路有關。"},
+ {id:"keepvid",t:"crime",kind:"criminal",img:"video",from:"你的手機",rel:"相簿",c:"#FFC2D4",
+  text:"同學私訊傳來那段大家在傳的同校女生私密影片。存在手機裡「留著」好了？",money:0,label:"+1 個「收藏」",delay:3,
+  cons:{title:"手機被扣押",body:"警方追查影片流向，調查你的手機時找到了那段影片。你說自己「只是存著沒傳」。",parents:-30000,rec:1},
+  laws:["兒童及少年性剝削防制條例：無正當理由持有兒少性影像（2023 年修法改為刑事處罰）"],
+  law:"現在連「存著」都犯法。收到別人傳來的兒少性影像，不要下載、不要保存，告訴大人並檢舉。"},
+ {id:"askpic",t:"gray",victim:true,img:"lock",from:"網友小澤",rel:"遊戲認識・聊了 2 個月",c:"#C7C9FF",
+  text:"我們這麼好了，傳一張你的私密照給我嘛，我送你 500 點遊戲點數。只有我會看到。",money:0,label:"+500 遊戲點數",delay:2,
+  cons:{title:"他開始威脅你",body:"他說如果你不再多傳幾張，就把照片寄給你的同學和爸媽。你嚇壞了，最後鼓起勇氣告訴爸媽，一起去報警。",health:-30},
+  law:"你是被害人，這不是你的錯。叫未成年人拍私密照的人，已經違反兒少性剝削防制條例。被威脅時不要再傳、不要付錢，保留對話，馬上告訴信任的大人，或撥 113 保護專線、110 報警。",
+  news:"常見手法：網友先用交往、遊戲點數、偶像周邊、打工機會拉近關係，再要求照片，之後用照片威脅。"},
+ {id:"fbshame",t:"crime",kind:"criminal",img:"mega",from:"爆料社團",rel:"臉書社團・12 萬人",c:"#BDE7FF",
+  text:"你覺得是阿哲偷了你的耳機。發文附上他的照片和班級，寫「大家來看小偷長怎樣」，公審他！",money:0,label:"+2,300 個怒",delay:3,
+  cons:{title:"耳機在你的書包夾層找到了",body:"阿哲被留言罵了好幾天。他的家長提告，爸媽陪你去地檢署，最後道歉、賠錢和解。",parents:-50000,rec:1},
+  laws:["刑法第 310 條：誹謗（用文字散布的是加重誹謗）","個人資料保護法：未經同意公開他人照片、班級"],civil:true,
+  law:"網路公審是在指摘具體的事（「他偷東西」），講錯了就是誹謗；就算是真的，公開他的個資也可能違法。有問題找老師或報警，不要自己在網路上審判。"},
+ {id:"dminsult",t:"gray",img:"chat",from:"你的私訊",rel:"一對一聊天",c:"#E7DDFF",
+  text:"阿宏在球場害你們輸球。私訊他，用最難聽的話罵他一整晚？",money:0,label:"+ 爽了一個晚上",delay:2,
+  cons:{title:"學校啟動霸凌調查",body:"阿宏把對話截圖給導師。學校認定你連續謾罵構成霸凌，你被記過、要參加輔導，阿宏的家長也說要民事求償。",health:-5},
+  law:"一對一私訊只有對方看到，不是「公然」，通常不構成公然侮辱罪。2024 年憲法法庭也把公然侮辱限縮在故意貶損、超出一般人能忍受的程度。但反覆謾罵會被學校認定為霸凌，對方也可以民事請求精神賠償。換成群組或留言區，就可能變成公然侮辱。"},
+ {id:"extort",t:"crime",kind:"criminal",img:"bills",from:"大頭學長",rel:"籃球隊學長",c:"#FFB3B3",
+  text:"一年級的學弟很好欺負。跟他說每天交 50 元「保護費」，不然放學堵他，錢我們分？",money:1500,label:"+$1,500（一個月）",delay:2,
+  cons:{title:"學弟的媽媽報警了",body:"學弟每天偷家裡的錢交給你們，被家人發現。你們被移送，收的錢全部要還，還要賠償。",money:-1500,parents:-20000,rec:1},
+  laws:["刑法第 346 條：恐嚇取財（6 個月以上 5 年以下有期徒刑）"],civil:true,
+  law:"用「不給錢就怎樣」逼人交錢，就是恐嚇取財，金額再小都一樣。被勒索時，告訴老師或家長，學校必須處理。"},
+ {id:"hidecam",s:[1,5],t:"crime",kind:"criminal",img:"cam",from:"阿翔",rel:"同班同學",c:"#FFB59A",
+  text:"把手機藏在更衣室的置物櫃，偷錄同學換衣服，「整人」一下？",money:0,label:"+ 阿翔說你很有種",delay:2,
+  cons:{title:"手機被發現了",body:"同學發現置物櫃裡的手機正在錄影，馬上報告老師。學校啟動性平調查，警方也介入。",parents:-50000,rec:1},
+  laws:["刑法第 319-1 條：未經同意攝錄他人性影像","兒童及少年性剝削防制條例：拍攝兒少性影像（3 年以上 10 年以下有期徒刑）"],civil:true,
+  law:"偷拍別人更衣、如廁、裙底，不管是不是「開玩笑」，都是重罪。被拍的人未滿 18 歲，適用更重的兒少性剝削防制條例。",
+  news:"2026 年 5 月，彰化一名男子把針孔鏡頭裝在鞋子裡，在超商偷拍國中女生裙底，被同學發現後當場遭逮。"},
+ {id:"sellacct",t:"crime",kind:"criminal",img:"game",from:"遊戲交易版",rel:"有人要買你的帳號",c:"#C8F0EA",
+  text:"網友要用 2,000 買你的遊戲帳號，說會先匯款。收到錢之後……直接封鎖他、不給帳號？",money:2000,delay:3,
+  cons:{title:"收到警察局通知書",body:"網友報案，警方從匯款帳戶找到你。你要把錢還回去，還被移送少年法院。",money:-2000,parents:-5000,rec:1},
+  laws:["刑法第 339 條：詐欺取財"],
+  law:"收錢不出貨就是詐欺，網路交易一樣。在少年犯罪類型裡，詐欺已經是第一名。"},
+ {id:"fakeacct",t:"crime",kind:"criminal",img:"mask",from:"你的 IG",rel:"小帳",c:"#D0D4FF",
+  text:"用阿凱的大頭貼和名字開一個假帳號，去留言罵別人，讓大家以為是他？",money:0,label:"+ 看他被罵超好笑",delay:2,
+  cons:{title:"平台交出註冊資料",body:"阿凱被誤會，被很多人罵。他家人報警，警方調閱註冊用的手機門號，找到了你。",parents:-30000,rec:1},
+  laws:["個人資料保護法第 41 條：冒用他人照片、姓名","刑法第 310 條：誹謗（讓人誤以為他做了某些事）"],civil:true,
+  law:"冒用別人的照片和名字開帳號不只是整人，可能同時侵害他的個資和名譽。"},
+ {id:"tire",t:"crime",kind:"criminal",img:"wheel",from:"阿豪",rel:"隔壁班同學",c:"#FFE38A",
+  text:"那個人很討厭。放學把他的腳踏車輪胎刺破，讓他走路回家？",money:0,label:"+ 出一口氣",delay:2,
+  cons:{title:"車棚有監視器",body:"監視器拍得一清二楚。對方家長報警，你要賠新的輪胎，學校也記你過。",parents:-3000,rec:1},
+  laws:["刑法第 354 條：毀損他人之物"],civil:true,
+  law:"故意弄壞別人的東西就是毀損。刮車、割座椅、破壞公物都算。"},
+ {id:"touch",t:"crime",kind:"criminal",img:"hand",from:"死黨們",rel:"下課在走廊",c:"#FFC2D4",
+  text:"大家在玩「偷襲」，趁同學不注意摸他的屁股或胸部，看他嚇一跳的樣子。你也來？",money:0,label:"+ 大家笑成一團",delay:2,
+  cons:{title:"性平會找你談話",body:"同學覺得很不舒服，告訴了導師。學校啟動性平調查，對方家長決定提告。",parents:-20000,rec:1},
+  laws:["性騷擾防治法第 25 條：趁人不及抗拒觸摸臀部、胸部或其他身體隱私處（2 年以下有期徒刑）"],civil:true,
+  law:"重點不是你覺得好不好玩，而是對方願不願意。碰觸身體隱私處，就算是同性、好朋友、說是開玩笑，都可能是性騷擾。"},
+ {id:"stalk",s:[2,5],t:"crime",kind:"criminal",img:"pin",from:"你自己",rel:"你喜歡隔壁班的小晴",c:"#FFC8F0",
+  text:"小晴不回你訊息。每天放學偷偷跟到她家樓下，再用好幾個小帳私訊她？",money:0,label:"+ 每天都看得到她",delay:3,
+  cons:{title:"收到警察的書面告誡",body:"小晴很害怕，家人報警。警方對你發出書面告誡；如果再犯，她可以聲請保護令。",parents:-5000,rec:1},
+  laws:["跟蹤騷擾防制法：對特定人反覆或持續跟蹤、監視、糾纏（1 年以下有期徒刑）"],
+  law:"喜歡一個人沒有錯，但對方拒絕或不回應時，還一直跟蹤、換帳號私訊，就是跟蹤騷擾。"},
+
+ // ---------- 正常賺零用錢 ----------
+ {id:"chores",t:"legal",img:"dish",from:"媽媽",rel:"家人",c:"#FFD7A8",text:"這週碗都給你洗，洗完給你 300 元零用錢。",money:300,
+  law:"做家事換零用錢，最正當的收入。"},
+ {id:"redenv",t:"legal",img:"redenv",from:"阿嬤",rel:"家人",c:"#FFD7A8",text:"乖孫，紅包 2,000 給你。要不要自己存進你的帳戶？",money:2000,
+  law:"自己的帳戶自己用。存摺、提款卡、密碼不交給別人，就是最安全的帳戶。"},
+ {id:"exam",t:"legal",img:"trophy",from:"爸爸",rel:"家人",c:"#FFD7A8",text:"段考比上次進步 30 分！說好的獎金 500 給你。",money:500,
+  law:"靠自己努力換來的獎勵，拿得心安理得。"},
+ {id:"sell",t:"legal",img:"book",from:"二手拍賣 App",rel:"系統通知",c:"#E7DDFF",text:"有人想用 350 元買你看完的整套漫畫，要成交嗎？",money:350,
+  law:"偶爾賣自己的二手物品是合法的。但如果大量進貨再轉賣，就是在做生意，要辦登記、報稅。"},
+ {id:"dog",t:"legal",img:"dog",from:"陳阿姨",rel:"樓下鄰居",c:"#C9F2C2",text:"這週幫我遛狗，每天半小時，給你 400。",money:400,
+  law:"幫認識的人做家事型的小幫忙，是合法又安全的零用錢來源。"},
+ {id:"errand",t:"legal",img:"package",from:"王伯伯",rel:"隔壁鄰居",c:"#D0D4FF",text:"我出國這週，幫我去管理室領包裹，放在我家門口就好。給你 100 當跑腿費。",money:100,
+  law:"這是合法的跑腿：你認識委託的人、知道包裹是他的、報酬合理。和詐團「領包裹」差在這三點。"},
+ {id:"invoice",t:"legal",img:"receipt",from:"統一發票",rel:"開獎日",c:"#FFE38A",text:"你收在抽屜的發票對中了 200 元！要去超商兌獎嗎？",money:200,
+  law:"統一發票中獎，誰都可以領，不分年齡。"},
+ {id:"essay",t:"legal",img:"trophy",from:"學校",rel:"作文比賽",c:"#C8F0EA",text:"你的作文拿到全市第二名，獎金 1,000。",money:1000,
+  law:"比賽獎金是合法收入。"},
+ {id:"uniform",t:"legal",img:"shirt",from:"學弟的媽媽",rel:"二手制服",c:"#D3F3EE",text:"你穿不下的運動服可以 200 賣給我們家小孩嗎？",money:200,
+  law:"賣自己的二手物品，合法。"},
+ {id:"family",t:"legal",img:"shop",from:"爸爸",rel:"自家麵店",c:"#FFD7A8",text:"週末店裡缺人，幫忙收碗擦桌，給你 500。",money:500,
+  law:"在自己家裡的店幫忙，是家人之間的互助，不是受僱，所以不受「未滿 15 歲不得受僱」限制。"},
+ {id:"tutor",s:[4,5],t:"legal",img:"book",from:"鄰居林媽媽",rel:"樓上鄰居",c:"#E7DDFF",text:"可以每週幫我兒子看一次小學作業嗎？一次 300。",money:600,label:"+$600（2 次）",
+  law:"幫認識的鄰居小孩看功課拿謝禮，是合法的小幫忙。"},
+ {id:"bike14",s:[3,5],t:"legal",img:"ebike",from:"表哥",rel:"家人",c:"#FFD7A8",text:"我那台有掛牌、有保強制險的微電車借你騎去補習。你滿 14 歲了，記得戴安全帽。",money:600,label:"+$600 省下的公車錢",
+  law:"滿 14 歲、車子有掛牌有保險、戴安全帽、不載人、不改裝，就可以合法騎微電車。"},
+ {id:"work15",s:[5,5],t:"legal",img:"cup",from:"飲料店",rel:"徵工讀生",c:"#FFE0B3",text:"你滿 15 歲了。暑假工讀時薪 196，要附家長同意書和年齡證明。去應徵嗎？",money:1568,label:"+$1,568（週末 8 小時）",
+  law:"滿 15 歲可以合法打工。未滿 18 歲要有家長同意書和年齡證明（勞基法第 46 條），晚上 8 點到早上 6 點不能上班（第 48 條），時薪不能低於 196 元。"},
+ {id:"refund",t:"miss",img:"shirt",from:"網購小幫手",rel:"系統通知",c:"#E7DDFF",
+  text:"你網購的外套到貨了，可是穿起來太小。今天是收到的第 3 天，要申請退貨嗎？",money:899,label:"+$899 退款",
+  missed:{title:"退不了了",body:"你拖到第 9 天才想退，賣家說已經超過 7 天猶豫期。外套只能送給弟弟穿。",money:-899},
+  law:"網購有 7 天猶豫期，不用說理由也能退（消保法第 19 條）。實體店買的沒有這條規定，能不能退要看店家。"},
+ {id:"wallet",t:"keep",img:"wallet",from:"路邊",rel:"你撿到一個錢包",c:"#FFE38A",
+  text:"錢包裡有 5,000 元和一張身分證。要把它交給警察局嗎？（左滑＝自己留著）",money:500,label:"+$500 失主謝禮",
+  kept:{title:"監視器拍到你了",body:"失主報案，警方調監視器找到你。你把錢花掉一半，被依侵占遺失物移送。",money:5000,parents:-5000,rec:1},
+  keptLaws:["刑法第 337 條：侵占遺失物"],
+  law:"撿到東西交給警察，失主找回後，你可以請求不超過物品價值十分之一的報酬（民法第 805 條）。這張卡左滑反而才是犯法。"}
+];
+const EVENTS={
+ 3:{id:"bday14",t:"event",img:"cake",from:"全家人",rel:"生日快樂",c:"#FF9DB5",
+  text:"今天你滿 14 歲了！生日紅包 1,000 元。不過從今天起，有些事在法律上不一樣了……",money:1000,age:14,
+  toast:"滿 14 歲：可以騎微電車，也開始要負刑事責任"},
+ 5:{id:"bday15",t:"event",img:"cake",from:"全家人",rel:"生日快樂",c:"#FF9DB5",
+  text:"你滿 15 歲了！生日紅包 1,000 元。滿 15 歲可以合法打工了，但規矩也更多。",money:1000,age:15,
+  toast:"滿 15 歲：可以合法打工（要家長同意書）"}
+};
+const SEM=["國一上","國一下","國二上","國二下","國三上","國三下"];
+const SEM_AGE=[12,13,13,13,14,14];
+
+/* ===== 音效 (Web Audio 合成) ===== */
+const A={ctx:null,on:true,master:null,mus:null,timer:null,step:0,next:0};
+const mf=m=>440*Math.pow(2,(m-69)/12);
+function aInit(){if(A.ctx){try{A.ctx.resume()}catch(e){}return;}
+  try{A.ctx=new (window.AudioContext||window.webkitAudioContext)();A.master=A.ctx.createGain();A.master.gain.value=A.on?.9:0;A.master.connect(A.ctx.destination);
+  A.mus=A.ctx.createGain();A.mus.gain.value=.5;A.mus.connect(A.master);A.next=A.ctx.currentTime+.1;A.timer=setInterval(sched,25);}catch(e){A.ctx=null}}
+function tone(f,t,d,type,vol,dest,f2){const c=A.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.01);
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(dest||A.master);o.start(t);o.stop(t+d+.05);}
+function noise(t,d,vol,f1,f2,dest){const c=A.ctx,b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),x=b.getChannelData(0);
+  for(let i=0;i<x.length;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const bp=c.createBiquadFilter();bp.type="bandpass";
+  bp.frequency.setValueAtTime(f1,t);bp.frequency.exponentialRampToValueAtTime(f2,t+d);const g=c.createGain();g.gain.setValueAtTime(vol,t);
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(bp);bp.connect(g);g.connect(dest||A.master);s.start(t);}
+const MEL=[72,0,76,79,81,0,79,76,74,0,72,74,76,0,0,0,72,0,76,79,84,0,81,79,76,0,74,72,74,0,0,0];
+const BASS=[48,48,45,45,41,41,43,43];
+let musicMode="main";
+function sched(){if(!A.ctx)return;const st=60/116/2;
+  while(A.next<A.ctx.currentTime+.12){const s=A.step%32,t=A.next;
+    if(musicMode==="main"){
+      if(MEL[s])tone(mf(MEL[s]),t,st*.9,"square",.05,A.mus);
+      if(s%4===0)tone(mf(BASS[s/4]),t,st*1.8,"triangle",.14,A.mus);
+      if(s%2===1)noise(t,.04,.05,6000,8000,A.mus);
+    }else if(musicMode==="dark"){
+      if(s%8===0)tone(mf(s%16===0?40:39),t,st*7,"sawtooth",.05,A.mus);
+      if(s%4===2)noise(t,.06,.04,3000,2000,A.mus);
+    }
+    A.next+=st;A.step++;}}
+const SFX={
+  yes(){if(!ok())return;const t=A.ctx.currentTime;tone(420,t,.18,"triangle",.15,null,900)},
+  no(){if(!ok())return;const t=A.ctx.currentTime;noise(t,.25,.25,2500,400)},
+  coin(){if(!ok())return;const t=A.ctx.currentTime+.05;tone(988,t,.08,"square",.09);tone(1319,t+.08,.3,"square",.09)},
+  good(){if(!ok())return;const t=A.ctx.currentTime;[523,659,784,1047].forEach((f,i)=>tone(f,t+i*.07,.25,"triangle",.14))},
+  alarm(){if(!ok())return;const t=A.ctx.currentTime;for(let i=0;i<3;i++){tone(880,t+i*.3,.14,"sawtooth",.08);tone(620,t+i*.3+.15,.14,"sawtooth",.08)}},
+  meh(){if(!ok())return;const t=A.ctx.currentTime;tone(392,t,.2,"square",.07);tone(370,t+.2,.2,"square",.07);tone(349,t+.4,.5,"square",.07,null,300)},
+  bday(){if(!ok())return;const t=A.ctx.currentTime;[67,67,69,67,72,71].forEach((m,i)=>tone(mf(m),t+i*.16,.22,"square",.08))},
+  bell(){if(!ok())return;const t=A.ctx.currentTime;[76,72,74,67].forEach((m,i)=>tone(mf(m),t+i*.22,.4,"triangle",.1))},
+  end(){if(!ok())return;const t=A.ctx.currentTime;[60,64,67,72,76].forEach((m,i)=>tone(mf(m),t+i*.12,.5,"triangle",.14))}
+};
+function ok(){return A.ctx&&A.on}
+function duck(v){if(A.ctx)A.mus.gain.setTargetAtTime(v,A.ctx.currentTime,.1)}
+
+/* ===== 遊戲狀態 ===== */
+const $=id=>document.getElementById(id);
+const fmt=n=>(n<0?"-$":"$")+Math.abs(n).toLocaleString("zh-TW");
+let S,DECK;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+const inSem=(c,s)=>!c.s||(s>=c.s[0]&&s<=c.s[1]);
+const isLegal=c=>["legal","miss","keep"].includes(c.t);
+function draw(sem,used){const out=[];
+  const take=(f,n)=>{shuffle(POOL.filter(c=>!used.has(c.id)&&inSem(c,sem)&&f(c))).slice(0,n).forEach(c=>{used.add(c.id);out.push(c)})};
+  take(c=>c.t==="crime",1);take(c=>c.t==="gray",1);take(isLegal,1);take(c=>c.t==="crime"||c.t==="gray",1);
+  return shuffle(out)}
+function buildDeck(){const used=new Set(),d=[];
+  for(let s=0;s<6;s++){if(EVENTS[s])d.push({c:EVENTS[s],sem:s});draw(s,used).forEach(c=>d.push({c,sem:s}))}
+  return d}
+function reset(){DECK=buildDeck();S={i:0,sem:0,money:0,parents:200000,health:100,rec:0,age:12,pending:[],log:[],busy:false,qBusy:false};musicMode="main";duck(.5);render()}
+function render(){$("money").textContent=fmt(S.money);$("parents").textContent=fmt(S.parents);$("rec").textContent=S.rec;
+  $("health").textContent=S.health;$("hpbar").style.width=S.health+"%";$("hpbar").style.background=S.health<40?"var(--alarm)":S.health<70?"var(--gold)":"var(--no)";
+  $("week").textContent=SEM[S.sem]+"・"+S.age+" 歲";
+  [...$("prog").children].forEach((e,i)=>{e.className=i<S.sem?"done":i===S.sem?"on":""});drawCards()}
+function flash(id,cls){const e=$(id);e.classList.remove("bump","hurt");void e.offsetWidth;e.classList.add(cls)}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+function toast(txt,k){const d=document.createElement("div");d.className="toast"+(k?" "+k:"");d.textContent=txt;$("stage").appendChild(d);setTimeout(()=>d.remove(),1800)}
+
+function cardEl(c,n){const d=document.createElement("div");d.className="card"+(c.t==="event"?" event":"");
+  const lab=c.label||((c.money>=0?"+":"")+fmt(c.money));
+  d.innerHTML=`<div class="stamp y">要！</div><div class="stamp n">不要</div>
+  <div class="who"><div class="ava" style="background:${c.c}">${c.from[0]}</div><div><h2>${c.from}</h2><div class="rel">${c.rel}</div></div></div>
+  <div class="bubble">${c.text}</div><div class="ill">${ill(c.img,c.c)}</div>
+  <div class="foot-row"><div class="reward${c.money<0?" neg":""}">${c.money<0?"代價":"好康"} <span class="n">${lab}</span></div><div class="count">${n}/${DECK.length}</div></div>`;return d}
+function drawCards(){const st=$("stage");st.querySelectorAll(".card").forEach(e=>e.remove());
+  const nx=DECK[S.i+1],cur=DECK[S.i];
+  if(nx){const u=cardEl(nx.c,S.i+2);u.classList.add("under");st.appendChild(u)}
+  if(cur){const t=cardEl(cur.c,S.i+1);st.appendChild(t);bindDrag(t)}}
+
+function bindDrag(el){let sx=0,sy=0,dx=0,dy=0,down=false;
+  const sY=el.querySelector(".stamp.y"),sN=el.querySelector(".stamp.n");
+  el.addEventListener("pointerdown",e=>{if(S.busy||S.qBusy)return;down=true;sx=e.clientX;sy=e.clientY;el.classList.remove("back");try{el.setPointerCapture(e.pointerId)}catch(_){}});
+  el.addEventListener("pointermove",e=>{if(!down)return;dx=e.clientX-sx;dy=e.clientY-sy;
+    el.style.transform=`translate(${dx}px,${dy*.3}px) rotate(${dx/14}deg)`;
+    sY.style.opacity=Math.max(0,Math.min(1,dx/90));sN.style.opacity=Math.max(0,Math.min(1,-dx/90))});
+  const up=()=>{if(!down)return;down=false;
+    if(Math.abs(dx)>90)decide(dx>0,el);else{el.classList.add("back");el.style.transform="";sY.style.opacity=0;sN.style.opacity=0}dx=0;dy=0};
+  el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up)}
+
+function decide(yes,el){if(S.busy||S.qBusy)return;const item=DECK[S.i];if(!item)return;const c=item.c;S.busy=true;aInit();
+  el=el||[...$("stage").querySelectorAll(".card")].pop();el.querySelector(yes?".stamp.y":".stamp.n").style.opacity=1;
+  el.classList.add("fly");el.style.transform=`translate(${yes?600:-600}px,40px) rotate(${yes?30:-30}deg)`;
+  yes?SFX.yes():SFX.no();
+  const entry={c,yes,res:null,age:S.age,sem:item.sem};S.log.push(entry);
+  const gain=v=>{S.money+=v;if(v>0){flash("sMoney","bump");setTimeout(SFX.coin,120);buzz(30)}else if(v<0)flash("sMoney","hurt")};
+  if(c.t==="event"){gain(c.money);S.age=c.age;entry.res="good";setTimeout(SFX.bday,150);setTimeout(()=>toast(c.toast,"y"),350)}
+  else if(yes){
+    if(isLegal(c)){gain(c.money);entry.res="good";setTimeout(SFX.good,200);setTimeout(()=>toast("✓ 合法收入 "+(c.label||fmt(c.money))),350)}
+    else{gain(c.money);entry.res=c.t==="crime"?"bad":"gray";S.pending.push({at:S.i+c.delay,entry,o:c.cons,kind:entry.res})}
+  }else{
+    if(c.t==="miss"){entry.res="miss";S.pending.push({at:S.i+1,entry,o:c.missed,kind:"gray"})}
+    else if(c.t==="keep"){entry.res="bad";entry.kept=true;gain(c.kept.money);S.pending.push({at:S.i+2,entry,o:Object.assign({},c.kept,{money:-c.kept.money}),kind:"bad"})}
+    else if(c.t==="legal")entry.res="skip";
+    else entry.res="dodge";
+  }
+  setTimeout(()=>{S.i++;S.busy=false;
+    const nx=DECK[S.i];let newSem=false;
+    if(nx&&nx.sem!==S.sem){S.sem=nx.sem;S.age=Math.max(S.age,SEM_AGE[S.sem]);newSem=true}
+    render();
+    if(newSem){setTimeout(SFX.bell,100);toast(SEM[S.sem]+" 開學了","s")}
+    checkPending()},330)}
+
+function checkPending(){const due=S.pending.filter(p=>p.at<=S.i);S.pending=S.pending.filter(p=>p.at>S.i);
+  if(S.i>=DECK.length){const rest=due.concat(S.pending);S.pending=[];return endPhase(rest)}
+  if(due.length)setTimeout(()=>showQueue(due,()=>{}),250)}
+
+function applyO(o){S.money+=o.money||0;S.parents+=o.parents||0;S.rec+=o.rec||0;S.health=Math.max(0,Math.min(100,S.health+(o.health||0)));
+  if(o.money<0)flash("sMoney","hurt");if(o.money>0)flash("sMoney","bump");if(o.parents)flash("sParents","hurt");if(o.health)flash("sHealth","hurt");if(o.rec)flash("sRec","hurt");
+  $("money").textContent=fmt(S.money);$("parents").textContent=fmt(S.parents);$("rec").textContent=S.rec;$("health").textContent=S.health;$("hpbar").style.width=S.health+"%"}
+function showQueue(list,done){const ov=$("ov");if(!list.length){S.qBusy=false;ov.hidden=true;duck(.5);return done()}
+  S.qBusy=true;const p=list.shift(),o=p.o;applyO(o);
+  const bad=p.kind==="bad";bad?SFX.alarm():SFX.meh();buzz(bad?[80,60,80,60,80]:[60]);duck(.12);
+  const chips=[];if(o.money)chips.push(`<span>零用錢 ${o.money>0?"+":""}${fmt(o.money)}</span>`);if(o.parents)chips.push(`<span>爸媽存款 ${fmt(o.parents)}</span>`);
+  if(o.health)chips.push(`<span>健康 ${o.health}</span>`);if(o.rec)chips.push(`<span>紀錄 +1</span>`);
+  ov.hidden=false;
+  ov.innerHTML=`<div class="sheet noti${bad?"":" g"}"><div class="bar"><b>${bad?"警告":"通知"}</b>關於：${p.entry.c.from}・${bad?"違法":p.entry.c.victim?"你是被害人":"有事但不犯法"}</div>
+  <h3>${o.title}</h3><p>${o.body}</p><div class="loss">${chips.join("")}</div>
+  <button class="btn dark" id="ok">……好喔</button></div>`;
+  const app=$("app");app.classList.remove("shake");void app.offsetWidth;if(bad)app.classList.add("shake");
+  const b=$("ok");b.focus();b.onclick=()=>showQueue(list,done)}
+
+function endPhase(rest){const ov=$("ov");ov.hidden=false;S.qBusy=true;
+  ov.innerHTML=`<div class="later">畢業典禮<small>${rest.length?"可是在你拿到畢業證書之前……":"三年過去了"}</small></div>`;
+  SFX.bell();
+  if(!rest.length)return setTimeout(results,2000);
+  musicMode="dark";setTimeout(()=>showQueue(rest,results),2000)}
+
+function juv(age,kind){
+  if(kind==="admin")return age<14
+    ?`你當時 ${age} 歲：行政罰法和社會秩序維護法都規定未滿 14 歲不罰，但罰單、沒入和賠償通常會找上車主或家長，學校也會處理。`
+    :`你當時 ${age} 歲：14 到 18 歲的違規可以減輕處罰，但還是會罰。`;
+  return age<14
+    ?`你當時 ${age} 歲：刑法第 18 條規定未滿 14 歲不罰，所以不會被判刑。但少年事件處理法規定 12 到 18 歲觸法由少年法院處理，可能被訓誡、假日生活輔導、保護管束，嚴重時安置輔導或感化教育。`
+    :`你當時 ${age} 歲：已經到刑事責任年齡。少年法院會先審理，多半給保護處分；但若犯的是最輕本刑 5 年以上的重罪，會移送檢察官，跟大人一樣起訴、可能被判刑。`}
+function rank(){const r=S.rec,h=S.health;
+  if(r===0&&h>=80)return"人間清醒・法律雷達滿格";if(r===0)return"沒犯法，但把自己搞得很累";if(r<=2)return"差一點就被坑";if(r<=4)return"好康收割機（被收割的那種）";if(r<=6)return"少年法院的常客";return"詐騙集團的 VIP 會員"}
+function results(){S.qBusy=true;musicMode="main";duck(.35);SFX.end();const ov=$("ov");ov.hidden=false;
+  const lost=200000-S.parents,dodged=S.log.filter(l=>l.res==="dodge").length;
+  const tags={bad:["犯法","bad"],gray:["有事但不犯法","gray"],good:["合法","good"],dodge:["閃過陷阱","dodge"],miss:["錯過權利","miss"],skip:["沒拿","dodge"]};
+  let lastSem=-1,rows="";
+  S.log.filter(l=>l.c.t!=="event").forEach(l=>{const c=l.c,t=(c.victim&&l.res==="gray")?["你是被害人","miss"]:tags[l.res];let out="",extra="";
+    if(l.sem!==lastSem){rows+=`<div class="semh">${SEM[l.sem]}</div>`;lastSem=l.sem}
+    if(l.kept){out=c.kept.body;extra=`<div class="stat-law"><b>違反條文</b><ul>${c.keptLaws.map(x=>`<li>${x}</li>`).join("")}</ul>${juv(l.age,"criminal")}</div>`}
+    else if(l.res==="bad"){out=c.cons.body;extra=`<div class="stat-law"><b>違反條文</b><ul>${c.laws.map(x=>`<li>${x}</li>`).join("")}</ul>${juv(l.age,c.kind)}${c.civil?"<br>另外，未成年人造成別人損失，爸媽依民法第 187 條要連帶賠償。":""}</div>`}
+    else if(l.res==="gray")out=c.cons.body;
+    else if(l.res==="miss")out=c.missed.body;
+    else if(l.res==="dodge")out="你拒絕了。如果接受："+c.cons.body;
+    else if(l.res==="good")out="這是合法的好康，你拿到了。";
+    else out="這其實是合法的好康，你錯過了。";
+    rows+=`<div class="match"><div class="ava" style="background:${c.c}">${c.from[0]}</div><div>
+    <h4>${c.from}<span class="tag ${t[1]}">${t[0]}</span><span class="tag">你${l.yes?"右滑":"左滑"}</span></h4>
+    <p>${out}</p>${extra}<p class="law">${c.law}</p>${c.news?`<p class="news">${c.news}</p>`:""}</div></div>`});
+  ov.innerHTML=`<div class="sheet result"><h1>國中三年畢業結算</h1><div class="rank">${rank()}</div>
+  <div class="sum"><div><small>零用錢</small><b>${fmt(S.money)}</b></div><div><small>爸媽賠掉</small><b>${fmt(lost)}</b></div><div><small>健康</small><b>${S.health}</b></div><div><small>紀錄</small><b>${S.rec} 筆</b></div></div>
+  <div class="legend"><span class="tag bad">犯法</span><span class="tag gray">有事但不犯法</span><span class="tag good">合法</span><span class="tag dodge">閃過陷阱 ${dodged}</span></div>
+  ${rows}
+  <p class="foot">遊戲裡的罰款、賠償金額與事件經過為示意，實際結果依個案而定。遇到不確定的「好康」，先問家人或老師；疑似詐騙可撥 165 反詐騙專線，消費問題可撥 1950。每次重玩，卡片都會重新抽。</p>
+  <button class="btn wide" id="again">重新入學（換一副牌）</button></div>`;
+  ov.querySelector(".sheet").scrollTop=0;$("again").onclick=()=>{ov.hidden=true;reset()}}
+
+function start(){const ov=$("ov");ov.hidden=false;
+  ov.innerHTML=`<div class="sheet start"><h1>好康滑滑樂</h1>
+  <p>你 12 歲，剛升上國一。接下來三年，很多人會丟好康給你：打工、團購、跑腿、便宜貨、好玩的東西。</p>
+  <p>你只要決定<b>要</b>還是<b>不要</b>。目標：畢業時零用錢越多越好。</p>
+  <div class="howto"><div class="l">← 左滑<br>不要</div><div class="r">右滑 →<br>要！</div></div>
+  <button class="btn wide" id="go">開始國中生活</button></div>`;
+  $("go").onclick=()=>{aInit();SFX.bell();ov.hidden=true};$("go").focus()}
+
+$("bYes").onclick=()=>decide(true);$("bNo").onclick=()=>decide(false);
+$("mute").onclick=()=>{A.on=!A.on;aInit();if(A.master)A.master.gain.value=A.on?.9:0;$("mute").textContent=A.on?"♪":"✕";$("mute").setAttribute("aria-label",A.on?"關閉聲音":"開啟聲音")};
+document.addEventListener("keydown",e=>{if(!$("ov").hidden)return;if(e.key==="ArrowRight")decide(true);if(e.key==="ArrowLeft")decide(false)});
+reset();start();
+</script>
+
+</body></html>

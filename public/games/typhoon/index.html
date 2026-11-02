@@ -1,0 +1,1669 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>颱風天沒四千萬別出門</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Silkscreen:wght@400;700&display=swap">
+<style>
+/* Layout: one arcade cabinet column — the storm screen on top, a controller deck under it, a field guide of road hazards below */
+:root{
+  --night:#0e1526;      /* page ground, typhoon night */
+  --deck:#17213a;       /* panels / windows */
+  --rim:#2c3b5e;        /* window inner bevel */
+  --mist:#9db2d6;       /* secondary text, rain blue */
+  --paper:#eef2f8;      /* main text, window border */
+  --coat:#f2c230;       /* raincoat yellow, the accent */
+  --coat-dk:#a87d0b;
+  --chili:#d63a2a;      /* red paper / hearts */
+  --sea:#3d7fd9;        /* 藍白拖 blue */
+  --cream:#f4efe3;      /* mom's dialog */
+  --ink:#141a2b;
+  --f-px:"DotGothic16","Noto Sans TC","PingFang TC","Microsoft JhengHei",monospace;
+  --f-lat:"Silkscreen","DotGothic16",monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--night);color:var(--paper)}
+body{font-family:var(--f-px);line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+
+.app{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px;display:flex;flex-direction:column;gap:14px}
+.col{width:100%;max-width:max(320px,min(960px,calc((100svh - 250px) * 16 / 9)));margin-inline:auto}
+
+/* header strip */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.alert{margin:0;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mist);letter-spacing:.06em}
+.tbtns{display:flex;gap:8px}
+.led{width:10px;height:10px;background:var(--chili);box-shadow:0 0 0 2px #05080f;animation:blink 1s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.15}}
+
+/* the cabinet screen */
+.cab{border:3px solid var(--paper);box-shadow:0 0 0 3px #05080f,6px 6px 0 3px rgba(0,0,0,.55);background:#000}
+.stage{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+#game{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+
+.hud-dist{position:absolute;top:.6cqw;right:1.6cqw;font-family:var(--f-lat);font-size:clamp(11px,4.8cqw,30px);line-height:1;color:var(--paper);text-shadow:2px 2px 0 #05080f;font-variant-numeric:tabular-nums;pointer-events:none;display:flex;align-items:baseline;gap:.2em}
+.hud-dist small{font-size:.55em;color:var(--coat)}
+
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.menu{justify-content:flex-start;padding-top:9cqw;background:linear-gradient(rgba(8,12,24,.82),rgba(8,12,24,.55) 55%,rgba(8,12,24,0) 75%);cursor:pointer;gap:1.2cqw}
+.menu h1{margin:0;font-weight:400;font-size:clamp(20px,6.6cqw,62px);line-height:1.15;color:var(--coat);letter-spacing:.04em;text-shadow:3px 3px 0 #05080f,-1px -1px 0 #05080f;text-wrap:balance}
+.menu .sub{margin:0;font-size:clamp(11px,3cqw,24px);color:var(--paper);text-shadow:2px 2px 0 #05080f}
+.menu .press{margin:1.4cqw 0 0;font-family:var(--f-lat);font-size:clamp(10px,2.4cqw,18px);color:var(--mist);letter-spacing:.12em;animation:blink 1.1s steps(2,end) infinite}
+
+.toast{position:absolute;left:50%;top:15%;transform:translateX(-50%);padding:.5em .9em;font-size:clamp(11px,3cqw,22px);white-space:nowrap;background:var(--deck);border:2px solid var(--paper);box-shadow:0 0 0 2px #05080f;pointer-events:none}
+.toast.pop{animation:pop .25s steps(3,end)}
+@keyframes pop{0%{transform:translateX(-50%) scale(.6)}100%{transform:translateX(-50%) scale(1)}}
+
+.pa{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) rotate(-8deg);font-size:clamp(40px,18cqw,170px);line-height:1;color:var(--chili);pointer-events:none;
+  text-shadow:4px 0 0 #fff,-4px 0 0 #fff,0 4px 0 #fff,0 -4px 0 #fff,4px 4px 0 #fff,-4px -4px 0 #fff,4px -4px 0 #fff,-4px 4px 0 #fff,8px 8px 0 #05080f;animation:slap .18s steps(2,end)}
+@keyframes slap{0%{transform:translate(-50%,-50%) rotate(-8deg) scale(1.8)}100%{transform:translate(-50%,-50%) rotate(-8deg) scale(1)}}
+
+/* pixel window */
+.win{background:var(--deck);border:3px solid var(--paper);box-shadow:0 0 0 3px #05080f,5px 5px 0 3px rgba(0,0,0,.6)}
+.dim{background:rgba(6,9,18,.6)}
+.dlg{width:min(92%,640px);padding:2.2cqw 2.6cqw;text-align:left;display:flex;flex-direction:column;gap:1cqw}
+.dlg-tag{margin:0;font-family:var(--f-lat);font-size:clamp(9px,2.2cqw,15px);color:var(--coat);letter-spacing:.14em}
+.dlg h2{margin:0;font-weight:400;font-size:clamp(15px,4.6cqw,34px);line-height:1.2}
+.dlg p.body{margin:0;font-size:clamp(11px,3cqw,20px);color:var(--mist)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:2cqw;margin-top:.6cqw}
+.choice{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.1em;padding:1.3cqw 1.6cqw 1.3cqw 3.6cqw;background:var(--night);border:2px solid var(--rim);cursor:pointer;text-align:left;min-height:40px}
+.choice b{font-weight:400;font-size:clamp(12px,3.4cqw,24px);line-height:1.2}
+.choice small{font-size:clamp(10px,2.5cqw,17px);color:var(--mist)}
+.choice.sel{border-color:var(--coat);background:#1f2a46}
+.choice.sel::before{content:"";position:absolute;left:1.2cqw;top:50%;margin-top:-4px;border:4px solid transparent;border-left:6px solid var(--coat)}
+.choice:focus-visible{outline:2px dashed var(--paper);outline-offset:2px}
+
+/* victory scene props, positioned in canvas coordinates (320×180) */
+.sign{position:absolute;left:19.6%;top:0;width:75.9%;height:15.9%;display:flex;align-items:center;justify-content:center;gap:.6em;font-size:clamp(12px,7.6cqw,72px);line-height:1;letter-spacing:.3em;color:#7a5b18;pointer-events:none}
+.sign.on{color:#ffe7a0;text-shadow:0 0 6px #ffb627}
+.sign small{font-size:.4em;letter-spacing:.1em}
+.paper{position:absolute;left:31.4%;top:23.5%;width:52.7%;padding:1.6cqw 1.4cqw;background:#cf2e22;color:#1a0d06;text-align:center;transform:rotate(-2.5deg);box-shadow:3px 3px 0 rgba(0,0,0,.45);animation:drop .45s steps(4,end) both;pointer-events:none}
+.paper::before,.paper::after{content:"";position:absolute;top:-1.6cqw;width:7cqw;height:2.8cqw;background:rgba(240,230,200,.75)}
+.paper::before{left:-1cqw;transform:rotate(-30deg)}
+.paper::after{right:-1cqw;transform:rotate(25deg)}
+.paper p{margin:0;line-height:1.25;font-size:clamp(10px,4.1cqw,36px)}
+.paper p.big{font-size:clamp(13px,6.3cqw,56px);margin-block:.15em}
+@keyframes drop{0%{transform:translateY(-40%) rotate(8deg);opacity:0}100%{transform:rotate(-2.5deg);opacity:1}}
+
+.mom{position:absolute;left:4%;right:4%;top:5%;padding:1.6cqw 2.2cqw;background:var(--cream);color:var(--ink);border-color:var(--ink);box-shadow:0 0 0 3px var(--cream),5px 5px 0 3px rgba(0,0,0,.6);text-align:left;animation:pop2 .3s steps(3,end)}
+@keyframes pop2{0%{transform:scale(.7)}100%{transform:scale(1)}}
+.mom .who{margin:0;display:flex;align-items:center;gap:.5em;font-size:clamp(10px,2.5cqw,18px);color:#8a3a2a;letter-spacing:.08em}
+.mom .who i{width:1.1em;height:1.1em;background:#8a3a2a;clip-path:polygon(0 0,40% 0,40% 30%,25% 30%,25% 70%,40% 70%,40% 100%,0 100%)}
+.mom p.line{margin:.2em 0 0;font-size:clamp(14px,4.4cqw,36px);line-height:1.25}
+
+/* controller deck */
+.panel{min-height:88px;display:flex;flex-direction:column;justify-content:center}
+.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.acts{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px}
+.acts .keys,.ctrls-hint{margin:0;font-size:13px;color:var(--mist)}
+.kbd{font-family:var(--f-lat);font-size:11px;padding:1px 6px;border:2px solid var(--rim);background:var(--deck);color:var(--paper);white-space:nowrap}
+
+.px-btn{font-size:18px;line-height:1.1;color:var(--ink);background:var(--coat);border:3px solid #05080f;padding:12px 22px;min-height:48px;cursor:pointer;
+  box-shadow:inset -4px -4px 0 var(--coat-dk),inset 4px 4px 0 #fff2b8,0 4px 0 #05080f}
+.px-btn:active{transform:translateY(3px);box-shadow:inset -4px -4px 0 var(--coat-dk),inset 4px 4px 0 #fff2b8,0 1px 0 #05080f}
+.px-btn:focus-visible{outline:3px dashed var(--paper);outline-offset:4px}
+.px-btn.ghost{color:var(--paper);background:var(--deck);box-shadow:inset -3px -3px 0 #0a0f1d,inset 3px 3px 0 var(--rim),0 4px 0 #05080f}
+.px-btn.sm{font-size:13px;padding:6px 12px;min-height:36px}
+.pad{min-height:68px;font-size:22px;display:flex;align-items:center;justify-content:center;gap:10px;touch-action:none;user-select:none;-webkit-user-select:none}
+.pad .arr{font-family:var(--f-lat);font-size:20px}
+.pad.down{background:var(--sea);color:#fff;box-shadow:inset -4px -4px 0 #1f4f9c,inset 4px 4px 0 #8fbaf5,0 4px 0 #05080f}
+.pad.held{transform:translateY(3px)}
+
+.end{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 18px}
+.ach{display:flex;align-items:center;gap:14px;min-width:0;flex:1 1 280px}
+.ach canvas{flex:none;width:42px;height:54px;image-rendering:pixelated;background:var(--deck);border:2px solid var(--rim);padding:4px}
+.ach > div{min-width:0}
+.ach p{margin:0}
+.ach-k{font-family:var(--f-lat);font-size:11px;letter-spacing:.14em;color:var(--coat)}
+.ach-t{font-size:20px;line-height:1.25}
+.ach-d{font-size:13px;color:var(--mist)}
+.badge{font-size:13px;color:var(--coat)}
+
+/* field guide */
+.guide{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.guide h2{margin:0;font-weight:400;font-size:22px;text-wrap:balance}
+.guide .lede{margin:0;font-size:14px;color:var(--mist);max-width:62ch}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.grp{background:var(--deck);border:2px solid var(--rim);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.grp h3{margin:0;font-weight:400;font-size:16px;display:flex;align-items:center;gap:8px}
+.tag{font-family:var(--f-lat);font-size:10px;letter-spacing:.08em;padding:2px 6px;color:var(--ink)}
+.tag.hurt{background:var(--chili);color:#fff}
+.tag.prank{background:var(--sea);color:#fff}
+.tag.item{background:var(--coat)}
+.grp ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.grp li{display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:center}
+.ico{display:flex;align-items:center;justify-content:center;height:48px;background:var(--night);border:2px solid var(--rim)}
+.ico canvas{image-rendering:pixelated}
+.grp li b{display:block;font-weight:400;font-size:15px}
+.grp li span{display:block;font-size:13px;color:var(--mist);line-height:1.4}
+
+.hud-basil{position:absolute;left:4.9%;top:8.6%;font-family:var(--f-lat);font-size:clamp(9px,4.3cqw,26px);line-height:1;color:#a8e3b2;text-shadow:2px 2px 0 #05080f;pointer-events:none}
+.ad-text{position:absolute;left:41%;top:24%;width:54%;color:#7a1a12;pointer-events:none;display:flex;flex-direction:column;gap:.6cqw}
+.ad-text p{margin:0;line-height:1.1}
+.ad-k{font-size:clamp(10px,3.4cqw,28px);color:#fff;background:#c0392b;align-self:flex-start;padding:.1em .4em}
+.ad-b{font-size:clamp(20px,9cqw,84px);letter-spacing:.02em;text-shadow:3px 3px 0 #f2c230}
+.ad-s{font-size:clamp(9px,2.6cqw,20px);color:#5a3d2b}
+.ach-pop{position:absolute;left:2cqw;bottom:3cqw;display:flex;flex-direction:column;padding:.8cqw 1.6cqw;background:var(--deck);border:2px solid var(--coat);box-shadow:0 0 0 2px #05080f;pointer-events:none;max-width:70%}
+.ach-pop span{font-family:var(--f-lat);font-size:clamp(8px,2cqw,13px);color:var(--coat);letter-spacing:.1em}
+.ach-pop span i{font-style:normal;color:var(--chili);margin-left:.6em}
+.ach-pop b{font-weight:400;font-size:clamp(11px,3.2cqw,22px)}
+.ach-pop.in{animation:slidein .3s steps(3,end)}
+@keyframes slidein{0%{transform:translateX(-30%);opacity:0}100%{transform:none;opacity:1}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font-size:12px;padding:2px 8px;border:2px solid var(--rim);background:var(--night)}
+.chip.new{border-color:var(--coat);color:var(--coat)}
+.end-r{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.end-r p{margin:0;font-size:13px;color:var(--mist);font-variant-numeric:tabular-nums}
+.rot-hint{margin:0;font-size:13px;color:var(--mist);display:none}
+@media (orientation:portrait) and (max-width:600px){.rot-hint{display:block}}
+.wall-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px}
+.wall-h p{margin:0;font-family:var(--f-lat);font-size:13px;color:var(--coat)}
+.wall{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.wall li{padding:10px 12px;background:var(--deck);border:2px solid var(--rim);display:flex;flex-direction:column;gap:2px;min-width:0}
+.wall li b{font-weight:400;font-size:15px;color:#5d6b8c}
+.wall li span{font-size:12px;color:var(--mist);line-height:1.4}
+.wall li.got{border-color:var(--coat)}
+.wall li.got b{color:var(--coat)}
+
+/* 出發前的物品介紹 */
+.brief{position:fixed;inset:0;z-index:20;background:rgba(6,9,18,.84);display:flex;align-items:center;justify-content:center;
+  padding-block:calc(12px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bf-win{width:min(780px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px;padding:16px 18px;min-height:0}
+.bf-head h2{margin:2px 0 0;font-weight:400;font-size:22px;line-height:1.25;text-wrap:balance;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bf-note{margin:4px 0 0;font-size:13px;color:var(--mist)}
+.bf-body{overflow-y:auto;min-height:0;flex:1 1 auto}
+.bf-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px 16px}
+.bf-grid li{display:grid;grid-template-columns:68px 1fr;gap:10px;align-items:center;min-width:0}
+.bf-grid .ico{height:46px}
+.bf-grid .ico canvas{image-rendering:pixelated}
+.bf-grid b{display:block;font-weight:400;font-size:15px}
+.bf-grid span{display:block;font-size:12.5px;color:var(--mist);line-height:1.4}
+.bf-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dots{display:flex;gap:6px}
+.dots i{width:10px;height:10px;background:var(--rim)}
+.dots i.on{background:var(--coat)}
+.bf-btns{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+@media (max-height:520px){
+  .bf-win{padding:10px 14px;gap:8px}
+  .bf-head h2{font-size:18px}
+  .bf-grid li{grid-template-columns:60px 1fr}
+  .bf-grid .ico{height:38px}
+}
+
+@media (max-width:520px){
+  .pad{min-height:76px}
+  .acts .keys{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .led,.menu .press{animation:none}
+  .toast.pop,.pa,.paper,.mom,.ach-pop.in{animation:none}
+}
+
+/* 手機橫向：畫面置中撐滿高度，▲ 在左、▼ 在右 */
+@media (orientation:landscape) and (max-height:600px){
+  html,body{height:100%;overflow:hidden}
+  .app{max-width:none;height:100%;padding-block:8px;justify-content:center;align-items:center;gap:0}
+  .guide,.alert{display:none}
+  .top{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));width:auto;max-width:none;z-index:6}
+  .cab{width:min(calc(100vw - 236px),calc((100svh - 22px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)) * 16 / 9));max-width:none;margin:0}
+  .panel{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));margin-inline:auto;width:min(calc(100vw - 256px),620px);max-width:none;min-height:0;pointer-events:none;z-index:5}
+  #pnMenu,#pnEnd{pointer-events:auto;background:rgba(14,21,38,.92);border:2px solid var(--rim);padding:8px 12px}
+  #pnPlay{position:fixed;inset:0;display:flex;justify-content:space-between;align-items:center;padding-block:calc(12px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-bottom,0px));padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));pointer-events:none}
+  #pnPlay .pad{pointer-events:auto;width:92px;height:min(64%,240px);flex-direction:column;font-size:20px}
+  .acts .keys,.rot-hint,.ach canvas{display:none}
+  .ach-t{font-size:16px}
+  .chips{max-height:50px;overflow:hidden}
+}
+</style>
+
+<main class="app">
+  <header class="top col">
+    <p class="alert"><i class="led" aria-hidden="true"></i>陸上颱風警報 · 發布中</p>
+    <div class="tbtns"><button class="px-btn ghost sm" id="btnMusic" aria-pressed="false">音樂 開</button><button class="px-btn ghost sm" id="btnMute" aria-pressed="false">音效 開</button></div>
+  </header>
+
+  <div class="cab col">
+    <div class="stage" id="stage">
+      <canvas id="game" width="224" height="126" aria-label="遊戲畫面"></canvas>
+
+      <div class="hud-dist" id="hudDist" hidden><span id="distNum">500</span><small>M</small></div>
+
+      <div class="ov menu" id="ovMenu">
+        <h1>颱風天沒四千萬別出門</h1>
+        <p class="sub">颱風天就是要吃鹹酥雞……嗎？！</p>
+        <p class="press">PRESS START</p>
+      </div>
+
+      <div class="toast" id="toast" hidden></div>
+      <div class="pa" id="pa" hidden>趴！</div>
+      <div class="hud-basil" id="hudBasil" hidden>×<span id="basilN">0</span></div>
+      <div class="ad-text" id="adText" hidden>
+        <p class="ad-k">颱風限定</p>
+        <p class="ad-b">漢堡<br>買一送一</p>
+        <p class="ad-s">※ 本日外送暫停</p>
+      </div>
+      <div class="ach-pop" id="achPop" hidden><span>ACHIEVEMENT<i id="achPopNew"></i></span><b id="achPopName"></b></div>
+
+      <div class="sign" id="sign" hidden>鹹酥雞<small>炸物・飲料</small></div>
+      <div class="paper" id="paper" hidden>
+        <p>老闆也是人生父母養！</p>
+        <p>風太大了，</p>
+        <p class="big">今日停業防颱！</p>
+        <p>回去吃泡麵啦！</p>
+      </div>
+
+      <div class="mom win" id="mom" hidden>
+        <p class="who"><i aria-hidden="true"></i>媽媽來電</p>
+        <p class="line">「就跟你說颱風天沒事千萬別出門！」</p>
+      </div>
+
+      <div class="ov dim" id="ovEvent" hidden>
+        <div class="win dlg" role="dialog" aria-labelledby="evTitle">
+          <p class="dlg-tag" id="evTag">EVENT</p>
+          <h2 id="evTitle">前方淹水！</h2>
+          <p class="body" id="evBody"></p>
+          <div class="choices">
+            <button class="choice sel" id="ch0" data-i="0"><b></b><small></small></button>
+            <button class="choice" id="ch1" data-i="1"><b></b><small></small></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel col">
+    <div class="acts" id="pnMenu">
+      <button class="px-btn" id="btnStart">開始衝！</button>
+      <button class="px-btn ghost" id="btnFull" hidden>全螢幕</button>
+      <p class="keys"><span class="kbd">▲</span> <span class="kbd">W</span> <span class="kbd">SPACE</span> 跳　<span class="kbd">▼</span> <span class="kbd">S</span> 蹲（按住）</p>
+      <p class="rot-hint">手機轉成橫的玩，畫面更大，按鈕會分到左右兩邊。</p>
+      <p class="badge" id="badge" hidden></p>
+    </div>
+    <div class="ctrls" id="pnPlay" hidden>
+      <button class="px-btn pad" id="btnUp" aria-label="跳"><span class="arr">▲</span>跳</button>
+      <button class="px-btn pad down" id="btnDown" aria-label="蹲"><span class="arr">▼</span>蹲</button>
+    </div>
+    <div class="end" id="pnEnd" hidden>
+      <div class="ach">
+        <canvas id="achIco" width="7" height="9"></canvas>
+        <div>
+          <p class="ach-k" id="achK">ACHIEVEMENT UNLOCKED</p>
+          <p class="ach-t" id="achT">【風雨無阻的吃貨】</p>
+          <p class="ach-d" id="achD"></p>
+          <div class="chips" id="chips"></div>
+        </div>
+      </div>
+      <div class="end-r"><button class="px-btn" id="btnRetry">重新挑戰</button><p id="achCount"></p></div>
+    </div>
+  </div>
+
+  <div class="brief" id="brief" hidden role="dialog" aria-modal="true" aria-labelledby="bfTitle">
+    <div class="win bf-win">
+      <div class="bf-head">
+        <p class="dlg-tag" id="bfTag">BRIEFING</p>
+        <h2 id="bfTitle"></h2>
+        <p class="bf-note" id="bfNote"></p>
+      </div>
+      <div class="bf-body"><ul class="bf-grid" id="bfGrid"></ul></div>
+      <div class="bf-foot">
+        <div class="dots" id="bfDots" aria-hidden="true"></div>
+        <div class="bf-btns">
+          <button class="px-btn ghost sm" id="bfSkip">跳過介紹</button>
+          <button class="px-btn ghost sm" id="bfPrev">上一頁</button>
+          <button class="px-btn sm" id="bfNext">下一頁</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="guide col" aria-labelledby="gTitle">
+    <h2 id="gTitle">從家門口到巷口鹹酥雞，1000 公尺</h2>
+    <p class="lede">HP 3 顆心，最多補到 5 顆。路上會遇到兩次突發事件，選擇會改變剩下的路。手機上也可以直接點畫面：上半部跳、下半部蹲。</p>
+    <div class="groups">
+      <div class="grp">
+        <h3><span class="tag hurt">-1 HP</span>危險物</h3>
+        <ul>
+          <li><div class="ico"><canvas data-spr="roof" data-s="3"></canvas></div><div><b>飛天鐵皮</b><span>從頭頂高度飛來，按 ▼ 蹲下</span></div></li>
+          <li><div class="ico"><canvas data-spr="cone" data-s="3"></canvas></div><div><b>霸道三角錐</b><span>貼著地面彈過來，按 ▲ 跳過</span></div></li>
+          <li><div class="ico"><canvas data-spr="log" data-s="3"></canvas></div><div><b>斷裂路樹</b><span>在地上滾，跳過去</span></div></li>
+          <li><div class="ico"><canvas data-spr="scooter" data-s="2"></canvas></div><div><b>摔跤機車</b><span>被風吹倒一路滑，速度最快，提早跳</span></div></li>
+          <li><div class="ico"><canvas data-spr="sign" data-s="3"></canvas></div><div><b>被吹落的招牌</b><span>跟鐵皮一樣從頭頂飛來，蹲下</span></div></li>
+          <li><div class="ico"><canvas data-spr="pot" data-s="4"></canvas></div><div><b>陽台盆栽</b><span>一彈一彈過來，抓空檔跳或蹲</span></div></li>
+        </ul>
+      </div>
+      <div class="grp">
+        <h3><span class="tag prank">不扣血</span>干擾物</h3>
+        <ul>
+          <li><div class="ico"><canvas data-spr="slipper" data-s="4"></canvas></div><div><b>藍白拖</b><span>打到臉，「趴！」定格 0.5 秒</span></div></li>
+          <li><div class="ico"><canvas data-spr="helmet" data-s="4"></canvas></div><div><b>路人的安全帽</b><span>蓋住畫面中間 1 秒</span></div></li>
+          <li><div class="ico"><canvas data-spr="banner" data-s="3"></canvas></div><div><b>漢堡廣告布條</b><span>整片糊到臉上，畫面被廣告佔滿</span></div></li>
+          <li><div class="ico"><canvas data-spr="bag" data-s="4"></canvas></div><div><b>紅白塑膠袋</b><span>套住頭，上下操作顛倒 2.5 秒</span></div></li>
+          <li><div class="ico"><canvas data-spr="boba" data-s="4"></canvas></div><div><b>飛來的珍奶</b><span>珍珠黏滿畫面 2 秒</span></div></li>
+          <li><div class="ico"><canvas data-spr="umb" data-s="3"></canvas></div><div><b>開花雨傘</b><span>抓著你往上飄，跳躍變很輕 3 秒</span></div></li>
+        </ul>
+      </div>
+      <div class="grp">
+        <h3><span class="tag item">撿起來</span>道具</h3>
+        <ul>
+          <li><div class="ico"><canvas data-spr="thermos" data-s="4"></canvas></div><div><b>熱可可保溫杯</b><span>HP +1</span></div></li>
+          <li><div class="ico"><canvas data-spr="coat" data-s="4"></canvas></div><div><b>加厚無敵雨衣</b><span>金身 3 秒，撞到什麼都撞飛</span></div></li>
+          <li><div class="ico"><canvas data-spr="basil" data-s="6"></canvas></div><div><b>九層塔</b><span>成排飄過來，一局撿滿 20 片有成就</span></div></li>
+          <li><div class="ico"><canvas data-spr="tape" data-s="4"></canvas></div><div><b>防颱膠帶</b><span>在雨衣上貼個 X，擋下一次撞擊</span></div></li>
+        </ul>
+      </div>
+    </div>
+    <div class="wall-h"><h2>成就牆</h2><p id="wallCount"></p></div>
+    <ul class="wall" id="wall"></ul>
+  </section>
+</main>
+
+<script>
+(() => {
+'use strict';
+/* =========================================================
+   基本設定
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const cvs = $('game'), ctx = cvs.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const W = 320, H = 180;          // 世界座標
+const VW = 224, VH = 126;        // 鏡頭實際看到的範圍（放大約 1.43 倍）
+const SIDE_TOP = 144;   // 紅磚人行道上緣
+const GROUND = 154;     // 腳踩的高度
+const START_DIST = 1000, MAX_HP = 5, PX_PER_M = 16;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const irand = (a, b) => Math.floor(rand(a, b + 1));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const seeded = s => () => (s = (s * 16807) % 2147483647, (s - 1) / 2147483646);
+const hash = k => { const v = Math.sin(k * 91.37) * 43758.5453; return v - Math.floor(v); };
+
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k, v); } catch(e){} }
+};
+
+/* =========================================================
+   像素圖工具：字串陣列 → 離屏 canvas
+   ========================================================= */
+function canvasOf(w, h, fn){ const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); fn(x); return c; }
+function sprite(rows, pal){
+  return canvasOf(rows[0].length, rows.length, x => {
+    rows.forEach((row, j) => { for (let i = 0; i < row.length; i++){ const c = pal[row[i]]; if (c){ x.fillStyle = c; x.fillRect(i, j, 1, 1); } } });
+  });
+}
+
+/* ---------- 主角：穿雨衣、腳踩藍白拖 ---------- */
+const HERO_TOP = [
+  "...YYYYYY...",
+  "..YYYYYYYY..",
+  "..YYSSSSSY..",
+  "..YSSKSSKS..",
+  "..YSSSSSSS..",
+  "..YYSSSSYY..",
+  "...YYYYYY...",
+  "..YYYYYYYY..",
+  ".YYYYYYYYYS.",
+  ".YYYyYYYYYS.",
+  ".YYYyYYYYY..",
+  ".YYYYYYYYY..",
+  ".yYYYYYYYy..",
+  "..yyyyyyyy.."
+];
+const LEGS_A = ["...DD..DD...","...DD..DD...","...SS..SS...","..bWW..bWW.."];
+const LEGS_B = ["...DD.DD....","..DD...DD...","..SS...SS...",".bWW...bWW.."];
+const LEGS_J = ["..DD..DD....","..SS..SS....",".bWW.bWW....","............"];
+const DUCK = [
+  "...YYYYYY...",
+  "..YYYYYYYY..",
+  "..YYSSSSSY..",
+  "..YSSKSSKS..",
+  ".YYYYYYYYYS.",
+  ".YYYyYYYYYS.",
+  ".YYYYYYYYY..",
+  ".yyyyyyyyy..",
+  "..DD...DD...",
+  ".bWW..bWW..."
+];
+const P_HERO = {Y:'#f2c230',y:'#b8860b',S:'#f1c39a',K:'#1b1b2b',D:'#2d3a58',b:'#2f6fd6',W:'#f2f4f8'};
+const P_GOLD = {Y:'#fff1a8',y:'#ffb627',S:'#ffe3b0',K:'#5a3a00',D:'#d79a1c',b:'#fff1a8',W:'#ffffff'};
+function heroSet(p){ return {
+  a: sprite(HERO_TOP.concat(LEGS_A), p), b: sprite(HERO_TOP.concat(LEGS_B), p),
+  j: sprite(HERO_TOP.concat(LEGS_J), p), d: sprite(DUCK, p), coat: p.Y, coatDk: p.y }; }
+const HERO = heroSet(P_HERO), HERO_G = heroSet(P_GOLD);
+
+/* ---------- 障礙物與道具 ---------- */
+const SPR = {};
+SPR.cone = sprite([
+  "....OO....","....OO....","...OOOO...","...WWWW...","...OOOO...",
+  "..OOOOOO..","..WWWWWW..","..OOOOOO..",".OOOOOOOO.","KKKKKKKKKK"
+], {O:'#f07a1a',W:'#f4f4f4',K:'#2a2a2a'});
+
+SPR.roof = canvasOf(24, 6, c => {          // 鐵皮浪板
+  for (let x = 0; x < 24; x++){
+    c.fillStyle = ['#6f7a86','#b3bdc8','#8b97a3'][x % 3]; c.fillRect(x, 0, 1, 6);
+  }
+  c.fillStyle = '#4e5762'; c.fillRect(0, 0, 24, 1);
+  c.fillStyle = '#9a4b2a'; [[3,3],[4,4],[15,2],[16,3],[20,4],[9,5]].forEach(([x,y]) => c.fillRect(x, y, 1, 1));
+  c.fillStyle = '#2d3138'; c.fillRect(2, 1, 1, 1); c.fillRect(21, 1, 1, 1);  // 螺絲孔
+});
+
+SPR.log = canvasOf(16, 16, c => {          // 斷樹橫切面，滾動時年輪轉動
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++){
+    const d = Math.hypot(x - 7.5, y - 7.5);
+    if (d <= 6.2){ c.fillStyle = d > 5.1 ? '#4a2f1f' : (Math.floor(d) % 2 ? '#c49a63' : '#a87b47'); c.fillRect(x, y, 1, 1); }
+  }
+  c.fillStyle = '#6b4a2a'; c.fillRect(7, 7, 2, 2);
+  c.fillStyle = '#3a2416'; c.fillRect(5, 3, 1, 3); c.fillRect(6, 5, 1, 1);  // 裂痕
+  c.fillStyle = '#5a3d2b'; c.fillRect(11, 1, 1, 3); c.fillRect(12, 0, 1, 2);
+  c.fillStyle = '#3e8a50'; c.fillRect(12, 0, 3, 2); c.fillRect(13, 2, 2, 1);
+  c.fillStyle = '#57a865'; c.fillRect(14, 0, 1, 1);
+});
+
+SPR.scooter = sprite([
+  "................KK....",
+  "...............KGK....",
+  "..............RRG.....",
+  "..............RRR.....",
+  "...kkkkkkkk...RRR.....",
+  "..RRRRRRRRRRRRRRRY....",
+  "..RRRRRRRRRRRRRRRR....",
+  "..RRRRRRGGGGGGRRRR....",
+  "...RRRRR......RRR.....",
+  "...KKKK.......KKKK....",
+  "..KKGGKK.....KKGGKK...",
+  "...KKKK.......KKKK...."
+], {R:'#d64545',G:'#9aa3ad',K:'#16161d',k:'#2b2b33',Y:'#ffe680'});
+
+SPR.slipper = sprite(["...bbbbbb...","..bb....bb..",".bb......b..","WWWWWWWWWWWW","bbbbbbbbbbbb"], {b:'#2f6fd6',W:'#f2f4f8'});
+SPR.helmet = sprite([
+  "...CCCC...","..CCCCCC..",".CCCWCCCC.",".CCCCVVVV.",".CCCCVVVV.",".CCCCCCCC.","..K....K.."
+], {C:'#3fa7d6',W:'#bfe6f7',V:'#1b2b3a',K:'#222222'});
+SPR.thermos = sprite([
+  "..GG..",".GGGG.",".RRRR.",".RWRR.",".RRRR.",".RRWR.",".RRRR.",".RRRR.",".GGGG.","..GG.."
+], {G:'#c9d1db',R:'#d64545',W:'#fff2f2'});
+SPR.coat = sprite([
+  "...YYYY...","..YYYYYY..","..YKKKKY..",".YYYYYYYY.","YYYYwYYYYY",
+  "YYYYwYYYYY",".YYYYYYYY.",".YYYwYYYY.",".YYYYYYYY.","YYYYYYYYYY"
+], {Y:'#ffd84a',w:'#fff6c4',K:'#7a5200'});
+
+SPR.umbrella = canvasOf(14, 12, c => {     // 開花雨傘
+  for (let x = 0; x < 14; x++){
+    const top = Math.floor(6 - Math.abs(x - 6.5) * 0.85);
+    c.fillStyle = Math.floor(x / 3.5) % 2 ? '#f2f4f8' : '#d64545';
+    c.fillRect(x, top, 1, 3);
+  }
+  c.fillStyle = '#3a3a44'; c.fillRect(7, 7, 1, 4); c.fillRect(6, 11, 1, 1);
+});
+
+/* ---------- 新增：招牌、盆栽、廣告布條、塑膠袋、珍奶、雨傘、九層塔、膠帶 ---------- */
+SPR.sign = canvasOf(22, 8, c => {
+  c.fillStyle = '#5b6475'; c.fillRect(0, 0, 22, 8);
+  c.fillStyle = '#c0392b'; c.fillRect(1, 1, 20, 6);
+  c.fillStyle = '#f4f4f4';
+  [[3,2,3,1],[4,2,1,4],[3,5,3,1],[8,2,1,4],[8,2,3,1],[10,3,1,3],[13,2,3,1],[14,3,1,3],[17,2,2,1],[17,4,2,1],[18,2,1,4]].forEach(([x,y,w,h]) => c.fillRect(x, y, w, h));
+  c.fillStyle = '#ffe680'; c.fillRect(1, 1, 1, 1); c.fillRect(20, 1, 1, 1);
+});
+SPR.pot = sprite([
+  "...G..G...","..GGG.GG..",".GGgGGGgG.","..GGGGGG..","OOOOOOOOOO",".OoOOOOOO.",
+  ".OOOOOOOO.",".OOOOOOoO.","..OOOOOO..","..OOOOOO..","...OOOO..."
+], {G:'#3e8a50',g:'#57a865',O:'#b5552f',o:'#d47a4f'});
+const BURGER = sprite([
+  "....BBBBBBBB....",
+  "..BBBwBBBBwBBB..",
+  ".BBwBBBBBBBBwBB.",
+  ".BBBBBBBBBBBBBB.",
+  "GGGGGGGGGGGGGGGG",
+  ".YYYYYYYYYYYYY..",
+  ".MMMMMMMMMMMMMM.",
+  "MMMMMMMMMMMMMMMM",
+  ".MMMMMMMMMMMMMM.",
+  "..RRRRRRRRRRRR..",
+  ".BBBBBBBBBBBBBB.",
+  "..BBBBBBBBBBBB.."
+], {B:'#d8913a',w:'#fff2cc',G:'#5cb85c',Y:'#f2c230',M:'#5a2e1a',R:'#d64545'});
+SPR.banner = canvasOf(20, 10, c => {
+  c.fillStyle = '#f6e7b0'; c.fillRect(0, 0, 20, 10);
+  c.fillStyle = '#c0392b'; c.fillRect(0, 0, 20, 2); c.fillRect(0, 9, 20, 1);
+  c.fillStyle = '#d8913a'; c.fillRect(2, 3, 4, 1); c.fillRect(1, 4, 6, 1); c.fillRect(2, 7, 4, 1);
+  c.fillStyle = '#5cb85c'; c.fillRect(1, 5, 6, 1);
+  c.fillStyle = '#5a2e1a'; c.fillRect(1, 6, 6, 1);
+  c.fillStyle = '#c0392b'; for (let i = 0; i < 3; i++) c.fillRect(9 + i * 3, 3, 2, 3); c.fillRect(9, 7, 9, 1);
+  c.fillStyle = '#9aa3ad'; c.fillRect(0, 0, 1, 1); c.fillRect(19, 0, 1, 1);
+});
+SPR.bag = sprite([".R....R.",".R....R.","RWRWRWRW","RWRWRWRW","RWRWRWRW",".WRWRWR.",".RWRWRW.","..WRWR.."], {R:'#d64545',W:'#f4f4f4'});
+SPR.boba = sprite(["....K...","....K...","...K....","WWWWWWWW",".TTTTTT.",".TTTTTT.",".TTTTTT.",".TTTTTT.",".TKTTKT.",".KTKKTK.","..KTTK..","..KKKK.."], {K:'#2a1a12',W:'#e8eef7',T:'#c9a27a'});
+SPR.umb = canvasOf(14, 10, c => {
+  for (let x = 0; x < 14; x++){
+    const d = Math.abs(x - 6.5), top = Math.floor(d * d / 11);
+    c.fillStyle = Math.floor(x / 3.5) % 2 ? '#f2f4f8' : '#2f6fd6';
+    c.fillRect(x, top, 1, 5 - top + (d > 5 ? 1 : 0));
+  }
+  c.fillStyle = '#3a3a44'; c.fillRect(7, 5, 1, 4); c.fillRect(6, 9, 1, 1);
+});
+SPR.basil = sprite(["...g...","..ggg..",".gGggg.","ggGgGgg",".ggGgg.","..ggg..","...d..."], {g:'#3e9a50',G:'#7fd08a',d:'#2f6b3f'});
+SPR.tape = sprite(["..TTTT..",".TTTTTT.","TTT..TTT","TT....TT","TT....TT","TTT..TTT",".TTTTTT.","..TTTT.."], {T:'#d9a441'});
+
+const HEART = sprite([".RR.RR.","RwRRRRR","RRRRRRR",".RRRRR.","..RRR..","...R..."], {R:'#e0413a',w:'#ffd0cc'});
+const HEART_E = sprite([".RR.RR.","RRRRRRR","RRRRRRR",".RRRRR.","..RRR..","...R..."], {R:'#3a3550'});
+const ICON_HOUSE = sprite(["...R...","..RRR..",".RRRRR.","RRRRRRR",".WWWWW.",".WKWDW.",".WWWDW."], {R:'#c0392b',W:'#d9d2c3',K:'#4a6fa5',D:'#5a3d2b'});
+const ICON_BAG = sprite([".T..T..",".T..T..",".T.T...","BBBBBBB","BbBBBbB","BBBBBBB","BBRRRBB","BBBBBBB","BBBBBBB"], {B:'#c9a26b',b:'#a8834f',T:'#e3c9a0',R:'#c0392b'});
+
+/* ---------- 背景圖層（預先繪製，捲動時平鋪）---------- */
+const SKY = canvasOf(W, SIDE_TOP, c => {
+  const bands = ['#121a2c','#172038','#1c2742','#222e4c','#283658','#2d3c60'];
+  bands.forEach((col, i) => { c.fillStyle = col; c.fillRect(0, i * 24, W, 24); });
+  bands.forEach((col, i) => { if (!i) return; c.fillStyle = col; for (let x = 0; x < W; x += 2) c.fillRect(x + (x / 2 % 2), i * 24 - 1, 1, 1); });
+});
+
+const CLOUDS = canvasOf(480, 44, c => {
+  const r = seeded(31);
+  for (let i = 0; i < 46; i++){
+    const cx = r() * 480, cy = 4 + r() * 26, w = 24 + r() * 46, h = 6 + r() * 10;
+    c.fillStyle = r() < .5 ? '#0d1322' : '#141b30';
+    c.fillRect(cx - w / 2, cy, w, h);
+    c.fillRect(cx - w / 2 + 4, cy - 3, w - 8, 3);
+    c.fillStyle = '#26314f'; c.fillRect(cx - w / 2 + 4, cy - 3, w - 8, 1);
+  }
+});
+
+const FAR = canvasOf(400, 80, c => {
+  const r = seeded(11); let x = 0;
+  while (x < 400){
+    const w = 18 + Math.floor(r() * 30), h = 34 + Math.floor(r() * 42);
+    c.fillStyle = '#1b2338'; c.fillRect(x, 80 - h, w, h);
+    c.fillStyle = '#34405e';
+    for (let k = 0; k < 4; k++) if (r() < .5) c.fillRect(x + 2 + Math.floor(r() * (w - 4)), 80 - h + 4 + Math.floor(r() * (h - 8)), 1, 1);
+    x += w + Math.floor(r() * 4);
+  }
+  // 遠方那棟竹節狀的高塔
+  const tx = 214; c.fillStyle = '#1f2840';
+  c.fillRect(tx + 6, 0, 1, 6); c.fillRect(tx + 4, 6, 5, 4);
+  for (let s = 0; s < 7; s++){ c.fillRect(tx + 1, 10 + s * 8, 11, 8); c.fillRect(tx, 10 + s * 8 + 6, 13, 2); }
+  c.fillRect(tx - 2, 66, 17, 14);
+  c.fillStyle = '#e0413a'; c.fillRect(tx + 6, 0, 1, 1);
+});
+
+const CITY = canvasOf(512, 120, c => {
+  const r = seeded(7); let x = 0;
+  while (x < 512){
+    let w = 30 + Math.floor(r() * 30); if (512 - x < 44) w = 512 - x;
+    const h = 52 + Math.floor(r() * 56), top = 120 - h;
+    c.fillStyle = ['#3b4459','#434b5f','#384156','#4a4f5c'][Math.floor(r() * 4)]; c.fillRect(x, top, w, h);
+    c.fillStyle = 'rgba(255,255,255,.035)'; for (let yy = top; yy < 120; yy += 3) c.fillRect(x, yy, w, 1);   // 磁磚
+    for (let wy = top + 6; wy < 110; wy += 12) for (let wx = x + 3; wx < x + w - 8; wx += 10){
+      c.fillStyle = r() < .3 ? '#e3c26a' : '#1c2233'; c.fillRect(wx, wy, 7, 6);
+      c.fillStyle = '#6b7487'; c.fillRect(wx - 1, wy - 1, 9, 1); c.fillRect(wx - 1, wy + 6, 9, 1);   // 鐵窗
+      for (let gx = wx; gx < wx + 8; gx += 2) c.fillRect(gx, wy, 1, 6);
+    }
+    if (r() < .6 && w > 16){        // 屋頂水塔
+      const tx = x + 3 + Math.floor(r() * (w - 13));
+      c.fillStyle = '#9aa8ba'; c.fillRect(tx, top - 7, 8, 6);
+      c.fillStyle = '#c4cfdc'; c.fillRect(tx + 1, top - 7, 2, 6);
+      c.fillStyle = '#55607a'; c.fillRect(tx + 1, top - 1, 1, 1); c.fillRect(tx + 6, top - 1, 1, 1);
+    }
+    if (r() < .45 && w > 18){       // 頂樓加蓋藍色鐵皮
+      const aw = Math.min(w - 4, 14 + Math.floor(r() * 10)), ax = x + w - aw - 2;
+      c.fillStyle = '#2f5f9e'; c.fillRect(ax, top - 6, aw, 6);
+      c.fillStyle = '#4f86c6'; for (let i = ax; i < ax + aw; i += 2) c.fillRect(i, top - 6, 1, 6);
+    }
+    if (r() < .75 && x + w < 508){  // 直立招牌
+      const sc = ['#c0392b','#e0a526','#2d7dd2','#2e9e6a','#d35400'][Math.floor(r() * 5)];
+      const sy = top + 8 + Math.floor(r() * 18), sh = 22 + Math.floor(r() * 22);
+      c.fillStyle = sc; c.fillRect(x + w - 3, sy, 5, sh);
+      c.fillStyle = 'rgba(255,255,255,.55)'; for (let k = sy + 2; k < sy + sh - 2; k += 4) c.fillRect(x + w - 2, k, 3, 2);
+    }
+    x += w + 1;
+  }
+});
+
+/* =========================================================
+   Web Audio：8-bit 合成音效
+   ========================================================= */
+/* =========================================================
+   背景音樂：原創的破直笛＋大號＋小鼓進行曲（全部即時合成）
+   音符以 C5 為 0 的半音數；'sq' = 直笛破音尖叫、'sl' = 往下滑掉的哀嚎
+   ========================================================= */
+const SONGS = {
+  menu: { bpm: () => 104, drums:false, bass:[0,0,5,7], mel:[
+    [[0,1],[null,.5],[0,.5],[3,1],[null,1]],
+    [[7,.5],[6,.5],[5,.5],[3,.5],[0,1],['sq',1]],
+    [[0,1],[null,.5],[0,.5],[3,1],[5,1]],
+    [[6,.5],[7,.5],[6,.5],[5,.5],[3,.5],[0,.5],['sl',1]]
+  ]},
+  // 越接近鹹酥雞攤，節奏越快
+  run: { bpm: () => 138 + 34 * clamp(1 - G.remain / G.total, 0, 1), drums:true, bass:[0,5,0,7,-3,7,5,0], mel:[
+    [[0,.5],[4,.5],[7,.5],[4,.5],[9,1],[7,.5],[null,.5]],
+    [[5,.5],[4,.5],[2,.5],[4,.5],[0,1.5],[null,.5]],
+    [[0,.5],[4,.5],[7,.5],[12,.5],[11,.5],[9,.5],[7,1]],
+    [[5,.5],[7,.5],[4,.5],[2,.5],[0,1],['sq',1]],
+    [[9,.75],[9,.25],[8,.5],[9,.5],[12,1],[9,1]],
+    [[7,.75],[7,.25],[6,.5],[7,.5],[11,1],[7,1]],
+    [[5,.5],[5,.5],[4,.5],[4,.5],[2,.5],[2,.5],[-1,.5],[-1,.5]],
+    [[0,.5],[null,.5],[-5,.5],[null,.5],['sl',1],[null,1]]
+  ]}
+};
+
+const Snd = {
+  ctx:null, master:null, muted: store.get('ksj-mute') === '1', nbuf:null, windG:null,
+  mus:null, musicOn: store.get('ksj-music') !== '0', ducked:false, cur:null, timer:null, bar:0, nextT:0,
+  init(){
+    if (this.ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    try {
+      const a = this.ctx = new AC();
+      this.master = a.createGain(); this.master.gain.value = this.muted ? 0 : .5; this.master.connect(a.destination);
+      this.mus = a.createGain(); this.mus.gain.value = this.musicOn ? .6 : 0; this.mus.connect(this.master);
+      const len = a.sampleRate * 2, buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      this.nbuf = buf;
+      // 呼呼的風聲：帶通雜訊 + LFO
+      const src = a.createBufferSource(); src.buffer = buf; src.loop = true;
+      const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 520; bp.Q.value = .8;
+      const g = a.createGain(); g.gain.value = 0;
+      src.connect(bp); bp.connect(g); g.connect(this.master); src.start();
+      const lfo = a.createOscillator(); lfo.frequency.value = .23; const lg = a.createGain(); lg.gain.value = 300;
+      lfo.connect(lg); lg.connect(bp.frequency); lfo.start();
+      this.windG = g;
+    } catch(e){ this.ctx = null; }
+  },
+  resume(){ if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(() => {}); },
+  setMute(m){ this.muted = m; if (this.master) this.master.gain.value = m ? 0 : .5; store.set('ksj-mute', m ? '1' : '0'); },
+  wind(level){ if (this.windG) this.windG.gain.setTargetAtTime(level, this.ctx.currentTime, .4); },
+  tone(f1, f2, dur, type = 'square', vol = .2, delay = 0, dest){
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime + delay, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f1, t);
+    if (f2 && f2 !== f1) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0008, t + dur);
+    o.connect(g); g.connect(dest || this.master); o.start(t); o.stop(t + dur + .05);
+  },
+  noise(dur, vol = .3, freq = 1200, delay = 0, type = 'lowpass', dest){
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime + delay, s = this.ctx.createBufferSource(), f = this.ctx.createBiquadFilter(), g = this.ctx.createGain();
+    s.buffer = this.nbuf; s.loop = true; f.type = type; f.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0008, t + dur);
+    s.connect(f); f.connect(g); g.connect(dest || this.master); s.start(t, Math.random()); s.stop(t + dur + .05);
+  },
+  seq(notes, step, type, vol){ notes.forEach((n, i) => { if (n) this.tone(n, n, step * .9, type, vol, i * step); }); },
+  jump(){ this.tone(300, 900, .14, 'square', .14); },                         // 上揚 beep
+  hit(){ this.noise(.3, .5, 900); this.tone(180, 50, .25, 'sawtooth', .16); },   // 撞擊雜訊
+  coin(){ this.tone(988, 988, .08, 'square', .15); this.tone(1319, 1319, .22, 'square', .15, .08); }, // 雙頻 coin
+  power(){ this.seq([523,659,784,1047,784,1047,1319], .06, 'square', .13); },
+  pa(){ this.noise(.09, .7, 3500, 0, 'highpass'); this.tone(240, 110, .12, 'square', .2); },
+  clunk(){ this.tone(420, 160, .14, 'triangle', .35); this.noise(.06, .3, 2500); },
+  bonk(){ this.tone(200, 700, .1, 'square', .13); this.noise(.08, .25, 1500); },
+  thunder(){ this.noise(1.6, .55, 220, .35); },
+  alert(){ this.seq([880,0,880,0,1175], .08, 'square', .13); },
+  go(){ this.seq([523,0,659,0,784,1047], .07, 'square', .12); },
+  arrive(){ this.seq([523,659,784,1047,0,1047,1319], .1, 'square', .15); },
+  sad(){ [392,370,349,330].forEach((f, i) => this.tone(f, f * .96, i === 3 ? 1.1 : .32, 'sawtooth', .12, i * .38)); },
+  ach(){ this.seq([784,988,1175,1568], .07, 'square', .11); },
+  slap(){ this.noise(.18, .9, 2500, 0, 'highpass'); this.noise(.3, .5, 500); this.tone(150, 60, .22, 'square', .25); },
+  leaf(){ this.tone(1568, 2093, .06, 'square', .07); },
+  rustle(){ this.noise(.4, .35, 3000, 0, 'highpass'); },
+  splat(){ this.noise(.22, .5, 800); this.tone(300, 80, .16, 'sine', .3); },
+  floaty(){ this.tone(400, 1200, .5, 'triangle', .15); },
+  /* ---------- 背景音樂 ---------- */
+  setMusic(on){
+    this.musicOn = on; store.set('ksj-music', on ? '1' : '0');
+    if (this.mus) this.mus.gain.setTargetAtTime(on ? (this.ducked ? .15 : .6) : 0, this.ctx.currentTime, .05);
+  },
+  duck(on){ this.ducked = on; if (this.mus && this.musicOn) this.mus.gain.setTargetAtTime(on ? .15 : .6, this.ctx.currentTime, .15); },
+  playMusic(name){
+    if (!this.ctx || this.cur === name) return;
+    this.stopMusic(); this.cur = name; this.bar = 0; this.nextT = this.ctx.currentTime + .08;
+    this.timer = setInterval(() => this.pump(), 25); this.pump();
+  },
+  stopMusic(){ clearInterval(this.timer); this.timer = null; this.cur = null; },
+  pump(){
+    const a = this.ctx, song = SONGS[this.cur]; if (!song) return;
+    if (this.nextT < a.currentTime - .05) this.nextT = a.currentTime + .05;     // 分頁切回來時不要一次補一堆
+    while (this.nextT < a.currentTime + .15){
+      const beat = 60 / song.bpm();
+      this.scheduleBar(song, this.bar, this.nextT, beat);
+      this.nextT += beat * 4; this.bar = (this.bar + 1) % song.mel.length;
+    }
+  },
+  scheduleBar(song, bi, t, beat){
+    const now = this.ctx.currentTime, M = this.mus;
+    let x = t;
+    for (const [n, d] of song.mel[bi]){
+      const dur = d * beat;
+      if (n === 'sq') this.squeak(x, dur);
+      else if (n === 'sl') this.slide(x, dur);
+      else if (n !== null) this.recorder(n, x, dur);
+      x += dur;
+    }
+    const root = song.bass[bi];
+    for (let b = 0; b < 4; b++){
+      const bt = t + b * beat - now;
+      if (b % 2 === 0) this.tone(130.81 * 2 ** (root / 12), 0, beat * .7, 'triangle', .26, bt, M);          // 嗡
+      else this.tone(261.63 * 2 ** ((root + 7) / 12), 0, beat * .22, 'square', .035, bt, M);               // 叭
+      if (song.drums){
+        if (b % 2 === 0) this.tone(140, 45, .12, 'sine', .32, bt, M);
+        else this.noise(.09, .16, 1800, bt, 'highpass', M);
+        this.noise(.03, .05, 6500, bt + beat / 2, 'highpass', M);
+      }
+    }
+    if (bi % 4 === 0) this.noise(beat * 3, .07, 650, t - now, 'bandpass', M);   // 一陣風
+  },
+  recorder(n, t, dur){                     // 破直笛：每個音都有點不準、起音往上滑、帶氣音
+    const a = this.ctx, f = 523.25 * 2 ** (n / 12), end = t + Math.max(.06, dur * .9);
+    const out = a.createGain(); out.connect(this.mus);
+    const o = a.createOscillator(), o2 = a.createOscillator(), g2 = a.createGain();
+    const lfo = a.createOscillator(), lg = a.createGain();
+    const off = (Math.random() * 2 - 1) * 30 + (Math.random() < .14 ? -70 : 0);
+    o.type = 'triangle'; o.frequency.value = f;
+    o.detune.setValueAtTime(off - 110, t); o.detune.linearRampToValueAtTime(off, t + .05);
+    o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = .18;
+    lfo.frequency.value = 5 + Math.random() * 2; lg.gain.value = 16;
+    lfo.connect(lg); lg.connect(o.detune);
+    o.connect(out); o2.connect(g2); g2.connect(out);
+    out.gain.setValueAtTime(0, t); out.gain.linearRampToValueAtTime(.2, t + .02);
+    out.gain.linearRampToValueAtTime(.14, t + .08); out.gain.setValueAtTime(.14, end - .03);
+    out.gain.linearRampToValueAtTime(0, end);
+    [o, o2, lfo].forEach(k => { k.start(t); k.stop(end + .02); });
+    this.noise(.06, .07, f * 1.6, t - a.currentTime, 'bandpass', this.mus);
+  },
+  squeak(t, dur){                          // 吹太大力的破音
+    const a = this.ctx, o = a.createOscillator(), g = a.createGain(), e = t + Math.min(dur, .32);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(2300, t); o.frequency.linearRampToValueAtTime(3300, t + .07);
+    o.frequency.linearRampToValueAtTime(2600, t + .12); o.frequency.linearRampToValueAtTime(3100, t + .18);
+    o.frequency.exponentialRampToValueAtTime(1500, e);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.08, t + .02); g.gain.exponentialRampToValueAtTime(.001, e);
+    o.connect(g); g.connect(this.mus); o.start(t); o.stop(e + .02);
+    this.noise(.12, .09, 3000, t - a.currentTime, 'bandpass', this.mus);
+  },
+  slide(t, dur){                           // 「咿～～嗚」往下掉
+    const a = this.ctx, o = a.createOscillator(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain(), e = t + dur * .95;
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(523.25 * 2 ** (7 / 12), t); o.frequency.exponentialRampToValueAtTime(523.25 * 2 ** (-5 / 12), e);
+    lfo.frequency.value = 7; lg.gain.value = 45; lfo.connect(lg); lg.connect(o.detune);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.17, t + .03); g.gain.linearRampToValueAtTime(0, e);
+    o.connect(g); g.connect(this.mus); o.start(t); lfo.start(t); o.stop(e + .02); lfo.stop(e + .02);
+  },
+  lose(){ this.seq([659,587,523,494,440,0,330,0,262], .14, 'triangle', .26); this.noise(.45, .3, 600); }
+};
+
+/* =========================================================
+   遊戲狀態機：MENU → PLAYING ⇄ EVENT → GAMEOVER / VICTORY
+   ========================================================= */
+const G = {
+  state:'MENU', t:0, scroll:0, speed:0, mult:1, remain:START_DIST, total:START_DIST, hp:3,
+  objs:[], parts:[], spawnT:1.4, eventDone:false, eventKind:'A', eventSel:0, eventAt:0,
+  freeze:0, blind:0, inv:0, hurt:0, shake:0, slowT:0, slipFace:0,
+  flash:0, bolt:null, nextBolt:4, vt:0, gt:0, endShown:false, endReady:false, momShown:false,
+  paperShown:false, arrived:false, duckHeld:false, best: Number(store.get('ksj-best')) || null
+};
+const PL = { x:34, y:GROUND, vy:0, onGround:true, duck:false, anim:0, frame:0 };
+/* 每局重置的干擾狀態與成就計數 */
+function resetExtras(){
+  Object.assign(G, { ad:0, invert:0, boba:0, pearls:[], float:0, shield:false, basil:0, slips:0, knocks:0,
+    damaged:false, upHeld:false, downHeld:false, runAch:new Set(), newAch:new Set(),
+    jumps:0, duckT:0, thermos:0, coats:0, ads:0, dodged:0, traveled:0, pranks:new Set(),
+    evQueue: Math.random() < .5 ? ['A','B'] : ['B','A'], evAt:[700, 350] });   // 兩次突發事件
+}
+resetExtras();
+
+/* 雨、風線、落葉 */
+const RAIN = Array.from({length:160}, () => ({ x:rand(0, W + 80), y:rand(-H, H), v:rand(230, 330), l:irand(3, 6) }));
+const STREAKS = Array.from({length:9}, () => ({ x:rand(0, W), y:rand(18, 140), len:irand(18, 60), v:rand(380, 620) }));
+
+/* 障礙物種類 */
+const TYPES = {
+  cone:   { w:10, h:10, kind:'hazard', extra:25,  msg:'被霸道三角錐鏟到！' },
+  log:    { w:12, h:12, kind:'hazard', extra:35,  msg:'被斷掉的路樹絆倒！' },
+  roof:   { w:24, h:6,  kind:'hazard', extra:75,  msg:'鐵皮從天而降！' },
+  scooter:{ w:22, h:12, kind:'hazard', extra:80,  msg:'機車整台滑過來！' },
+  slipper:{ w:12, h:5,  kind:'prank',  extra:100 },
+  helmet: { w:10, h:7,  kind:'prank',  extra:70 },
+  thermos:{ w:6,  h:10, kind:'item',   extra:0 },
+  coat:   { w:10, h:10, kind:'item',   extra:0 },
+  sign:   { w:22, h:8,  kind:'hazard', extra:70,  msg:'招牌被吹下來了！' },
+  pot:    { w:10, h:11, kind:'hazard', extra:40,  msg:'陽台盆栽砸過來！' },
+  banner: { w:20, h:10, kind:'prank',  extra:95 },
+  bag:    { w:8,  h:8,  kind:'prank',  extra:80 },
+  boba:   { w:8,  h:12, kind:'prank',  extra:100 },
+  umb:    { w:14, h:10, kind:'prank',  extra:70 },
+  basil:  { w:7,  h:7,  kind:'item',   extra:0 },
+  tape:   { w:8,  h:8,  kind:'item',   extra:0 }
+};
+
+function spawn(type, x = VW + 16, y){
+  const T = TYPES[type], o = { type, ...T, x, t:0, rot:0, dead:false, gone:false };
+  if (y !== undefined) o.baseY = y;
+  else if (type === 'roof' || type === 'sign') o.baseY = GROUND - 13 - o.h;   // 只有蹲下躲得過
+  else if (type === 'banner') o.baseY = GROUND - rand(16, 26);
+  else if (T.kind === 'prank') o.baseY = GROUND - rand(12, 32);
+  else if (T.kind === 'item') o.baseY = GROUND - (Math.random() < .5 ? 14 : 36);
+  else o.baseY = GROUND - o.h;
+  o.y = o.baseY;
+  G.objs.push(o);
+}
+function spawnRandom(){
+  const done = START_DIST - G.remain;
+  const pool = [['cone',16],['log',10],['roof',14],['slipper',8],['helmet',6],['banner',7],['bag',5],['boba',5],['umb',4],
+    ['basil',16],['tape',3],['coat',3],['thermos', G.hp < 3 ? 7 : 3]];
+  if (done > 60) pool.push(['scooter', 10]);
+  if (done > 80) pool.push(['sign', 8]);
+  if (done > 120) pool.push(['pot', 8]);
+  let s = 0; for (const p of pool) s += p[1];
+  let r = Math.random() * s;
+  for (const p of pool){
+    if ((r -= p[1]) < 0){
+      if (p[0] === 'basil'){            // 九層塔成排出現：低排直接撿、高排要跳
+        const n = irand(3, 5), high = Math.random() < .5;
+        for (let i = 0; i < n; i++) spawn('basil', VW + 16 + i * 13, high ? GROUND - 30 - Math.sin(i / (n - 1) * Math.PI) * 12 : GROUND - 12);
+      } else spawn(p[0]);
+      return;
+    }
+  }
+}
+
+/* ---------- 碰撞 ---------- */
+function playerBox(){ return PL.duck ? { x:PL.x + 2, y:PL.y - 9, w:9, h:9 } : { x:PL.x + 2, y:PL.y - 17, w:8, h:16 }; }
+function objBox(o){ return { x:o.x + 1, y:o.y + 1, w:o.w - 2, h:o.h - 2 }; }
+const overlap = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+
+function knock(o){ o.dead = true; o.vx = rand(60, 150); o.vy = -rand(170, 250); }
+function burst(col, n = 14){
+  for (let i = 0; i < n; i++) G.parts.push({ x:PL.x + 6, y:PL.y - 9, vx:rand(-70, 70), vy:rand(-110, -20), g:260, life:rand(.3, .6), col, s:1 });
+}
+
+function hitObj(o){
+  if (o.kind === 'item'){
+    o.gone = true;
+    switch (o.type){
+      case 'thermos':
+        G.hp = Math.min(MAX_HP, G.hp + 1); Snd.coin(); burst('#ff9a8a'); toast('熱可可下肚，HP +1');
+        if (G.hp >= MAX_HP) unlock('hp5'); if (++G.thermos >= 3) unlock('thermos3'); break;
+      case 'coat': G.inv = 3; Snd.power(); burst('#ffd84a', 22); toast('加厚無敵雨衣！撞飛一切 3 秒'); if (++G.coats >= 2) unlock('coat2'); break;
+      case 'tape': G.shield = true; Snd.coin(); toast('撿到防颱膠帶！可以擋一次撞擊'); break;
+      case 'basil': G.basil++; setBasil(); Snd.leaf(); if (G.basil >= 20) unlock('basil20'); if (G.basil >= 40) unlock('basil40'); break;
+    }
+    return;
+  }
+  if (G.inv > 0){ knock(o); Snd.bonk(); G.shake = .12; if (++G.knocks >= 5) unlock('gold'); return; }
+  if (o.kind === 'prank'){
+    o.gone = true;
+    G.pranks.add(o.type); if (G.pranks.size >= 5) unlock('combo5');
+    switch (o.type){
+      case 'slipper': G.freeze = .5; G.slipFace = 1; $('pa').hidden = false; Snd.pa(); if (++G.slips >= 3) unlock('slipper3'); break;
+      case 'helmet': G.blind = 1; Snd.clunk(); toast('安全帽蓋臉！看不到啦！', 1000); break;
+      case 'banner':   // 整片廣告糊在臉上：定格 + 全畫面廣告
+        G.freeze = 1.1; G.ad = 1.55; G.shake = .25; $('adText').hidden = false; $('toast').hidden = true; Snd.slap(); unlock('burger'); if (++G.ads >= 2) unlock('ad2'); break;
+      case 'bag': G.invert = 2.5; Snd.rustle(); toast('紅白塑膠袋套頭！上下顛倒 2.5 秒', 1800); unlock('bag'); break;
+      case 'boba':
+        G.boba = 2; G.pearls = Array.from({length:16}, () => ({ x:irand(24, 296), y:irand(20, 150), d:irand(2, 9) }));
+        Snd.splat(); toast('珍奶洗臉！', 1000); unlock('boba'); break;
+      case 'umb': G.float = 3; Snd.floaty(); toast('被雨傘拉著飄起來了！', 1500); unlock('umbrella'); break;
+    }
+    return;
+  }
+  if (G.hurt > 0) return;
+  if (G.shield){ G.shield = false; G.hurt = .6; G.shake = .15; knock(o); Snd.bonk(); toast('膠帶擋下一擊！'); unlock('tape'); return; }
+  G.hp--; G.damaged = true; G.hurt = 1.2; G.shake = .3; Snd.hit(); knock(o); burst('#ffffff');
+  if (G.hp <= 0){ lose(); return; }
+  toast(o.msg);
+}
+
+/* ---------- 成就 ---------- */
+const ACH = [
+  { id:'arrive',   name:'風雨無阻的吃貨', desc:'走到鹹酥雞攤（然後發現沒開）' },
+  { id:'flawless', name:'一滴血都沒掉',   desc:'不扣血走到終點' },
+  { id:'burger',   name:'今天改吃漢堡',   desc:'被漢堡廣告布條糊臉' },
+  { id:'slipper3', name:'藍白拖連環巴',   desc:'一局被藍白拖打中 3 次' },
+  { id:'basil20',  name:'九層塔收藏家',   desc:'一局撿到 20 片九層塔' },
+  { id:'bag',      name:'塑膠袋套頭',     desc:'被紅白塑膠袋罩住頭' },
+  { id:'boba',     name:'珍奶洗臉',       desc:'被飛來的珍奶噴滿臉' },
+  { id:'umbrella', name:'雨傘帶我飛',     desc:'被開花雨傘拉上天' },
+  { id:'gold',     name:'金身五連撞',     desc:'一局在無敵時撞飛 5 個東西' },
+  { id:'tape',     name:'防颱膠帶有用',   desc:'用膠帶擋下一次撞擊' },
+  { id:'chief',    name:'里長的好鄰居',   desc:'對里長大喊辛苦了' },
+  { id:'detour',   name:'寧可繞遠路',     desc:'遇到淹水選擇繞路' },
+  { id:'wade',     name:'涉水強衝',       desc:'遇到淹水直接衝過去' },
+  { id:'mom',      name:'聽媽媽的話',     desc:'倒在路上，被媽媽念' },
+  { id:'close',    name:'只差一點點',     desc:'剩不到 50 公尺時倒下' },
+  { id:'half',     name:'走了一半了',     desc:'在颱風裡走滿 500 公尺' },
+  { id:'onehp',    name:'一顆心衝到底',   desc:'只剩 1 顆心走到終點' },
+  { id:'hp5',      name:'滿血吃貨',       desc:'血量補到 5 顆心' },
+  { id:'thermos3', name:'熱可可續杯',     desc:'一局喝到 3 杯熱可可' },
+  { id:'coat2',    name:'雙層雨衣',       desc:'一局撿到 2 件無敵雨衣' },
+  { id:'basil40',  name:'九層塔田',       desc:'一局撿到 40 片九層塔' },
+  { id:'ad2',      name:'廣告效果極佳',   desc:'一局被漢堡廣告糊臉 2 次' },
+  { id:'combo5',   name:'颱風天大禮包',   desc:'一局被 5 種不同干擾物打中' },
+  { id:'jumper',   name:'跳跳吃貨',       desc:'一局跳 60 次' },
+  { id:'ducker',   name:'蹲好蹲滿',       desc:'一局累計蹲 15 秒' },
+  { id:'dodge50',  name:'閃避達人',       desc:'一局閃過 50 個危險物' },
+  { id:'ignore',   name:'假裝沒聽到',     desc:'里長叫你回家，你繼續衝' },
+  { id:'mom3',     name:'被念到耳朵長繭', desc:'累計倒下 3 次' },
+  { id:'veteran',  name:'颱風天常客',     desc:'累計出門 10 次' }
+];
+const achSaved = new Set((() => { try { return JSON.parse(store.get('ksj-achs') || '[]'); } catch(e){ return []; } })());
+if (store.get('ksj-ach') === '1') achSaved.add('arrive');
+function unlock(id){
+  if (G.runAch.has(id)) return;
+  const a = ACH.find(x => x.id === id); if (!a) return;
+  G.runAch.add(id);
+  const isNew = !achSaved.has(id);
+  if (isNew){ achSaved.add(id); G.newAch.add(id); store.set('ksj-achs', JSON.stringify([...achSaved])); renderWall(); }
+  popAch(a, isNew); Snd.ach();
+}
+const popQ = []; let popBusy = false;
+function popAch(a, isNew){ popQ.push([a, isNew]); if (!popBusy) nextPop(); }
+function nextPop(){
+  const it = popQ.shift(), el = $('achPop');
+  if (!it){ popBusy = false; el.hidden = true; return; }
+  popBusy = true;
+  $('achPopName').textContent = it[0].name; $('achPopNew').textContent = it[1] ? 'NEW!' : '';
+  el.hidden = false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in');
+  setTimeout(nextPop, 2000);
+}
+function renderWall(){
+  const ul = $('wall'); ul.innerHTML = '';
+  for (const a of ACH){
+    const got = achSaved.has(a.id), li = document.createElement('li');
+    if (got) li.className = 'got';
+    const b = document.createElement('b'); b.textContent = got ? a.name : '？？？';
+    const s = document.createElement('span'); s.textContent = a.desc;
+    li.append(b, s); ul.appendChild(li);
+  }
+  $('wallCount').textContent = `${achSaved.size} / ${ACH.length}`;
+}
+function setBasil(){ $('basilN').textContent = G.basil; }
+
+/* ---------- 出發前簡報：任務＋三頁物品介紹 ---------- */
+const ICON_EXCL = sprite(["..YY..","..YY..","..YY..","..YY..","......","..YY.."], {Y:'#f2c230'});
+const ICON_PAD = sprite(["..Y..",".YYY.","YYYYY","..Y..","..Y..",".....","..B..","..B..","BBBBB",".BBB.","..B.."], {Y:'#f2c230',B:'#5b9be6'});
+const BRIEF = [
+  { title:'出門前的任務簡報', note:'颱風天沒事千萬別出門。可是你有事：你想吃鹹酥雞。', rows:[
+    [ICON_HOUSE, '起點', '家門口。外面風雨很大，雨衣穿好。'],
+    [ICON_BAG, '目標', '巷口那攤鹹酥雞，距離 1000 公尺。'],
+    [HEART, '血量', '3 顆心，撞到危險物扣 1 顆，最多補到 5 顆。'],
+    [ICON_EXCL, '突發事件', '路上會遇到兩次，選擇會影響剩下的路。'],
+    [ICON_PAD, '操作', '▲ / W / Space 跳，▼ / S 按住蹲。手機橫拿：左邊跳、右邊蹲；也可以點畫面上半跳、下半蹲。']
+  ]},
+  { title:'會痛的東西', tag:['hurt','-1 HP'], note:'撞到扣一顆心。看它飛多高，決定跳還是蹲。', rows:[
+    ['roof', '飛天鐵皮', '從頭頂高度飛來 → 蹲'],
+    ['sign', '被吹落的招牌', '也是頭頂高度 → 蹲'],
+    ['cone', '霸道三角錐', '貼著地面彈過來 → 跳'],
+    ['log', '斷裂路樹', '在地上滾 → 跳'],
+    ['scooter', '摔跤機車', '被吹倒一路滑，速度最快 → 提早跳'],
+    ['pot', '陽台盆栽', '一彈一彈過來 → 抓空檔跳或蹲']
+  ]},
+  { title:'很煩但不痛的東西', tag:['prank','不扣血'], note:'不會扣血，但會讓你很難玩。', rows:[
+    ['slipper', '藍白拖', '打到臉，「趴！」定格 0.5 秒'],
+    ['helmet', '路人的安全帽', '蓋住畫面中間 1 秒'],
+    ['banner', '漢堡廣告布條', '整片糊到臉上，畫面被廣告佔滿'],
+    ['bag', '紅白塑膠袋', '套住頭，上下操作顛倒 2.5 秒'],
+    ['boba', '飛來的珍奶', '珍珠黏滿畫面 2 秒'],
+    ['umb', '開花雨傘', '拉著你往上飄，跳躍變很輕 3 秒']
+  ]},
+  { title:'撿起來就對了', tag:['item','道具'], note:'有些飄在高處，要跳起來才拿得到。', rows:[
+    ['thermos', '熱可可保溫杯', 'HP +1'],
+    ['coat', '加厚無敵雨衣', '金身 3 秒，撞到什麼都撞飛'],
+    ['tape', '防颱膠帶', '在雨衣上貼個 X，擋下下一次撞擊'],
+    ['basil', '九層塔', '成排飄過來，收集越多成就越多']
+  ]}
+];
+let bfPage = 0;
+function iconCanvas(src){
+  const img = typeof src === 'string' ? SPR[src] : src, c = document.createElement('canvas');
+  c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0);
+  const s = Math.max(1, Math.min(5, Math.floor(Math.min(52 / img.width, 34 / img.height))));
+  c.style.width = img.width * s + 'px'; c.style.height = img.height * s + 'px';
+  return c;
+}
+function renderBrief(){
+  const p = BRIEF[bfPage];
+  $('bfTag').textContent = `BRIEFING ${bfPage + 1} / ${BRIEF.length}`;
+  const h = $('bfTitle'); h.textContent = p.title;
+  if (p.tag){ const t = document.createElement('span'); t.className = 'tag ' + p.tag[0]; t.textContent = p.tag[1]; h.prepend(t); }
+  $('bfNote').textContent = p.note;
+  const ul = $('bfGrid'); ul.innerHTML = '';
+  for (const [src, name, hint] of p.rows){
+    const li = document.createElement('li'), box = document.createElement('div'), txt = document.createElement('div');
+    box.className = 'ico'; box.appendChild(iconCanvas(src));
+    const b = document.createElement('b'); b.textContent = name;
+    const s = document.createElement('span'); s.textContent = hint;
+    txt.append(b, s); li.append(box, txt); ul.appendChild(li);
+  }
+  $('bfDots').innerHTML = BRIEF.map((_, i) => `<i class="${i === bfPage ? 'on' : ''}"></i>`).join('');
+  $('bfPrev').hidden = bfPage === 0;
+  $('bfNext').textContent = bfPage === BRIEF.length - 1 ? '出發！' : '下一頁';
+}
+function openBrief(){
+  Snd.init(); Snd.resume();
+  Snd.playMusic('menu');
+  G.state = 'BRIEF'; bfPage = 0; renderBrief(); $('brief').hidden = false;
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+}
+function briefNext(){ if (bfPage < BRIEF.length - 1){ bfPage++; renderBrief(); Snd.leaf(); } else startGame(); }
+function briefPrev(){ if (bfPage > 0){ bfPage--; renderBrief(); } }
+
+/* ---------- 流程 ---------- */
+function startGame(){
+  Snd.init(); Snd.resume();
+  Object.assign(G, { state:'PLAYING', remain:START_DIST, total:START_DIST, hp:3, objs:[], parts:[], spawnT:1.4,
+    eventDone:false, freeze:0, blind:0, inv:0, hurt:0, shake:0, slowT:0, mult:1, slipFace:0,
+    vt:0, gt:0, endShown:false, endReady:false, momShown:false, paperShown:false, arrived:false, duckHeld:false });
+  Object.assign(PL, { x:34, y:GROUND, vy:0, onGround:true, duck:false });
+  ['ovMenu','ovEvent','sign','paper','mom','pa','toast','adText','brief'].forEach(id => $(id).hidden = true);
+  resetExtras(); setBasil();
+  const plays = (Number(store.get('ksj-plays')) || 0) + 1; store.set('ksj-plays', String(plays));
+  if (plays >= 10) unlock('veteran');
+  $('hudDist').hidden = false; $('hudBasil').hidden = false; setDist();
+  setPanel('play');
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  Snd.wind(.07); Snd.go(); Snd.duck(false); Snd.cur === 'run' || Snd.playMusic('run');
+  toast('出發！目標：巷口鹹酥雞', 1500);
+}
+
+const EVENTS = {
+  A:{ title:'前方淹水！', body:'整條巷子變成小河，水已經淹過腳踝，前面好像更深……',
+      opts:[['涉水強衝','速度變慢 8 秒'],['繞路','距離 +50M']] },
+  B:{ title:'里長大喊：風太大了快回家！', body:'里長拿著大聲公從騎樓衝出來，雨衣都被吹翻了。',
+      opts:[['假裝沒聽到','繼續衝'],['大喊「里長辛苦了」','獲得熱可可 HP+1']] }
+};
+function openEvent(){
+  const at = G.evAt.shift(); G.eventKind = G.evQueue.shift();
+  G.state = 'EVENT'; G.upHeld = G.downHeld = false; G.objs.length = 0; G.eventAt = performance.now();
+  $('evTag').textContent = `EVENT · 剩 ${at}M`;
+  const ev = EVENTS[G.eventKind];
+  $('evTitle').textContent = ev.title; $('evBody').textContent = ev.body;
+  ev.opts.forEach((o, i) => { const b = $('ch' + i); b.querySelector('b').textContent = o[0]; b.querySelector('small').textContent = o[1]; });
+  selectChoice(0);
+  $('ovEvent').hidden = false; $('toast').hidden = true;
+  Snd.alert(); Snd.duck(true);
+}
+function selectChoice(i){ G.eventSel = i; [0,1].forEach(k => $('ch' + k).classList.toggle('sel', k === i)); }
+function resolveEvent(i){
+  if (G.state !== 'EVENT' || performance.now() - G.eventAt < 350) return;
+  $('ovEvent').hidden = true;
+  if (G.eventKind === 'A'){
+    if (i === 0){ G.slowT = 8; toast('涉水前進中……腳好重', 1800); unlock('wade'); }
+    else { G.remain += 50; G.total += 50; toast('繞路！多走 50 公尺', 1600); unlock('detour'); }
+  } else {
+    if (i === 0){ toast('里長：（嘆氣）年輕人喔……', 1600); unlock('ignore'); }
+    else { G.hp = Math.min(MAX_HP, G.hp + 1); Snd.coin(); burst('#ff9a8a'); toast('里長：乖！熱可可拿去！HP +1', 1800); unlock('chief'); if (G.hp >= MAX_HP) unlock('hp5'); }
+  }
+  G.state = 'PLAYING'; G.spawnT = 1.3; setDist(); Snd.duck(false);
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+}
+function win(){
+  G.state = 'VICTORY'; G.vt = 0; G.objs.length = 0; G.duckHeld = false;
+  Object.assign(PL, { x:60, y:GROUND, vy:0, onGround:true, duck:false });
+  $('hudDist').hidden = true; $('hudBasil').hidden = true; $('adText').hidden = true; $('toast').hidden = true; $('pa').hidden = true;
+  Object.assign(G, { ad:0, boba:0, invert:0, float:0, blind:0, inv:0 });
+  setPanel('none'); Snd.wind(.04); Snd.stopMusic();
+  store.set('ksj-best', '0'); G.best = 0;
+  unlock('arrive'); if (!G.damaged) unlock('flawless'); if (G.hp === 1) unlock('onehp');
+}
+function lose(){
+  G.state = 'GAMEOVER'; G.gt = 0; G.duckHeld = false; G.inv = 0; G.blind = 0;
+  $('hudDist').hidden = true; $('hudBasil').hidden = true; $('adText').hidden = true; $('toast').hidden = true; $('pa').hidden = true;
+  Object.assign(G, { ad:0, boba:0, invert:0, float:0 });
+  setPanel('none'); Snd.wind(.03); Snd.stopMusic(); Snd.lose();
+  const left = Math.ceil(G.remain);
+  if (G.best === null || left < G.best){ G.best = left; store.set('ksj-best', String(left)); }
+  unlock('mom'); if (G.remain < 50) unlock('close');
+  const losses = (Number(store.get('ksj-losses')) || 0) + 1; store.set('ksj-losses', String(losses));
+  if (losses >= 3) unlock('mom3');
+}
+function showEnd(won){
+  G.endShown = true;
+  const ic = $('achIco'), ix = ic.getContext('2d');
+  if (won){
+    ic.width = 7; ic.height = 9; ix.drawImage(ICON_BAG, 0, 0);
+    $('achK').textContent = 'ACHIEVEMENT UNLOCKED';
+    $('achT').textContent = '【風雨無阻的吃貨】';
+    $('achD').textContent = `冒著颱風走了 ${G.total} 公尺，換到一張紅紙。`;
+  } else {
+    ic.width = 7; ic.height = 6; ix.drawImage(HEART_E, 0, 0);
+    $('achK').textContent = 'GAME OVER';
+    $('achT').textContent = `倒在離鹹酥雞攤 ${Math.ceil(G.remain)} 公尺的地方`;
+    $('achD').textContent = G.best !== null ? `目前最接近的一次：剩 ${G.best} 公尺` : '媽媽說的話要聽。';
+  }
+  const chips = $('chips'); chips.innerHTML = '';
+  for (const id of G.runAch){
+    const a = ACH.find(x => x.id === id), s = document.createElement('span'), isNew = G.newAch.has(id);
+    s.className = 'chip' + (isNew ? ' new' : ''); s.textContent = (isNew ? 'NEW ' : '') + a.name;
+    chips.appendChild(s);
+  }
+  $('achCount').textContent = `成就 ${achSaved.size} / ${ACH.length}`;
+  setPanel('end');
+  setTimeout(() => { G.endReady = true; }, 700);
+  setTimeout(() => { if (G.state === 'VICTORY' || G.state === 'GAMEOVER'){ Snd.duck(false); Snd.playMusic('menu'); } }, 1600);
+}
+
+/* ---------- DOM 小工具 ---------- */
+function setPanel(m){ $('pnMenu').hidden = m !== 'menu'; $('pnPlay').hidden = m !== 'play'; $('pnEnd').hidden = m !== 'end'; }
+let toastTimer = 0;
+function toast(msg, ms = 1400){
+  const el = $('toast'); el.textContent = msg; el.hidden = false;
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+}
+let lastDist = -1;
+function setDist(){ const d = Math.max(0, Math.ceil(G.remain)); if (d !== lastDist){ lastDist = d; $('distNum').textContent = d; } }
+function refreshBadge(){
+  const b = $('badge');
+  if (achSaved.size){ b.textContent = `成就 ${achSaved.size} / ${ACH.length}` + (G.best !== null && G.best > 0 ? `・最接近剩 ${G.best} 公尺` : ''); b.hidden = false; }
+  else if (G.best !== null){ b.textContent = `最接近的一次：剩 ${G.best} 公尺`; b.hidden = false; }
+}
+
+/* =========================================================
+   更新
+   ========================================================= */
+function doJump(){
+  if (G.state !== 'PLAYING' || G.freeze > 0 || !PL.onGround) return;
+  PL.vy = -235; PL.onGround = false; Snd.jump();
+  if (++G.jumps >= 60) unlock('jumper');
+  for (let i = 0; i < 5; i++) G.parts.push({ x:PL.x + 5, y:GROUND - 1, vx:rand(-50, 10), vy:rand(-60, -20), g:300, life:.3, col:'#8fb0d8', s:1 });
+}
+
+function updateAmbient(dt){
+  const drift = G.state === 'PLAYING' ? G.speed : 0;
+  for (const d of RAIN){
+    d.y += d.v * dt; d.x -= (d.v * .55 + drift * .4) * dt;
+    if (d.y > H || d.x < -10){ d.y = rand(-30, 0); d.x = rand(0, W + 90); }
+  }
+  for (const s of STREAKS){ s.x -= s.v * dt; if (s.x + s.len < 0){ s.x = W + rand(0, 120); s.y = rand(18, 140); } }
+  // 雨滴濺起
+  for (let i = 0; i < 2; i++) G.parts.push({ x:rand(0, W), y:rand(146, 178), vx:0, vy:0, g:0, life:.12, col:'#a9c4ea', s:0, spl:true });
+  // 落葉
+  if (Math.random() < dt * 3) G.parts.push({ x:W + 4, y:rand(40, 140), vx:-rand(160, 260), vy:rand(-20, 30), g:20, life:3, col:Math.random() < .5 ? '#3e8a50' : '#8a6a3a', s:2, leaf:true });
+  // 閃電
+  G.nextBolt -= dt;
+  if (G.nextBolt <= 0){
+    G.nextBolt = rand(6, 13); G.flash = .2;
+    const pts = []; let x = rand(20, VW - 20), y = 0;
+    while (y < 48){ pts.push([x, y]); x += rand(-6, 6); y += rand(6, 12); }
+    G.bolt = pts; Snd.thunder();
+  }
+  if (G.flash > 0) G.flash -= dt;
+  for (const p of G.parts){ p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; }
+  G.parts = G.parts.filter(p => p.life > 0);
+  if (G.parts.length > 400) G.parts.splice(0, G.parts.length - 400);
+}
+
+function updatePlay(dt){
+  if (G.shake > 0) G.shake -= dt;
+  if (G.slipFace > 0) G.slipFace -= dt;
+  if (G.ad > 0){                                         // 廣告布條：最後 0.45 秒被風掀走
+    const was = G.ad; G.ad -= dt;
+    if (was > .45 && G.ad <= .45){ $('adText').hidden = true; toast('……突然好想吃漢堡', 1500); }
+  }
+  if (G.freeze > 0){ G.freeze -= dt; if (G.freeze <= 0) $('pa').hidden = true; return; }   // 「趴！」定格
+  if (G.blind > 0) G.blind -= dt;
+  if (G.inv > 0){ G.inv -= dt; if (Math.random() < .6) G.parts.push({ x:PL.x + rand(-2, 14), y:PL.y - rand(0, 20), vx:rand(-30, 0), vy:rand(-30, -5), g:0, life:.35, col:'#fff1a8', s:1 }); }
+  if (G.hurt > 0) G.hurt -= dt;
+  if (G.invert > 0){ G.invert -= dt; if (G.invert <= 0) toast('終於把塑膠袋扯下來了'); }
+  if (G.boba > 0) G.boba -= dt;
+  if (G.float > 0) G.float -= dt;
+  if (G.slowT > 0){ G.slowT -= dt; G.mult = .6; if (G.slowT <= 0){ G.mult = 1; toast('終於走出水坑了！'); } }
+
+  const prog = clamp(1 - G.remain / START_DIST, 0, 1);
+  G.speed = (100 + 55 * prog) * G.mult;
+  G.scroll += G.speed * dt;
+  G.remain -= G.speed * dt / PX_PER_M;
+  G.traveled += G.speed * dt / PX_PER_M; if (G.traveled >= 500) unlock('half');
+  setDist();
+
+  // 主角（塑膠袋套頭時上下顛倒）
+  G.duckHeld = G.invert > 0 ? G.upHeld : G.downHeld;
+  if (!PL.onGround){
+    PL.vy += (G.duckHeld ? 1600 : (G.float > 0 ? 260 : 720)) * dt; PL.y += PL.vy * dt;
+    if (PL.y >= GROUND){ PL.y = GROUND; PL.vy = 0; PL.onGround = true; }
+  }
+  PL.duck = G.duckHeld && PL.onGround;
+  if (PL.duck && (G.duckT += dt) >= 15) unlock('ducker');
+  PL.anim += dt * G.speed / 14;
+  const f = Math.floor(PL.anim) % 2;
+  if (f !== PL.frame){ PL.frame = f; if (PL.onGround) for (let i = 0; i < 3; i++) G.parts.push({ x:PL.x + 4 + i * 2, y:GROUND - 1, vx:rand(-60, -20), vy:rand(-50, -15), g:260, life:.25, col:'#8fb0d8', s:1 }); }
+
+  // 生成
+  if (G.remain > 18){
+    G.spawnT -= dt;
+    if (G.spawnT <= 0){ spawnRandom(); G.spawnT = rand(.95, 1.6) * (1 - prog * .3) / G.mult; }
+  }
+
+  // 物件
+  const pb = playerBox();
+  for (const o of G.objs){
+    o.t += dt;
+    if (o.dead){ o.x += (o.vx - G.speed) * dt; o.vy += 600 * dt; o.y += o.vy * dt; o.rot += 10 * dt; continue; }
+    o.x -= (G.speed + o.extra) * dt;
+    switch (o.type){
+      case 'cone': o.y = o.baseY - Math.abs(Math.sin(o.t * 10)) * 2; o.rot = Math.sin(o.t * 10) * .12; break;
+      case 'log': o.rot -= (G.speed + o.extra) * dt / 6; break;
+      case 'roof': o.y = o.baseY - Math.abs(Math.sin(o.t * 6)) * 2; o.rot = Math.sin(o.t * 5) * .14; break;
+      case 'scooter': o.rot = -.22 + Math.sin(o.t * 30) * .03;
+        if (Math.random() < .7) G.parts.push({ x:o.x + 3, y:GROUND - 1, vx:rand(30, 90), vy:rand(-70, -20), g:300, life:.25, col:Math.random() < .5 ? '#ffb627' : '#fff1a8', s:1 }); break;
+      case 'slipper': o.y = o.baseY + Math.sin(o.t * 5) * 5; o.rot += 12 * dt; break;
+      case 'helmet': o.y = o.baseY + Math.sin(o.t * 4) * 4; o.rot += 6 * dt; break;
+      case 'sign': o.y = o.baseY - Math.abs(Math.sin(o.t * 7)) * 2; o.rot = Math.sin(o.t * 6) * .18; break;
+      case 'pot': o.y = o.baseY - Math.abs(Math.sin(o.t * 4.5)) * 16; o.rot = Math.sin(o.t * 9) * .2; break;
+      case 'banner': o.y = o.baseY + Math.sin(o.t * 6) * 4; o.rot = Math.sin(o.t * 9) * .25; break;
+      case 'bag': o.y = o.baseY + Math.sin(o.t * 3) * 7; o.rot = Math.sin(o.t * 5) * .3; break;
+      case 'boba': o.y = o.baseY + Math.sin(o.t * 5) * 3; o.rot += 9 * dt; break;
+      case 'umb': o.y = o.baseY + Math.sin(o.t * 2.5) * 6; o.rot = Math.sin(o.t * 4) * .3; break;
+      default: o.y = o.baseY + Math.sin(o.t * 4) * 1.5;
+    }
+    if (o.kind === 'hazard' && !o.passed && o.x + o.w < PL.x){ o.passed = true; if (++G.dodged >= 50) unlock('dodge50'); }
+    if (G.state === 'PLAYING' && overlap(pb, objBox(o))) hitObj(o);
+  }
+  G.objs = G.objs.filter(o => !o.gone && o.x > -40 && o.y < H + 40);
+  if (G.state !== 'PLAYING') return;
+
+  if (G.evQueue.length && G.remain <= G.evAt[0]) openEvent();
+  else if (G.remain <= 0){ G.remain = 0; win(); }
+}
+
+function updateVictory(dt){
+  G.vt += dt;
+  if (PL.x < 112){ PL.x = Math.min(112, PL.x + 70 * dt); PL.anim += dt * 8; }
+  else if (!G.arrived){ G.arrived = true; Snd.arrive(); }
+  if (G.vt > .3) $('sign').hidden = false;
+  if (G.vt > 2.6 && !G.paperShown){ G.paperShown = true; $('paper').hidden = false; Snd.sad(); }
+  if (G.vt > 3.8 && !G.endShown) showEnd(true);
+  $('sign').classList.toggle('on', G.vt < 2.6 ? true : Math.floor(G.t * 8) % 19 === 0);
+}
+
+function update(dt){
+  G.t += dt;
+  updateAmbient(dt);
+  if (G.state === 'MENU' || G.state === 'BRIEF'){ G.scroll += 40 * dt; PL.anim += dt * 5; }
+  else if (G.state === 'PLAYING') updatePlay(dt);
+  else if (G.state === 'VICTORY') updateVictory(dt);
+  else if (G.state === 'GAMEOVER'){
+    G.gt += dt; if (G.shake > 0) G.shake -= dt;
+    if (G.gt > .8 && !G.momShown){ G.momShown = true; $('mom').hidden = false; }
+    if (G.gt > 1.6 && !G.endShown) showEnd(false);
+  }
+}
+
+/* =========================================================
+   繪製
+   ========================================================= */
+const R = Math.round;
+function rect(x, y, w, h, c){ ctx.fillStyle = c; ctx.fillRect(R(x), R(y), w, h); }
+function tile(img, off, y){ const o = ((Math.floor(off) % img.width) + img.width) % img.width; ctx.drawImage(img, -o, y); ctx.drawImage(img, img.width - o, y); }
+
+function drawSky(){
+  ctx.drawImage(SKY, 0, 0);
+  if (G.flash > 0){
+    const a = REDUCED ? .12 : Math.min(.75, G.flash * 4);
+    rect(0, 0, W, SIDE_TOP, `rgba(214,226,255,${a})`);
+    if (G.bolt){ for (let i = 0; i < G.bolt.length - 1; i++){ const [x1, y1] = G.bolt[i], [x2, y2] = G.bolt[i + 1]; const n = Math.ceil(y2 - y1); for (let k = 0; k <= n; k++) rect(x1 + (x2 - x1) * k / n, y1 + k, 1, 1, '#f4f8ff'); } }
+  }
+  tile(CLOUDS, G.t * 28 + G.scroll * .15, 0);
+}
+
+function drawTree(x, k){
+  rect(x, 118, 3, 26, '#5a3d2b'); rect(x + 1, 118, 1, 26, '#6e4c36');
+  rect(x - 3, 140, 1, 4, '#8a6a45'); rect(x + 5, 140, 1, 4, '#8a6a45');           // 支架
+  const s = Math.sin(G.t * 5 + k * 1.7) * 2 - 3;                                    // 被風壓向左
+  const blobs = [[-9,110,21,9,'#255a34',.4],[-11,103,24,9,'#2f6b3f',.7],[-8,97,18,7,'#3e8a50',1],[-4,93,10,5,'#3e8a50',1.3]];
+  for (const [dx, y, w, h, c, f] of blobs) rect(x + dx + s * f, y, w, h, c);
+  rect(x - 5 + s * 1.2, 95, 3, 1, '#57a865'); rect(x + 2 + s, 101, 4, 1, '#57a865');
+}
+function drawLamp(x){
+  rect(x, 94, 2, 50, '#5b6475'); rect(x, 94, 9, 2, '#5b6475'); rect(x + 6, 96, 4, 2, '#ffe7a1');
+  for (let i = 0; i < 6; i++) rect(x + 5 - i, 98 + i * 7, 6 + i * 2, 7, 'rgba(255,231,161,.05)');
+}
+function drawStreet(){
+  const sp = G.scroll * .85, gap = 96, first = Math.floor((sp - 40) / gap);
+  for (let k = first; k < first + 6; k++){
+    const x = R(k * gap - sp + 20);
+    if (x < -30 || x > W + 30) continue;
+    ((k % 3) + 3) % 3 === 0 ? drawLamp(x) : drawTree(x, k);
+  }
+}
+function drawGround(scroll){
+  rect(0, SIDE_TOP, W, 16, '#7d4236');                          // 紅磚道
+  const off = Math.floor(scroll) % 8;
+  for (let row = 0; row < 4; row++){
+    const y = SIDE_TOP + row * 4; rect(0, y, W, 1, '#5f3029');
+    for (let x = -off - 8 + (row % 2) * 4; x < W; x += 8) rect(x, y, 1, 4, '#5f3029');
+  }
+  rect(0, SIDE_TOP, W, 1, 'rgba(170,200,240,.25)');
+  // 水坑
+  const pk = Math.floor(scroll / 140);
+  for (let k = pk - 1; k < pk + 4; k++){
+    const x = R(k * 140 + hash(k) * 60 - scroll), w = 16 + Math.floor(hash(k + 9) * 16);
+    if (x > W || x + w < 0) continue;
+    rect(x + 2, 148, w - 4, 1, '#3d5a86'); rect(x, 149, w, 3, '#3d5a86'); rect(x + 2, 152, w - 4, 1, '#3d5a86');
+    rect(x + 3, 149, 4, 1, '#8fb0d8');
+    const rp = (G.t * 3 + k) % 1; rect(x + w / 2 - rp * 6, 150, 1, 1, '#8fb0d8'); rect(x + w / 2 + rp * 6, 150, 1, 1, '#8fb0d8');
+  }
+  rect(0, 160, W, 2, '#9aa3ad'); rect(0, 162, W, 1, '#6c7480');     // 路緣
+  rect(0, 163, W, 17, '#262a34');                                    // 柏油路
+  rect(0, 164, W, 1, '#b8322a');                                    // 紅線
+  for (let x = -(Math.floor(scroll) % 28); x < W; x += 28) rect(x, 173, 14, 1, '#c9ced6');
+  for (let x = -(Math.floor(scroll * .5) % 50); x < W; x += 50) rect(x + 10, 168, 18, 1, 'rgba(160,190,230,.10)');
+}
+
+function drawObj(o){
+  const img = SPR[o.type];
+  if (!o.dead && o.kind === 'hazard' && o.type !== 'roof' && o.type !== 'sign') rect(o.x + 1, GROUND, o.w - 2, 1, 'rgba(0,0,0,.35)');
+  ctx.save();
+  ctx.translate(R(o.x + o.w / 2), R(o.y + o.h / 2));
+  if (o.rot) ctx.rotate(o.rot);
+  ctx.drawImage(img, -Math.floor(img.width / 2), -Math.floor(img.height / 2));
+  ctx.restore();
+  if (o.type === 'thermos'){ const s = Math.floor(G.t * 6) % 3; rect(o.x + 2 + (s === 1 ? 1 : 0), o.y - 3 - s, 1, 2, 'rgba(255,255,255,.6)'); }
+  if (o.type === 'coat' && Math.floor(G.t * 8) % 2){ rect(o.x - 2, o.y + 1, 1, 1, '#fff6c4'); rect(o.x + 11, o.y + 6, 1, 1, '#fff6c4'); rect(o.x + 5, o.y - 3, 1, 1, '#fff6c4'); }
+}
+
+function drawPlayer(){
+  if (G.hurt > 0 && Math.floor(G.t * 20) % 2 === 0) return;
+  const gold = G.inv > 0 && (G.inv > .8 || Math.floor(G.t * 12) % 2 === 0);
+  const set = gold ? HERO_G : HERO;
+  let img;
+  if (!PL.onGround) img = set.j;
+  else if (PL.duck) img = set.d;
+  else img = (G.state === 'VICTORY' && PL.x >= 112) ? set.a : (Math.floor(PL.anim) % 2 ? set.b : set.a);
+  const x = R(PL.x), y = R(PL.y) - img.height;
+  // 雨衣下襬隨風往後飄
+  const n = PL.duck ? 3 : 4, base = y + (PL.duck ? 4 : 7);
+  for (let i = 0; i < n; i++){
+    const len = 2 + R((Math.sin(G.t * 22 + i * 1.3) + 1) * 1.6);
+    rect(x + 2 - len, base + i * 2, len, 2, i % 2 ? set.coatDk : set.coat);
+  }
+  if (gold){ ctx.globalAlpha = .35; rect(x - 2, y - 2, img.width + 4, img.height + 3, '#ffd84a'); ctx.globalAlpha = 1; }
+  ctx.drawImage(img, x, y);
+  if (G.slipFace > 0) ctx.drawImage(SPR.slipper, x + 5, y + 2);
+  const torso = y + (PL.duck ? 4 : 8);
+  if (G.shield) for (let i = 0; i < 5; i++){ rect(x + 3 + i, torso + i, 1, 1, '#d9a441'); rect(x + 7 - i, torso + i, 1, 1, '#d9a441'); }
+  if (G.invert > 0) ctx.drawImage(SPR.bag, x + 2, y - 2);
+  if (G.float > 0) ctx.drawImage(SPR.umb, x + 2, y - 11);
+}
+
+function drawParts(){
+  for (const p of G.parts){
+    if (p.spl){ rect(p.x, p.y, 1, 1, p.col); rect(p.x - 1, p.y - 1, 1, 1, p.col); rect(p.x + 1, p.y - 1, 1, 1, p.col); }
+    else rect(p.x, p.y, p.s || 1, p.leaf ? 1 : (p.s || 1), p.col);
+  }
+}
+function drawRain(){
+  ctx.fillStyle = 'rgba(178,204,240,.55)';
+  for (const d of RAIN) for (let j = 0; j < d.l; j++) ctx.fillRect(R(d.x + j * .6), R(d.y - j), 1, 1);
+  ctx.fillStyle = 'rgba(225,236,255,.13)';
+  for (const s of STREAKS) ctx.fillRect(R(s.x), R(s.y), s.len, 1);
+}
+
+function drawHUD(){
+  const shown = Math.max(3, G.hp);
+  for (let i = 0; i < shown; i++) ctx.drawImage(i < G.hp ? HEART : HEART_E, 3 + i * 8, 3);
+  const bx = 56, bw = 104, by = 5;
+  ctx.drawImage(ICON_HOUSE, bx - 11, by - 1);
+  rect(bx - 1, by - 1, bw + 2, 7, '#05080f'); rect(bx, by, bw, 5, '#eef2f8'); rect(bx + 1, by + 1, bw - 2, 3, '#1b2338');
+  for (let m = 100; m < G.total; m += 100) rect(bx + 1 + R((bw - 2) * m / G.total), by + 1, 1, 3, '#3a4766');
+  const p = clamp(1 - G.remain / G.total, 0, 1), fw = R((bw - 2) * p);
+  rect(bx + 1, by + 1, fw, 3, '#f2c230');
+  rect(bx + fw - 1, by - 2, 4, 4, '#f2c230'); rect(bx + fw + 1, by - 1, 1, 1, '#1b1b2b');
+  ctx.drawImage(ICON_BAG, bx + bw + 3, by - 3);
+  ctx.drawImage(SPR.basil, 3, 12);
+  if (G.shield) ctx.drawImage(SPR.tape, 36, 11);
+  let yb = 21;
+  const bar = (v, max, col) => { rect(4, yb, 30, 2, '#05080f'); rect(4, yb, R(30 * clamp(v / max, 0, 1)), 2, col); yb += 3; };
+  if (G.inv > 0) bar(G.inv, 3, '#ffd84a');
+  if (G.slowT > 0) bar(G.slowT, 8, '#5b8fd6');
+  if (G.invert > 0) bar(G.invert, 2.5, '#e05a5a');
+  if (G.float > 0) bar(G.float, 3, '#9fd0ff');
+}
+
+function drawStall(){
+  // 隔壁公寓
+  rect(0, 28, 128, 116, '#343c50');
+  for (let wy = 36; wy < 128; wy += 14) for (let wx = 8; wx < 120; wx += 14){
+    rect(wx, wy, 8, 7, (wx + wy) % 3 ? '#1c2233' : '#e3c26a'); rect(wx - 1, wy - 1, 10, 1, '#6b7487');
+    for (let gx = wx; gx < wx + 9; gx += 2) rect(gx, wy, 1, 7, '#6b7487');
+  }
+  // 鹹酥雞店面
+  rect(128, 6, 192, 138, '#4f463e');
+  for (let y = 8; y < 144; y += 4) rect(128, y, 192, 1, '#463e37');
+  rect(160, 10, 40, 12, '#1c2233'); rect(240, 10, 40, 12, '#e3c26a');
+  for (let gx = 160; gx < 280; gx += 3){ if (gx < 200 || gx >= 240) rect(gx, 10, 1, 12, '#6b7487'); }
+  // 燈箱招牌（熄燈中，偶爾閃一下）
+  const on = $('sign').classList.contains('on');
+  rect(138, 26, 174, 24, '#2a2a30');
+  rect(140, 28, 170, 20, on ? '#d23a2a' : '#5e1e1a');
+  rect(140, 28, 170, 1, on ? '#f2c230' : '#7a5b18'); rect(140, 47, 170, 1, on ? '#f2c230' : '#7a5b18');
+  rect(138, 50, 174, 2, '#2a2622');
+  // 鐵捲門
+  rect(147, 52, 156, 92, '#555d6a');
+  rect(150, 54, 150, 90, '#8a93a0');
+  for (let y = 54; y < 140; y += 3){ rect(150, y, 150, 1, '#6c7480'); rect(150, y + 1, 150, 1, '#a7b0bc'); }
+  rect(146, 52, 158, 3, '#3b4250'); rect(150, 140, 150, 4, '#4a525f'); rect(222, 141, 6, 2, '#c9a227');
+  for (let k = 0; k < 6; k++){ const dx = 158 + k * 25, dy = 56 + ((G.t * 30 + k * 17) % 80); rect(dx, dy, 1, 3, '#c6d3e2'); }
+  // 蓋著藍白帆布的攤車
+  for (let x = 18; x < 74; x++) rect(x, 120, 1, 28, ((x - 18) >> 2) % 2 ? '#2f6fd6' : '#e9eef5');
+  for (let x = 20; x < 72; x++) rect(x, 118, 1, 2, ((x - 18) >> 2) % 2 ? '#2f6fd6' : '#e9eef5');
+  for (let i = 0; i < 26; i++){ rect(19 + i * 2, 120 + i, 1, 1, '#2a2a2a'); rect(71 - i * 2, 120 + i, 1, 1, '#2a2a2a'); }
+  rect(22, 148, 5, 4, '#16161d'); rect(64, 148, 5, 4, '#16161d');
+}
+
+function drawVictoryFX(){
+  const x = R(PL.x), y = GROUND - 18;
+  if (G.vt > 2.0){                              // 「……」
+    rect(x + 4, y - 13, 20, 9, '#05080f'); rect(x + 5, y - 12, 18, 7, '#eef2f8'); rect(x + 6, y - 5, 2, 2, '#eef2f8');
+    const n = Math.min(3, Math.floor((G.vt - 2.0) / .3) + 1);
+    for (let i = 0; i < n; i++) rect(x + 8 + i * 5, y - 9, 2, 2, '#05080f');
+  }
+  if (G.vt > 2.7){                              // 冒汗
+    const s = Math.floor(G.t * 3) % 3;
+    rect(x - 2, y + 1 + s, 1, 1, '#8fd3ff'); rect(x - 3, y + 2 + s, 3, 2, '#8fd3ff');
+  }
+  if (G.vt < .5) rect(0, 0, W, H, `rgba(0,0,0,${1 - G.vt / .5})`);
+}
+
+function drawGameOver(){
+  const cx = 150;
+  // 躺平的主角
+  ctx.save(); ctx.translate(cx, GROUND - 6); ctx.rotate(-Math.PI / 2); ctx.drawImage(HERO.a, -6, -9); ctx.restore();
+  ctx.drawImage(SPR.slipper, cx + 16, GROUND - 4);            // 掉了一隻藍白拖
+  for (let i = 0; i < 3; i++){                                 // 頭上冒星星
+    const a = G.gt * 4 + i * 2.1, sx = cx - 9 + Math.cos(a) * 8, sy = GROUND - 17 + Math.sin(a) * 2.5;
+    rect(sx, sy - 1, 1, 3, '#ffd84a'); rect(sx - 1, sy, 3, 1, '#ffd84a');
+  }
+  const d = (G.gt * 70) % (W + 80);                            // 被吹走的開花雨傘
+  ctx.save(); ctx.translate(R(W + 20 - d), R(120 - d * .35 + Math.sin(G.gt * 4) * 6)); ctx.rotate(G.gt * 3);
+  ctx.drawImage(SPR.umbrella, -7, -6); ctx.restore();
+}
+
+function drawBoba(){                                 // 黏在畫面上的珍珠
+  ctx.globalAlpha = Math.min(1, G.boba / .5);
+  for (const p of G.pearls){
+    rect(p.x, p.y + 4, 1, p.d, 'rgba(201,162,122,.85)');
+    rect(p.x - 1, p.y, 4, 4, '#2a1a12'); rect(p.x - 2, p.y + 1, 6, 2, '#2a1a12'); rect(p.x, p.y + 1, 1, 1, '#8a6a58');
+  }
+  ctx.globalAlpha = 1;
+}
+function drawAd(){                                   // 糊滿整個畫面的漢堡廣告帆布
+  const peel = G.ad < .45 ? (.45 - G.ad) / .45 : 0;
+  ctx.save();
+  ctx.translate(160 - peel * 380, 92 - peel * 60); ctx.rotate(-peel * .6); ctx.translate(-160, -92);
+  const wob = R(Math.sin(G.t * 18) * 1.5);
+  rect(6, 12 + wob, 308, 160, '#05080f');
+  rect(8, 14 + wob, 304, 156, '#f6e7b0');
+  rect(8, 14 + wob, 304, 24, '#c0392b'); rect(8, 152 + wob, 304, 18, '#c0392b');
+  for (let x = 16; x < 306; x += 12) rect(x, 24 + wob, 6, 4, '#f2c230');
+  ctx.drawImage(BURGER, 20, 52 + wob, 96, 72);
+  for (const [gx, gy] of [[12,18],[302,18],[12,160],[302,160]]){ rect(gx, gy + wob, 5, 5, '#9aa3ad'); rect(gx + 1, gy + 1 + wob, 3, 3, '#3a3a44'); }
+  ctx.fillStyle = 'rgba(0,0,0,.07)';
+  for (let i = 0; i < 5; i++) ctx.fillRect(R((G.t * 140 + i * 70) % 320), 38 + wob, 10, 114);
+  ctx.restore();
+}
+
+function render(){
+  ctx.save();
+  if (G.shake > 0 && !REDUCED) ctx.translate(irand(-2, 2), irand(-2, 2));
+  drawSky();                                   // 天空是背景，用螢幕座標
+  const vic = G.state === 'VICTORY';           // 鏡頭：平常對準人行道，結局對準攤位
+  ctx.translate(vic ? -96 : 0, vic ? -28 : -48);
+  tile(FAR, G.scroll * .12, 64);
+  if (vic){
+    drawStall(); drawGround(G.scroll);
+  } else {
+    tile(CITY, G.scroll * .3, 24);
+    drawStreet(); drawGround(G.scroll);
+  }
+  if (G.slowT > 0 && G.state === 'PLAYING'){
+    rect(0, 147, W, 13, 'rgba(70,110,170,.6)');
+    for (let x = -(Math.floor(G.scroll) % 6); x < W; x += 6) rect(x, 146 + (Math.floor(G.t * 6 + x) % 2), 3, 1, '#8fb0d8');
+  }
+  for (const o of G.objs) drawObj(o);
+  if (G.state === 'GAMEOVER') drawGameOver(); else drawPlayer();
+  if (G.state === 'VICTORY') drawVictoryFX();
+  drawParts(); drawRain();
+  ctx.restore();
+
+  if (G.state === 'PLAYING' || G.state === 'EVENT') drawHUD();
+  if (G.blind > 0){                                            // 安全帽蓋住視野
+    ctx.globalAlpha = Math.min(1, G.blind * 3);
+    ctx.drawImage(SPR.helmet, 72, 18, 100, 70);
+    ctx.globalAlpha = 1;
+  }
+  if (G.boba > 0 || G.ad > 0){                 // 這兩個是 320×180 畫的，縮放到鏡頭大小
+    ctx.save(); ctx.scale(VW / W, VH / H);
+    if (G.boba > 0) drawBoba();
+    if (G.ad > 0) drawAd();
+    ctx.restore();
+  }
+  if (G.flash > 0 && !REDUCED) rect(0, 0, W, H, `rgba(230,238,255,${Math.min(.12, G.flash)})`);
+}
+
+/* =========================================================
+   主迴圈
+   ========================================================= */
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  update(dt); render();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* =========================================================
+   操作：鍵盤 / 觸控
+   ========================================================= */
+const UP = ['ArrowUp','w','W',' '], DOWN = ['ArrowDown','s','S'];
+/* 上 / 下 兩個輸入；塑膠袋套頭時，下＝跳、按住上＝蹲 */
+function inputUp(on){ G.upHeld = on; if (on && !(G.invert > 0)) doJump(); }
+function inputDown(on){ G.downHeld = on; if (on && G.invert > 0) doJump(); }
+addEventListener('keydown', e => {
+  const k = e.key;
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(k)) e.preventDefault();
+  if (G.state === 'MENU'){ if (!e.repeat && (k === 'Enter' || UP.includes(k))){ e.preventDefault(); openBrief(); } return; }
+  if (G.state === 'BRIEF'){
+    if (e.repeat) return;
+    if (k === 'Enter' || k === ' ' || k === 'ArrowRight'){ e.preventDefault(); briefNext(); }
+    else if (k === 'ArrowLeft') briefPrev();
+    else if (k === 'Escape') startGame();
+    return;
+  }
+  if (G.state === 'PLAYING'){ if (UP.includes(k)) inputUp(true); if (DOWN.includes(k)) inputDown(true); return; }
+  if (G.state === 'EVENT'){
+    if (e.repeat) return;
+    if (k === 'ArrowLeft' || k === 'a' || k === 'A' || k === 'ArrowUp') selectChoice(0);
+    else if (k === 'ArrowRight' || k === 'd' || k === 'D' || k === 'ArrowDown') selectChoice(1);
+    else if (k === '1') resolveEvent(0);
+    else if (k === '2') resolveEvent(1);
+    else if (k === 'Enter' || k === ' ') resolveEvent(G.eventSel);
+    return;
+  }
+  if ((G.state === 'VICTORY' || G.state === 'GAMEOVER') && G.endReady && !e.repeat && (k === 'Enter' || k === ' ' || k === 'r' || k === 'R')) startGame();
+});
+addEventListener('keyup', e => { if (UP.includes(e.key)) G.upHeld = false; if (DOWN.includes(e.key)) G.downHeld = false; });
+addEventListener('blur', () => { G.upHeld = G.downHeld = false; });
+
+const stage = $('stage');
+let stagePointer = null, stageSide = 'down';
+stage.addEventListener('pointerdown', e => {
+  if (e.target.closest('button')) return;
+  if (G.state === 'MENU'){ openBrief(); return; }
+  if (G.state !== 'PLAYING') return;
+  e.preventDefault();
+  const r = stage.getBoundingClientRect();
+  stageSide = e.clientY - r.top < r.height / 2 ? 'up' : 'down';
+  stageSide === 'up' ? inputUp(true) : inputDown(true);
+  stagePointer = e.pointerId; try { stage.setPointerCapture(e.pointerId); } catch(_){}
+});
+const releaseStage = e => {
+  if (e.pointerId !== stagePointer) return;
+  if (stageSide === 'up') G.upHeld = false; else G.downHeld = false;
+  stagePointer = null;
+};
+stage.addEventListener('pointerup', releaseStage);
+stage.addEventListener('pointercancel', releaseStage);
+
+const btnUp = $('btnUp'), btnDown = $('btnDown');
+btnUp.addEventListener('pointerdown', e => {
+  e.preventDefault(); btnUp.classList.add('held'); inputUp(true);
+  try { btnUp.setPointerCapture(e.pointerId); } catch(_){}
+});
+['pointerup','pointercancel','lostpointercapture'].forEach(t => btnUp.addEventListener(t, () => { G.upHeld = false; btnUp.classList.remove('held'); }));
+btnDown.addEventListener('pointerdown', e => {
+  e.preventDefault(); btnDown.classList.add('held'); inputDown(true);
+  try { btnDown.setPointerCapture(e.pointerId); } catch(_){}
+});
+['pointerup','pointercancel','lostpointercapture'].forEach(t => btnDown.addEventListener(t, () => { G.downHeld = false; btnDown.classList.remove('held'); }));
+btnUp.addEventListener('contextmenu', e => e.preventDefault());
+btnDown.addEventListener('contextmenu', e => e.preventDefault());
+
+$('ch0').addEventListener('click', () => { selectChoice(0); resolveEvent(0); });
+$('ch1').addEventListener('click', () => { selectChoice(1); resolveEvent(1); });
+$('btnStart').addEventListener('click', openBrief);
+$('bfNext').addEventListener('click', briefNext);
+$('bfPrev').addEventListener('click', briefPrev);
+$('bfSkip').addEventListener('click', startGame);
+$('btnRetry').addEventListener('click', startGame);
+
+const btnMute = $('btnMute');
+function syncMute(){ btnMute.textContent = Snd.muted ? '音效 關' : '音效 開'; btnMute.setAttribute('aria-pressed', String(Snd.muted)); }
+btnMute.addEventListener('click', () => { Snd.init(); Snd.resume(); Snd.setMute(!Snd.muted); syncMute(); btnMute.blur(); });
+syncMute();
+const btnMusic = $('btnMusic');
+function syncMusic(){ btnMusic.textContent = Snd.musicOn ? '音樂 開' : '音樂 關'; btnMusic.setAttribute('aria-pressed', String(!Snd.musicOn)); }
+btnMusic.addEventListener('click', () => {
+  Snd.init(); Snd.resume(); Snd.setMusic(!Snd.musicOn);
+  if (Snd.musicOn && !Snd.cur){
+    if (G.state === 'PLAYING' || G.state === 'EVENT') Snd.playMusic('run');
+    else if (G.state !== 'VICTORY' || G.endShown) Snd.playMusic('menu');
+  }
+  syncMusic(); btnMusic.blur();
+});
+syncMusic();
+
+/* 圖鑑小圖示 */
+document.querySelectorAll('canvas[data-spr]').forEach(c => {
+  const img = SPR[c.dataset.spr], s = Number(c.dataset.s) || 3;
+  c.width = img.width; c.height = img.height;
+  c.getContext('2d').drawImage(img, 0, 0);
+  c.style.width = img.width * s + 'px'; c.style.height = img.height * s + 'px';
+});
+renderWall();
+refreshBadge();
+
+/* 全螢幕＋鎖定橫向（瀏覽器不支援就算了，轉手機一樣能玩） */
+const btnFull = $('btnFull');
+if (document.fullscreenEnabled && document.documentElement.requestFullscreen){
+  btnFull.hidden = false;
+  btnFull.addEventListener('click', () => {
+    document.documentElement.requestFullscreen().then(() => {
+      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+    }).catch(() => toast('這裡開不了全螢幕，直接把手機轉橫也可以玩', 2200));
+    btnFull.blur();
+  });
+}
+})();
+</script>
+
+</body></html>

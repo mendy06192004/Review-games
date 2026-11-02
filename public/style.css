@@ -38,6 +38,7 @@ h2.sub{font-size:1.15rem;margin:32px 0 10px}
 .card .tag{align-self:flex-start;font-size:.78rem;border-radius:999px;padding:0 8px;background:var(--bg);color:var(--muted)}
 .cards.big .card{min-height:150px;justify-content:flex-end;color:#fff;border:none}
 .cards.big .card .count,.cards.big .card .desc{color:rgba(255,255,255,.85)}
+.subj-O{background:linear-gradient(135deg,#a78bfa,#6d5bd0)}
 .subj-C{background:linear-gradient(135deg,#f4a261,var(--c))}.subj-E{background:linear-gradient(135deg,#52b69a,var(--e))}.subj-M{background:linear-gradient(135deg,#7b8cff,var(--m))}
 .cards.big .card .icon{font-size:3rem}
 
@@ -104,3 +105,11 @@ h2.sub{font-size:1.15rem;margin:32px 0 10px}
   .nav{flex-wrap:wrap}
   .nav .btn{flex:1}
 }
+
+/* 其他遊戲 */
+#other-tabs{margin-bottom:8px}
+.cat{margin:18px 0 6px}
+.cat h2{margin:0;font-size:1.2rem}
+.cat p{margin:2px 0 10px;color:var(--muted);font-size:.92rem}
+.card .domain{align-self:flex-start;font-size:.78rem;border-radius:999px;padding:0 10px;background:#ede9fe;color:#5b21b6;font-weight:700}
+@media (prefers-color-scheme:dark){.card .domain{background:#2e2650;color:#c4b5fd}}

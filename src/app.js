@@ -1,6 +1,7 @@
 'use strict';
 const path = require('path');
 const express = require('express');
+const compression = require('compression');
 const { ensureIndex, nodeMap } = require('./indexer');
 const { readQuestionFile } = require('./loader');
 const { shuffle } = require('./util');
@@ -90,6 +91,8 @@ function publicTree(nodes, keep) {
 function createApp(cfg) {
   const app = express();
   app.disable('x-powered-by');
+  // gzip 壓縮：遊戲檔多為大型 HTML/JS，壓縮後傳輸量約只剩 1/3～1/4
+  app.use(compression());
   app.use(express.json({ limit: '100kb' }));
   app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
   app.use('/api/admin', createAdminRouter(cfg));
@@ -175,6 +178,8 @@ function createApp(cfg) {
 
   app.use('/api', (req, res) => res.status(404).json({ error: `沒有這個 API：${req.method} ${req.originalUrl}` }));
   app.use('/media', express.static(cfg.imageDir, { dotfiles: 'ignore', maxAge: 0 }));
+  // 遊戲檔很少變動：讓瀏覽器快取 1 天（仍會用 ETag 檢查是否有更新）
+  app.use('/games', express.static(path.join(__dirname, '..', 'public', 'games'), { maxAge: '1d' }));
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
   // eslint-disable-next-line no-unused-vars

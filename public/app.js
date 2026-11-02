@@ -31,7 +31,7 @@ function show(step) {
   window.scrollTo(0, 0);
   history.replaceState(null, '', step === 'subject' ? location.pathname : `#${step}`);
 }
-const PREV = { version: 'subject', volume: 'version', chapter: 'volume', mode: 'chapter', ready: 'mode' };
+const PREV = { others: 'subject', version: 'subject', volume: 'version', chapter: 'volume', mode: 'chapter', ready: 'mode' };
 document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => {
   const cur = b.closest('.step').dataset.step;
   show(PREV[cur] || 'subject');
@@ -50,16 +50,58 @@ async function initSubjects() {
     b.addEventListener('click', () => pickSubject(s.代碼, s.名稱));
     return b;
   }));
-  const standalone = games.filter((g) => g.類型 === 'standalone');
-  $('#standalone-box').hidden = !standalone.length;
-  $('#standalone-cards').replaceChildren(...standalone.map((g) => {
-    const a = el('a', { className: 'card', href: g.入口, style: 'text-decoration:none;color:inherit' },
-      el('span', { className: 'icon', textContent: g.圖示 }),
-      el('span', { className: 'name', textContent: g.名稱 }),
-      el('span', { className: 'tag', textContent: g.範圍 }),
-      el('span', { className: 'desc', textContent: g.說明 }));
-    return a;
+  const others = games.filter((g) => g.類型 === 'standalone');
+  if (others.length) {
+    const b = el('button', { className: 'card subj-O' },
+      el('span', { className: 'count', textContent: `${others.length} 個遊戲` }),
+      el('span', { className: 'icon', textContent: '🧩' }),
+      el('span', { className: 'name', textContent: '其他' }),
+      el('span', { className: 'desc', textContent: '生活管理・職業教育・社會技巧・學科練習' }));
+    b.addEventListener('click', buildOthers);
+    $('#subject-cards').append(b);
+  }
+}
+
+// ---------- 其他：特殊需求領域等，不需選範圍 ----------
+const CATEGORY = {
+  生活管理: '自我照顧、居家生活、時間管理、社區與交通安全',
+  職業教育: '職業探索、職前技能',
+  社會技巧: '人際互動、拒絕誘惑、自我保護',
+  學科練習: '內建固定範圍的學科小遊戲（不使用題庫資料夾）',
+};
+function buildOthers() {
+  const games = S.games.filter((g) => g.類型 === 'standalone');
+  const cats = [...new Set([...Object.keys(CATEGORY), ...games.map((g) => g.分類 || '其他')])]
+    .filter((c) => games.some((g) => (g.分類 || '其他') === c));
+  const list = $('#other-list');
+  list.replaceChildren(...cats.map((c) => el('section', { className: 'cat', id: `cat-${c}` },
+    el('h2', { textContent: c }),
+    CATEGORY[c] ? el('p', { textContent: CATEGORY[c] }) : null,
+    el('div', { className: 'cards' }, ...games.filter((g) => (g.分類 || '其他') === c).map((g) => {
+      const b = el('button', { className: 'card' },
+        el('span', { className: 'icon', textContent: g.圖示 }),
+        el('span', { className: 'name', textContent: g.名稱 }),
+        g.領域 ? el('span', { className: 'domain', textContent: g.領域 }) : null,
+        el('span', { className: 'desc', textContent: g.說明 }));
+      b.addEventListener('click', () => playStandalone(g));
+      return b;
+    })))));
+  $('#other-tabs').replaceChildren(...cats.map((c) => {
+    const chip = el('button', { className: 'chip', type: 'button', textContent: c });
+    chip.addEventListener('click', () => document.getElementById(`cat-${c}`).scrollIntoView({ behavior: 'smooth' }));
+    return chip;
   }));
+  show('others');
+}
+
+function playStandalone(g) {
+  runGame.stop?.();
+  S.returnTo = 'others';
+  $('#play-title').textContent = g.名稱;
+  const root = $('#game-root');
+  root.className = 'game-root frame';
+  root.replaceChildren(el('iframe', { src: g.入口, title: g.名稱, allow: 'autoplay; fullscreen' }));
+  show('play');
 }
 
 // ---------- 2. 版本 ----------
@@ -212,6 +254,7 @@ async function startGame() {
     if (!data.題目.length) { $('#ready-msg').textContent = '這個範圍目前沒有題目，請換個範圍。'; return; }
     store.set({ subject: S.subject, version: S.version.名稱, volumes: S.volumes.map((v) => v.key) });
     $('#play-title').textContent = S.game.名稱;
+    S.returnTo = 'mode';
     show('play');
     await runGame(S.game, data.題目, $('#game-root'), { onFinish: showResult, onExit: () => show('mode') });
   } catch (e) {
@@ -222,7 +265,12 @@ async function startGame() {
   }
 }
 $('#start').addEventListener('click', startGame);
-$('#quit').addEventListener('click', () => { if (confirm('確定要離開這場遊戲嗎？')) { runGame.stop?.(); show('mode'); } });
+$('#quit').addEventListener('click', () => {
+  if (!confirm('確定要離開這場遊戲嗎？')) return;
+  runGame.stop?.();
+  $('#game-root').replaceChildren();
+  show(S.returnTo || 'mode');
+});
 
 // ---------- 結果 ----------
 function showResult(r) {

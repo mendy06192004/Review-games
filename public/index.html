@@ -17,10 +17,15 @@
     <section class="step" data-step="subject">
       <h1>今天想複習哪一科？</h1>
       <div class="cards big" id="subject-cards"></div>
-      <div id="standalone-box" hidden>
-        <h2 class="sub">其他練習遊戲 <small>（內建題目，不需要選範圍）</small></h2>
-        <div class="cards" id="standalone-cards"></div>
-      </div>
+    </section>
+
+    <!-- 其他：特殊需求領域與固定範圍的學科遊戲 -->
+    <section class="step" data-step="others" hidden>
+      <h1>其他遊戲</h1>
+      <p class="tip">不需要選範圍，點了就能玩。</p>
+      <nav class="chips" id="other-tabs" aria-label="分類"></nav>
+      <div id="other-list"></div>
+      <div class="nav"><button class="btn ghost" data-back>← 回首頁</button></div>
     </section>
 
     <!-- 2 版本 -->

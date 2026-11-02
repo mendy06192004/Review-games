@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>國英數複習平台</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>國英數複習平台</h1>
+    <span id="updated" class="muted"></span>
+  </header>
+
+  <main>
+    <!-- 選擇範圍 -->
+    <section id="setup" class="panel">
+      <h2>1. 選擇科目</h2>
+      <div id="subjects" class="chips"></div>
+
+      <h2>2. 選擇範圍 <small class="muted">（可多選，勾選上層會包含底下全部）</small></h2>
+      <div id="tree" class="tree">載入中…</div>
+
+      <h2>3. 題數</h2>
+      <div class="row">
+        <input id="count" type="number" min="1" max="50" value="10">
+        <button id="start" class="primary">開始練習</button>
+      </div>
+      <p id="setup-msg" class="msg" role="alert"></p>
+    </section>
+
+    <!-- 作答 -->
+    <section id="quiz" class="panel" hidden>
+      <div class="progress">
+        <span id="progress-text"></span>
+        <div class="bar"><div id="progress-bar"></div></div>
+      </div>
+      <article class="card">
+        <div class="meta"><span id="q-subject" class="tag"></span><span id="q-difficulty" class="muted"></span></div>
+        <p id="q-stem" class="stem"></p>
+        <img id="q-image" alt="題目圖片" hidden>
+        <ol id="q-options" class="options"></ol>
+        <div id="feedback" class="feedback" hidden></div>
+      </article>
+      <div class="row end">
+        <button id="quit">結束</button>
+        <button id="next" class="primary" hidden>下一題</button>
+      </div>
+    </section>
+
+    <!-- 結果 -->
+    <section id="result" class="panel" hidden>
+      <h2>練習結束</h2>
+      <p id="score" class="score"></p>
+      <ol id="review" class="review"></ol>
+      <div class="row">
+        <button id="retry" class="primary">同範圍再練一次</button>
+        <button id="back">重新選擇範圍</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

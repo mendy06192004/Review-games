@@ -1,0 +1,5 @@
+node_modules/
+# 索引為自動產生的檔案
+題庫/索引/*.json
+*.tmp
+.DS_Store

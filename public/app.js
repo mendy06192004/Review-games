@@ -26,7 +26,12 @@ const store = {
 };
 
 async function api(url) {
-  const res = await fetch(url);
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 10000); // 10 秒沒回應就顯示錯誤，不要一直空白
+  let res;
+  try { res = await fetch(url, { signal: ctl.signal }); }
+  catch (e) { throw new Error(e.name === 'AbortError' ? '伺服器沒有回應，請確認平台是否還在執行' : '無法連線到伺服器'); }
+  finally { clearTimeout(timer); }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
@@ -375,6 +380,6 @@ $('#other-mode').addEventListener('click', () => pickSubject(S.subject, S.subjec
 $('#restart').addEventListener('click', buildVersions);
 
 initHome().then(() => show('subject')).catch((e) => {
-  $('#subject-cards').replaceChildren(el('p', { className: 'msg', textContent: '無法載入：' + e.message }));
+  $('#subject-cards').replaceChildren(el('p', { className: 'msg', textContent: '無法載入：' + e.message + '（請按 Ctrl+F5 重新整理；若還是不行，請看黑色視窗有沒有紅字）' }));
   show('subject');
 });

@@ -103,6 +103,7 @@ async function initHome() {
   });
   const others = gamesFor('O');
   if (others.length) zones.push(zone('O', '其他', '他', '生活管理・職業教育・社會技巧', `${others.length} 個遊戲`));
+  $('#subject-cards').dataset.ok = '1';
   $('#subject-cards').replaceChildren(...zones);
 }
 

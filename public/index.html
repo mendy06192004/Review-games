@@ -133,6 +133,21 @@
     <a href="/submit/">老師投稿遊戲</a>
   </footer>
 
+  <script>
+    // 安全網：程式沒有跑起來時，直接在畫面上說明原因（不會一直停在「載入中」）
+    (function () {
+      function fail(msg) {
+        var box = document.getElementById('subject-cards');
+        if (!box || box.dataset.ok === '1') return;
+        box.innerHTML = '<p class="msg" style="grid-column:1/-1">' + msg + '</p>';
+      }
+      window.addEventListener('error', function (e) { fail('網頁程式出現錯誤：' + (e.message || '未知錯誤') + '。請按 F12 查看 Console，或重新解壓縮最新版後再啟動。'); });
+      setTimeout(function () {
+        var box = document.getElementById('subject-cards');
+        if (box && box.querySelector('.zone') === null) fail('學科資料還沒有載入。請確認黑色視窗仍在執行，並開啟 <a href="/api/games">/api/games</a> 看是否有資料；若網頁程式沒有載入，請重新解壓縮最新版。');
+      }, 8000);
+    })();
+  </script>
   <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -28,6 +28,7 @@ const time = (s) => (s ? new Date(s).toLocaleString('zh-TW', { hour12: false }) 
 
 async function load() {
   try {
+    window.refreshAdminCounts?.();
     const data = await api('/api/admin/games');
     META = data;
     const pending = data.遊戲.filter((g) => g.狀態 === '待審核').length;
@@ -145,7 +146,7 @@ async function sampleQuestions(subjects) {
 }
 async function preview(g) {
   const root = $('#preview-root');
-  const url = `/admin/preview/${g.id}/index.html`;
+  const url = g.預覽網址;
   $('#preview-title').textContent = g.名稱;
   $('#preview-note').textContent = '';
   closePreview();

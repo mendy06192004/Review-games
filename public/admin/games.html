@@ -9,11 +9,8 @@
 </head>
 <body>
   <header class="top">
-    <h1>後台</h1>
-    <nav class="tabs"><a href="/admin/">題目審核</a><a href="/admin/games.html" class="on">遊戲管理</a></nav>
     <span id="summary" class="muted"></span>
     <button id="add" type="button" class="primary">＋ 新增遊戲</button>
-    <a href="/" class="link">回學生首頁</a>
   </header>
   <main>
     <p class="hint">老師從 <a href="/submit/" target="_blank">投稿頁</a> 上傳的遊戲會先出現在這裡（待審核），請先「預覽」試玩，確認沒問題再按「發布」，學生才看得到。上傳的遊戲一律在沙盒中執行，無法讀取平台資料或後台功能。</p>
@@ -30,6 +27,7 @@
     <div id="preview-root" class="preview-root"></div>
   </dialog>
   <div id="toast" class="toast" role="status"></div>
+  <script src="nav.js"></script>
   <script src="/shared/game-form.js"></script>
   <script type="module" src="games.js"></script>
 </body>

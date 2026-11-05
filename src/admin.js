@@ -1,7 +1,7 @@
 'use strict';
 /**
  * 審核 API（/api/admin/*）。草稿在 待審核/，通過後才寫入 題目/<科目>/<id>.json。
- * config.json 的 admin_password 不為空時，會要求 HTTP Basic 驗證（帳號任意、密碼為 admin_password）。
+ * config.json 的 admin_password 不為空時需要登入（見 auth.js）。
  */
 const fs = require('fs');
 const fsp = fs.promises;
@@ -10,20 +10,10 @@ const express = require('express');
 const D = require('./drafts');
 const { validateQuestion, parseId } = require('./schema');
 const { ensureIndex } = require('./indexer');
+const { adminAuth } = require('./auth');
 
 class HttpError extends Error {
   constructor(status, message, details) { super(message); this.status = status; this.details = details; }
-}
-
-function adminAuth(cfg) {
-  return (req, res, next) => {
-    if (!cfg.adminPassword) return next();
-    const [type, token] = (req.headers.authorization || '').split(' ');
-    const pass = type === 'Basic' && token ? Buffer.from(token, 'base64').toString().split(':').slice(1).join(':') : null;
-    if (pass === cfg.adminPassword) return next();
-    res.set('WWW-Authenticate', 'Basic realm="review-admin", charset="UTF-8"');
-    res.status(401).send('需要老師密碼');
-  };
 }
 
 /**

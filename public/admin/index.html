@@ -3,25 +3,80 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>後台・題目審核</title>
+  <title>後台・總覽</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <header class="top">
-    <h1>後台</h1>
-    <nav class="tabs"><a href="/admin/" class="on">題目審核</a><a href="/admin/games.html">遊戲管理</a></nav>
-    <span id="summary" class="muted"></span>
-    <label class="filter"><input type="checkbox" id="showRejected" checked> 顯示已退回</label>
-    <button id="reload" type="button">重新整理</button>
-    <a href="/" class="link">回學生首頁</a>
-  </header>
+  <header class="top"></header>
   <main>
-    <p class="hint">草稿來自 <code>待審核/</code>。標示「需審核」的題目排在最前面；黃色框是需要確認的欄位。按「通過」後題目才會放進 <code>題目/</code> 並立即出現在練習中。</p>
-    <div id="broken"></div>
-    <div id="list" class="list">載入中…</div>
+    <section class="hello">
+      <h2>今天要做什麼？</h2>
+      <p class="muted">考卷上傳後經過「匯入 → 審核」才會變成學生的題目；老師投稿的遊戲也要在這裡發布。</p>
+    </section>
+
+    <section class="flow" id="flow">
+      <a class="step-card" href="/admin/import.html">
+        <span class="num">一</span>
+        <b>匯入考卷</b>
+        <span class="muted">上傳 PDF、Word 或照片，交給 AI 整理成題目草稿</span>
+        <span class="stat" id="s-import"></span>
+      </a>
+      <a class="step-card" href="/admin/questions.html">
+        <span class="num">二</span>
+        <b>審核題目</b>
+        <span class="muted">逐題確認答案與章節，按「通過」才會出現在學生端</span>
+        <span class="stat" id="s-drafts"></span>
+      </a>
+      <a class="step-card" href="/admin/games.html">
+        <span class="num">三</span>
+        <b>遊戲管理</b>
+        <span class="muted">試玩老師投稿的遊戲，確認後發布；也可以自己新增</span>
+        <span class="stat" id="s-games"></span>
+      </a>
+    </section>
+
+    <section class="card">
+      <h2>題庫現況</h2>
+      <div class="bank" id="bank"></div>
+      <p class="muted small" id="folder"></p>
+    </section>
+
+    <section class="card">
+      <h2>最近的匯入紀錄</h2>
+      <div id="log" class="muted">載入中…</div>
+    </section>
   </main>
-  <datalist id="dl-版本"></datalist><datalist id="dl-年級"></datalist><datalist id="dl-冊"></datalist><datalist id="dl-章"></datalist>
-  <div id="toast" class="toast" role="status"></div>
-  <script src="admin.js"></script>
+  <script src="nav.js"></script>
+  <script>
+  (function () {
+    var $ = function (s) { return document.querySelector(s); };
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+    function render(o) {
+      if (!o) return;
+      $('#s-import').textContent = o.待匯入 ? '有 ' + o.待匯入 + ' 個檔案還沒匯入' : '沒有待匯入的檔案';
+      $('#s-import').className = 'stat' + (o.待匯入 ? ' todo' : '');
+      $('#s-drafts').textContent = o.草稿.總數 ? o.草稿.總數 + ' 題等待審核' + (o.草稿.需審核 ? '（' + o.草稿.需審核 + ' 題需要補資料）' : '') : '沒有待審核的題目';
+      $('#s-drafts').className = 'stat' + (o.草稿.總數 ? ' todo' : '');
+      $('#s-games').textContent = o.待審遊戲 ? o.待審遊戲 + ' 個投稿等待發布' : '沒有待審核的投稿';
+      $('#s-games').className = 'stat' + (o.待審遊戲 ? ' todo' : '');
+      $('#bank').replaceChildren.apply($('#bank'), [el('div', 'total', '')].concat(o.題庫.各科.map(function (s) {
+        var d = el('div', 'subj'); d.append(el('b', null, s.題數), el('span', null, s.名稱)); return d;
+      })));
+      $('#bank .total').append(el('b', null, o.題庫.總數), el('span', null, '題（全部）'));
+      $('#folder').textContent = '題庫資料夾：' + o.資料夾 + (o.題庫.錯誤數 ? '　⚠ 有 ' + o.題庫.錯誤數 + ' 個格式錯誤的題目沒有列入' : '');
+      var log = $('#log');
+      if (!o.最近匯入.length) { log.textContent = '還沒有匯入過考卷。'; return; }
+      var ul = el('ul', 'loglist');
+      o.最近匯入.forEach(function (r) {
+        var li = el('li', r.錯誤 ? 'bad' : '');
+        li.append(el('span', 'when', new Date(r.處理時間).toLocaleString('zh-TW', { hour12: false })), el('b', null, r.來源檔),
+          el('span', null, r.錯誤 ? '失敗：' + r.錯誤 : '產生 ' + r.產生題數 + ' 題' + (r.需審核題數 ? '，' + r.需審核題數 + ' 題需審核' : '')));
+        ul.append(li);
+      });
+      log.replaceChildren(ul);
+    }
+    var wait = setInterval(function () { if (window.refreshAdminCounts) { clearInterval(wait); window.refreshAdminCounts().then(render); } }, 30);
+  })();
+  </script>
 </body>
 </html>

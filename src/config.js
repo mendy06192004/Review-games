@@ -23,7 +23,7 @@ function resolveConfig(raw, baseDir) {
     gamesDir: path.resolve(dataDir, raw.gamesDir || '遊戲'),
     claude: { model: 'claude-opus-5-5', effort: 'high', pagesPerRequest: 6, fallbacks: true, ...(raw.claude || {}) },
     // 預留：之後要加審核頁登入驗證時使用（空字串＝不驗證）
-    adminPassword: raw.admin_password || '',
+    adminPassword: process.env.ADMIN_PASSWORD || raw.admin_password || '',
     // 老師投稿遊戲頁的密碼（空字串＝知道網址的人都能投稿；投稿一律要等管理員審核後才會發布）
     submitPassword: raw.submit_password || '',
     gameUpload: { maxZipMB: 30, maxFiles: 800, ...(raw.gameUpload || {}) },
@@ -42,6 +42,15 @@ function loadConfig(configPath) {
     raw = JSON.parse(fs.readFileSync(file, 'utf8').replace(/^﻿/, ''));
   } catch (e) {
     throw new Error(`無法讀取設定檔 ${file}：${e.message}`);
+  }
+  // 本機設定.json（不上傳 GitHub）可覆蓋密碼等私人設定，例如 { "admin_password": "1234" }
+  const local = path.join(path.dirname(file), '本機設定.json');
+  if (fs.existsSync(local)) {
+    try {
+      Object.assign(raw, JSON.parse(fs.readFileSync(local, 'utf8').replace(/^\uFEFF/, '')));
+    } catch (e) {
+      throw new Error(`無法讀取 ${local}：${e.message}`);
+    }
   }
   return resolveConfig(raw, path.dirname(file));
 }

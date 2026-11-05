@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>後台・匯入考卷</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="top"></header>
+  <main>
+    <section class="card">
+      <h2><span class="num">1</span> 上傳考卷</h2>
+      <p class="muted">先選好科目、版本、年級（AI 會用來判斷章節與題號），再選檔案。支援 PDF、Word（.docx）、照片（.jpg / .png），可一次選多個。</p>
+      <div class="up-grid">
+        <label>科目<select id="u-subject"><option value="">（讓 AI 判斷）</option></select></label>
+        <label>版本<input type="text" id="u-version" list="dl-version" placeholder="例如：南一、翰林、康軒"></label>
+        <label>年級<select id="u-grade"><option value="">（讓 AI 判斷）</option></select></label>
+      </div>
+      <datalist id="dl-version"><option value="南一"><option value="翰林"><option value="康軒"></datalist>
+      <label class="drop" id="drop">
+        <input type="file" id="u-files" multiple accept=".pdf,.docx,.png,.jpg,.jpeg">
+        <b>點這裡選擇檔案</b><span class="muted">或把檔案拖曳到這個框裡</span>
+      </label>
+      <p id="u-msg" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h2><span class="num">2</span> 確認要匯入的檔案</h2>
+      <p class="muted">勾選要交給 AI 整理的檔案。處理完的原檔會自動歸檔，題目先變成「草稿」，不會直接給學生。</p>
+      <div id="files" class="files">載入中…</div>
+
+      <div class="keybox" id="keybox" hidden>
+        <p><b>還沒有 Claude API 金鑰。</b>AI 整理需要金鑰；貼上後只保存在這次開啟的平台中，關掉黑色視窗就會清除，不會寫進任何檔案。</p>
+        <div class="row"><input type="password" id="key" placeholder="sk-ant-…"><button type="button" id="key-save">使用這把金鑰</button></div>
+        <p class="muted small">想要每次啟動都自動有金鑰：雙擊專案資料夾裡的「設定金鑰-Windows.bat」一次即可。</p>
+      </div>
+      <label class="offline"><input type="checkbox" id="offline"> 離線模式（不用 AI，只能處理「有文字、格式整齊」的 PDF；掃描檔與照片不適用）</label>
+
+      <div class="actions">
+        <button type="button" class="primary" id="run" disabled>開始匯入勾選的檔案</button>
+      </div>
+    </section>
+
+    <section class="card" id="job-card" hidden>
+      <h2><span class="num">3</span> 匯入進度</h2>
+      <div class="progress"><i id="bar"></i></div>
+      <p id="job-status"></p>
+      <ul id="job-results" class="loglist"></ul>
+      <details><summary class="muted">詳細紀錄</summary><pre id="job-log" class="joblog"></pre></details>
+      <div class="actions" id="job-next" hidden><a class="btnlink primary" href="/admin/questions.html">前往審核題目 →</a></div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="nav.js"></script>
+  <script src="import.js"></script>
+</body>
+</html>

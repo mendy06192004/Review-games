@@ -16,6 +16,6 @@ ensureIndex(cfg)
     createApp(cfg).listen(cfg.port, () => {
       console.log(`題庫資料夾：${cfg.dataDir}`);
       console.log(`複習小書房已啟動：http://localhost:${cfg.port}`);
-      console.log(`老師審核頁面：http://localhost:${cfg.port}/admin${cfg.adminPassword ? '（需要密碼）' : ''}`);
+      console.log(`老師後台（匯入考卷、審核題目、遊戲管理）：http://localhost:${cfg.port}/admin${cfg.adminPassword ? '（需要密碼）' : ''}`);
     });
   });

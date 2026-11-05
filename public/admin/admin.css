@@ -79,3 +79,58 @@ dialog.preview::backdrop{background:rgba(30,28,25,.55)}
 .preview-root{flex:1;background:#000}
 .preview-root iframe{width:100%;height:100%;border:0;display:block}
 @media (max-width:700px){.grow{flex-direction:column}.thumb{width:100%}}
+
+/* 共用導覽 */
+.brand{display:flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-family:var(--serif);font-weight:700;letter-spacing:.1em}
+.seal{display:inline-grid;place-items:center;width:26px;height:26px;border:1.5px solid var(--accent);color:var(--accent);border-radius:3px;font-size:.85rem}
+.tabs a{display:inline-flex;align-items:center;gap:6px}
+.tabs .count{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);color:var(--bg);font-size:.75rem;display:inline-grid;place-items:center;font-weight:700}
+.top-right{margin-left:auto;display:flex;gap:12px;align-items:center}
+.top .link{margin-left:0}
+.top button.primary{margin-left:0}
+.small{font-size:.85rem}
+.num{display:inline-grid;place-items:center;width:26px;height:26px;border:1px solid var(--accent);color:var(--accent);border-radius:50%;font-size:.85rem;margin-right:6px;font-family:var(--serif)}
+main>.card{margin-bottom:18px}
+
+/* 總覽 */
+.hello h2{margin:12px 0 4px;font-size:1.5rem}
+.hello p{margin:0 0 22px}
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px}
+.step-card{display:flex;flex-direction:column;gap:6px;padding:20px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text);text-decoration:none;transition:border-color .2s,transform .2s}
+.step-card:hover{border-color:var(--muted);transform:translateY(-2px)}
+.step-card .num{width:34px;height:34px;font-size:1rem}
+.step-card b{font-family:var(--serif);font-size:1.15rem;letter-spacing:.08em}
+.step-card .stat{margin-top:auto;padding-top:10px;border-top:1px dashed var(--border);color:var(--muted)}
+.step-card .stat.todo{color:var(--accent);font-weight:700}
+.bank{display:flex;flex-wrap:wrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.bank>div{flex:1;min-width:90px;padding:14px 8px;text-align:center;color:var(--muted);font-size:.85rem}
+.bank>div+div{border-left:1px solid var(--border)}
+.bank b{display:block;font-size:1.6rem;color:var(--text);font-family:var(--serif)}
+.loglist{list-style:none;padding:0;margin:0}
+.loglist li{display:flex;gap:12px;flex-wrap:wrap;padding:8px 0;border-bottom:1px dashed var(--border)}
+.loglist li.bad span:last-child{color:var(--bad)}
+.loglist .when{color:var(--muted);font-size:.85rem;min-width:150px}
+
+/* 匯入考卷 */
+.up-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+.up-grid label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--muted)}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:28px;border:1.5px dashed var(--border);border-radius:4px;cursor:pointer;text-align:center}
+.drop:hover,.drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.drop b{font-family:var(--serif);font-size:1.1rem;color:var(--accent)}
+.files{display:grid;gap:8px;margin:12px 0}
+.file{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:4px;cursor:pointer}
+.file input{width:20px;height:20px;accent-color:var(--accent)}
+.fname{flex:1;display:flex;flex-direction:column;min-width:0}
+.fname b{overflow-wrap:anywhere}
+.keybox{border-left:3px solid var(--warn);background:var(--warn-bg);padding:10px 14px;margin:12px 0;border-radius:2px}
+.keybox p{margin:4px 0}
+.keybox .row input{flex:1}
+.offline{display:flex;gap:8px;align-items:flex-start;color:var(--muted);font-size:.92rem;margin-top:6px}
+.offline input{margin-top:5px}
+.progress{height:4px;background:var(--border);overflow:hidden;border-radius:2px}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+.joblog{white-space:pre-wrap;font-size:.82rem;max-height:260px;overflow:auto;background:color-mix(in srgb,var(--border) 25%,transparent);padding:10px;border-radius:4px}
+.btnlink{display:inline-block;padding:8px 18px;border-radius:4px;text-decoration:none;letter-spacing:.06em}
+.btnlink.primary{background:var(--text);color:var(--bg)}
+@media (max-width:760px){.flow,.up-grid{grid-template-columns:1fr}}

@@ -40,6 +40,7 @@
   async function load() {
     const list = $('#list');
     try {
+      window.refreshAdminCounts?.();
       const data = await api('/api/admin/drafts');
       const showRejected = $('#showRejected').checked;
       const items = data.草稿.filter((it) => showRejected || it.題目.審核?.狀態 !== '退回');

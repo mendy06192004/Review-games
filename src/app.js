@@ -5,7 +5,9 @@ const compression = require('compression');
 const { ensureIndex, nodeMap } = require('./indexer');
 const { readQuestionFile } = require('./loader');
 const { shuffle } = require('./util');
-const { createAdminRouter, adminAuth, sameOriginGuard } = require('./admin');
+const { createAdminRouter, sameOriginGuard } = require('./admin');
+const { adminAuth, loginRoutes } = require('./auth');
+const { createWorkspaceRouter } = require('./workspace');
 const { createPublicGameRouter, createAdminGameRouter, createPreviewRouter } = require('./games');
 
 class HttpError extends Error {
@@ -100,8 +102,11 @@ function createApp(cfg) {
   app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
   app.use('/api/admin', sameOriginGuard);
   app.use('/api/admin/games', adminAuth(cfg), createAdminGameRouter(cfg));
+  app.use('/api/admin', adminAuth(cfg), createWorkspaceRouter(cfg));
   app.use('/api/admin', createAdminRouter(cfg));
-  app.use('/admin', adminAuth(cfg), createPreviewRouter(cfg));
+  app.use('/admin', adminAuth(cfg));
+  app.use(createPreviewRouter(cfg));
+  loginRoutes(app, cfg);
   app.use(createPublicGameRouter(cfg));
 
   // 版本與範圍樹（只有題數，不含題目內容與 ID）

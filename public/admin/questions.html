@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>後台・題目審核</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="top">
+    <span id="summary" class="muted"></span>
+    <label class="filter"><input type="checkbox" id="showRejected" checked> 顯示已退回</label>
+    <button id="reload" type="button">重新整理</button>
+  </header>
+  <main>
+    <p class="hint">這裡是「匯入考卷」整理出來的題目草稿。標示「需審核」的題目排在最前面；黃色框是需要確認的欄位。按「通過」後題目才會放進 <code>題目/</code> 並立即出現在練習中。</p>
+    <div id="broken"></div>
+    <div id="list" class="list">載入中…</div>
+  </main>
+  <datalist id="dl-版本"></datalist><datalist id="dl-年級"></datalist><datalist id="dl-冊"></datalist><datalist id="dl-章"></datalist>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="nav.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

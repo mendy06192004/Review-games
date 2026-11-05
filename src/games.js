@@ -19,6 +19,7 @@ const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
 const JSZip = require('jszip');
+const { previewToken } = require('./auth');
 
 class HttpError extends Error {
   constructor(status, message, details) { super(message); this.status = status; this.details = details; }
@@ -379,7 +380,10 @@ function createAdminGameRouter(cfg) {
 
   r.get('/', async (req, res) => {
     const list = await listGames(cfg);
-    for (const g of list) g.有封面 = !!(await findCover(cfg, g.id));
+    for (const g of list) {
+      g.有封面 = !!(await findCover(cfg, g.id));
+      g.預覽網址 = `/gpreview/${previewToken(cfg, g.id)}/${g.id}/index.html`;
+    }
     list.sort((a, b) => (ORDER[a.狀態] ?? 9) - (ORDER[b.狀態] ?? 9) || String(b.建立時間).localeCompare(String(a.建立時間)));
     res.json({ 遊戲: list, 分類: CATEGORIES, 科目: cfg.subjects, 上限MB: cfg.gameUpload.maxZipMB });
   });
@@ -441,12 +445,17 @@ function createAdminGameRouter(cfg) {
   return r;
 }
 
-/** 管理員預覽（任何狀態都能看），掛在 /admin 之下 */
+/**
+ * 管理員預覽（任何狀態都能看）：/gpreview/<簽章>/<遊戲編號>/...
+ * 沙盒中的遊戲載入自己的圖片、程式時不會帶登入 Cookie，所以改用網址中的簽章驗證；
+ * 簽章只有後台遊戲清單才拿得到。
+ */
 function createPreviewRouter(cfg) {
   const r = express.Router();
-  r.get(/^\/preview\/(u-[0-9a-f]{8})(?:\/(.*))?$/, (req, res, next) => {
-    req.params.id = req.params[0];
-    req.params[0] = req.params[1];
+  r.get(/^\/gpreview\/([0-9a-f]{16})\/(u-[0-9a-f]{8})(?:\/(.*))?$/, (req, res, next) => {
+    if (req.params[0] !== previewToken(cfg, req.params[1])) return res.status(404).end();
+    req.params.id = req.params[1];
+    req.params[0] = req.params[2];
     next();
   }, serveGameFiles(cfg, { allow: () => true }));
   return r;

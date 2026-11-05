@@ -15,7 +15,8 @@ function makeTempBank() {
     if (f.endsWith('.json')) fs.rmSync(path.join(dir, '索引', f));
   }
   const raw = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json'), 'utf8'));
-  const cfg = resolveConfig({ ...raw, dataDir: dir }, '/');
+  // 測試預設不需要後台密碼（登入功能另有專門測試）
+  const cfg = resolveConfig({ ...raw, dataDir: dir, admin_password: '' }, '/');
   return { dir, cfg, cleanup: () => fs.rmSync(dir, { recursive: true, force: true }) };
 }
 

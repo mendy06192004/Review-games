@@ -167,6 +167,7 @@ body.playing .topbar,body.playing .foot{display:none}
 .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:1040px;width:100%;margin:0 auto;padding:18px 20px calc(18px + env(safe-area-inset-bottom,0px));
   color:var(--ink-3);font-size:.82rem;border-top:1px solid var(--line);font-family:var(--serif);letter-spacing:.15em}
 .foot a{color:var(--ink-3)}
+.foot-links{display:flex;gap:18px}
 .foot a:hover{color:var(--accent)}
 
 @media (max-width:820px){

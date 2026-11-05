@@ -22,7 +22,7 @@ async function start(cfg) {
     try { json = JSON.parse(text); } catch { /* 非 JSON */ }
     return { status: res.status, body: json, text, headers: res.headers };
   };
-  return { call, close: () => server.close() };
+  return { call, base, close: () => server.close() };
 }
 
 const HTML = '<!doctype html><html><head><title>t</title></head><body><script>localStorage.setItem("a","1")</script>hi</body></html>';
@@ -41,8 +41,10 @@ test('老師投稿 → 待審核（學生看不到）→ 管理員發布 → 學
     let list = await app.call('/api/games');
     assert.ok(!list.body.遊戲.some((g) => g.id === id), '待審核的遊戲不應出現在學生端');
     assert.strictEqual((await app.call(`/ugames/${id}/index.html`)).status, 404);
-    // 管理員可以預覽未發布的遊戲
-    const pv = await app.call(`/admin/preview/${id}/index.html`);
+    // 管理員可以預覽未發布的遊戲（網址帶簽章，簽章錯誤就看不到）
+    const adminList = await app.call('/api/admin/games');
+    const pv = await app.call(adminList.body.遊戲.find((x) => x.id === id).預覽網址);
+    assert.strictEqual((await app.call(`/gpreview/0000000000000000/${id}/index.html`)).status, 404);
     assert.strictEqual(pv.status, 200);
     assert.match(pv.headers.get('content-security-policy'), /^sandbox allow-scripts/);
 
@@ -154,6 +156,74 @@ test('五個學科：自然 B、社會 S 可用於題號與篩選', async () => 
     const t = await app.call('/api/tree');
     assert.deepStrictEqual(t.body.科目.map((s) => s.代碼), ['C', 'E', 'M', 'B', 'S']);
     assert.strictEqual((await app.call('/api/tree?subject=社會')).status, 200);
+  } finally {
+    app.close();
+    cleanup();
+  }
+});
+
+test('後台登入：沒登入看不到後台，密碼正確才能進入，登出後失效', async () => {
+  const { cfg, cleanup } = makeTempBank();
+  cfg.adminPassword = '0928';
+  const app = await start(cfg);
+  try {
+    assert.strictEqual((await app.call('/api/admin/overview')).status, 401);
+    assert.strictEqual((await app.call('/api/admin/drafts')).status, 401);
+    const redirect = await app.call('/admin/', { headers: {} });
+    assert.ok(redirect.text.includes('後台登入'), '未登入開後台會被導到登入頁');
+    assert.strictEqual((await app.call('/api/login', { method: 'POST', body: { 密碼: '1234' } })).status, 401);
+    const ok = await app.call('/api/login', { method: 'POST', body: { 密碼: '0928' } });
+    assert.strictEqual(ok.status, 200);
+    const cookie = ok.headers.get('set-cookie').split(';')[0];
+    assert.match(ok.headers.get('set-cookie'), /HttpOnly/);
+    assert.match(ok.headers.get('set-cookie'), /SameSite=Strict/);
+    const ov = await app.call('/api/admin/overview', { headers: { Cookie: cookie } });
+    assert.strictEqual(ov.status, 200);
+    assert.strictEqual(ov.body.題庫.總數, 3);
+    // 學生端與投稿頁不需要密碼
+    assert.strictEqual((await app.call('/api/tree')).status, 200);
+    assert.strictEqual((await app.call('/api/submit/info')).status, 200);
+  } finally {
+    app.close();
+    cleanup();
+  }
+});
+
+test('網頁匯入：上傳 → 列出 → 勾選確認後處理 → 只產生草稿，不會寫入題目/', async () => {
+  const { cfg, cleanup } = makeTempBank();
+  const app = await start(cfg);
+  try {
+    const pdf = fs.readFileSync(path.join(__dirname, 'fixtures', 'sample-exam.pdf'));
+    const up = await fetch(`${app.base}/api/admin/import/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/pdf', 'X-File-Name': encodeURIComponent('段考/../一.pdf'), 'X-Subject': encodeURIComponent('數學'), 'X-Version': encodeURIComponent('南一'), 'X-Grade': encodeURIComponent('國二') },
+      body: pdf,
+    }).then((r) => r.json());
+    assert.strictEqual(up.檔案, '數學/南一/國二/段考..一.pdf', '檔名中的路徑符號會被移除');
+    const bad = await fetch(`${app.base}/api/admin/import/upload`, { method: 'POST', headers: { 'Content-Type': 'application/octet-stream', 'X-File-Name': 'a.exe' }, body: 'MZ' });
+    assert.strictEqual(bad.status, 400);
+
+    const list = await app.call('/api/admin/import/files');
+    assert.strictEqual(list.body.檔案.length, 1);
+    assert.deepStrictEqual(list.body.檔案[0].判斷, { 科目: '數學', 版本: '南一', 年級: '國二' });
+
+    assert.strictEqual((await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [] } })).status, 400, '沒勾選不能執行');
+    const before = fs.readdirSync(cfg.questionDir, { recursive: true }).length;
+    const run = await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [up.檔案], 離線: true } });
+    assert.strictEqual(run.status, 200, run.text);
+    let job;
+    for (let i = 0; i < 100; i++) {
+      job = (await app.call('/api/admin/import/job')).body.工作;
+      if (job.狀態 === '完成') break;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    assert.strictEqual(job.狀態, '完成');
+    assert.ok(job.結果[0].題數 > 0, JSON.stringify(job));
+    assert.strictEqual(fs.readdirSync(cfg.questionDir, { recursive: true }).length, before, '題目/ 不可被自動寫入');
+    const ov = await app.call('/api/admin/overview');
+    assert.strictEqual(ov.body.待匯入, 0);
+    assert.strictEqual(ov.body.草稿.總數, job.結果[0].題數);
+    assert.strictEqual(ov.body.最近匯入.length, 1);
   } finally {
     app.close();
     cleanup();

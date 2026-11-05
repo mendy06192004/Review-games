@@ -4,20 +4,20 @@
 const CSS = `
 .qz{max-width:760px;margin:0 auto}
 .qz-hud{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-.qz-pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:4px 14px;font-weight:700}
-.qz-bar{flex:1;min-width:120px;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.qz-pill{border:1px solid var(--border);border-radius:999px;padding:2px 14px;color:var(--muted);letter-spacing:.08em}
+.qz-bar{flex:1;min-width:120px;height:2px;background:var(--border);overflow:hidden}
 .qz-bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
-.qz-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px}
-.qz-stem{font-size:1.25rem;font-weight:700;white-space:pre-wrap;margin:0 0 14px}
+.qz-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:28px 24px}
+.qz-stem{font-family:var(--serif,serif);font-size:1.3rem;line-height:1.8;font-weight:700;white-space:pre-wrap;margin:0 0 18px}
 .qz-img{max-width:100%;max-height:300px;display:block;margin:0 auto 14px;border-radius:8px;background:#fff}
 .qz-opts{display:grid;gap:10px}
-.qz-opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;min-height:56px;padding:10px 14px;border:2px solid var(--border);border-radius:14px;background:var(--bg);font-size:1.08rem}
-.qz-opt b{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--panel);border:1px solid var(--border)}
-.qz-opt:hover:not(:disabled){border-color:var(--accent)}
+.qz-opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;min-height:56px;padding:10px 14px;border:1px solid var(--border);border-radius:4px;background:transparent;font-size:1.05rem}
+.qz-opt b{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif,serif);font-weight:500;border:1px solid var(--border)}
+.qz-opt:hover:not(:disabled){border-color:var(--muted)}
 .qz-opt.ok{border-color:var(--ok);background:var(--ok-bg)}
 .qz-opt.bad{border-color:var(--bad);background:var(--bad-bg)}
 .qz-opt:disabled{cursor:default}
-.qz-fb{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--bg);white-space:pre-wrap}
+.qz-fb{margin-top:16px;padding:12px 16px;border-left:2px solid var(--border);white-space:pre-wrap}
 .qz-fb.ok strong{color:var(--ok)}.qz-fb.bad strong{color:var(--bad)}
 .qz-plus{color:var(--ok);font-weight:800;margin-left:6px}
 .qz-next{margin-top:14px;width:100%}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>投稿遊戲</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/shared/game-form.css">
+  <style>
+    .sheet{max-width:760px}
+    .steps-list{padding-left:1.3em;color:var(--ink-2)}
+    .steps-list li{margin:4px 0}
+    .box{border:1px solid var(--line);border-radius:4px;background:var(--card);padding:22px}
+    .done{border-left:3px solid var(--ok);padding:14px 18px;background:var(--card)}
+    pre{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:12px 14px;overflow:auto;font-size:.85rem;line-height:1.6}
+    details{margin:18px 0}
+    summary{cursor:pointer;font-family:var(--serif);letter-spacing:.06em}
+    #pw-row{margin-bottom:14px}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand"><span class="seal">習</span>複習小書房</a>
+  </header>
+  <main class="sheet">
+    <div class="page-head">
+      <p class="eyebrow">老師投稿</p>
+      <h1>分享你做的遊戲</h1>
+      <p class="lede">上傳後會先交給管理員試玩審核，通過後才會出現在學生頁面。</p>
+    </div>
+
+    <ol class="steps-list">
+      <li>準備遊戲檔：單一 <code>.html</code> 檔，或把整個遊戲資料夾壓成 <code>.zip</code>（最外層要有 <code>index.html</code>）。</li>
+      <li>想用平台的題庫出題？下載 <a href="/submit/template.html" download="遊戲範本.html">遊戲範本</a>，照裡面的註解修改。</li>
+      <li>附上一張遊戲畫面截圖當封面（選填），學生選遊戲時看得到。</li>
+    </ol>
+
+    <details>
+      <summary>題庫遊戲的寫法（GameBridge）</summary>
+      <p>在網頁中加入 <code>&lt;script src="/games/_shared/bridge.js"&gt;&lt;/script&gt;</code>，就能使用：</p>
+<pre>GameBridge.requireBank('遊戲名稱')   // 沒有從平台開啟時顯示提示，回傳 false
+GameBridge.questions()               // Promise&lt;題目陣列&gt;：{ id, 科目, 題幹, 選項[], 難度, 圖片 }（不含答案）
+GameBridge.check(題目id, 選項索引)    // Promise&lt;{ correct, 答案, 解析 }&gt;，由伺服器批改
+GameBridge.finish({ score })         // 遊戲結束，平台會顯示成績</pre>
+      <p>注意：上傳的遊戲在安全沙盒中執行，<code>localStorage</code> 只在這次遊玩有效，關掉就清除；也無法讀取平台的其他資料。</p>
+    </details>
+
+    <div class="box" id="form-box">
+      <div id="pw-row" hidden></div>
+      <div id="form">載入中…</div>
+      <div class="nav"><span></span><button class="btn primary" id="send" type="button">送出投稿</button></div>
+    </div>
+    <div class="done" id="done" hidden></div>
+  </main>
+  <script src="/shared/game-form.js"></script>
+  <script>
+  (async () => {
+    const $ = (s) => document.querySelector(s);
+    const meta = await fetch('/api/submit/info').then((r) => r.json());
+    const form = GameForm.build(meta, { mode: 'submit' });
+    $('#form').replaceChildren(form.el);
+    let pw = null;
+    if (meta.需要密碼) {
+      pw = Object.assign(document.createElement('input'), { type: 'password', placeholder: '向管理員索取' });
+      const label = document.createElement('label');
+      label.className = 'gf-field';
+      label.append(Object.assign(document.createElement('span'), { className: 'gf-label', textContent: '投稿密碼' }), pw);
+      $('#pw-row').append(label);
+      $('#pw-row').hidden = false;
+    }
+    $('#send').addEventListener('click', async () => {
+      const b = $('#send');
+      b.disabled = true;
+      try {
+        const body = await form.collect();
+        if (pw) body.密碼 = pw.value;
+        b.textContent = '上傳中…';
+        const res = await fetch('/api/submit/games', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || (res.status === 413 ? '檔案太大' : `上傳失敗（${res.status}）`));
+        $('#form-box').hidden = true;
+        const done = $('#done');
+        done.hidden = false;
+        done.innerHTML = '<h2>已收到投稿，謝謝！</h2><p>管理員試玩確認後就會發布。投稿編號：<b class="id"></b></p><p class="skip"></p><p><a href="/submit/">再投一個</a>　<a href="/">回首頁</a></p>';
+        done.querySelector('.id').textContent = data.編號;
+        if (data.略過的檔案?.length) done.querySelector('.skip').textContent = `提醒：有 ${data.略過的檔案.length} 個不支援的檔案被略過（${data.略過的檔案.slice(0, 3).join('、')}${data.略過的檔案.length > 3 ? '…' : ''}）。`;
+      } catch (e) {
+        form.showError(e.message);
+      } finally {
+        b.disabled = false;
+        b.textContent = '送出投稿';
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

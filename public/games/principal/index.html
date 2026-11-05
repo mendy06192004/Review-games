@@ -328,7 +328,7 @@ svg.ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentC
     <h1 class="logo">救救校長！<span>校園大修繕</span></h1>
     <div class="homeArt" id="homeArt"></div>
     <ol class="howto">
-      <li><div><b>答題收集學魂</b>國文、英文、數學的選擇題，答對就能收集「學魂」，答錯不會扣。</div></li>
+      <li><div><b>答題收集學魂</b>國文、英文、數學、自然、社會的選擇題，答對就能收集「學魂」，答錯不會扣。</div></li>
       <li><div><b>挑一個地方修繕</b>在校園地圖上選地點，點壞掉的東西，用學魂換工具修好它。最貴的不一定最好。</div></li>
       <li><div><b>帶校長四處走走</b>角落裡藏著失物，撿到會收進背包，說不定哪裡用得上。</div></li>
     </ol>
@@ -385,7 +385,7 @@ svg.ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentC
 </section>
 
 <div class="modal" id="quizModal"><div class="sheet">
-  <div class="tabs" id="tabs"><button data-s="zh">國文</button><button data-s="en">英文</button><button data-s="ma">數學</button></div>
+  <div class="tabs" id="tabs"><button data-s="zh">國文</button><button data-s="en">英文</button><button data-s="ma">數學</button><button data-s="sc">自然</button><button data-s="so">社會</button></div>
   <div id="quizBody"></div>
 </div></div>
 <div class="modal" id="toolModal"><div class="sheet" id="toolBody"></div></div>
@@ -399,8 +399,8 @@ svg.ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentC
 <script src="/games/_shared/bridge.js"></script>
 <script>
 /* [題庫模式] 內建題庫已移除，題目一律來自老師的題庫資料夾 */
-const QB = {zh:[],en:[],ma:[]};
-const SUBJ={zh:{n:"國文",c:"#e76f51"},en:{n:"英文",c:"#2a9d8f"},ma:{n:"數學",c:"#5e60ce"}};
+const QB = {zh:[],en:[],ma:[],sc:[],so:[]};
+const SUBJ={zh:{n:"國文",c:"#e76f51"},en:{n:"英文",c:"#2a9d8f"},ma:{n:"數學",c:"#5e60ce"},sc:{n:"自然",c:"#6a994e"},so:{n:"社會",c:"#bc6c25"}};
 
 /* ===================== 圖示 ===================== */
 const IC={
@@ -968,12 +968,12 @@ function mapSVG(){
 
 /* ===================== 狀態 ===================== */
 const KEY="savePrincipal_v3";
-function fresh(){return {money:0,rooms:{},relics:{},marks:{},ach:[],g:{freezes:0,catRooms:[],birdRooms:[],disco:false,totalCorrect:0,walk:0},qs:{c:{zh:0,en:0,ma:0},w:0,streak:0,maxStreak:0},mute:false,subj:null};}
+function fresh(){return {money:0,rooms:{},relics:{},marks:{},ach:[],g:{freezes:0,catRooms:[],birdRooms:[],disco:false,totalCorrect:0,walk:0},qs:{c:{zh:0,en:0,ma:0,sc:0,so:0},w:0,streak:0,maxStreak:0},mute:false,subj:null};}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.g&&s.relics)return s;}catch(e){}return null;}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 let S=load()||fresh();
 let curRoom=null;
-const newStats=()=>({c:{zh:0,en:0,ma:0},w:0,streak:0,maxStreak:0,t0:Date.now(),maxMoney:S.money,first:null,lucky:false,unlucky:false,time:0,tiers:[]});
+const newStats=()=>({c:{zh:0,en:0,ma:0,sc:0,so:0},w:0,streak:0,maxStreak:0,t0:Date.now(),maxMoney:S.money,first:null,lucky:false,unlucky:false,time:0,tiers:[]});
 function rs(id){id=id||curRoom;if(!S.rooms[id])S.rooms[id]={fixed:{},temp:0,done:false,st:newStats()};return S.rooms[id];}
 const qst=()=>curRoom?rs().st:S.qs;
 const $=s=>document.querySelector(s);
@@ -1386,11 +1386,11 @@ function checkGlobal(){ACH.filter(a=>a.g&&!S.ach.includes(a.id)&&a.c()).forEach(
 setInterval(()=>{if(curRoom)checkGlobal();},5000);
 
 /* ===================== 答題 ===================== */
-const Q={subj:null,deck:{zh:[],en:[],ma:[]},cur:null,t0:0,answered:false,timer:null};
+const Q={subj:null,deck:{zh:[],en:[],ma:[],sc:[],so:[]},cur:null,t0:0,answered:false,timer:null};
 /* [題庫模式] 由平台傳入學生選的範圍題目，取代內建題庫；答案改由伺服器驗證 */
 if(window.GameBridge&&GameBridge.requireBank("救救校長！校園大修繕")){
-  const MAP={C:"zh",E:"en",M:"ma"};
-  QB.zh=[];QB.en=[];QB.ma=[];
+  const MAP={C:"zh",E:"en",M:"ma",B:"sc",S:"so"};
+  QB.zh=[];QB.en=[];QB.ma=[];QB.sc=[];QB.so=[];
   GameBridge.questions().then(qs=>{
     qs.forEach(q=>{const k=MAP[q.id.split("-")[0]];if(k)QB[k].push({bank:true,id:q.id,q:q.題幹,opts:q.選項,img:q.圖片});});
     $$("#tabs button").forEach(b=>{b.hidden=!QB[b.dataset.s].length;});
@@ -1433,7 +1433,7 @@ async function answer(i){
     catch(e){Q.answered=false;$$(".opt").forEach(b=>b.disabled=false);toast("無法驗證答案："+e.message);return;}}
   const el=(Date.now()-Q.t0)/1000,ok=i===Q.cur.ans,st=qst(),fb=$("#qFb");
   $$(".opt").forEach((b,k)=>{b.disabled=true;if(k===Q.cur.ans)b.classList.add("right");else if(k===i)b.classList.add("wrong");});
-  if(ok){const rew=el<=8?50:el<=15?40:30;S.money+=rew;st.c[Q.subj]++;st.streak++;st.maxStreak=Math.max(st.maxStreak,st.streak);if("maxMoney" in st)st.maxMoney=Math.max(st.maxMoney,S.money);S.g.totalCorrect++;
+  if(ok){const rew=el<=8?50:el<=15?40:30;S.money+=rew;st.c[Q.subj]=(st.c[Q.subj]||0)+1;st.streak++;st.maxStreak=Math.max(st.maxStreak,st.streak);if("maxMoney" in st)st.maxMoney=Math.max(st.maxMoney,S.money);S.g.totalCorrect++;
     fb.className="feedback ok";fb.innerHTML=`<b>✓ 答對了！${CUR} +${rew}</b>${rew===50?"　神速加碼！":""}${st.streak>=3?`　連對 ${st.streak} 題！`:""}<br><span style="font-size:14px;color:#555">${esc(Q.cur.exp)}</span>`;
     $("#qMoney").textContent=S.money;$("#qStreak").textContent=st.streak>=2?`連對 ${st.streak}`:"";coin(`+${rew}`);sfx.ok();updateMoney();
     const mb=$("#moneyBox");mb.classList.remove("bump");void mb.offsetWidth;mb.classList.add("bump");}

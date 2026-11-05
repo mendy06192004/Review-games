@@ -14,7 +14,12 @@ test('registry：每個遊戲的入口檔都存在，id 不重複', () => {
     ids.add(g.id);
     assert.ok(fs.existsSync(path.join(PUB, g.入口)), `${g.名稱} 的入口不存在：${g.入口}`);
     assert.ok(g.分類, `${g.名稱} 缺少分類`);
-    if (g.類型 === 'module') assert.deepStrictEqual(g.科目, ['C', 'E', 'M'], `${g.名稱} 應支援國英數`);
+    if (g.類型 === 'module') {
+      assert.deepStrictEqual(g.科目, ['C', 'E', 'M', 'B', 'S'], `${g.名稱} 應支援國英數自社`);
+      assert.strictEqual(g.使用題庫, true);
+    } else {
+      assert.strictEqual(g.使用題庫, false, `${g.名稱} 不使用題庫，應直接開始`);
+    }
   }
 });
 
@@ -23,7 +28,7 @@ test('題庫遊戲已移除內建題目，只能從題庫資料夾取題', () =>
   const survival = read('review-survival/index.html');
   assert.match(survival, /\nconst RAW = \[\];\n/);
   assert.ok(!survival.includes('RAW.push('), '複習生存大作戰不應再有內建題目');
-  assert.match(read('principal/index.html'), /const QB = \{zh:\[\],en:\[\],ma:\[\]\};/);
+  assert.match(read('principal/index.html'), /const QB = \{zh:\[\],en:\[\],ma:\[\],sc:\[\],so:\[\]\};/);
   const duel = read('review-duel/index.html');
   assert.match(duel, /const GEN=\{\};/);
   assert.ok(!duel.includes('function makeQuestion'), '複習齊打交不應再有自動出題器');

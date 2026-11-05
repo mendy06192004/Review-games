@@ -8,7 +8,9 @@ const { resolveConfig } = require('../src/config');
 function makeTempBank() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'review-bank-'));
   fs.cpSync(path.join(__dirname, '..', '題庫'), dir, { recursive: true });
-  for (const sub of ['待匯入', '待審核', '來源', '老師']) fs.rmSync(path.join(dir, sub), { recursive: true, force: true });
+  for (const sub of ['待匯入', '待審核', '來源', '老師', '遊戲']) fs.rmSync(path.join(dir, sub), { recursive: true, force: true });
+  // 測試只用國英數三題範例（自然、社會的範例題不列入，讓題數固定）
+  for (const sub of ['自然', '社會']) fs.rmSync(path.join(dir, '題目', sub), { recursive: true, force: true });
   for (const f of fs.readdirSync(path.join(dir, '索引'))) {
     if (f.endsWith('.json')) fs.rmSync(path.join(dir, '索引', f));
   }

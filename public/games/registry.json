@@ -7,8 +7,15 @@
     "分類": "複習遊戲",
     "類型": "module",
     "入口": "/games/quiz/game.js",
-    "科目": ["C", "E", "M"],
-    "預設題數": 10
+    "科目": [
+      "C",
+      "E",
+      "M",
+      "B",
+      "S"
+    ],
+    "預設題數": 10,
+    "使用題庫": true
   },
   {
     "id": "principal",
@@ -19,9 +26,21 @@
     "類型": "module",
     "入口": "/games/principal/game.js",
     "全版面": true,
-    "科目": ["C", "E", "M"],
-    "題數選項": [10, 20, 30, 50],
-    "預設題數": 30
+    "科目": [
+      "C",
+      "E",
+      "M",
+      "B",
+      "S"
+    ],
+    "題數選項": [
+      10,
+      20,
+      30,
+      50
+    ],
+    "預設題數": 30,
+    "使用題庫": true
   },
   {
     "id": "review-survival",
@@ -32,9 +51,21 @@
     "類型": "module",
     "入口": "/games/review-survival/game.js",
     "全版面": true,
-    "科目": ["C", "E", "M"],
-    "題數選項": [10, 20, 30, 50],
-    "預設題數": 30
+    "科目": [
+      "C",
+      "E",
+      "M",
+      "B",
+      "S"
+    ],
+    "題數選項": [
+      10,
+      20,
+      30,
+      50
+    ],
+    "預設題數": 30,
+    "使用題庫": true
   },
   {
     "id": "review-duel",
@@ -45,11 +76,22 @@
     "類型": "module",
     "入口": "/games/review-duel/game.js",
     "全版面": true,
-    "科目": ["C", "E", "M"],
-    "題數選項": [10, 20, 30, 50],
-    "預設題數": 30
+    "科目": [
+      "C",
+      "E",
+      "M",
+      "B",
+      "S"
+    ],
+    "題數選項": [
+      10,
+      20,
+      30,
+      50
+    ],
+    "預設題數": 30,
+    "使用題庫": true
   },
-
   {
     "id": "wash-up",
     "名稱": "今天好無聊喔！不然把自己洗香香吧！",
@@ -58,7 +100,8 @@
     "分類": "生活管理",
     "領域": "自我照顧・個人衛生",
     "類型": "standalone",
-    "入口": "/games/wash-up/index.html"
+    "入口": "/games/wash-up/index.html",
+    "使用題庫": false
   },
   {
     "id": "life-boom",
@@ -68,7 +111,8 @@
     "分類": "生活管理",
     "領域": "時間管理・居家生活",
     "類型": "standalone",
-    "入口": "/games/life-boom/index.html"
+    "入口": "/games/life-boom/index.html",
+    "使用題庫": false
   },
   {
     "id": "typhoon",
@@ -78,7 +122,8 @@
     "分類": "生活管理",
     "領域": "居家安全・防災",
     "類型": "standalone",
-    "入口": "/games/typhoon/index.html"
+    "入口": "/games/typhoon/index.html",
+    "使用題庫": false
   },
   {
     "id": "pedestrian-hell",
@@ -88,7 +133,8 @@
     "分類": "生活管理",
     "領域": "社區生活・行人安全",
     "類型": "standalone",
-    "入口": "/games/pedestrian-hell/index.html"
+    "入口": "/games/pedestrian-hell/index.html",
+    "使用題庫": false
   },
   {
     "id": "scooter-hell",
@@ -98,7 +144,8 @@
     "分類": "生活管理",
     "領域": "社區生活・交通安全",
     "類型": "standalone",
-    "入口": "/games/scooter-hell/index.html"
+    "入口": "/games/scooter-hell/index.html",
+    "使用題庫": false
   },
   {
     "id": "car-dilemma",
@@ -108,7 +155,8 @@
     "分類": "職業教育",
     "領域": "職前技能・駕駛訓練",
     "類型": "standalone",
-    "入口": "/games/car-dilemma/index.html"
+    "入口": "/games/car-dilemma/index.html",
+    "使用題庫": false
   },
   {
     "id": "traffic-police",
@@ -118,7 +166,8 @@
     "分類": "職業教育",
     "領域": "職業探索・交通警察",
     "類型": "standalone",
-    "入口": "/games/traffic-police/index.html"
+    "入口": "/games/traffic-police/index.html",
+    "使用題庫": false
   },
   {
     "id": "swipe-deal",
@@ -128,9 +177,9 @@
     "分類": "社會技巧",
     "領域": "拒絕誘惑・法治與自我保護",
     "類型": "standalone",
-    "入口": "/games/swipe-deal/index.html"
+    "入口": "/games/swipe-deal/index.html",
+    "使用題庫": false
   },
-
   {
     "id": "element-hero",
     "名稱": "元素勇者：週期表大冒險",
@@ -139,7 +188,11 @@
     "分類": "學科練習",
     "領域": "國中理化：元素、化合物、化學反應",
     "類型": "standalone",
-    "入口": "/games/element-hero/index.html"
+    "入口": "/games/element-hero/index.html",
+    "使用題庫": false,
+    "科目": [
+      "B"
+    ]
   },
   {
     "id": "eat-homework",
@@ -149,7 +202,11 @@
     "分類": "學科練習",
     "領域": "國一數學：絕對值、正負數四則、根號（題目自動產生）",
     "類型": "standalone",
-    "入口": "/games/eat-homework/index.html"
+    "入口": "/games/eat-homework/index.html",
+    "使用題庫": false,
+    "科目": [
+      "M"
+    ]
   },
   {
     "id": "radical-academy",
@@ -159,6 +216,10 @@
     "分類": "學科練習",
     "領域": "國二數學：根式的意義、乘除與化簡（教學關卡）",
     "類型": "standalone",
-    "入口": "/games/radical-academy/index.html"
+    "入口": "/games/radical-academy/index.html",
+    "使用題庫": false,
+    "科目": [
+      "M"
+    ]
   }
 ]

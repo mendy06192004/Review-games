@@ -5,7 +5,8 @@ const compression = require('compression');
 const { ensureIndex, nodeMap } = require('./indexer');
 const { readQuestionFile } = require('./loader');
 const { shuffle } = require('./util');
-const { createAdminRouter, adminAuth } = require('./admin');
+const { createAdminRouter, adminAuth, sameOriginGuard } = require('./admin');
+const { createPublicGameRouter, createAdminGameRouter, createPreviewRouter } = require('./games');
 
 class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -93,10 +94,15 @@ function createApp(cfg) {
   app.disable('x-powered-by');
   // gzip 壓縮：遊戲檔多為大型 HTML/JS，壓縮後傳輸量約只剩 1/3～1/4
   app.use(compression());
-  app.use(express.json({ limit: '100kb' }));
+  // 一般 API 只收小型 JSON；上傳遊戲的路由自己處理較大的內容
+  const smallJson = express.json({ limit: '100kb' });
+  app.use((req, res, next) => (/^\/api\/(admin\/games|submit\/games)(\/|$)/.test(req.path) ? next() : smallJson(req, res, next)));
   app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
+  app.use('/api/admin', sameOriginGuard);
+  app.use('/api/admin/games', adminAuth(cfg), createAdminGameRouter(cfg));
   app.use('/api/admin', createAdminRouter(cfg));
-  app.use('/admin', adminAuth(cfg));
+  app.use('/admin', adminAuth(cfg), createPreviewRouter(cfg));
+  app.use(createPublicGameRouter(cfg));
 
   // 版本與範圍樹（只有題數，不含題目內容與 ID）
   app.get('/api/tree', async (req, res) => {
@@ -179,6 +185,8 @@ function createApp(cfg) {
   app.use('/api', (req, res) => res.status(404).json({ error: `沒有這個 API：${req.method} ${req.originalUrl}` }));
   app.use('/media', express.static(cfg.imageDir, { dotfiles: 'ignore', maxAge: 0 }));
   // 遊戲檔很少變動：讓瀏覽器快取 1 天（仍會用 ETag 檢查是否有更新）
+  // _shared 允許跨來源載入：上傳的遊戲在沙盒（另一個來源）中也要能用 bridge.js
+  app.use('/games/_shared', (req, res, next) => { res.set('Access-Control-Allow-Origin', '*'); next(); });
   app.use('/games', express.static(path.join(__dirname, '..', 'public', 'games'), { maxAge: '1d' }));
   app.use(express.static(path.join(__dirname, '..', 'public')));
 

@@ -1,7 +1,7 @@
 {
   "name": "review-games",
   "version": "0.1.0",
-  "description": "國英數複習平台：讀取資料夾題庫、依版本範圍隨機出題",
+  "description": "複習小書房：讀取資料夾題庫、依版本範圍隨機出題的複習遊戲平台",
   "private": true,
   "main": "server.js",
   "engines": {
@@ -12,7 +12,8 @@
     "validate": "node scripts/validate.js",
     "build-index": "node scripts/build-index.js",
     "test": "node --test",
-    "import": "node scripts/import.js"
+    "import": "node scripts/import.js",
+    "screenshots": "node scripts/screenshots.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
@@ -20,6 +21,7 @@
     "compression": "^1.8.2",
     "express": "^5.1.0",
     "mammoth": "^1.13.0",
-    "pdfjs-dist": "^6.5.438"
+    "pdfjs-dist": "^6.5.438",
+    "jszip": "^3.10.1"
   }
 }

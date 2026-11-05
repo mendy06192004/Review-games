@@ -1,5 +1,6 @@
-// 學生端選範圍流程：科目 → 版本 → 年級與冊 → 章節 → 遊戲模式 → 開始
+// 學生端流程：學科 → 遊戲 →（使用題庫的遊戲才需要）版本 → 年級與冊 → 章節 → 開始 → 全螢幕遊戲
 import { runGame } from './games/host.js';
+import { SANDBOX } from './games/_shared/iframe-game.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, props = {}, ...kids) => {
@@ -7,10 +8,18 @@ const el = (tag, props = {}, ...kids) => {
   kids.flat().forEach((k) => k != null && e.append(k));
   return e;
 };
-const SUBJECT_ICON = { C: '📖', E: '🔤', M: '🧮' };
-const STEPS = [['subject', '科目'], ['version', '版本'], ['volume', '年級與冊'], ['chapter', '章節'], ['mode', '遊戲'], ['ready', '開始']];
 
-const S = { subject: null, subjectName: '', tree: [], version: null, volumes: [], scopes: [], game: null, games: [], count: 10 };
+const SUBJECT_CHAR = { C: '國', E: '英', M: '數', B: '自', S: '社' };
+const SUBJECT_NOTE = { C: '字音字形・閱讀', E: '單字・文法', M: '計算・圖形', B: '生物・理化・地科', S: '歷史・地理・公民' };
+const OTHER_CATS = {
+  生活管理: '自我照顧、居家生活、時間管理、社區與交通安全',
+  職業教育: '職業探索、職前技能',
+  社會技巧: '人際互動、拒絕誘惑、自我保護',
+  學科練習: '內建固定範圍的學科小遊戲',
+};
+const BANK_STEPS = [['subject', '學科'], ['games', '遊戲'], ['version', '版本'], ['volume', '年級冊'], ['chapter', '章節'], ['ready', '開始']];
+
+const S = { subject: null, subjectName: '', tree: [], counts: {}, version: null, volumes: [], scopes: [], scopeSubject: null, game: null, games: [], subjects: {} };
 const store = {
   get() { try { return JSON.parse(localStorage.getItem('review-last') || 'null'); } catch { return null; } },
   set(v) { try { localStorage.setItem('review-last', JSON.stringify(v)); } catch { /* 無痕模式等 */ } },
@@ -23,106 +32,181 @@ async function api(url) {
   return data;
 }
 
+// ---------- 畫面切換 ----------
+let current = 'subject';
 function show(step) {
+  current = step;
   document.querySelectorAll('.step').forEach((s) => { s.hidden = s.dataset.step !== step; });
-  const idx = STEPS.findIndex(([k]) => k === step);
-  $('#steps').replaceChildren(...STEPS.map(([k, label], i) => el('li', { className: i === idx ? 'on' : i < idx ? 'done' : '', textContent: `${i + 1}. ${label}` })));
-  $('#steps').hidden = idx < 0;
-  window.scrollTo(0, 0);
+  document.body.classList.toggle('playing', step === 'play');
+  const idx = BANK_STEPS.findIndex(([k]) => k === step);
+  const bankFlow = S.subject !== 'O' && idx > 0;
+  $('#steps').replaceChildren(...BANK_STEPS.map(([k, label], i) => el('li', { className: i === idx ? 'on' : i < idx ? 'done' : '', textContent: label })));
+  $('#steps').hidden = !bankFlow;
+  document.querySelectorAll('[data-game-name]').forEach((e) => { e.textContent = S.game ? `${S.subjectName}・${S.game.名稱}` : ''; });
+  if (step !== 'play') { window.scrollTo(0, 0); exitFullscreen(); }
   history.replaceState(null, '', step === 'subject' ? location.pathname : `#${step}`);
 }
-const PREV = { others: 'subject', version: 'subject', volume: 'version', chapter: 'volume', mode: 'chapter', ready: 'mode' };
-document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => {
-  const cur = b.closest('.step').dataset.step;
-  show(PREV[cur] || 'subject');
-}));
-$('#home-link').addEventListener('click', (e) => { e.preventDefault(); show('subject'); });
+const PREV = { games: 'subject', version: 'games', volume: 'version', chapter: 'volume', ready: 'games' };
+document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => show(PREV[b.closest('.step').dataset.step] || 'subject')));
+$('#home-link').addEventListener('click', (e) => { e.preventDefault(); stopPlaying(); show('subject'); });
 
-// ---------- 1. 科目 ----------
-async function initSubjects() {
-  const [tree, games] = await Promise.all([api('/api/tree'), api('/games/registry.json')]);
-  S.games = games;
-  $('#subject-cards').replaceChildren(...tree.科目.map((s) => {
-    const b = el('button', { className: `card subj-${s.代碼}`, disabled: !s.題數 },
-      el('span', { className: 'count', textContent: `${s.題數} 題` }),
-      el('span', { className: 'icon', textContent: SUBJECT_ICON[s.代碼] || '📘' }),
-      el('span', { className: 'name', textContent: s.名稱 }));
-    b.addEventListener('click', () => pickSubject(s.代碼, s.名稱));
+// ---------- 全螢幕 ----------
+const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+function enterFullscreen() {
+  const root = document.documentElement;
+  const req = root.requestFullscreen || root.webkitRequestFullscreen;
+  if (!req || fsElement()) return;
+  try {
+    const p = req.call(root, { navigationUI: 'hide' });
+    if (p && p.catch) p.catch(() => {}); // 不支援（例如 iPhone）時仍有網頁內全版面
+  } catch { /* 忽略 */ }
+}
+function exitFullscreen() {
+  if (!fsElement()) return;
+  const ex = document.exitFullscreen || document.webkitExitFullscreen;
+  try { const p = ex.call(document); if (p && p.catch) p.catch(() => {}); } catch { /* 忽略 */ }
+}
+function updateFsButton() {
+  const on = !!fsElement();
+  $('#fs-label').textContent = on ? ' 縮小' : ' 全螢幕';
+  $('#fs-toggle').hidden = !(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+}
+document.addEventListener('fullscreenchange', updateFsButton);
+document.addEventListener('webkitfullscreenchange', updateFsButton);
+$('#fs-toggle').addEventListener('click', () => (fsElement() ? exitFullscreen() : enterFullscreen()));
+
+// ---------- 首頁：學科分區 ----------
+const gamesFor = (code) => S.games.filter((g) => (code === 'O' ? !g.使用題庫 && !g.科目?.length : g.科目?.includes(code)));
+
+async function initHome() {
+  const [tree, gameData] = await Promise.all([api('/api/tree'), api('/api/games')]);
+  S.games = gameData.遊戲;
+  S.subjects = gameData.科目;
+  S.counts = Object.fromEntries(tree.科目.map((s) => [s.代碼, s.題數]));
+  const zone = (code, name, char, note, meta) => {
+    const b = el('button', { className: `zone z-${code}`, type: 'button' },
+      el('span', { className: 'zone-char', textContent: char, ariaHidden: 'true' }),
+      el('span', { className: 'zone-name', textContent: name }),
+      el('span', { className: 'zone-note', textContent: note }),
+      el('span', { className: 'zone-meta', textContent: meta }));
+    b.addEventListener('click', () => pickSubject(code, name));
     return b;
-  }));
-  const others = games.filter((g) => g.類型 === 'standalone');
-  if (others.length) {
-    const b = el('button', { className: 'card subj-O' },
-      el('span', { className: 'count', textContent: `${others.length} 個遊戲` }),
-      el('span', { className: 'icon', textContent: '🧩' }),
-      el('span', { className: 'name', textContent: '其他' }),
-      el('span', { className: 'desc', textContent: '生活管理・職業教育・社會技巧・學科練習' }));
-    b.addEventListener('click', buildOthers);
-    $('#subject-cards').append(b);
+  };
+  const zones = tree.科目.map((s) => {
+    const n = gamesFor(s.代碼).length;
+    return zone(s.代碼, s.名稱, SUBJECT_CHAR[s.代碼] || s.名稱[0], SUBJECT_NOTE[s.代碼] || '', `${s.題數} 題・${n} 個遊戲`);
+  });
+  const others = gamesFor('O');
+  if (others.length) zones.push(zone('O', '其他', '他', '生活管理・職業教育・社會技巧', `${others.length} 個遊戲`));
+  $('#subject-cards').replaceChildren(...zones);
+}
+
+// ---------- 選遊戲 ----------
+function cover(g) {
+  const fig = el('div', { className: 'cover' });
+  if (g.封面) {
+    fig.append(el('img', { src: g.封面, alt: '', loading: 'lazy', decoding: 'async' }));
+  } else {
+    fig.classList.add('blank');
+    fig.append(el('span', { textContent: g.圖示 || '🎮' }));
   }
+  return fig;
 }
 
-// ---------- 其他：特殊需求領域等，不需選範圍 ----------
-const CATEGORY = {
-  生活管理: '自我照顧、居家生活、時間管理、社區與交通安全',
-  職業教育: '職業探索、職前技能',
-  社會技巧: '人際互動、拒絕誘惑、自我保護',
-  學科練習: '內建固定範圍的學科小遊戲（不使用題庫資料夾）',
-};
-function buildOthers() {
-  const games = S.games.filter((g) => g.類型 === 'standalone');
-  const cats = [...new Set([...Object.keys(CATEGORY), ...games.map((g) => g.分類 || '其他')])]
-    .filter((c) => games.some((g) => (g.分類 || '其他') === c));
-  const list = $('#other-list');
-  list.replaceChildren(...cats.map((c) => el('section', { className: 'cat', id: `cat-${c}` },
-    el('h2', { textContent: c }),
-    CATEGORY[c] ? el('p', { textContent: CATEGORY[c] }) : null,
-    el('div', { className: 'cards' }, ...games.filter((g) => (g.分類 || '其他') === c).map((g) => {
-      const b = el('button', { className: 'card' },
-        el('span', { className: 'icon', textContent: g.圖示 }),
-        el('span', { className: 'name', textContent: g.名稱 }),
-        g.領域 ? el('span', { className: 'domain', textContent: g.領域 }) : null,
-        el('span', { className: 'desc', textContent: g.說明 }));
-      b.addEventListener('click', () => playStandalone(g));
-      return b;
-    })))));
-  $('#other-tabs').replaceChildren(...cats.map((c) => {
-    const chip = el('button', { className: 'chip', type: 'button', textContent: c });
-    chip.addEventListener('click', () => document.getElementById(`cat-${c}`).scrollIntoView({ behavior: 'smooth' }));
-    return chip;
-  }));
-  show('others');
+function gameCard(g) {
+  const noBank = g.使用題庫 && !(S.counts[S.subject] > 0);
+  const b = el('button', { className: 'gcard', type: 'button', disabled: noBank },
+    cover(g),
+    el('span', { className: 'gbody' },
+      el('span', { className: 'gname', textContent: g.名稱 }),
+      g.領域 ? el('span', { className: 'gdomain', textContent: g.領域 }) : null,
+      el('span', { className: 'gdesc', textContent: g.說明 }),
+      el('span', { className: `gtag${g.使用題庫 ? ' bank' : ''}`, textContent: noBank ? '題庫還沒有這一科的題目' : g.使用題庫 ? '選範圍・用題庫出題' : '直接開始' })));
+  b.addEventListener('click', () => pickGame(g));
+  return b;
 }
 
+function pickSubject(code, name) {
+  S.subject = code;
+  S.subjectName = name;
+  S.game = null;
+  const list = gamesFor(code);
+  const tabs = $('#game-tabs');
+  if (code === 'O') {
+    $('#games-eyebrow').textContent = '其他';
+    $('#games-title').textContent = '生活與特殊需求領域';
+    $('#games-lede').textContent = '這些遊戲不需要選範圍，點了就能玩。';
+    const cats = [...new Set([...Object.keys(OTHER_CATS), ...list.map((g) => g.分類 || '其他')])].filter((c) => list.some((g) => (g.分類 || '其他') === c));
+    $('#game-list').replaceChildren(...cats.map((c) => el('section', { className: 'gsection', id: `cat-${c}` },
+      el('h2', {}, c, OTHER_CATS[c] ? el('small', { textContent: OTHER_CATS[c] }) : null),
+      el('div', { className: 'gcards' }, ...list.filter((g) => (g.分類 || '其他') === c).map(gameCard)))));
+    tabs.replaceChildren(...cats.map((c) => {
+      const chip = el('button', { className: 'chip', type: 'button', textContent: c });
+      chip.addEventListener('click', () => document.getElementById(`cat-${c}`).scrollIntoView({ behavior: 'smooth' }));
+      return chip;
+    }));
+    tabs.hidden = cats.length < 2;
+  } else {
+    const bank = list.filter((g) => g.使用題庫);
+    const fixed = list.filter((g) => !g.使用題庫);
+    $('#games-eyebrow').textContent = `${name}・${S.counts[code] || 0} 題`;
+    $('#games-title').textContent = '選一個遊戲';
+    $('#games-lede').textContent = bank.length ? '「用題庫出題」的遊戲，下一步會讓你選版本與章節。' : '';
+    const sections = [];
+    if (bank.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '用題庫複習', el('small', { textContent: '題目來自老師整理的題庫' })), el('div', { className: 'gcards' }, ...bank.map(gameCard))));
+    if (fixed.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '學科小遊戲', el('small', { textContent: '內建固定範圍，直接開始' })), el('div', { className: 'gcards' }, ...fixed.map(gameCard))));
+    if (!sections.length) sections.push(el('p', { className: 'empty', textContent: '這一科目前還沒有遊戲。' }));
+    $('#game-list').replaceChildren(...sections);
+    tabs.hidden = true;
+  }
+  show('games');
+}
+
+function pickGame(g) {
+  S.game = g;
+  if (!g.使用題庫) { playStandalone(g); return; }
+  // 已經選過同一科的範圍，就直接到「開始」，可再按「更改範圍」
+  if (S.scopes.length && S.scopeSubject === S.subject) { buildReady(); return; }
+  buildVersions();
+}
+
+// ---------- 不用題庫的遊戲：點了就玩 ----------
 function playStandalone(g) {
-  runGame.stop?.();
-  S.returnTo = 'others';
+  enterFullscreen();
+  stopPlaying();
+  S.returnTo = 'games';
   $('#play-title').textContent = g.名稱;
   const root = $('#game-root');
   root.className = 'game-root frame';
-  root.replaceChildren(el('iframe', { src: g.入口, title: g.名稱, allow: 'autoplay; fullscreen' }));
+  const frame = el('iframe', { src: g.入口, title: g.名稱, allow: 'autoplay; fullscreen' });
+  if (g.外部) frame.setAttribute('sandbox', SANDBOX);
+  root.replaceChildren(frame);
   show('play');
+  updateFsButton();
 }
 
-// ---------- 2. 版本 ----------
-async function pickSubject(code, name) {
-  S.subject = code;
-  S.subjectName = name;
-  const data = await api(`/api/tree?subject=${encodeURIComponent(code)}`);
-  S.tree = data.樹;
+// ---------- 版本 ----------
+async function buildVersions() {
+  try {
+    const data = await api(`/api/tree?subject=${encodeURIComponent(S.subject)}`);
+    S.tree = data.樹;
+  } catch (e) {
+    S.tree = [];
+  }
   $('#version-cards').replaceChildren(...S.tree.map((v) => {
-    const b = el('button', { className: 'card' },
-      el('span', { className: 'count', textContent: `${v.題數} 題` }),
+    const b = el('button', { className: 'card', type: 'button' },
       el('span', { className: 'name', textContent: v.名稱 }),
-      el('span', { className: 'desc', textContent: v.子層.map((g) => g.名稱).join('、') }));
+      el('span', { className: 'desc', textContent: v.子層.map((g) => g.名稱).join('、') }),
+      el('span', { className: 'count', textContent: `${v.題數} 題` }));
     b.addEventListener('click', () => pickVersion(v));
     return b;
   }));
-  if (!S.tree.length) $('#version-cards').replaceChildren(el('p', { textContent: '這一科目前還沒有題目。' }));
+  if (!S.tree.length) $('#version-cards').replaceChildren(el('p', { className: 'empty', textContent: '這一科目前還沒有題目。' }));
+  if (S.tree.length === 1) { pickVersion(S.tree[0]); return; }
   show('version');
 }
 
-// ---------- 3. 年級與冊（多選） ----------
+// ---------- 年級與冊（多選） ----------
 function pickVersion(v) {
   S.version = v;
   const last = store.get();
@@ -149,7 +233,7 @@ function pickVersion(v) {
 }
 $('#volume-next').addEventListener('click', buildChapters);
 
-// ---------- 4. 章節樹 ----------
+// ---------- 章節樹 ----------
 function buildChapters() {
   const tree = $('#chapter-tree');
   tree.replaceChildren();
@@ -170,8 +254,8 @@ function buildChapters() {
       const secBox = el('div', { className: 'secs', hidden: true }, ...secs.map((s) => el('div', { className: 'sec-row' },
         el('label', {}, s.cb, el('span', { textContent: s.node.名稱 }), el('span', { className: 'n-count', textContent: `${s.node.題數} 題` })))));
       if (secs.length) {
-        const ex = el('button', { className: 'expand', type: 'button', textContent: '▸', ariaLabel: '展開小節' });
-        ex.addEventListener('click', () => { secBox.hidden = !secBox.hidden; ex.textContent = secBox.hidden ? '▸' : '▾'; });
+        const ex = el('button', { className: 'expand', type: 'button', textContent: '＋', ariaLabel: '展開小節' });
+        ex.addEventListener('click', () => { secBox.hidden = !secBox.hidden; ex.textContent = secBox.hidden ? '＋' : '－'; });
         row.append(ex);
       }
       cb.addEventListener('change', () => { secs.forEach((s) => { s.cb.checked = cb.checked; }); cb.indeterminate = false; refresh(); });
@@ -191,6 +275,7 @@ function buildChapters() {
       if (cb.checked) S.scopes.push(cb._path);
       else S.scopes.push(...cb._secs.filter((s) => s.cb.checked).map((s) => s.cb._path));
     }
+    S.scopeSubject = S.subject;
     $('#chapter-next').disabled = !S.scopes.length;
   };
   const setAll = (on) => { boxes.forEach((cb) => { cb.checked = on; cb.indeterminate = false; cb._secs.forEach((s) => { s.cb.checked = on; }); }); refresh(); };
@@ -199,43 +284,34 @@ function buildChapters() {
   setAll(false);
   show('chapter');
 }
-$('#chapter-next').addEventListener('click', buildModes);
+$('#chapter-next').addEventListener('click', buildReady);
 
-// ---------- 5. 遊戲模式 ----------
-function buildModes() {
-  const list = S.games.filter((g) => g.類型 !== 'standalone' && (!g.科目 || g.科目.includes(S.subject)));
-  $('#mode-cards').replaceChildren(...list.map((g) => {
-    const b = el('button', { className: 'card' },
-      el('span', { className: 'icon', textContent: g.圖示 }),
-      el('span', { className: 'name', textContent: g.名稱 }),
-      el('span', { className: 'desc', textContent: g.說明 }));
-    b.addEventListener('click', () => { S.game = g; buildReady(); });
-    return b;
-  }));
-  show('mode');
-}
-
-// ---------- 6. 開始 ----------
-function buildReady() {
-  const names = [...$('#chapter-tree').querySelectorAll('.ch')].map((ch) => {
+// ---------- 開始 ----------
+function chapterNames() {
+  return [...$('#chapter-tree').querySelectorAll('.ch')].map((ch) => {
     const main = ch.querySelector('.ch-row input');
     const label = ch.querySelector('.ch-row .n').textContent;
     if (main.checked) return label;
     const secs = [...ch.querySelectorAll('.sec-row input:checked')].map((i) => i.parentElement.querySelector('span').textContent);
     return secs.length ? `${label}（${secs.join('、')}）` : null;
   }).filter(Boolean);
+}
+
+function buildReady() {
+  $('#ready-cover').replaceChildren(cover(S.game));
   $('#summary').replaceChildren(el('dl', {},
-    el('dt', { textContent: '科目' }), el('dd', { textContent: S.subjectName }),
+    el('dt', { textContent: '遊戲' }), el('dd', { textContent: S.game.名稱 }),
+    el('dt', { textContent: '學科' }), el('dd', { textContent: S.subjectName }),
     el('dt', { textContent: '版本' }), el('dd', { textContent: S.version.名稱 }),
-    el('dt', { textContent: '年級與冊' }), el('dd', { textContent: S.volumes.map((v) => `${v.grade} ${v.node.名稱}`).join('、') }),
-    el('dt', { textContent: '章節' }), el('dd', { textContent: names.join('、') }),
-    el('dt', { textContent: '遊戲' }), el('dd', { textContent: S.game.名稱 })));
+    el('dt', { textContent: '年級冊' }), el('dd', { textContent: S.volumes.map((v) => `${v.grade} ${v.node.名稱}`).join('、') }),
+    el('dt', { textContent: '章節' }), el('dd', { textContent: chapterNames().join('、') })));
   const counts = S.game.題數選項 || [5, 10, 15, 20];
   $('#count').replaceChildren(...counts.map((n) => el('option', { value: n, textContent: `${n} 題` })));
-  $('#count').value = String(S.game.預設題數 || 10);
+  $('#count').value = String(S.game.預設題數 || counts[0]);
   $('#ready-msg').textContent = '';
   show('ready');
 }
+$('#change-scope').addEventListener('click', buildVersions);
 
 function scopeQuery(count) {
   const p = new URLSearchParams();
@@ -246,52 +322,59 @@ function scopeQuery(count) {
 }
 
 async function startGame() {
+  enterFullscreen(); // 必須在點擊當下呼叫，瀏覽器才允許
   const count = Number($('#count').value) || 10;
   $('#start').disabled = true;
+  $('#again').disabled = true;
   $('#ready-msg').textContent = '';
   try {
     const data = await api(`/api/questions?${scopeQuery(count)}`);
-    if (!data.題目.length) { $('#ready-msg').textContent = '這個範圍目前沒有題目，請換個範圍。'; return; }
+    if (!data.題目.length) throw new Error('這個範圍目前沒有題目，請換個範圍。');
     store.set({ subject: S.subject, version: S.version.名稱, volumes: S.volumes.map((v) => v.key) });
     $('#play-title').textContent = S.game.名稱;
-    S.returnTo = 'mode';
+    S.returnTo = 'ready';
     show('play');
-    await runGame(S.game, data.題目, $('#game-root'), { onFinish: showResult, onExit: () => show('mode') });
+    updateFsButton();
+    await runGame(S.game, data.題目, $('#game-root'), { onFinish: showResult, onExit: () => show('ready') });
   } catch (e) {
     show('ready');
     $('#ready-msg').textContent = '無法開始：' + e.message;
   } finally {
     $('#start').disabled = false;
+    $('#again').disabled = false;
   }
 }
 $('#start').addEventListener('click', startGame);
-$('#quit').addEventListener('click', () => {
-  if (!confirm('確定要離開這場遊戲嗎？')) return;
+
+function stopPlaying() {
   runGame.stop?.();
   $('#game-root').replaceChildren();
-  show(S.returnTo || 'mode');
+}
+$('#quit').addEventListener('click', () => {
+  if (!confirm('確定要離開這場遊戲嗎？')) return;
+  stopPlaying();
+  show(S.returnTo || 'games');
 });
 
 // ---------- 結果 ----------
 function showResult(r) {
   const total = r.total || 0;
   const pct = total ? Math.round((r.correct / total) * 100) : 0;
-  $('#result-title').textContent = pct >= 80 ? '太厲害了！🎉' : pct >= 50 ? '完成！繼續加油 💪' : '完成！再練習一次吧 📚';
+  $('#result-title').textContent = pct >= 80 ? '寫得真好。' : pct >= 50 ? '完成了，再一點點就更好。' : '完成了，再練一次吧。';
   $('#score-box').replaceChildren(
     el('div', {}, el('b', { textContent: r.score ?? 0 }), '分數'),
-    el('div', {}, el('b', { textContent: `${r.correct}/${total}` }), '答對題數'),
+    el('div', {}, el('b', { textContent: `${r.correct}/${total}` }), '答對'),
     el('div', {}, el('b', { textContent: `${pct}%` }), '正確率'));
-  $('#review').replaceChildren(...(r.紀錄 || []).map((x) => el('li', {},
-    el('span', { className: x.correct ? 'ok' : 'bad', textContent: x.correct ? '✔ ' : '✘ ' }),
-    x.題幹,
-    x.correct ? null : el('div', { className: 'ans', textContent: `正確答案：${x.正確答案}` }))));
+  $('#review').replaceChildren(...(r.紀錄 || []).map((x) => el('li', { className: x.correct ? 'ok' : 'bad' },
+    el('span', { className: 'mark', textContent: x.correct ? '○' : '×' }),
+    el('span', {}, x.題幹, x.correct ? null : el('span', { className: 'ans', textContent: `正確答案：${x.正確答案}` })))));
   show('result');
 }
 $('#again').addEventListener('click', startGame);
-$('#other-mode').addEventListener('click', () => show('mode'));
-$('#restart').addEventListener('click', () => show('subject'));
+$('#other-mode').addEventListener('click', () => pickSubject(S.subject, S.subjectName));
+$('#restart').addEventListener('click', buildVersions);
 
-initSubjects().then(() => show('subject')).catch((e) => {
-  $('#subject-cards').replaceChildren(el('p', { className: 'msg', textContent: '無法載入題庫：' + e.message }));
+initHome().then(() => show('subject')).catch((e) => {
+  $('#subject-cards').replaceChildren(el('p', { className: 'msg', textContent: '無法載入：' + e.message }));
   show('subject');
 });

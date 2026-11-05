@@ -1,6 +1,11 @@
 // 把「單檔 HTML 遊戲」包成統一介面的遊戲模組。
 // 遊戲在 iframe 中執行（樣式互不干擾），透過 postMessage 取得題目、驗證答案。
-export function iframeGame(url) {
+//
+// opts.sandbox：上傳的遊戲（老師投稿）以沙盒執行，瀏覽器視為「另一個來源」，
+// 碰不到平台的資料與管理功能；訊息來源會是 "null"，回覆時也只送到該 iframe。
+export const SANDBOX = 'allow-scripts allow-pointer-lock allow-forms allow-modals allow-popups allow-downloads';
+
+export function iframeGame(url, opts = {}) {
   return function createGame(host) {
     let questions = [];
     let frame = null;
@@ -15,14 +20,17 @@ export function iframeGame(url) {
       },
       render() {
         frame = document.createElement('iframe');
-        frame.src = `${url}?bank=1`;
+        if (opts.sandbox) frame.setAttribute('sandbox', SANDBOX);
+        frame.src = `${url}${url.includes('?') ? '&' : '?'}bank=1`;
         frame.title = '遊戲畫面';
         frame.allow = 'autoplay; fullscreen';
         host.root.replaceChildren(frame);
+        const target = opts.sandbox ? '*' : location.origin;
         onMsg = async (e) => {
-          if (!frame || e.source !== frame.contentWindow || e.origin !== location.origin) return;
+          if (!frame || e.source !== frame.contentWindow) return;
+          if (e.origin !== location.origin && !(opts.sandbox && e.origin === 'null')) return;
           const m = e.data || {};
-          const reply = (msg) => frame.contentWindow.postMessage(msg, location.origin);
+          const reply = (msg) => frame && frame.contentWindow.postMessage(msg, target);
           if (m.type === 'ready') reply({ type: 'init', questions });
           if (m.type === 'check') {
             try {
@@ -31,7 +39,7 @@ export function iframeGame(url) {
               reply({ type: 'checkResult', req: m.req, error: err.message });
             }
           }
-          if (m.type === 'finish') host.finish({ score: m.summary.score ?? stats.correct * 10, ...stats });
+          if (m.type === 'finish') host.finish({ score: m.summary?.score ?? stats.correct * 10, ...stats });
         };
         window.addEventListener('message', onMsg);
       },

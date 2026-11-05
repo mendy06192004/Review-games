@@ -9,7 +9,9 @@
   "subjects": {
     "C": "國文",
     "E": "英文",
-    "M": "數學"
+    "M": "數學",
+    "B": "自然",
+    "S": "社會"
   },
   "grades": {
     "P1": "小一",
@@ -35,5 +37,11 @@
     "pagesPerRequest": 6,
     "fallbacks": true
   },
-  "admin_password": ""
+  "admin_password": "",
+  "gamesDir": "遊戲",
+  "submit_password": "",
+  "gameUpload": {
+    "maxZipMB": 30,
+    "maxFiles": 800
+  }
 }

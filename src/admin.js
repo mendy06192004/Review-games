@@ -26,6 +26,21 @@ function adminAuth(cfg) {
   };
 }
 
+/**
+ * 防止跨站偽造請求：上傳的遊戲在沙盒（來源為 "null"）中，可能偷偷對管理 API 發出 POST。
+ * 會改變資料的請求必須來自本站，且使用 JSON 或圖片等「需要預檢」的內容類型。
+ */
+function sameOriginGuard(req, res, next) {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  const origin = req.headers.origin;
+  const host = req.headers.host;
+  const okOrigin = !origin || origin === `http://${host}` || origin === `https://${host}`;
+  const type = String(req.headers['content-type'] || '').split(';')[0].trim().toLowerCase();
+  const simple = !type || ['text/plain', 'multipart/form-data', 'application/x-www-form-urlencoded'].includes(type);
+  if (okOrigin && !simple) return next();
+  res.status(403).json({ error: '拒絕：請從後台頁面操作' });
+}
+
 // 同一個草稿檔的讀寫依序執行
 const locks = new Map();
 function withLock(key, fn) {
@@ -206,4 +221,4 @@ function createAdminRouter(cfg) {
   return r;
 }
 
-module.exports = { createAdminRouter, adminAuth };
+module.exports = { createAdminRouter, adminAuth, sameOriginGuard };

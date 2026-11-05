@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>遊戲範本</title>
+<!--
+  ╭──────────────────────────────────────────────╮
+  │ 複習小書房・題庫遊戲範本                        │
+  │ 1. 修改下面的 GAME_NAME 與畫面樣式              │
+  │ 2. 在 askQuestion() 裡改成你想要的遊戲玩法        │
+  │ 3. 存檔後到平台「老師投稿遊戲」上傳這個 .html 檔   │
+  │    （勾選「這個遊戲會用平台的題庫出題」）          │
+  ╰──────────────────────────────────────────────╯
+  題目由平台傳入（學生先選好範圍），答案由伺服器批改，遊戲裡看不到答案。
+-->
+<script src="/games/_shared/bridge.js"></script>
+<style>
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f4f0e8;color:#2e2b27;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif}
+  .box{width:min(640px,92vw);background:#faf8f3;border:1px solid #d9d1c4;border-radius:6px;padding:28px}
+  h1{margin:0 0 6px;font-size:1.2rem;color:#9b4a37}
+  .stem{font-size:1.3rem;font-weight:700;margin:12px 0 18px;white-space:pre-wrap}
+  .stem img{max-width:100%;display:block;margin-top:10px}
+  button{display:block;width:100%;margin:8px 0;padding:12px;font:inherit;text-align:left;border:1px solid #d9d1c4;border-radius:4px;background:#fff;cursor:pointer}
+  button.ok{border-color:#4f6f52;background:#e8efe6}
+  button.bad{border-color:#a2463a;background:#f6e5e1}
+  .hud{color:#6e675d}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1 id="title"></h1>
+  <div class="hud" id="hud"></div>
+  <div class="stem" id="stem">載入題目中…</div>
+  <div id="opts"></div>
+</div>
+<script>
+const GAME_NAME = '我的題庫遊戲';   // ← 改成你的遊戲名稱
+document.getElementById('title').textContent = GAME_NAME;
+
+let questions = [], i = 0, score = 0, correct = 0;
+
+// 不是從平台開啟（例如直接點開檔案）時，會顯示提示畫面
+if (GameBridge.requireBank(GAME_NAME)) {
+  GameBridge.questions().then((qs) => { questions = qs; askQuestion(); });
+}
+
+function askQuestion() {
+  if (i >= questions.length) {
+    GameBridge.finish({ score });      // 告訴平台遊戲結束，平台會顯示成績與錯題
+    return;
+  }
+  const q = questions[i];              // { id, 科目, 題幹, 選項:[...], 難度, 圖片 }
+  document.getElementById('hud').textContent = `第 ${i + 1} / ${questions.length} 題　分數 ${score}`;
+  const stem = document.getElementById('stem');
+  stem.textContent = q.題幹;
+  if (q.圖片) { const img = new Image(); img.src = q.圖片; stem.append(img); }
+  const opts = document.getElementById('opts');
+  opts.replaceChildren();
+  q.選項.forEach((text, k) => {
+    const b = document.createElement('button');
+    b.textContent = `${'ABCDEFGH'[k]}. ${text}`;
+    b.onclick = async () => {
+      opts.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+      const r = await GameBridge.check(q.id, k);   // 伺服器批改 → { correct, 答案, 解析 }
+      b.className = r.correct ? 'ok' : 'bad';
+      opts.children[r.答案].className = 'ok';
+      if (r.correct) { score += 10; correct++; }
+      setTimeout(() => { i++; askQuestion(); }, 900);
+    };
+    opts.append(b);
+  });
+}
+</script>
+</body>
+</html>

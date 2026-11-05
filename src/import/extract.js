@@ -10,6 +10,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 
 const PDF_RENDER_LONG_EDGE = 1600; // 頁面圖長邊像素，Claude 建議 ≤ 1568 附近
@@ -26,9 +27,10 @@ async function extractPdf(file) {
   const pkgDir = path.dirname(require.resolve('pdfjs-dist/package.json'));
   const doc = await lib.getDocument({
     data: new Uint8Array(fs.readFileSync(file)),
-    cMapUrl: path.join(pkgDir, 'cmaps') + path.sep,
+    // pdf.js 只接受以 / 結尾的「網址」格式；Windows 的反斜線路徑會被拒絕
+    cMapUrl: pathToFileURL(path.join(pkgDir, 'cmaps') + path.sep).href,
     cMapPacked: true,
-    standardFontDataUrl: path.join(pkgDir, 'standard_fonts') + path.sep,
+    standardFontDataUrl: pathToFileURL(path.join(pkgDir, 'standard_fonts') + path.sep).href,
     disableFontFace: true,
     verbosity: 0,
   }).promise;
@@ -79,8 +81,15 @@ async function extractPdf(file) {
 async function extractDocx(file) {
   const mammoth = require('mammoth');
   const images = [];
-  const result = await mammoth.convertToHtml(
-    { path: file },
+  const buf = fs.readFileSync(file);
+  // 舊版 Word（.doc）改名成 .docx 也打不開，先檢查檔案格式，給老師看得懂的說明
+  if (buf.length < 4 || buf[0] !== 0x50 || buf[1] !== 0x4b) {
+    throw new Error('這不是 .docx 格式（可能是舊版 .doc 或改了副檔名）。請用 Word 開啟後「另存新檔」，選擇 Word 文件 (.docx) 再上傳。');
+  }
+  let result;
+  try {
+    result = await mammoth.convertToHtml(
+      { buffer: buf },
     {
       convertImage: mammoth.images.imgElement(async (image) => {
         const buf = await image.readAsBuffer();
@@ -89,7 +98,10 @@ async function extractDocx(file) {
         return { src: `#${代號}`, alt: 代號 };
       }),
     },
-  );
+    );
+  } catch (e) {
+    throw new Error(`Word 檔無法讀取（${e.message}）。請用 Word 開啟後另存為 .docx 再上傳。`);
+  }
   // HTML 轉成保留段落與圖片位置的純文字
   const text = result.value
     .replace(/<img[^>]*alt="([^"]+)"[^>]*>/g, '\n[$1]\n')

@@ -109,3 +109,15 @@ test('沒有 API 金鑰時給出清楚的錯誤', async () => {
     cleanup();
   }
 });
+
+test('Word（.docx）與 PDF 都能抽取（Windows 路徑格式的 PDF 字型設定也正確）', async () => {
+  const { extract } = require('../src/import/extract');
+  const pdf = await extract(path.join(__dirname, 'fixtures', 'sample-exam.pdf'));
+  assert.strictEqual(pdf.方式, '文字層');
+  const docx = await extract(path.join(__dirname, 'fixtures', 'sample-exam.docx'));
+  assert.match(docx.文字, /2 \+ 3/);
+  const fake = path.join(require('os').tmpdir(), `old-${Date.now()}.docx`);
+  require('fs').writeFileSync(fake, '\xd0\xcf\x11\xe0 not a zip');
+  await assert.rejects(extract(fake), /不是 \.docx 格式/);
+  require('fs').unlinkSync(fake);
+});

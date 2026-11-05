@@ -194,6 +194,7 @@ async function processFile(cfg, item, opts = {}) {
     log(`     原檔已移到 ${destRel}`);
   } catch (e) {
     record.錯誤 = e.message;
+    if (e.code === '金鑰') record.錯誤代碼 = '金鑰';
     log(`  ❌ 處理失敗：${e.message}（原檔保留在 待匯入/）`);
   }
   await appendLog(cfg, record);

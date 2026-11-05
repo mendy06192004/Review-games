@@ -229,3 +229,58 @@ test('網頁匯入：上傳 → 列出 → 勾選確認後處理 → 只產生�
     cleanup();
   }
 });
+
+test('Claude 金鑰：無效金鑰會被擋下；匯入遇到金鑰錯誤會暫停並保留檔案；錯誤訊息為中文', async () => {
+  const express = require('express');
+  const { createWorkspaceRouter } = require('../src/workspace');
+  const { explainApiError } = require('../src/import/claude');
+  const { cfg, cleanup } = makeTempBank();
+  const oldKey = process.env.ANTHROPIC_API_KEY;
+  delete process.env.ANTHROPIC_API_KEY;
+  const app = express();
+  app.use(express.json());
+  const calls = [];
+  app.use('/w', createWorkspaceRouter(cfg, {
+    verifyKeyImpl: async (k) => { if (k !== 'sk-ant-good-key-1234567890') throw explainApiError({ status: 401, message: '401 invalid x-api-key' }); },
+    processFileImpl: async (c, f) => { calls.push(f.rel); return { 產生題數: 0, 錯誤: explainApiError({ status: 401 }).message, 錯誤代碼: '金鑰' }; },
+  }));
+  const server = app.listen(0);
+  await new Promise((r) => server.once('listening', r));
+  const base = `http://127.0.0.1:${server.address().port}/w`;
+  const post = (p, body) => fetch(base + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  try {
+    let r = await post('/import/key', { 金鑰: 'abc' });
+    assert.strictEqual(r.status, 400);
+    assert.match((await r.json()).error, /sk-ant-/);
+    r = await post('/import/key', { 金鑰: 'sk-ant-wrong-key-1234567890' });
+    assert.strictEqual(r.status, 400);
+    assert.match((await r.json()).error, /金鑰無效/);
+    assert.strictEqual(process.env.ANTHROPIC_API_KEY, undefined, '無效金鑰不可被採用');
+    r = await post('/import/key', { 金鑰: ' sk-ant-good-key-1234567890 \n' });
+    assert.strictEqual(r.status, 200);
+    assert.strictEqual((await r.json()).金鑰末碼, '…7890');
+
+    for (const n of ['a.pdf', 'b.pdf', 'c.pdf']) {
+      fs.mkdirSync(cfg.importDir, { recursive: true });
+      fs.writeFileSync(path.join(cfg.importDir, n), '%PDF');
+    }
+    r = await post('/import/run', { 檔案: ['a.pdf', 'b.pdf', 'c.pdf'] });
+    assert.strictEqual(r.status, 200);
+    let job;
+    for (let i = 0; i < 50; i++) {
+      job = (await (await fetch(base + '/import/job')).json()).工作;
+      if (job.狀態 === '完成') break;
+      await new Promise((res) => setTimeout(res, 50));
+    }
+    assert.strictEqual(job.金鑰錯誤, true);
+    assert.deepStrictEqual(calls, ['a.pdf'], '金鑰錯誤後不再處理其他檔案');
+    assert.match(job.結果[1].錯誤, /尚未處理/);
+
+    assert.match(explainApiError({ status: 400, message: 'Your credit balance is too low' }).message, /額度不足/);
+    assert.match(explainApiError({ message: 'fetch failed' }).message, /連不上/);
+  } finally {
+    server.close();
+    if (oldKey === undefined) delete process.env.ANTHROPIC_API_KEY; else process.env.ANTHROPIC_API_KEY = oldKey;
+    cleanup();
+  }
+});

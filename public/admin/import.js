@@ -32,7 +32,7 @@
       Object.values(INFO.科目).forEach((n) => $('#u-subject').append(el('option', { value: n, textContent: n })));
       Object.values(INFO.年級).forEach((n) => $('#u-grade').append(el('option', { value: n, textContent: n })));
     }
-    $('#keybox').hidden = INFO.有金鑰;
+    showKey(INFO);
     const box = $('#files');
     if (!INFO.檔案.length) {
       box.replaceChildren(el('p', { className: 'empty', textContent: '目前沒有待匯入的檔案，請先在上方上傳。' }));
@@ -95,13 +95,29 @@
   drop.addEventListener('drop', (e) => { e.preventDefault(); if (e.dataTransfer.files.length) upload(e.dataTransfer.files); });
 
   // ---------- 金鑰 ----------
+  function showKey(info, forceBox) {
+    $('#keystatus').hidden = !info.有金鑰;
+    $('#keystatus-text').textContent = info.有金鑰 ? `✔ 已有 Claude API 金鑰（${info.金鑰末碼 || ''}，來源：${info.金鑰來源 || '環境變數'}）` : '';
+    $('#keybox').hidden = info.有金鑰 && !forceBox;
+    $('#keybox-title').textContent = info.有金鑰 ? '更換 Claude API 金鑰。' : '還沒有 Claude API 金鑰。';
+  }
+  $('#key-change').addEventListener('click', () => { showKey(INFO, true); $('#key').focus(); });
   $('#key-save').addEventListener('click', async () => {
+    const b = $('#key-save');
+    b.disabled = true;
+    b.textContent = '檢查中…';
     try {
-      await api('/api/admin/import/key', { method: 'POST', body: JSON.stringify({ 金鑰: $('#key').value }) });
+      const r = await api('/api/admin/import/key', { method: 'POST', body: JSON.stringify({ 金鑰: $('#key').value }) });
       $('#key').value = '';
-      toast('已設定金鑰（關閉平台後清除）');
-      loadFiles();
-    } catch (e) { toast(e.message); }
+      Object.assign(INFO, r);
+      showKey(INFO);
+      toast('金鑰可以使用 ✔（關閉平台後清除）');
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      b.disabled = false;
+      b.textContent = '檢查並使用這把金鑰';
+    }
   });
 
   // ---------- 執行與進度 ----------
@@ -130,6 +146,10 @@
       el('span', { textContent: r.錯誤 ? `失敗：${r.錯誤}（原檔留在待匯入，可修正後重試）` : `產生 ${r.題數} 題${r.需審核 ? `，其中 ${r.需審核} 題需要補資料` : ''}` }))));
     $('#job-log').textContent = job.紀錄.join('\n');
     $('#job-next').hidden = !(done && total);
+    if (done && job.金鑰錯誤) {
+      $('#job-status').textContent = '金鑰有問題，已暫停匯入，檔案都還留在清單中。請在上方按「更換金鑰」貼上正確的金鑰後再按「開始匯入」。';
+      if (INFO) showKey(INFO, true);
+    }
   }
   function startPolling() {
     clearInterval(polling);

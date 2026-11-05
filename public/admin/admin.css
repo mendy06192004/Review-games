@@ -134,3 +134,4 @@ main>.card{margin-bottom:18px}
 .btnlink{display:inline-block;padding:8px 18px;border-radius:4px;text-decoration:none;letter-spacing:.06em}
 .btnlink.primary{background:var(--text);color:var(--bg)}
 @media (max-width:760px){.flow,.up-grid{grid-template-columns:1fr}}
+.keystatus{color:var(--ok);margin:10px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}

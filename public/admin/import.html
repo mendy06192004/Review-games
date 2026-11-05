@@ -30,9 +30,11 @@
       <p class="muted">勾選要交給 AI 整理的檔案。處理完的原檔會自動歸檔，題目先變成「草稿」，不會直接給學生。</p>
       <div id="files" class="files">載入中…</div>
 
+      <p class="keystatus" id="keystatus" hidden><span id="keystatus-text"></span> <button type="button" class="small" id="key-change">更換金鑰</button></p>
       <div class="keybox" id="keybox" hidden>
-        <p><b>還沒有 Claude API 金鑰。</b>AI 整理需要金鑰；貼上後只保存在這次開啟的平台中，關掉黑色視窗就會清除，不會寫進任何檔案。</p>
-        <div class="row"><input type="password" id="key" placeholder="sk-ant-…"><button type="button" id="key-save">使用這把金鑰</button></div>
+        <p><b id="keybox-title">還沒有 Claude API 金鑰。</b>AI 整理需要金鑰；貼上後只保存在這次開啟的平台中，關掉黑色視窗就會清除，不會寫進任何檔案。</p>
+        <p class="muted small">金鑰要到 <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> 登入後，在「API Keys」按「Create Key」產生，是一長串以 <code>sk-ant-</code> 開頭的文字（只會顯示一次，請完整複製）。帳戶需要先在 Billing 儲值才能使用。注意：Claude.ai 的訂閱（Pro / Max）和 API 金鑰是分開的。</p>
+        <div class="row"><input type="password" id="key" placeholder="sk-ant-…"><button type="button" id="key-save">檢查並使用這把金鑰</button></div>
         <p class="muted small">想要每次啟動都自動有金鑰：雙擊專案資料夾裡的「設定金鑰-Windows.bat」一次即可。</p>
       </div>
       <label class="offline"><input type="checkbox" id="offline"> 離線模式（不用 AI，只能處理「有文字、格式整齊」的 PDF；掃描檔與照片不適用）</label>

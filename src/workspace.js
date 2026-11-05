@@ -12,12 +12,15 @@ const D = require('./drafts');
 const { ensureIndex } = require('./indexer');
 const { scanImportDir, processFile } = require('./import/importer');
 const { SUPPORTED_EXT } = require('./import/extract');
+const { verifyKey } = require('./import/claude');
 
 class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
 
 const hasKey = () => !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
+// 只顯示金鑰最後 4 碼，方便老師確認用的是哪一把
+const keyHint = () => (process.env.ANTHROPIC_API_KEY ? `…${process.env.ANTHROPIC_API_KEY.slice(-4)}` : null);
 const cleanName = (s) => String(s || '').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').replace(/^\.+/, '').trim().slice(0, 100);
 
 async function readLog(cfg) {
@@ -29,10 +32,12 @@ async function readLog(cfg) {
   }
 }
 
-function createWorkspaceRouter(cfg, { processFileImpl = processFile } = {}) {
+function createWorkspaceRouter(cfg, opts = {}) {
+  const processFileImpl = opts.processFileImpl || processFile;
   const r = express.Router();
   // 一次只跑一個匯入工作，進度存在記憶體
   let job = null;
+  let keySource = hasKey() ? 'Windows 設定（設定金鑰-Windows.bat）' : null;
 
   r.get('/overview', async (req, res) => {
     const [idx, files, drafts, log] = await Promise.all([
@@ -82,7 +87,7 @@ function createWorkspaceRouter(cfg, { processFileImpl = processFile } = {}) {
       const st = await fsp.stat(f.abs).catch(() => null);
       out.push({ 檔案: f.rel, 名稱: f.name, 大小: st ? st.size : 0, 判斷: f.hints });
     }
-    res.json({ 檔案: out, 有金鑰: hasKey(), 科目: cfg.subjects, 年級: cfg.grades, 支援: SUPPORTED_EXT });
+    res.json({ 檔案: out, 有金鑰: hasKey(), 金鑰末碼: keyHint(), 金鑰來源: keySource, 科目: cfg.subjects, 年級: cfg.grades, 支援: SUPPORTED_EXT });
   });
 
   // 上傳考卷到 待匯入/科目/版本/年級/
@@ -112,11 +117,18 @@ function createWorkspaceRouter(cfg, { processFileImpl = processFile } = {}) {
   });
 
   // 金鑰：只存在記憶體，關閉平台就消失
-  r.post('/import/key', (req, res) => {
-    const key = String(req.body?.金鑰 || '').trim();
-    if (!/^sk-ant-[\w-]{10,}$/.test(key)) throw new HttpError(400, '金鑰格式不正確（應以 sk-ant- 開頭）');
+  r.post('/import/key', async (req, res) => {
+    const key = String(req.body?.金鑰 || '').replace(/\s+/g, '');
+    if (!/^sk-ant-[\w-]{10,}$/.test(key)) throw new HttpError(400, '金鑰格式不正確：應以 sk-ant- 開頭，是一長串英數字（請從 console.anthropic.com 的 API Keys 頁面複製）');
+    // 先向 Claude 確認金鑰有效，再採用（不會產生費用）
+    try {
+      await (opts.verifyKeyImpl || verifyKey)(key);
+    } catch (e) {
+      throw new HttpError(400, e.message);
+    }
     process.env.ANTHROPIC_API_KEY = key;
-    res.json({ 有金鑰: true });
+    keySource = '本次貼上（關閉平台後清除）';
+    res.json({ 有金鑰: true, 金鑰末碼: keyHint(), 金鑰來源: keySource });
   });
 
   // 老師確認清單後才開始處理
@@ -138,11 +150,18 @@ function createWorkspaceRouter(cfg, { processFileImpl = processFile } = {}) {
         try {
           const rec = await processFileImpl(cfg, f, { offline, log });
           current.結果.push({ 檔案: f.rel, 題數: rec.產生題數 || 0, 需審核: rec.需審核題數 || 0, 錯誤: rec.錯誤 || null });
+          if (rec.錯誤代碼 === '金鑰') {
+            // 金鑰有問題，後面的檔案也一定失敗：停下來，檔案都留在待匯入
+            for (const rest of files.slice(i + 1)) current.結果.push({ 檔案: rest.rel, 題數: 0, 需審核: 0, 錯誤: '尚未處理（金鑰有問題，已暫停）' });
+            current.金鑰錯誤 = true;
+            current.完成 = files.length;
+            break;
+          }
         } catch (e) {
           log(`  ❌ ${e.message}`);
           current.結果.push({ 檔案: f.rel, 題數: 0, 需審核: 0, 錯誤: e.message });
         }
-        current.完成 = i + 1;
+        if (!current.金鑰錯誤) current.完成 = i + 1;
       }
       current.狀態 = '完成';
       current.結束時間 = new Date().toISOString();

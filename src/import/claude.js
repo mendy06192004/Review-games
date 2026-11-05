@@ -98,6 +98,35 @@ function buildUserContent(chunk, hints) {
   return content;
 }
 
+/**
+ * 把 Claude API 的錯誤翻成老師看得懂的中文。金鑰相關錯誤會標記 code='金鑰'，
+ * 讓批次匯入停下來（後面的檔案也一定會失敗，不必浪費時間）。
+ */
+function explainApiError(e) {
+  const status = e && e.status;
+  const raw = String((e && e.message) || e);
+  const fail = (msg, code) => Object.assign(new Error(msg), { code, status });
+  if (status === 401) return fail('Claude API 金鑰無效（可能貼錯、少複製幾個字，或金鑰已被刪除）。請到「匯入考卷」頁按「更換金鑰」，貼上正確的金鑰。', '金鑰');
+  if (status === 403) return fail('這把金鑰沒有使用權限（帳戶可能被停用）。請到 console.anthropic.com 確認帳戶狀態。', '金鑰');
+  if (/credit balance|billing|purchase credits/i.test(raw)) return fail('Claude 帳戶額度不足。請到 console.anthropic.com 的 Billing 頁面儲值後再試。', '金鑰');
+  if (status === 429) return fail('Claude 使用量達到上限，請過幾分鐘再重試。');
+  if (status === 529 || status === 503) return fail('Claude 目前太忙碌，請過幾分鐘再重試。');
+  if (status === 413) return fail('檔案內容太大，請把考卷拆成較少頁數的檔案再匯入。');
+  if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|fetch failed|Connection error/i.test(raw)) return fail('連不上 Claude 伺服器，請確認電腦有連上網路（學校網路可能擋住 api.anthropic.com）。');
+  return e;
+}
+
+/** 檢查金鑰是否可用（列出模型清單，不會產生費用） */
+async function verifyKey(apiKey) {
+  const AnthropicSDK = require('@anthropic-ai/sdk');
+  const Anthropic = AnthropicSDK.default || AnthropicSDK;
+  try {
+    await new Anthropic({ apiKey, timeout: 15000, maxRetries: 1 }).models.list({ limit: 1 });
+  } catch (e) {
+    throw explainApiError(e);
+  }
+}
+
 /** 呼叫 Claude（串流，避免長輸出逾時），回傳解析後的 JSON */
 async function callClaude(chunk, hints, opts = {}) {
   if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
@@ -122,7 +151,12 @@ async function callClaude(chunk, hints, opts = {}) {
   }
 
   const stream = request.betas ? client.beta.messages.stream(request) : client.messages.stream(request);
-  const msg = await stream.finalMessage();
+  let msg;
+  try {
+    msg = await stream.finalMessage();
+  } catch (e) {
+    throw explainApiError(e);
+  }
   if (msg.stop_reason === 'refusal') {
     throw new Error(`Claude 拒絕處理此檔（${msg.stop_details?.category || '未說明'}）`);
   }
@@ -174,4 +208,4 @@ function offlineParse(chunk, hints) {
   return out;
 }
 
-module.exports = { OUTPUT_SCHEMA, SYSTEM_PROMPT, callClaude, offlineParse, buildUserContent };
+module.exports = { OUTPUT_SCHEMA, SYSTEM_PROMPT, callClaude, offlineParse, buildUserContent, explainApiError, verifyKey };

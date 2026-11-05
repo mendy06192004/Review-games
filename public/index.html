@@ -16,6 +16,7 @@
   <header class="topbar">
     <a href="#" id="home-link" class="brand"><span class="seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.2 5 7.6 4.5 4 4.8v13.4c3.6-.3 6.2.2 8 1.7 1.8-1.5 4.4-2 8-1.7V4.8c-3.6-.3-6.2.2-8 1.7z"/><path d="M12 6.5v13.4"/></svg></span>複習小書房</a>
     <ol class="steps" id="steps" aria-label="步驟"></ol>
+    <button class="qr-btn" id="qr-open" type="button" aria-label="用手機掃碼開啟">📱<span> 手機掃碼</span></button>
   </header>
 
   <main id="main">
@@ -107,6 +108,7 @@
       <div class="play-bar">
         <button class="pbtn" id="quit" type="button" aria-label="離開遊戲">✕<span> 離開</span></button>
         <span class="play-title" id="play-title"></span>
+        <button class="pbtn" id="qr-play" type="button" aria-label="用手機掃碼開啟這個遊戲">📱<span> 掃碼</span></button>
         <button class="pbtn" id="fs-toggle" type="button" aria-label="全螢幕">⛶<span id="fs-label"> 全螢幕</span></button>
       </div>
       <div id="game-root" class="game-root"></div>
@@ -127,6 +129,20 @@
       </div>
     </section>
   </main>
+
+  <dialog class="qr-dialog" id="qr-dialog" aria-labelledby="qr-title">
+    <form method="dialog" class="qr-close-row"><button class="btn ghost small" aria-label="關閉">✕ 關閉</button></form>
+    <h2 id="qr-title">用手機掃碼一起玩</h2>
+    <p class="qr-what" id="qr-what"></p>
+    <div class="qr-code" id="qr-code"></div>
+    <p class="qr-url" id="qr-url"></p>
+    <select id="qr-pick" hidden aria-label="選擇網路位址"></select>
+    <ol class="qr-tips">
+      <li>手機要和這台電腦連<b>同一個 Wi-Fi</b>。</li>
+      <li>掃不開？請老師在電腦上允許 Windows 防火牆（勾選「私人網路」）。</li>
+      <li>電腦上的黑色視窗要一直開著，關掉後手機就打不開。</li>
+    </ol>
+  </dialog>
 
   <footer class="foot">
     <span>慢慢來，比較快。</span>
@@ -151,6 +167,7 @@
     })();
   </script>
   <script src="/vendor/katex/render-math.js"></script>
+  <script src="/vendor/qrcode/qrcode.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>

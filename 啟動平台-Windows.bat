@@ -39,6 +39,8 @@ echo 啟動中，瀏覽器會自動打開。
 echo 學生端：http://localhost:3000
 echo 審核後台：http://localhost:3000/admin
 echo 使用期間請不要關閉這個黑色視窗。
+echo 學生手機掃碼：網頁右上角按「手機掃碼」（手機要連同一個 Wi-Fi）。
+echo 若 Windows 跳出防火牆視窗，請勾選「私人網路」並按「允許存取」。
 echo.
 start "" cmd /c "timeout /t 4 >nul & start http://localhost:3000"
 call npm start

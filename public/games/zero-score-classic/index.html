@@ -1,0 +1,762 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>我要考零分</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* 版面概念：木頭課桌上的一張手寫考卷，紅筆批改、鉛筆塗鴉。刻意只用一種「白天教室」的外觀。 */
+:root{
+  --desk:#b98d62; --desk-dark:#9c7350;
+  --paper:#fbf8ef; --paper-shade:#efe7d0;
+  --ink:#2b2a33; --ink-soft:#6a6672;
+  --red:#c8231e; --blue:#2a4fb5; --green:#3f8a4f; --hi:#ffe46b;
+  --line:#cfe0f0; --margin:#f0a3a3; --chip:#ffffff; --locked:#e9e3d2; --locked-ink:#948f83;
+  --f-hand:"LXGW WenKai TC","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  --wobble:255px 15px 225px 15px/15px 225px 15px 255px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  margin:0;font-family:var(--f-hand);color:var(--ink);font-size:17px;
+  background:
+    radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.18),transparent 55%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.04) 0 2px,transparent 2px 16px),
+    var(--desk);
+  min-height:100vh;overflow-x:hidden;
+  padding-block:24px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+button{font-family:inherit;cursor:pointer;color:var(--ink)}
+button:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.svg-defs{position:absolute;width:0;height:0}
+
+/* ===== 考卷 ===== */
+.paper{
+  max-width:780px;margin:0 auto;position:relative;
+  background:
+    linear-gradient(90deg,transparent 54px,var(--margin) 54px,var(--margin) 56px,transparent 56px),
+    repeating-linear-gradient(180deg,transparent 0 33px,var(--line) 33px 34px),
+    var(--paper);
+  border-radius:3px;
+  box-shadow:0 2px 0 var(--paper-shade),0 4px 0 #ddd3b6,0 20px 40px rgba(60,35,10,.35);
+  padding:34px 26px 34px 74px;transform:rotate(-.35deg);
+  animation:paperIn .45s ease-out;
+}
+@keyframes paperIn{from{transform:translateY(24px) rotate(1.5deg);opacity:.2}}
+.paper::before{content:"";position:absolute;top:14px;left:18px;width:26px;height:6px;background:linear-gradient(#c4c4c4,#8a8a8a);border-radius:2px;transform:rotate(-30deg)}
+.eyebrow{font-size:14px;color:var(--ink-soft);letter-spacing:.18em}
+
+.title{font-size:clamp(42px,9vw,68px);line-height:1.1;margin:8px 0 6px;font-weight:700}
+.title .hl{background:linear-gradient(transparent 58%,var(--hi) 58%,var(--hi) 92%,transparent 92%)}
+.title-zero{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.22em;margin-left:.06em}
+.lead{color:var(--ink-soft);font-size:18px;margin:0 0 6px;max-width:34em}
+
+.label{font-weight:700;font-size:20px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+.label svg{width:22px;height:22px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{
+  background:var(--chip);border:2.5px solid var(--ink);border-radius:var(--wobble);
+  padding:8px 18px;font-size:19px;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,background .12s;
+}
+.chip:hover{transform:translate(-1px,-2px) rotate(-1deg)}
+.chip[aria-pressed="true"]{background:var(--hi);transform:rotate(-2deg)}
+
+.rules{
+  margin-top:24px;padding:14px 18px;background:rgba(255,228,107,.42);border:2px dashed var(--ink);
+  border-radius:var(--wobble);line-height:1.75;transform:rotate(.5deg);max-width:40em;
+}
+.rules b{color:var(--red)}
+.rules ol{margin:6px 0 0;padding-left:1.4em}
+
+.btn{
+  border:3px solid var(--ink);border-radius:var(--wobble);padding:12px 26px;font-size:21px;font-weight:700;
+  background:var(--red);color:var(--paper);box-shadow:4px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s;
+}
+.btn:hover{transform:translate(-2px,-2px) rotate(-1deg);box-shadow:6px 6px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.plain{background:var(--chip);color:var(--ink)}
+.btn.blue{background:var(--blue)}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:28px}
+.count-pill{font-size:15px;color:var(--red);margin-left:4px}
+
+/* ===== 答題 ===== */
+.exam-head{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;align-items:flex-end;border-bottom:3px double var(--ink);padding-bottom:12px;margin-bottom:16px}
+.exam-head .name{border-bottom:2px solid var(--ink);padding:0 10px;color:var(--blue);font-weight:700}
+.dots{display:flex;gap:8px}
+.dot{width:22px;height:22px;border:2.5px solid var(--ink);border-radius:50%;background:var(--chip)}
+.dot.done{background:var(--ink)}
+.dot.now{background:var(--hi);transform:scale(1.15)}
+.timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.timer{flex:1;height:18px;border:2.5px solid var(--ink);border-radius:var(--wobble);background:var(--chip);overflow:hidden}
+.timer-bar{height:100%;width:100%;background:var(--green)}
+.timer-bar.warn{background:#e9a020}
+.timer-bar.crit{background:var(--red)}
+.timer-num{font-size:24px;font-weight:700;width:46px;text-align:right;font-variant-numeric:tabular-nums}
+.timer-num.crit{color:var(--red)}
+.qno{font-size:17px;color:var(--ink-soft)}
+.question{font-size:clamp(22px,4.6vw,28px);font-weight:700;margin:6px 0 18px;line-height:1.45}
+.options{display:grid;gap:12px}
+.opt{
+  text-align:left;background:var(--chip);border:2.5px solid var(--ink);border-radius:var(--wobble);
+  padding:12px 16px;font-size:19px;display:flex;gap:12px;align-items:center;box-shadow:3px 3px 0 var(--ink);
+  transition:transform .12s,background .15s;position:relative;min-width:0;
+}
+.opt:hover:not(:disabled){transform:translate(-2px,-2px) rotate(-.5deg);background:#fffbe0}
+.opt:disabled{cursor:default}
+.opt .key{flex:0 0 34px;height:34px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-weight:700}
+.opt .txt{flex:1;min-width:0}
+.opt .mark{flex:0 0 40px;height:40px;margin:-8px 0}
+.opt.picked{background:#fff6c9}
+.opt.is-right .key{background:var(--red);color:var(--paper);border-color:var(--red)}
+.tag{display:inline-block;font-size:13px;color:var(--red);border:1.5px solid var(--red);border-radius:10px;padding:0 7px;margin-left:6px;transform:rotate(-2deg);white-space:nowrap}
+.feedback{min-height:56px;margin-top:16px;font-size:20px;font-weight:700;text-align:center;color:var(--blue)}
+.feedback small{display:block;font-size:15px;font-weight:400;color:var(--red);margin-top:2px}
+
+/* ===== 結算 ===== */
+.report-top{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.score-box{position:relative;width:min(320px,100%);flex-shrink:0}
+.score-box canvas{width:100%;height:auto;display:block;aspect-ratio:320/230}
+.score-box .unit{position:absolute;right:10px;bottom:30px;color:var(--red);font-size:22px;transform:rotate(-8deg)}
+.verdict{flex:1;min-width:220px}
+.verdict h2{font-size:clamp(26px,6vw,36px);line-height:1.25}
+.verdict h2.bad{color:var(--red)}
+.verdict p{color:var(--ink-soft);margin:6px 0 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin:22px 0}
+.stat{background:var(--chip);border:2px solid var(--ink);border-radius:var(--wobble);padding:10px;text-align:center}
+.stat .v{font-size:24px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums}
+.stat .l{font-size:14px;color:var(--ink-soft)}
+.comment{border-left:4px solid var(--red);padding:10px 14px;background:rgba(200,35,30,.06);font-size:19px;line-height:1.6;color:var(--red);transform:rotate(-.4deg)}
+.comment .sig{display:block;text-align:right;font-size:15px;margin-top:4px}
+
+.review{display:grid;gap:10px}
+.rv{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start;padding:10px 0;border-bottom:1.5px dashed var(--ink-soft)}
+.rv svg{width:44px;height:44px}
+.rv .q{font-weight:700;line-height:1.45}
+.rv .a{font-size:15px;color:var(--ink-soft);margin-top:4px;line-height:1.6}
+.rv .a b{color:var(--ink)}
+
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:10px}
+.badge{
+  background:var(--chip);border:2.5px solid var(--ink);border-radius:var(--wobble);padding:12px 10px 14px;text-align:center;
+  position:relative;box-shadow:3px 3px 0 var(--ink);animation:pop .45s backwards;min-width:0;
+}
+.badge svg{width:72px;height:72px;display:block;margin:0 auto}
+.badge .n{font-weight:700;font-size:16px;margin-top:4px;line-height:1.3}
+.badge .d{font-size:13px;color:var(--ink-soft);margin-top:4px;line-height:1.45}
+.badge .new{position:absolute;top:-10px;right:-8px;background:var(--red);color:var(--paper);font-size:13px;padding:2px 8px;border-radius:10px;transform:rotate(12deg);font-weight:700}
+.badge.locked{background:var(--locked);box-shadow:3px 3px 0 var(--locked-ink);border-color:var(--locked-ink);color:var(--locked-ink)}
+.badge.locked svg{opacity:.35;filter:grayscale(1)}
+.badge.locked .d{color:var(--locked-ink)}
+@keyframes pop{from{transform:scale(.5) rotate(-12deg);opacity:0}}
+.empty{color:var(--ink-soft)}
+
+.modal{position:fixed;inset:0;background:rgba(40,25,10,.55);display:grid;place-items:center;z-index:10;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal .paper{max-height:86vh;overflow:auto;width:100%;transform:rotate(.25deg)}
+.close-x{position:absolute;top:10px;right:12px;font-size:28px;background:none;border:none;line-height:1;padding:6px}
+.progress{font-size:18px;margin:6px 0 4px}
+.progress b{color:var(--red)}
+.danger-zone{font-size:15px;padding:8px 16px}
+
+/* 手繪筆觸 */
+.k{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.kt{fill:none;stroke:var(--ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.r{fill:none;stroke:var(--red);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.b{fill:none;stroke:var(--blue);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.fy{fill:var(--hi)} .fw{fill:var(--paper)} .fr{fill:var(--red)} .fb{fill:var(--blue)} .fg{fill:var(--green)} .fk{fill:var(--ink)}
+.st{font-family:var(--f-hand);font-weight:700}
+
+@media (max-width:520px){
+  .paper{padding:28px 16px 26px 44px;background:
+    linear-gradient(90deg,transparent 32px,var(--margin) 32px,var(--margin) 34px,transparent 34px),
+    repeating-linear-gradient(180deg,transparent 0 33px,var(--line) 33px 34px),var(--paper)}
+  .paper::before{left:6px}
+  .opt{font-size:17px;padding:10px 12px}
+  .btn{font-size:18px;padding:10px 20px}
+  .badges{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<svg class="svg-defs" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="3"/>
+      <feDisplacementMap in="SourceGraphic" scale="2.6"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ===== 主選單 ===== -->
+<main id="menu" class="paper">
+  <div class="eyebrow">廢柴國民中學 ・ 反向學習實驗班 ・ 期中考</div>
+  <h1 class="title"><span class="hl">我要考</span><svg class="title-zero" viewBox="0 0 64 64" filter="url(#rough)" aria-label="零"><path class="r" style="stroke-width:7" d="M40 9C22 6 9 22 10 38s14 22 28 18 20-20 15-34C50 12 40 8 30 12"/></svg><span class="hl">分</span></h1>
+  <p class="lead">全校唯一一場「答錯才有面子」的考試。題庫每次隨機抽五題，有些正解長得像亂寫，有些錯誤選項長得像標準答案。</p>
+
+  <div class="label"><svg viewBox="0 0 24 24" filter="url(#rough)"><path class="b" d="M4 20l3-1L19 7l-2-2L5 17z"/></svg>選擇年級</div>
+  <div class="chips" id="gradeChips"></div>
+
+  <div class="label"><svg viewBox="0 0 24 24" filter="url(#rough)"><path class="b" d="M4 20l3-1L19 7l-2-2L5 17z"/></svg>選擇科目</div>
+  <div class="chips" id="subjectChips"></div>
+
+  <div class="rules">
+    <b>考試規則</b>
+    <ol>
+      <li>每題請<b>故意選錯</b>，越荒謬越好。答對一題 +20 分，目標是 0 分。</li>
+      <li>小心！有些<b>正解長得很像錯的</b>，有些<b>錯誤選項看起來很正確</b>。</li>
+      <li>每題限時 10 秒，時間到算交白卷。不管對錯，五題都要寫完。</li>
+      <li>桌機可用鍵盤 1～4 作答。</li>
+    </ol>
+  </div>
+
+  <div class="row">
+    <button class="btn" id="startBtn">進入考場</button>
+    <button class="btn plain" id="galleryBtn">成就圖鑑<span class="count-pill" id="achCount"></span></button>
+  </div>
+</main>
+
+<!-- ===== 答題 ===== -->
+<section id="exam" class="paper" hidden>
+  <div class="exam-head">
+    <div>班級：<span id="examGrade"></span>　科目：<span id="examSubject"></span><br>姓名：<span class="name">未來的零分王</span></div>
+    <div class="dots" id="dots" aria-label="作答進度"></div>
+  </div>
+  <div class="timer-wrap">
+    <div class="timer"><div class="timer-bar" id="timerBar"></div></div>
+    <div class="timer-num" id="timerNum">10</div>
+  </div>
+  <div class="qno" id="qno"></div>
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+</section>
+
+<!-- ===== 結算 ===== -->
+<section id="result" class="paper" hidden>
+  <div class="eyebrow">廢柴國民中學 ・ 成績通知單</div>
+  <div class="report-top">
+    <div class="score-box"><canvas id="scoreCanvas" width="320" height="230" aria-label="得分"></canvas><span class="unit">分</span></div>
+    <div class="verdict"><h2 id="verdictTitle"></h2><p id="verdictSub"></p></div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="comment" id="comment"></div>
+
+  <div class="label" style="margin-top:26px">本次獲得成就</div>
+  <div class="badges" id="earnedBadges"></div>
+
+  <div class="label" style="margin-top:26px">考卷檢討</div>
+  <div class="review" id="review"></div>
+
+  <div class="row">
+    <button class="btn" id="retryBtn">再考一次</button>
+    <button class="btn plain" id="menuBtn">返回主選單</button>
+    <button class="btn blue" id="galleryBtn2">成就圖鑑</button>
+  </div>
+</section>
+
+<!-- ===== 成就圖鑑 ===== -->
+<div class="modal" id="gallery" hidden>
+  <div class="paper" role="dialog" aria-label="成就圖鑑">
+    <button class="close-x" id="closeGallery" aria-label="關閉">✕</button>
+    <div class="eyebrow">廢柴國民中學 ・ 反向榮譽榜</div>
+    <h2 style="font-size:32px;margin-top:6px">成就圖鑑</h2>
+    <div class="progress" id="galleryProgress"></div>
+    <div class="badges" id="galleryBadges"></div>
+    <div class="row"><button class="btn plain danger-zone" id="resetAch">清除成就紀錄</button></div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   題庫：[題目, 正解, 陷阱（像正解的錯誤）, 荒謬選項, 其他錯誤, 反直覺?]
+   最後一欄為 1 表示「正解長得很像錯的」
+================================================================ */
+const BANK={
+"國一":{
+"國文":[
+["「差強人意」的意思是？","大致令人滿意","很不令人滿意","差點強迫別人同意","人的意志又差又強",1],
+["「空穴來風」的原意是？","事出有因，有所根據","毫無根據的謠言","洞穴裡吹出來的冷氣","山洞颱風特報",1],
+["「萬人空巷」形容什麼景象？","人們湧出家門，非常熱鬧","街巷冷清，空無一人","一萬個人在玩躲貓貓","巷子被拆掉了",1],
+["「七月流火」原本是指？","天氣漸漸轉涼","七月熱得像火在流","七月火山爆發","烤肉節開跑",1],
+["「聞」這個字的部首是？","耳","門","鼻（聞東西用鼻子）","口",1],
+["「炙手可熱」原本形容？","權勢很大、氣焰很盛","東西很受歡迎、很搶手","手被烤得很燙","燒烤店的熱門菜",1],
+["「畫蛇添足」的寓意是？","多此一舉","做事要追求完美","蛇其實有腳，只是很害羞","美術課加分技巧"],
+["「三人行，必有我師焉」出自？","《論語》","《孟子》","《三國演義》","《哈利波特》"],
+["「目不識丁」的意思是？","一個字都不認識","看不清楚細小的東西","沒見過姓丁的朋友","討厭吃丁香魚"],
+["「螳臂擋車」比喻？","不自量力","勇敢面對困難","螳螂考到駕照","昆蟲版交通警察"]],
+"英文":[
+["「sheep」的複數是？","sheep","sheeps","羊羊們","sheeeeeep",1],
+["選出正確冠詞：___ hour","an","a","the one and only","哇",1],
+["選出正確冠詞：___ university","a","an","the uni","優尼",1],
+["「mouse」的複數是？","mice","mouses","米老鼠們","mousemouse",1],
+["「butterfly」是什麼？","蝴蝶","奶油蒼蠅","會飛的奶油","牛油果"],
+["「I'm all ears.」的意思是？","我正在專心聽","我的耳朵很大","我全身都是耳朵","我在吃玉米"],
+["「How are you?」最合適的回答是？","I'm fine, thank you.","Yes, I am.","I'm a potato.","怎麼是你？"],
+["「Monday」的下一天是？","Tuesday","Thursday","Money Day","還是 Monday（人生好苦）"],
+["「Apple」是什麼意思？","蘋果","鳳梨","阿伯","手機病毒"],
+["「Good morning」適合什麼時候說？","早上","下午","熬夜打電動到半夜","早餐店老闆生日"]],
+"數學":[
+["0.999…（9 無限循環）等於多少？","1","比 1 小一點點","0.9 再多一點吧","看你心情",1],
+["1 是質數嗎？","不是","是，它只能被 1 和自己整除","1 是孤獨數","看 1 的心情",1],
+["唯一的偶數質數是？","2","沒有偶數是質數","4","偶數都是好朋友",1],
+["(−1)¹⁰⁰ = ？","1","−1","−100","負號太多算不完"],
+["(−3) × (−4) = ？","12","−12","7（負負得正但我很負）","−34"],
+["2x + 3 = 11，x = ？","4","7","x 就是 x","我不想找回前任 x"],
+["1/2 + 1/3 = ？","5/6","2/5","1/23","半個披薩加一點點等於吃飽"],
+["12 和 18 的最大公因數是？","6","36","1218","它們沒有共同話題"],
+["0 ÷ 5 = ？","0","無意義","5","0 很孤單分不出去"],
+["直角是幾度？","90°","180°","360°（轉一圈也很直）","攝氏 90 度"]],
+"社會":[
+["「萬里長城在太空中肉眼清楚可見」這句話？","錯的，它太窄了看不清楚","對的，它是唯一看得到的建築","長城本來就在太空","要戴 3D 眼鏡才看得到",1],
+["荷蘭人在台灣的主要據點在哪裡？","台南（大員）","淡水和基隆","阿姆斯特丹","鬱金香島"],
+["鄭成功打敗誰而取得台灣？","荷蘭人","西班牙人","日本人","寶可夢訓練家"],
+["台灣最高峰是？","玉山","雪山","台北 101","我的期末考壓力"],
+["赤道是幾度緯線？","0°","90°","37.5 度（發燒了）","很熱度"],
+["台灣位於哪個大洋的西側邊緣？","太平洋","大西洋","珍珠奶茶洋","北極海"],
+["等高線越密集，代表？","坡度越陡","坡度越緩","山很怕冷穿了很多件","那邊人很多"],
+["台灣最長的河川是？","濁水溪","淡水河","我家門口的水溝","浴缸"],
+["台灣冬季主要吹什麼風？","東北季風","西南季風","電風扇","颱風"],
+["比例尺 1：100 的地圖上 1 公分，實際代表？","100 公分","100 公里","1 公分（地圖很誠實）","100 隻螞蟻排排站"]],
+"自然":[
+["番茄在植物學上屬於？","果實","蔬菜","番茄就是番茄","紅色的蘋果",1],
+["香蕉在植物學上屬於？","漿果","不是漿果，草莓才是","黃色的熱狗","猴子的手機",1],
+["蝙蝠屬於哪一類動物？","哺乳類","鳥類","會飛的老鼠精","夜店常客",1],
+["蜘蛛是昆蟲嗎？","不是","是，牠是最常見的昆蟲","牠是章魚的親戚","牠是網路工程師",1],
+["人體最大的器官是？","皮膚","肝臟","吃飽後的肚子","很會講話的嘴巴",1],
+["鴨嘴獸會生蛋，牠屬於？","哺乳類","鳥類","鴨子和海狸的混血","爬蟲類",1],
+["鯨魚屬於哪一類動物？","哺乳類","魚類","海底潛水艇","巨大的蝌蚪"],
+["植物行光合作用需要？","光、水、二氧化碳","光、水、氧氣","洗髮精和沐浴乳","手機閃光燈"],
+["細胞的控制中心是？","細胞核","粒線體","細胞裡的班長","細胞遙控器"],
+["血液中負責運送氧氣的是？","紅血球","白血球","外送員","隨身氧氣瓶"]]
+},
+"國二":{
+"國文":[
+["「首當其衝」的意思是？","最先受到攻擊或遭遇災難","第一個勇敢衝出去","頭被水衝到","衝浪比賽第一名",1],
+["「不刊之論」是指？","不能更改的正確言論","不能刊登的錯誤言論","雜誌停刊了","沒人看的論文",1],
+["「呆若木雞」在《莊子》中的原意是？","鬥雞修養到家、精神內斂","形容人發呆的樣子","木頭雕刻的雞","被雷打到的雞",1],
+["「美輪美奐」適合用來形容？","建築物高大華美","人長得很漂亮","輪胎很美","美食很好吃",1],
+["「罄竹難書」原本形容？","罪狀多到寫不完","功績多到寫不完","竹子被用光了","書很難買"],
+["〈愛蓮說〉中，周敦頤最欣賞的花是？","蓮花","菊花","花椰菜","雪花冰"],
+["「醉翁之意不在酒」是指？","本意不在此，另有目的","老翁喝醉了不想再喝","老翁其實在喝珍奶","酒被偷走了"],
+["陶淵明為什麼號「五柳先生」？","住家旁有五棵柳樹","他排行第五、姓柳","他有五顆柳丁","考試都考五分"],
+["「三顧茅廬」是誰拜訪誰？","劉備拜訪諸葛亮","諸葛亮拜訪劉備","三個顧客去上茅廁","房仲帶看三次"],
+["「守株待兔」比喻？","妄想不勞而獲、墨守成規","有耐心就會成功","兔子很愛撞樹","農夫在練功"]],
+"英文":[
+["「read」的過去式拼法是？","read","readed","red","讀過了",1],
+["「put」的過去式是？","put","putted","puted","噗",1],
+["「fish」指同一種魚很多條時，複數是？","fish","fishes 才對","fishs","魚魚",1],
+["「go」的過去式是？","went","goed","gone with the wind","狗 ed"],
+["I am looking forward to ___ you.","seeing","see","sea","看見"],
+["「big」的比較級是？","bigger","biger","more big","大大"],
+["「It's raining cats and dogs.」的意思是？","雨下得很大","天上掉下貓和狗","寵物店倒了","貓狗在跳雨中舞"],
+["She ___ a student.","is","are","am","是是是"],
+["「good」的比較級是？","better","gooder","more good","古德"],
+["哪一句文法正確？","He doesn't like milk.","He don't like milk.","He no like milk.","He milk like not."]],
+"數學":[
+["正方形是長方形嗎？","是","不是，正方形四邊一樣長","正方形是胖胖的三角形","它們是遠房親戚",1],
+["任何不為 0 的數的 0 次方等於？","1","0","它自己","不能算",1],
+["√49 = ？","7","±7","24.5","打勾勾"],
+["(a + b)² = ？","a² + 2ab + b²","a² + b²","ab²ab","啊比方"],
+["直角三角形兩股長 3、4，斜邊是？","5","7","34","斜邊太斜量不到"],
+["等差數列 2, 5, 8, 11, ___","14","13","2581114","我的生日"],
+["三角形內角和是？","180°","360°","3 個角","看三角形心情"],
+["√2 是什麼數？","無理數","有理數，約等於 1.414","沒禮貌的數","2 的平方"],
+["x² − 9 因式分解為？","(x + 3)(x − 3)","(x − 3)²","x(x − 9)","叉叉減九"],
+["平行四邊形的兩組對角？","分別相等","互補","互相看不順眼","都是直角"]],
+"社會":[
+["「黃河」為什麼是黃色？","河水夾帶大量黃土泥沙","河底鋪滿黃金","有人倒了芒果汁","黃色比較顯眼"],
+["秦始皇統一了什麼？","文字與度量衡","全國的科舉考試","全國手搖飲菜單","整個宇宙"],
+["東漢時改良造紙術的是？","蔡倫","畢昇","紙片人","衛生紙公司董事長"],
+["活字印刷術的發明者是？","畢昇","蔡倫","印表機","活字小姐"],
+["科舉制度始於哪個朝代？","隋朝","唐朝","補習班朝","石器時代"],
+["絲路主要的功能是？","東西方貿易往來","專門運絲綢給皇帝","運送蜘蛛絲","傳遞 WiFi 訊號"],
+["鴉片戰爭發生在哪個朝代？","清朝","明朝","侏羅紀","未來世界"],
+["長城最主要的用途是？","防禦北方游牧民族","防止百姓逃跑","給外星人看的地標","世界最長溜滑梯"],
+["日本明治維新的主要方向是？","向西方學習、推動現代化","閉關鎖國","全國改吃明治巧克力","武士轉職忍者"],
+["中國最長的河流是？","長江","黃河","銀河","長江七號"]],
+"自然":[
+["空氣中含量最多的氣體是？","氮氣","氧氣","屁","WiFi",1],
+["羽毛和鐵球在真空中同時放手，誰先落地？","同時落地","鐵球，因為比較重","羽毛，因為很輕盈","羽毛會飄回家",1],
+["鑽石是由什麼元素組成？","碳","矽","玻璃加閃粉","石頭的眼淚",1],
+["水的化學式是？","H₂O","H₂O₂","HOT","水"],
+["聲音在真空中會？","無法傳播","傳得比在空氣中更快","變成回音","切換成靜音模式"],
+["pH 值 = 7 代表？","中性","弱酸性","第七名","很鹼的心情"],
+["一大氣壓下，水的沸點是？","100°C","0°C","37°C","泡麵剛好的溫度"],
+["一般金屬受熱後會？","膨脹","收縮","害羞臉紅","開始唱歌"],
+["冰塊浮在水面上是因為？","冰的密度比水小","冰的密度比水大","冰塊裡有游泳圈","冰塊怕溺水"],
+["光在真空中的速度約為？","3 × 10⁸ m/s","3 × 10⁸ km/s","時速 60 公里","看網速"]]
+},
+"國三":{
+"國文":[
+["「明日黃花」比喻？","過時的事物","有希望的未來","明天才會開的花","應該寫成「昨日黃花」才對",1],
+["「每下愈況」的原意是？","越往下探查，越能看清真相","情況越來越糟","每次下課越來越開心","是「每況愈下」的錯字",1],
+["〈出師表〉是誰寫給誰的？","諸葛亮寫給劉禪","諸葛亮寫給劉備","學生寫給畢業的老師","出師前的打卡紀錄"],
+["「破釜沉舟」比喻？","下定決心，不留退路","不小心把船弄沉","海上烹飪意外","資源回收"],
+["賈島「推敲」的故事，他是在斟酌？","詩句用字","推銷保險","敲詐勒索","該推門還是敲門的禮儀"],
+["「青出於藍而勝於藍」比喻？","學生勝過老師","綠色比藍色好看","藍色顏料過期了","青蛙打贏藍鯨"],
+["「三十而立」的「立」指？","立身處世、有所成就","三十歲才學會站立","立正站好","立刻結婚"],
+["「學而時習之」的「時」意思是？","按時、時常","時間到了才學","時鐘","時髦"],
+["〈桃花源記〉的作者是？","陶淵明","王維","桃太郎","桃花小姐"],
+["「不以物喜，不以己悲」出自？","〈岳陽樓記〉","〈醉翁亭記〉","〈開心農場記〉","〈心情日記〉"]],
+"英文":[
+["If I ___ a bird, I would fly to you.","were","was","am bird","鳥",1],
+["Neither Tom nor I ___ ready.","am","is","are","都沒有",1],
+["「news」是可數還是不可數名詞？","不可數","可數，因為字尾有 s","新新聞們","看新聞台",1],
+["He suggested that she ___ a doctor.","see","sees","saw","see see",1],
+["演出前對人說「Break a leg!」是？","祝你好運","提醒你小心跌倒","叫你去把腿弄斷","推薦骨科醫生",1],
+["The cake ___ by Mom yesterday.","was made","is made","made itself","was eaten by me secretly"],
+["The boy ___ is singing is Tom.","who","which","whom ever","誰"],
+["I ___ already finished my homework.","have","has","am","已經已經"],
+["「a piece of cake」常用來表示？","很簡單","一塊蛋糕的價格","肚子餓了","蛋糕被偷吃一塊"],
+["「economics」當學科名稱時，動詞用？","單數","複數，因為字尾有 s","不用動詞","經濟艙"]],
+"數學":[
+["0!（0 的階乘）等於？","1","0","驚嘆號","0 很驚訝",1],
+["連續擲公正硬幣 5 次都是反面，第 6 次出現正面的機率？","1/2","大於 1/2，該輪到正面了","1/6","0（硬幣討厭你）",1],
+["資料 1, 2, 2, 3, 100 的中位數是？","2","21.6","100","2 和 3 在吵架"],
+["y = x² 的圖形是？","拋物線","直線","外星人簽名","兩條麵條"],
+["圓周率 π 和 22/7 的關係？","22/7 只是近似值","22/7 剛好等於 π","π 是一塊派","22/7 是七夕"],
+["x² = 9 的解是？","x = ±3","x = 3","x = 4.5","x = 9"],
+["相似三角形邊長比 1：2，面積比是？","1：4","1：2","2：1","都是三角形所以一樣大"],
+["圓內接四邊形的對角？","互補","相等","互相不理","都是 90 度"],
+["三角形的外心是三邊什麼線的交點？","中垂線","角平分線","海岸線","起跑線"],
+["y = −x² 的開口方向？","向下","向上","向左轉","看心情"]],
+"社會":[
+["拿破崙的身高大約是？","約 168 公分，當時算一般","約 150 公分，非常矮","兩公尺的巨人","一個馬桶高",1],
+["中世紀維京人的戰鬥頭盔上有角嗎？","沒有","有，兩隻大牛角","有，還會發光","頭盔就是一頭馴鹿",1],
+["哥倫布 1492 年抵達的是？","美洲","印度","月球","哥倫比亞大學"],
+["工業革命起源於哪個國家？","英國","美國","樂高王國","我家車庫"],
+["三權分立是哪三權？","行政、立法、司法","行政、立法、考試","吃、喝、睡","剪刀、石頭、布"],
+["需求增加、供給不變時，價格通常會？","上升","下降","直接消失","變成股票"],
+["法國大革命的口號是？","自由、平等、博愛","民族、民權、民生","麵包、可頌、法棍","放假、放假、放假"],
+["「機會成本」是指？","做選擇時放棄的最高價值","買東西實際花掉的錢","抽獎券的成本","機器人的成本"],
+["文藝復興最早興起於？","義大利","法國","文藝國","復興路"],
+["第一次世界大戰的導火線是？","塞拉耶佛事件","珍珠港事件","一顆蘋果掉下來","兩國搶最後一塊雞排"]],
+"自然":[
+["北半球冬天時，地球離太陽比較？","近","遠","太陽放寒假","看地圖比例尺",1],
+["在月球表面看白天的天空是什麼顏色？","黑色","藍色","粉紅色","彩虹色",1],
+["牛頓第一運動定律又稱？","慣性定律","萬有引力定律","躺平定律","蘋果砸頭定律"],
+["力的國際單位是？","牛頓","公斤","馬力歐","蘋果"],
+["地球公轉一圈約需？","一年","一天","一個暑假","看地球心情"],
+["串聯電路中一顆燈泡燒壞，其他燈泡會？","全部不亮","照常發亮","變得更亮","開始哭"],
+["板塊運動會造成？","地震與火山","颱風","披薩被切片","板凳自己移動"],
+["月亮本身會發光嗎？","不會，是反射陽光","會，它是夜晚的太陽","會，裡面有燈泡","只有中秋節會"],
+["「功」的單位焦耳等於？","牛頓 × 公尺","牛頓 ÷ 公尺","焦慮的耳朵","一首焦耳之歌"],
+["電流的單位是？","安培","伏特","安安","電電"]]
+}};
+const GRADES=["國一","國二","國三"], SUBJECTS=["國文","英文","數學","社會","自然"];
+const TIME_LIMIT=10, QN=5, PER=20;
+
+/* ================= 手繪成就圖示（viewBox 0 0 64 64） ================= */
+const ICON={
+zh:`<path class="k fy" d="M14 14h36v36H14z"/><path class="k" d="M9 12h46M9 52h46"/><path class="kt" d="M20 24h16M20 31h20M20 38h12"/><path class="b fb" d="M46 32c-4 7-5 10-1 12s6-4 1-12z"/><path class="b" d="M38 46c2 4 0 8-3 10"/>`,
+en:`<path class="k" d="M7 46l8-26 8 26M10 37h10"/><path class="k" d="M27 20v26M27 20h6a6 6 0 0 1 0 12h-6M27 32h7a7 7 0 0 1 0 14h-7"/><path class="k" d="M57 25c-3-6-14-5-14 8s11 15 14 8"/><path class="r" d="M4 12l10 8 6-6 8 10 10-12 6 8 14-6"/><path class="r" d="M30 54l4 6M40 52l6 6M20 54l-2 6"/>`,
+ma:`<circle class="k fy" cx="32" cy="32" r="13"/><ellipse class="r" cx="32" cy="33" rx="27" ry="8" transform="rotate(-18 32 33)"/><path class="kt" d="M9 10v6M6 13h6M53 50v6M50 53h6M52 8l1 2"/><text class="st" x="24" y="37" font-size="12" fill="var(--ink)">1+1</text>`,
+so:`<g transform="rotate(22 32 32)"><path class="k" d="M18 8h28M18 56h28"/><path class="k fw" d="M21 8c0 14 21 16 21 24S21 40 21 56h21c0-16-21-16-21-24s21-10 21-24z"/><path class="fy" d="M25 50c2-6 12-6 14 0z"/></g><path class="r" d="M50 14c6 2 8 10 2 12s-8-6-2-6"/>`,
+sc:`<path class="k fw" d="M6 34h52v4c0 10-9 14-26 14S6 48 6 38z"/><path class="k" d="M14 52l-3 6M50 52l3 6"/><path class="k fg" d="M28 32c-4-14 6-24 20-24 0 14-8 24-20 24z"/><path class="kt" d="M28 32c4-8 10-14 18-20"/><circle class="b" cx="14" cy="26" r="3"/><circle class="b" cx="20" cy="18" r="2"/><circle class="b" cx="10" cy="16" r="2.5"/>`,
+flash:`<path class="k fw" d="M12 6h30l10 10v42H12z"/><path class="k" d="M42 6v10h10"/><path class="r fy" d="M34 14L20 36h10l-6 18 18-26H32l6-14z"/>`,
+buzzer:`<circle class="k fw" cx="32" cy="36" r="21"/><path class="k" d="M28 10h8M32 10v5M48 18l4-4"/><path class="r" d="M32 36V22M32 36l9 6"/><path class="r" d="M6 18l6 4M4 30h6M58 30h-5"/>`,
+rope:`<path class="k" d="M2 46c20 6 40 6 60 0"/><circle class="k fw" cx="32" cy="16" r="5"/><path class="k" d="M32 21v14M32 35l-5 13M32 35l5 13"/><path class="b" d="M8 24l48 0"/><path class="k" d="M32 26l-10-2M32 26l10-2"/>`,
+curse:`<circle class="k fy" cx="32" cy="34" r="22"/><circle class="k fw" cx="23" cy="31" r="7"/><circle class="k fw" cx="41" cy="31" r="7"/><path class="k" d="M30 31h4"/><circle class="fk" cx="23" cy="31" r="2"/><circle class="fk" cx="41" cy="31" r="2"/><path class="r" d="M16 20l10 4M48 20l-10 4"/><path class="k" d="M24 45c5 4 11 4 16 0"/>`,
+almost:`<circle class="k fw" cx="30" cy="36" r="20"/><path class="k" d="M21 32h4M35 32h4"/><path class="k" d="M24 46c4-2 8-2 12 0"/><path class="b fb" d="M50 14c-4 7-5 10-1 12s6-4 1-12z"/><text class="st" x="40" y="62" font-size="15" fill="var(--red)">20</text>`,
+pass:`<circle class="r" cx="32" cy="32" r="25"/><circle class="r" cx="32" cy="32" r="20" style="stroke-width:1.6"/><text class="st" x="14" y="39" font-size="18" fill="var(--red)">及格</text>`,
+blank:`<path class="k fw" d="M14 8h36v48H14z"/><text class="st" x="30" y="30" font-size="14" fill="var(--blue)">Z</text><text class="st" x="38" y="22" font-size="10" fill="var(--blue)">z</text><text class="st" x="44" y="16" font-size="8" fill="var(--blue)">z</text><path class="kt" d="M20 44h24M20 50h16"/>`,
+absurd:`<path class="k fw" d="M26 6h12M28 6v16L12 52c-2 4 0 6 4 6h32c4 0 6-2 4-6L36 22V6"/><path class="fy" d="M18 42h28l5 10c1 3 0 4-3 4H16c-3 0-4-1-3-4z"/><circle class="r" cx="30" cy="46" r="3"/><circle class="r" cx="38" cy="38" r="2"/><path class="r" d="M22 30c6-4 14 4 20 0"/>`,
+trap:`<path class="k" d="M32 4v26c0 14-18 14-18 2"/><path class="k" d="M14 32l-4-6"/><path class="k fy" d="M38 38h20v16H38z"/><text class="st" x="43" y="51" font-size="12" fill="var(--ink)">A</text><path class="r" d="M32 30c4 4 6 6 6 8"/>`,
+rev:`<circle class="r fw" cx="26" cy="36" r="18"/><circle class="r" cx="26" cy="36" r="14" style="stroke-width:1.4"/><text class="st" x="17" y="43" font-size="18" fill="var(--red)">將</text><path class="k" d="M48 54c10-8 10-30-6-38"/><path class="k" d="M40 10l2 6-6 2"/>`,
+eye:`<path class="k fw" d="M4 34c14-18 42-18 56 0-14 18-42 18-56 0z"/><circle class="k fy" cx="32" cy="34" r="9"/><circle class="fk" cx="32" cy="34" r="4"/><path class="r" d="M14 18c4-8 8-2 10-10 2 6 6 2 8 8 2-6 6-4 8-10 2 8 6 4 8 12"/>`,
+same:`<path class="r fw" d="M32 54C10 40 6 28 12 18s18-6 20 4c2-10 14-14 20-4s2 22-20 36z"/><text class="st" x="25" y="40" font-size="20" fill="var(--red)">C</text>`,
+streak:`<ellipse class="r" cx="16" cy="32" rx="9" ry="13"/><ellipse class="r" cx="32" cy="32" rx="9" ry="13"/><ellipse class="r" cx="48" cy="32" rx="9" ry="13"/><path class="k" d="M6 54h52"/>`,
+veteran:`<path class="k fy" d="M18 8h28v14c0 10-6 16-14 16S18 32 18 22z"/><path class="k" d="M18 12H8c0 10 6 12 10 12M46 12h10c0 10-6 12-10 12M32 38v8M22 56h20M24 46h16v10"/><ellipse class="r" cx="32" cy="20" rx="5" ry="7"/>`,
+crown:`<path class="k fy" d="M8 48l-2-30 14 12 12-20 12 20 14-12-2 30z"/><path class="k" d="M8 54h48"/><circle class="r fr" cx="32" cy="38" r="3"/><circle class="fb" cx="18" cy="40" r="2.5"/><circle class="fb" cx="46" cy="40" r="2.5"/>`,
+stairs:`<path class="k fw" d="M6 12h14v14h14v14h14v14h10v4H6z"/><text class="st" x="9" y="23" font-size="8" fill="var(--ink)">國一</text><text class="st" x="23" y="37" font-size="8" fill="var(--ink)">國二</text><text class="st" x="37" y="51" font-size="8" fill="var(--ink)">國三</text><path class="r" d="M50 10l4 8M56 6l2 10"/>`,
+grid:`<path class="k fw" d="M6 14h52v36H6z"/><path class="kt" d="M16.4 14v36M26.8 14v36M37.2 14v36M47.6 14v36M6 26h52M6 38h52"/><path class="r" d="M8 20l3 3 4-6M29 32l3 3 4-6M50 44l3 3 4-6M19 44l3 3 4-6M40 20l3 3 4-6"/>`,
+back:`<path class="k" d="M48 54V26c0-12-20-12-20 0v8"/><path class="k" d="M20 26l8 10 8-10"/><text class="st" x="6" y="22" font-size="13" fill="var(--red)">60</text><text class="st" x="20" y="58" font-size="15" fill="var(--red)">0</text>`,
+night:`<path class="k fy" d="M42 6a22 22 0 1 0 16 30A18 18 0 0 1 42 6z"/><circle class="k fw" cx="20" cy="40" r="6"/><circle class="k fw" cx="34" cy="40" r="6"/><circle class="fk" cx="20" cy="40" r="2"/><circle class="fk" cx="34" cy="40" r="2"/><path class="k" d="M24 48l3 3 3-3"/>`,
+pencil:`<path class="k fy" d="M14 50l30-30 8 8-30 30-10 2z"/><path class="k" d="M40 24l8 8M14 50l8 8"/><path class="k fr" d="M44 20l6-6 8 8-6 6z"/>`,
+snail:`<circle class="k fy" cx="34" cy="34" r="15"/><path class="kt" d="M34 34c0-4 6-4 6 0s-10 6-10-2 14-10 14 2"/><path class="k" d="M6 50h48c4 0 6-4 4-6M16 50c-4 0-6-4-6-10 0-4 2-6 4-6M12 34l-4-8M16 34l0-9"/>`,
+lucky:`<path class="k fg" d="M32 32c-10-2-14-10-8-14s10 4 8 14zM32 32c2-10 10-14 14-8s-4 10-14 8zM32 32c10 2 14 10 8 14s-10-4-8-14zM32 32c-2 10-10 14-14 8s4-10 14-8z"/><path class="k" d="M32 32c4 10 4 18 0 26"/>`,
+mixed:`<path class="k fw" d="M10 10h20v20H10z"/><path class="r" d="M14 20l4 4 8-10"/><path class="k fw" d="M34 34h20v20H34z"/><path class="r" d="M38 38l12 12M50 38L38 50"/><path class="b" d="M36 12c10 0 16 6 16 16M28 52c-10 0-16-6-16-16"/>`
+};
+const svg=(id,cls="")=>`<svg viewBox="0 0 64 64" filter="url(#rough)" class="${cls}" aria-hidden="true">${ICON[id]}</svg>`;
+
+/* ================= 成就 ================= */
+const A=(id,icon,name,desc,test)=>({id,icon,name,desc,test});
+const SUBJ_ICON={國文:"zh",英文:"en",數學:"ma",社會:"so",自然:"sc"};
+const SUBJ_NAME={國文:"倉頡看了都流淚",英文:"ABC 毀滅者",數學:"宇宙新定理",社會:"時空混亂者",自然:"光合作用洗澡論"};
+const ACH=[
+  ...SUBJECTS.map(s=>A("z_"+s,SUBJ_ICON[s],SUBJ_NAME[s],`${s}科考到 0 分（不能全交白卷）`,r=>r.zero&&r.subject===s&&r.timeouts<QN)),
+  A("newbie","pencil","入學新生","完成第一場考試",r=>true),
+  A("flash","flash","閃電白卷","五題都有作答，平均每題不到 2 秒",r=>r.timeouts===0&&r.avg<2),
+  A("buzzer","buzzer","極限壓線","至少兩題在最後 1 秒內才作答",r=>r.lastSec>=2),
+  A("rope","rope","走鋼索的人","0 分，而且每題都在剩下 3 秒內才作答",r=>r.zero&&r.timeouts===0&&r.times.every(t=>t>=TIME_LIMIT-3)),
+  A("snail","snail","深思熟慮","0 分，平均每題想超過 7 秒",r=>r.zero&&r.timeouts===0&&r.avg>7),
+  A("blank","blank","全卷空白","五題全部時間到交白卷",r=>r.timeouts===QN),
+  A("absurd","absurd","荒謬純度 100%","五題都選到最荒謬的選項",r=>r.picks.every(p=>p==="x")),
+  A("trap","trap","似是而非大師","0 分，且至少 3 題選了看起來最像正解的錯誤選項",r=>r.zero&&r.picks.filter(p=>p==="t").length>=3),
+  A("eye","eye","火眼金睛","0 分，且避開至少 2 題「長得像錯的正解」",r=>r.zero&&r.weird>=2),
+  A("rev","rev","被反將一軍","選了一個以為很荒謬、結果是正解的答案",r=>r.weirdFell>0),
+  A("same","same","專一的人","五題都選同一個字母",r=>r.timeouts===0&&new Set(r.letters).size===1),
+  A("almost","almost","差一點點","只答對一題，拿到 20 分",r=>r.score===20),
+  A("pass","pass","不小心及格","剛好考 60 分",r=>r.score===60),
+  A("mixed","mixed","對錯參半症候群","考到 40 分或 80 分",r=>r.score===40||r.score===80),
+  A("curse","curse","學霸的詛咒","五題全對，考了 100 分",r=>r.score===100),
+  A("back","back","浪子回頭","上一場至少 60 分，這一場考回 0 分",r=>r.zero&&r.prevScore!=null&&r.prevScore>=60),
+  A("streak","streak","連續零分","連續 3 場考 0 分",r=>r.streak>=3),
+  A("lucky","lucky","零分常客","累計 10 場 0 分",r=>r.zeroCount>=10),
+  A("stairs","stairs","跨年級廢柴","國一、國二、國三都考過 0 分",r=>r.zGrade>=3),
+  A("crown","crown","全科大滿貫","五個科目都考過 0 分",r=>r.zSub>=5),
+  A("grid","grid","十五宮格全破","所有年級 × 科目組合都考過 0 分",r=>r.zCombo>=15),
+  A("night","night","夜貓考生","在凌晨 0 點到 5 點之間交卷",r=>new Date().getHours()<5),
+  A("veteran","veteran","考場老兵","累計完成 20 場考試",r=>r.exams>=20)
+];
+
+/* ================= 存檔（只存在這台瀏覽器） ================= */
+const KEY="zeroScore.v2";
+const blank=()=>({ach:[],zSub:[],zGrade:[],zCombo:[],zeroCount:0,streak:0,exams:0,lastScore:null});
+function load(){try{return Object.assign(blank(),JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){return blank()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DATA))}catch(e){}}
+let DATA=load();
+
+/* ================= 工具 ================= */
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.random()*a.length|0];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function show(id){["menu","exam","result"].forEach(s=>$(s).hidden=s!==id);window.scrollTo({top:0,behavior:reduce?"auto":"smooth"})}
+const MARK_OK=`<svg viewBox="0 0 64 64" filter="url(#rough)" aria-label="答對"><path class="r" style="stroke-width:5" d="M10 34l14 14L56 10"/></svg>`;
+const MARK_NO=`<svg viewBox="0 0 64 64" filter="url(#rough)" aria-label="答錯"><path class="r" style="stroke-width:5" d="M12 12l40 40M52 14L14 52"/></svg>`;
+const MARK_BLANK=`<svg viewBox="0 0 64 64" filter="url(#rough)" aria-label="空白"><path class="r" style="stroke-width:4" d="M10 32c10-8 34 8 44 0"/></svg>`;
+
+/* ================= 主選單 ================= */
+let grade="國一", subject="國文", state=null, timerId=null;
+function renderMenu(){
+  $("gradeChips").innerHTML=GRADES.map(g=>`<button class="chip" data-g="${g}" aria-pressed="${g===grade}">${g}</button>`).join("");
+  $("subjectChips").innerHTML=SUBJECTS.map(s=>`<button class="chip" data-s="${s}" aria-pressed="${s===subject}">${s}</button>`).join("");
+  $("achCount").textContent=`${DATA.ach.length}/${ACH.length}`;
+}
+$("gradeChips").onclick=e=>{const b=e.target.closest("[data-g]");if(b){grade=b.dataset.g;renderMenu()}};
+$("subjectChips").onclick=e=>{const b=e.target.closest("[data-s]");if(b){subject=b.dataset.s;renderMenu()}};
+
+/* ================= 考試 ================= */
+function startGame(){
+  const qs=shuffle(BANK[grade][subject]).slice(0,QN).map(([q,c,t,x,o,w])=>({
+    q,weird:!!w,opts:shuffle([{t:c,k:"c"},{t:t,k:"t"},{t:x,k:"x"},{t:o,k:"o"}])
+  }));
+  state={qs,i:0,picks:[],letters:[],times:[],lastSec:0,timeouts:0,locked:false};
+  $("examGrade").textContent=grade;$("examSubject").textContent=subject;
+  show("exam");nextQuestion();
+}
+function renderDots(){$("dots").innerHTML=state.qs.map((_,i)=>`<span class="dot ${i<state.i?"done":i===state.i?"now":""}"></span>`).join("")}
+function nextQuestion(){
+  const cur=state.qs[state.i];state.locked=false;renderDots();
+  $("qno").textContent=`第 ${state.i+1} 題 / 共 ${QN} 題　請選出錯誤的答案`;
+  $("question").textContent=cur.q;$("feedback").innerHTML="";
+  $("options").innerHTML=cur.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="key">${"ABCD"[k]}</span><span class="txt">${esc(o.t)}</span><span class="mark"></span></button>`).join("");
+  state.t0=performance.now();clearInterval(timerId);timerId=setInterval(tick,50);tick();
+}
+function tick(){
+  const rem=Math.max(0,TIME_LIMIT-(performance.now()-state.t0)/1000);
+  $("timerBar").style.width=(rem/TIME_LIMIT*100)+"%";
+  $("timerBar").className="timer-bar"+(rem<=3?" crit":rem<=6?" warn":"");
+  $("timerNum").textContent=Math.ceil(rem);$("timerNum").className="timer-num"+(rem<=3?" crit":"");
+  if(rem<=0)answer(-1);
+}
+const LINE={
+  c:["糟糕，你答對了！","知識不小心外洩了","老師在這題打了一個勾"],
+  t:["漂亮！看起來很對，其實是錯的","你完美避開了正解","這個陷阱你踩得很有氣質"],
+  x:["完美的錯誤！老師氣到吃手手","太荒謬了，我好欣賞","這答案連 AI 都想不到"],
+  o:["錯得很穩健","低調的錯誤也是錯誤","零分之路，穩穩前進"]
+};
+function answer(k){
+  if(state.locked)return;state.locked=true;clearInterval(timerId);
+  const el=Math.min(TIME_LIMIT,(performance.now()-state.t0)/1000);
+  const cur=state.qs[state.i],btns=[...$("options").children];
+  btns.forEach(b=>b.disabled=true);
+  state.times.push(el);
+  const ri=cur.opts.findIndex(o=>o.k==="c");
+  btns[ri].classList.add("is-right");btns[ri].querySelector(".mark").innerHTML=MARK_OK;
+  let msg;
+  if(k<0){state.timeouts++;state.picks.push("none");state.letters.push(-1);msg="時間到，交白卷";}
+  else{
+    if(TIME_LIMIT-el<=1)state.lastSec++;
+    const kind=cur.opts[k].k;state.picks.push(kind);state.letters.push(k);
+    btns[k].classList.add("picked");
+    if(kind!=="c")btns[k].querySelector(".mark").innerHTML=MARK_NO;
+    msg=pick(LINE[kind]);
+  }
+  const note=cur.weird?"這題的正解長得最像亂寫的":"";
+  $("feedback").innerHTML=esc(msg)+(note?`<small>${note}</small>`:"");
+  setTimeout(()=>{state.i++;state.i>=QN?endGame():nextQuestion()},1300);
+}
+document.addEventListener("keydown",e=>{
+  if($("exam").hidden||!state||state.locked)return;
+  const k="1234".indexOf(e.key);if(k>=0)answer(k);
+});
+$("options").onclick=e=>{const b=e.target.closest(".opt");if(b&&!b.disabled)answer(+b.dataset.k)};
+
+/* ================= 結算 ================= */
+const COMMENT={
+  0:["整張考卷乾淨得像沒被知識打擾過的大腦。老師已預約心理諮商。","每一題都精準避開正解，這需要的其實是真本事。","你的錯誤充滿創意，建議保送反向思考研究所。"],
+  20:["只答對一題，瑕不掩瑜，仍是一份令人絕望的好考卷。","差一點點就完美了，請把那一題的知識忘掉。"],
+  40:["你在學霸和廢柴之間來回橫跳，老師心臟受不了。"],
+  60:["不小心及格了。這在本班是嚴重違紀行為。"],
+  80:["你是不是偷偷有讀書？請誠實面對自己。"],
+  100:["全對。你的大腦背叛了你，知識終究從你身上流出來了。","恭喜（並不），你被抓到其實很認真。"]
+};
+function endGame(){
+  clearInterval(timerId);
+  const correct=state.picks.filter(p=>p==="c").length, score=correct*PER, zero=score===0;
+  const avg=state.times.reduce((a,b)=>a+b,0)/QN;
+  // 更新累計紀錄
+  const prevScore=DATA.lastScore;
+  DATA.exams++;DATA.lastScore=score;
+  if(zero&&state.timeouts<QN){
+    DATA.zeroCount++;DATA.streak++;
+    [["zSub",subject],["zGrade",grade],["zCombo",grade+subject]].forEach(([k,v])=>{if(!DATA[k].includes(v))DATA[k].push(v)});
+  }else DATA.streak=0;
+  const r={
+    subject,score,zero,avg,times:state.times,timeouts:state.timeouts,lastSec:state.lastSec,picks:state.picks,letters:state.letters,
+    weird:state.qs.filter((q,i)=>q.weird&&state.picks[i]!=="c"&&state.picks[i]!=="none").length,
+    weirdFell:state.qs.filter((q,i)=>q.weird&&state.picks[i]==="c").length,
+    prevScore,streak:DATA.streak,zeroCount:DATA.zeroCount,exams:DATA.exams,
+    zSub:DATA.zSub.length,zGrade:DATA.zGrade.length,zCombo:DATA.zCombo.length
+  };
+  const earned=ACH.filter(a=>a.test(r)).map(a=>a.id);
+  const fresh=new Set(earned.filter(id=>!DATA.ach.includes(id)));
+  earned.forEach(id=>{if(!DATA.ach.includes(id))DATA.ach.push(id)});
+  save();
+
+  // 標題與評語
+  const vt=$("verdictTitle");
+  if(zero&&state.timeouts===QN){vt.textContent="零分，但全是白卷";vt.className="bad";$("verdictSub").textContent="交白卷不算本事，科目成就不給你。";}
+  else if(zero){vt.textContent="完美零分！廢得光明磊落";vt.className="";$("verdictSub").textContent=`${grade}・${subject}　本次考試正式證明：你什麼都不會（讚）`;}
+  else{vt.textContent=score===100?"學霸降臨，滿分！":`不小心拿了 ${score} 分`;vt.className="bad";$("verdictSub").textContent=`答對 ${correct} 題。知識的力量太強大了……`;}
+  $("stats").innerHTML=[
+    ["答對",`${correct} 題`],["平均答題",`${avg.toFixed(1)} 秒`],["壓線作答",`${state.lastSec} 題`],
+    ["踩陷阱",`${state.picks.filter(p=>p==="t").length} 題`],["交白卷",`${state.timeouts} 題`]
+  ].map(([l,v])=>`<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  $("comment").innerHTML=`${pick(COMMENT[score])}<span class="sig">導師 廢老師</span>`;
+
+  $("earnedBadges").innerHTML=earned.map((id,i)=>badge(ACH.find(a=>a.id===id),false,fresh.has(id),i)).join("");
+
+  const tagOf={t:"像正解的陷阱",x:"最荒謬選項",o:"普通錯誤",c:"正解"};
+  $("review").innerHTML=state.qs.map((q,i)=>{
+    const p=state.picks[i], mine=p==="none"?null:q.opts[state.letters[i]], right=q.opts.find(o=>o.k==="c");
+    const mark=p==="none"?MARK_BLANK:p==="c"?MARK_OK:MARK_NO;
+    return `<div class="rv">${mark}<div style="min-width:0"><div class="q">${i+1}. ${esc(q.q)}${q.weird?'<span class="tag">反直覺正解</span>':""}</div>
+      <div class="a">你的答案：<b>${mine?esc(mine.t):"（空白）"}</b>${mine&&p!=="c"?`<span class="tag">${tagOf[p]}</span>`:""}<br>正解：<b>${esc(right.t)}</b></div></div></div>`;
+  }).join("");
+
+  show("result");renderMenu();
+  requestAnimationFrame(()=>drawScore($("scoreCanvas"),score));
+}
+function badge(a,locked,isNew,i=0){
+  return `<div class="badge ${locked?"locked":""}" style="animation-delay:${i*.08}s">
+    ${isNew?'<span class="new">NEW</span>':""}${svg(a.icon)}
+    <div class="n">${locked?"？？？":"【"+esc(a.name)+"】"}</div>
+    <div class="d">${esc(a.desc)}</div></div>`;
+}
+
+/* ================= 紅毛筆打分數 =================
+   每個數字是一串控制點（100×140 的格子），用 Catmull-Rom 曲線取樣，
+   再以「筆肚 + 多根筆毛」模擬下筆、行筆、收筆飛白。 */
+const GLYPH={
+  "0":[[[66,16],[42,10],[22,32],[14,72],[20,110],[44,132],[72,124],[88,92],[88,50],[74,20],[52,8],[30,18]]],
+  "1":[[[28,38],[52,10],[50,70],[44,134]]],
+  "2":[[[14,44],[30,16],[58,8],[80,26],[76,58],[50,92],[16,132],[52,122],[96,128]]],
+  "4":[[[62,8],[38,56],[10,96],[54,92],[98,86]],[[70,44],[66,92],[60,136]]],
+  "6":[[[80,10],[50,28],[26,66],[20,104],[40,132],[70,126],[84,96],[64,76],[36,84],[22,108]]],
+  "8":[[[76,24],[52,8],[26,22],[30,50],[56,68],[82,96],[72,126],[40,134],[16,106],[36,78],[64,56],[80,32],[70,14]]]
+};
+function spline(pts){
+  const P=[pts[0],...pts,pts[pts.length-1]],out=[];
+  for(let i=1;i<P.length-2;i++){
+    const[p0,p1,p2,p3]=[P[i-1],P[i],P[i+1],P[i+2]];
+    for(let s=0;s<24;s++){const t=s/24,t2=t*t,t3=t2*t;
+      out.push([.5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),
+                .5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)])}
+  }
+  out.push(pts[pts.length-1]);
+  const res=[out[0]];let acc=0;   // 等距重新取樣
+  for(let i=1;i<out.length;i++){const d=Math.hypot(out[i][0]-out[i-1][0],out[i][1]-out[i-1][1]);acc+=d;if(acc>=1.4){res.push(out[i]);acc=0}}
+  return res;
+}
+const pressure=t=>t<.06?.5+.5*(t/.06):t<.62?1-.14*((t-.06)/.56):.86*Math.pow(1-(t-.62)/.38,.75)+.04;
+function brushSteps(ctx,pts,baseW,ink){
+  const S=spline(pts),N=20,steps=[];
+  const br=Array.from({length:N},(_,k)=>({u:Math.max(-1,Math.min(1,-1+2*k/(N-1)+(Math.random()-.5)*.12)),dry:.5+Math.random()*.48,w:.8+Math.random()*1.5,a:.55+Math.random()*.4}));
+  let prevW=baseW*pressure(0),prevN=[0,0];
+  // 起筆墨點
+  steps.push(()=>{ctx.fillStyle=ink;for(let i=0;i<3;i++){ctx.globalAlpha=.6;ctx.beginPath();ctx.arc(S[0][0]+(Math.random()-.5)*baseW*2.2,S[0][1]+(Math.random()-.5)*baseW*2.2,Math.random()*1.6+.4,0,7);ctx.fill()}ctx.globalAlpha=1});
+  for(let i=1;i<S.length;i++){
+    const t=i/(S.length-1),[x,y]=S[i],[px,py]=S[i-1];
+    let dx=x-px,dy=y-py;const L=Math.hypot(dx,dy)||1;dx/=L;dy/=L;
+    const n=[-dy,dx],W=baseW*pressure(t),pw=prevW,pn=prevN[0]||prevN[1]?prevN:n;
+    steps.push(()=>{
+      ctx.fillStyle=ink;ctx.strokeStyle=ink;
+      if(t<.7){ctx.globalAlpha=.92;ctx.beginPath();ctx.arc(x,y,W*.42,0,7);ctx.fill()}
+      if(t<.05){ctx.globalAlpha=.85;ctx.beginPath();ctx.arc(x,y,W*.55,0,7);ctx.fill()}
+      ctx.lineCap="round";
+      for(const b of br){
+        if(t>b.dry&&Math.random()<(t-b.dry)*6)continue;
+        ctx.globalAlpha=b.a;ctx.lineWidth=b.w;ctx.beginPath();
+        ctx.moveTo(px+pn[0]*b.u*pw/2,py+pn[1]*b.u*pw/2);ctx.lineTo(x+n[0]*b.u*W/2,y+n[1]*b.u*W/2);ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    });
+    prevW=W;prevN=n;
+  }
+  return steps;
+}
+let scoreAnim=0;
+function drawScore(cv,score){
+  cancelAnimationFrame(scoreAnim);
+  const dpr=Math.min(3,window.devicePixelRatio||1),W=320,H=230;
+  cv.width=W*dpr;cv.height=H*dpr;
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  const ink=getComputedStyle(document.documentElement).getPropertyValue("--red").trim()||"#c8231e";
+  const digits=String(score).split(""),n=digits.length;
+  const s=n===3?.92:n===2?1.02:1.12,adv=66*s,total=(n-1)*adv+100*s;
+  const x0=(W-total)/2-10,y0=16;
+  ctx.save();ctx.translate(W/2,H/2);ctx.rotate(-.1);ctx.translate(-W/2,-H/2);
+  let steps=[];
+  digits.forEach((d,i)=>GLYPH[d].forEach(stroke=>{
+    const pts=stroke.map(([px,py])=>[x0+i*adv+px*s+(140-py)*.14*s+(Math.random()-.5)*3,y0+py*s+(Math.random()-.5)*3]);
+    steps=steps.concat(brushSteps(ctx,pts,17*s,ink),Array(6).fill(()=>{}));
+  }));
+  const uy=y0+140*s+18;
+  steps=steps.concat(brushSteps(ctx,[[x0-6,uy+2],[x0+total*.45,uy+8],[x0+total+24,uy-2],[x0+total+40,uy-16]],11,ink),Array(4).fill(()=>{}));
+  if(score===0)steps=steps.concat(brushSteps(ctx,[[x0+18,uy+20],[x0+total*.55,uy+22],[x0+total+12,uy+14]],8,ink));
+  if(reduce){steps.forEach(f=>f());ctx.restore();return}
+  let i=0;
+  (function frame(){for(let k=0;k<10&&i<steps.length;k++)steps[i++]();if(i<steps.length)scoreAnim=requestAnimationFrame(frame);else ctx.restore()})();
+}
+
+/* ================= 成就圖鑑 ================= */
+function openGallery(){
+  $("galleryProgress").innerHTML=`已解鎖 <b>${DATA.ach.length}</b> / ${ACH.length}　・　累計 ${DATA.exams} 場考試、${DATA.zeroCount} 場零分`;
+  $("galleryBadges").innerHTML=ACH.map((a,i)=>badge(a,!DATA.ach.includes(a.id),false,i*.3)).join("");
+  resetArmed=false;$("resetAch").textContent="清除成就紀錄";
+  $("gallery").hidden=false;$("closeGallery").focus();
+}
+let resetArmed=false;
+$("resetAch").onclick=()=>{
+  if(!resetArmed){resetArmed=true;$("resetAch").textContent="再按一次確認清除（無法復原）";return}
+  DATA=blank();save();renderMenu();openGallery();
+};
+$("galleryBtn").onclick=openGallery;$("galleryBtn2").onclick=openGallery;
+$("closeGallery").onclick=()=>$("gallery").hidden=true;
+$("gallery").onclick=e=>{if(e.target.id==="gallery")$("gallery").hidden=true};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("gallery").hidden=true});
+
+$("startBtn").onclick=startGame;$("retryBtn").onclick=startGame;
+$("menuBtn").onclick=()=>{show("menu");renderMenu()};
+renderMenu();
+</script>
+
+</body></html>

@@ -135,7 +135,8 @@ function gameCard(g) {
         g.章節 ? el('span', { className: 'gchip', textContent: g.章節 }) : null,
         g.連結遊戲 ? el('span', { className: 'gchip link', textContent: '外部連結' }) : null) : null,
       el('span', { className: 'gdesc', textContent: g.說明 }),
-      el('span', { className: `gtag${g.使用題庫 ? ' bank' : ''}`, textContent: noBank ? '題庫還沒有這一科的題目' : g.使用題庫 ? '選範圍・用題庫出題' : '直接開始' })));
+      el('span', { className: `gtag${g.使用題庫 ? ' bank' : ''}`, textContent: noBank ? '題庫還沒有這一科的題目' : g.使用題庫 ? '平台題庫・選範圍出題' : g.平台版 ? '內建題庫・直接開始' : '直接開始' })));
+  b.dataset.id = g.id;
   b.addEventListener('click', () => pickGame(g));
   return b;
 }
@@ -164,13 +165,18 @@ function pickSubject(code, name) {
     }));
     tabs.hidden = cats.length < 2;
   } else {
-    const bank = list.filter((g) => g.使用題庫);
-    const fixed = list.filter((g) => !g.使用題庫);
+    // 內建題庫版（有「平台版」欄位）緊接在平台題庫版後面，兩張卡片並排
+    const bank = [];
+    for (const g of list.filter((x) => x.使用題庫)) {
+      bank.push(g);
+      bank.push(...list.filter((x) => x.平台版 === g.id));
+    }
+    const fixed = list.filter((g) => !g.使用題庫 && !bank.includes(g));
     $('#games-eyebrow').textContent = `${name}・${S.counts[code] || 0} 題`;
     $('#games-title').textContent = '選一個遊戲';
     $('#games-lede').textContent = bank.length ? '「用題庫出題」的遊戲，下一步會讓你選版本與章節。' : '';
     const sections = [];
-    if (bank.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '用題庫複習', el('small', { textContent: '題目來自老師整理的題庫' })), el('div', { className: 'gcards' }, ...bank.map(gameCard))));
+    if (bank.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '複習遊戲', el('small', { textContent: '平台題庫：選範圍、題目來自老師整理的題庫　內建題庫：直接開始' })), el('div', { className: 'gcards' }, ...bank.map(gameCard))));
     if (fixed.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '學科小遊戲', el('small', { textContent: '內建固定範圍，直接開始' })), el('div', { className: 'gcards' }, ...fixed.map(gameCard))));
     if (!sections.length) sections.push(el('p', { className: 'empty', textContent: '這一科目前還沒有遊戲。' }));
     $('#game-list').replaceChildren(...sections);
@@ -396,11 +402,74 @@ $('#again').addEventListener('click', startGame);
 $('#other-mode').addEventListener('click', () => pickSubject(S.subject, S.subjectName));
 $('#restart').addEventListener('click', buildVersions);
 
+// ---------- 手機掃碼（同一個 Wi-Fi） ----------
+const isLocalHost = () => /^(localhost|127\.|\[?::1\]?$)/.test(location.hostname);
+let lanBases = null;
+async function openQr() {
+  const dlg = $('#qr-dialog');
+  // 目前在哪個遊戲，就讓手機直接開到同一個遊戲
+  const params = new URLSearchParams();
+  if (S.subject) params.set('s', S.subject);
+  if (S.game && ['games', 'play', 'ready', 'version', 'volume', 'chapter', 'result'].includes(current)) params.set('g', S.game.id);
+  const tail = params.toString() ? `/?${params}` : '/';
+  $('#qr-what').textContent = params.get('g') ? `掃描後直接開啟「${S.game.名稱}」` : params.get('s') ? `掃描後直接進入「${S.subjectName}」` : '掃描後開啟複習小書房';
+  if (!lanBases) {
+    try { lanBases = (await api('/api/lan')).網址 || []; } catch { lanBases = []; }
+    if (!isLocalHost()) lanBases = [location.origin, ...lanBases.filter((u) => u !== location.origin)];
+  }
+  const pick = $('#qr-pick');
+  const draw = (base) => {
+    const box = $('#qr-code');
+    if (!base) {
+      box.replaceChildren(el('p', { className: 'msg', textContent: '找不到這台電腦的區網位址。請確認電腦已連上 Wi-Fi 或網路線，再重新開啟這個視窗。' }));
+      $('#qr-url').textContent = '';
+      return;
+    }
+    const url = base + tail;
+    if (window.qrcode) {
+      const qr = window.qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      box.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+    } else box.replaceChildren();
+    $('#qr-url').textContent = url;
+  };
+  pick.replaceChildren(...lanBases.map((u) => el('option', { value: u, textContent: u })));
+  pick.hidden = lanBases.length < 2;
+  pick.onchange = () => draw(pick.value);
+  draw(lanBases[0]);
+  if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+}
+$('#qr-open').addEventListener('click', openQr);
+$('#qr-play').addEventListener('click', openQr);
+$('#qr-dialog').addEventListener('click', (e) => { if (e.target.id === 'qr-dialog') e.target.close(); });
+
+// 從 QR Code 開啟：?s=科目&g=遊戲，直接帶到那一科／那個遊戲
+function openFromLink() {
+  const q = new URLSearchParams(location.search);
+  const code = q.get('s');
+  if (!code) return false;
+  history.replaceState(null, '', location.pathname);
+  const name = code === 'O' ? '其他' : (S.subjects?.[code] || ({ C: '國文', E: '英文', M: '數學', B: '自然', S: '社會' })[code]);
+  if (!name || (code !== 'O' && S.counts[code] == null && !gamesFor(code).length)) return false;
+  pickSubject(code, name);
+  const g = S.games.find((x) => x.id === q.get('g'));
+  if (g) {
+    if (g.使用題庫) pickGame(g);
+    else {
+      // 直接開始的遊戲：先停在選遊戲頁並標出來，讓學生自己點（手機瀏覽器要點一下才能全螢幕、播音效）
+      const card = [...document.querySelectorAll('#game-list .gcard')].find((c) => c.dataset.id === g.id);
+      if (card) { card.classList.add('flash'); card.scrollIntoView({ block: 'center' }); }
+    }
+  }
+  return true;
+}
+
 // 題目裡的 $...$ 數學式用 KaTeX 顯示（遊戲畫面、結果檢討）
 window.MathRender?.watch($('#game-root'));
 window.MathRender?.watch($('#review'));
 
-initHome().then(() => show('subject')).catch((e) => {
+initHome().then(() => { if (!openFromLink()) show('subject'); }).catch((e) => {
   $('#subject-cards').dataset.ok = 'err';
   $('#subject-cards').replaceChildren(el('p', { className: 'msg', textContent: '無法載入：' + e.message + '（請按 Ctrl+F5 重新整理；若還是不行，請看黑色視窗有沒有紅字）' }));
   show('subject');

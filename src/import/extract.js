@@ -22,6 +22,52 @@ function pdfjs() {
   return pdfjsPromise;
 }
 
+/**
+ * 找出頁面上「畫出來的東西」（圖片、線條、色塊）的位置，用來只截取題目的圖。
+ * 回傳 [{左, 右, 上, 下}]（佔頁面寬高的比例，左上角為 0）；排除裁切範圍、整頁外框與分隔線。
+ */
+async function graphicsOf(lib, page) {
+  const out = [];
+  try {
+    const OPS = lib.OPS;
+    const ol = await page.getOperatorList();
+    const [x0, y0, x1, y1] = page.view;
+    const W = x1 - x0;
+    const H = y1 - y0;
+    let ctm = [1, 0, 0, 1, 0, 0];
+    const stack = [];
+    const mul = (m, t) => [m[0] * t[0] + m[2] * t[1], m[1] * t[0] + m[3] * t[1], m[0] * t[2] + m[2] * t[3], m[1] * t[2] + m[3] * t[3], m[0] * t[4] + m[2] * t[5] + m[4], m[1] * t[4] + m[3] * t[5] + m[5]];
+    const add = (bb) => {
+      const pts = [[bb[0], bb[1]], [bb[2], bb[1]], [bb[0], bb[3]], [bb[2], bb[3]]].map(([x, y]) => [ctm[0] * x + ctm[2] * y + ctm[4], ctm[1] * x + ctm[3] * y + ctm[5]]);
+      const xs = pts.map((p) => (p[0] - x0) / W);
+      const ys = pts.map((p) => 1 - (p[1] - y0) / H);
+      const g = { 左: Math.max(0, Math.min(...xs)), 右: Math.min(1, Math.max(...xs)), 上: Math.max(0, Math.min(...ys)), 下: Math.min(1, Math.max(...ys)) };
+      const w = g.右 - g.左;
+      const h = g.下 - g.上;
+      if (w > 0.85 && h > 0.5) return; // 整頁外框
+      if (h < 0.004 && w > 0.3) return; // 橫向分隔線、底線
+      if (w < 0.004 && h > 0.3) return; // 直向分隔線
+      if (w < 0.002 && h < 0.002) return;
+      out.push(g);
+    };
+    const IMG = new Set([OPS.paintImageXObject, OPS.paintInlineImageXObject, OPS.paintImageMaskXObject, OPS.paintImageXObjectRepeat].filter((x) => x != null));
+    for (let i = 0; i < ol.fnArray.length; i++) {
+      const fn = ol.fnArray[i];
+      const a = ol.argsArray[i];
+      if (fn === OPS.save) stack.push(ctm);
+      else if (fn === OPS.restore) ctm = stack.pop() || ctm;
+      else if (fn === OPS.transform) ctm = mul(ctm, a);
+      else if (fn === OPS.paintFormXObjectBegin && a && a[0]) { stack.push(ctm); ctm = mul(ctm, a[0]); }
+      else if (fn === OPS.paintFormXObjectEnd) ctm = stack.pop() || ctm;
+      else if (fn === OPS.constructPath) {
+        // 只算真的畫出來的（填色或描線），裁切用的路徑不算
+        if (a && a[0] !== OPS.endPath && a[2] && a[2].length === 4) add(Array.from(a[2]));
+      } else if (IMG.has(fn)) add([0, 0, 1, 1]);
+    }
+  } catch { /* 讀不到就用文字範圍截圖 */ }
+  return out;
+}
+
 async function extractPdf(file) {
   const lib = await pdfjs();
   const pkgDir = path.dirname(require.resolve('pdfjs-dist/package.json'));
@@ -37,7 +83,8 @@ async function extractPdf(file) {
 
   const texts = [];
   const pages = [];
-  const pageLines = []; // 每頁每一行的文字與位置（上緣佔頁高的比例），用來自動截取題目圖
+  const pageLines = []; // 每頁每一行的文字與位置（佔頁面寬高的比例），用來自動截取題目圖
+  const pageGraphics = []; // 每頁的圖片與向量圖形位置
 
   for (let n = 1; n <= doc.numPages; n++) {
     const page = await doc.getPage(n);
@@ -46,23 +93,34 @@ async function extractPdf(file) {
     const base = page.getViewport({ scale: 1 });
     let lastY = null;
     let line = '';
-    let lineTop = 1;
+    let box = null;
     const lines = [];
     const placed = [];
+    const [vx0, vy0] = page.view;
     const flush = () => {
-      if (line.trim()) { lines.push(line); placed.push({ 文字: line.trim(), 上: Math.max(0, lineTop) }); }
-      line = ''; lineTop = 1;
+      if (line.trim() && box) { lines.push(line); placed.push({ 文字: line.trim(), ...box }); }
+      line = ''; box = null;
     };
     for (const it of tc.items) {
       if (!('str' in it)) continue;
       const y = Math.round(it.transform[5]);
       if (lastY !== null && Math.abs(y - lastY) > 2) flush();
       line += it.str;
-      const h = Math.abs(it.transform[3]) || 10;
-      lineTop = Math.min(lineTop, 1 - (it.transform[5] + h) / base.height);
+      if (it.str.trim()) {
+        const h = Math.abs(it.transform[3]) || 10;
+        const x = it.transform[4] - vx0;
+        const b = {
+          上: Math.max(0, 1 - (it.transform[5] - vy0 + h) / base.height),
+          下: Math.min(1, 1 - (it.transform[5] - vy0 - h * 0.25) / base.height),
+          左: Math.max(0, x / base.width),
+          右: Math.min(1, (x + (it.width || h * it.str.length)) / base.width),
+        };
+        box = box ? { 上: Math.min(box.上, b.上), 下: Math.max(box.下, b.下), 左: Math.min(box.左, b.左), 右: Math.max(box.右, b.右) } : b;
+      }
       lastY = y;
     }
     flush();
+    pageGraphics.push(await graphicsOf(lib, page));
     texts.push(lines.map((l) => l.trim()).filter(Boolean).join('\n'));
     pageLines.push(placed);
 
@@ -85,6 +143,7 @@ async function extractPdf(file) {
     文字: hasText ? texts.map((t, i) => `=== 第 ${i + 1} 頁 ===\n${t}`).join('\n\n') : '',
     頁文字: hasText ? texts : texts.map(() => ''),
     頁行: pageLines,
+    頁圖形: pageGraphics,
     頁面: pages,
     內嵌圖片: [],
   };

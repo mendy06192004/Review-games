@@ -2,6 +2,7 @@
 const { loadConfig } = require('./src/config');
 const { createApp } = require('./src/app');
 const { ensureIndex } = require('./src/indexer');
+const { lanAddresses } = require('./src/lan');
 
 const cfg = loadConfig(process.argv[2]);
 cfg.onRebuild = (idx) => {
@@ -16,6 +17,11 @@ ensureIndex(cfg)
     createApp(cfg).listen(cfg.port, () => {
       console.log(`題庫資料夾：${cfg.dataDir}`);
       console.log(`複習小書房已啟動：http://localhost:${cfg.port}`);
+      const lan = lanAddresses();
+      if (lan.length) {
+        console.log(`學生手機（連同一個 Wi-Fi）可開：http://${lan[0]}:${cfg.port}　或在網頁右上角按「手機掃碼」`);
+        console.log('  ※ 手機打不開時：Windows 第一次會跳出防火牆視窗，請勾選「私人網路」並按「允許存取」。');
+      }
       console.log(`老師後台（匯入考卷、審核題目、遊戲管理）：http://localhost:${cfg.port}/admin${cfg.adminPassword ? '（需要密碼）' : ''}`);
     });
   });

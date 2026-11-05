@@ -38,6 +38,10 @@ test('自動整理（不需金鑰）：從考卷標題判斷科目版本年級�
     assert.ok(q4.選項.includes('$\\sqrt{12}$'));
     assert.ok(q3.圖片 && fs.statSync(path.join(cfg.imageDir, q3.圖片)).size > 1000, '如圖的題目應自動截圖');
     assert.ok(!q3.圖片.includes('段考'), '圖片檔名不應洩漏來源檔名');
+    const png = fs.readFileSync(path.join(cfg.imageDir, q3.圖片));
+    const w = png.readUInt32BE(16);
+    const h = png.readUInt32BE(20);
+    assert.ok(h < w * 1.2 && h > w * 0.3, `截圖應只留圖（${w}×${h}）`);
     assert.ok(q4.待確認欄位.includes('答案'));
     assert.ok(!q1.待確認欄位.includes('難度') && !q1.待確認欄位.includes('科目'));
     assert.strictEqual(fs.readdirSync(cfg.questionDir, { recursive: true }).length, before, '題目/ 不可被自動寫入');

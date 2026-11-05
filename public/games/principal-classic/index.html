@@ -1,0 +1,1566 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>救救校長！校園大修繕</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&display=swap">
+<style>
+/* 單一視覺：冬日校園的亮藍天空。故意只做一種主題，所有顏色都在這裡明確指定 */
+:root{color-scheme:light;
+  --sky:#7fb3f5;--sky2:#d4e7ff;--ink:#22303f;--muted:#5a6878;--paper:#fffaf2;--card:#ffffff;
+  --primary:#ff7b54;--primary-d:#d95b33;--blue:#3f8cff;--blue-d:#2a69cc;--green:#2f9e63;--red:#e5484d;
+  --gold:#c9a24a;--soul:#1c1b26;--lore:#6b5a3a;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:linear-gradient(var(--sky),var(--sky2) 60%,#eef6ff);background-attachment:fixed;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none;color:inherit;background:none}
+button:focus-visible{outline:3px solid #ffd43b;outline-offset:2px}
+svg.ic{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#bgSnow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.flake{position:absolute;top:-12px;border-radius:50%;background:#fff;opacity:.85;animation:fall linear infinite}
+@keyframes fall{to{transform:translate(var(--dx,30px),110vh)}}
+.screen{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding-block:10px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:none}
+.screen.active{display:block}
+.pill{background:var(--card);border-radius:999px;padding:7px 14px;font-size:15px;box-shadow:0 3px 0 rgba(0,0,0,.12);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn{border-radius:14px;padding:12px 16px;font-size:17px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-o{color:#fff;background:linear-gradient(#ff9a6b,var(--primary));box-shadow:0 5px 0 var(--primary-d)}
+.btn-b{color:#fff;background:var(--blue);box-shadow:0 4px 0 var(--blue-d)}
+.btn-w{background:var(--card);box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.btn:active{transform:translateY(3px)}
+.lore{font-family:var(--serif);font-weight:600;color:var(--lore)}
+
+/* HOME */
+.home{display:grid;gap:18px;max-width:560px;margin:4vh auto 0}
+.logo{margin:0;text-align:center;font-size:clamp(34px,9vw,58px);line-height:1.1;color:#fff;letter-spacing:3px;text-shadow:0 3px 0 var(--blue-d),0 7px 0 rgba(0,0,0,.14);text-wrap:balance}
+.logo span{display:block;color:#ffd166;font-size:.82em}
+.homeArt{display:flex;justify-content:center}
+.homeArt svg{width:150px;height:auto;animation:shiv .14s linear infinite}
+.howto{list-style:none;margin:0;padding:16px;background:rgba(255,255,255,.92);border-radius:20px;display:grid;gap:12px;counter-reset:st}
+.howto li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;line-height:1.55;font-size:15px}
+.howto li::before{counter-increment:st;content:counter(st);width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center}
+.howto b{display:block;font-size:16px}
+.homeNote{text-align:center;margin:0;color:#244;font-size:14px}
+.homeLinks{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.link{text-decoration:underline;color:#345;font-size:14px;padding:4px}
+
+/* MAP */
+.mapbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.mapbar h2{margin:0 auto 0 4px;font-size:22px;color:#fff;text-shadow:0 2px 0 var(--blue-d)}
+.mapHint{margin:0 0 8px;font-size:14px;color:#234}
+.swipe{margin-left:4px;color:#7a4b00;font-weight:700}
+@media (orientation:landscape) and (min-width:600px){.swipe{display:none}}
+.mapScroll{overflow:auto;border-radius:18px;border:4px solid #fff;box-shadow:0 5px 0 rgba(0,0,0,.12);background:#dfe9d6}
+#campus{display:block;width:100%;min-width:740px;height:auto}
+#campus text{font-family:var(--sans);pointer-events:none}
+.mroom,.mmark{cursor:pointer}
+.mroom .hit,.mmark .hit{fill:transparent}
+.mroom:hover .bld,.mmark:hover .bld{filter:brightness(1.08)}
+.pin{animation:pinb 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes pinb{50%{transform:translateY(-5px)}}
+.mapMsg{margin:10px 0 0;background:var(--card);border-radius:16px;padding:12px 14px;display:none;gap:4px;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.mapMsg.show{display:grid}
+.mapMsg b{font-size:16px}
+.room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
+.room-card{background:var(--card);border-radius:18px;padding:12px;text-align:left;box-shadow:0 4px 0 rgba(0,0,0,.12);border:3px solid transparent;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center}
+.room-card h3{margin:0;font-size:18px}
+.room-card p{grid-column:1/-1;margin:2px 0 4px;font-size:13px;color:var(--muted);line-height:1.5}
+.room-card .rbar{grid-column:1/-1;height:9px;background:#e9eef6;border-radius:6px;overflow:hidden}
+.room-card .rbar i{display:block;height:100%;background:linear-gradient(90deg,#ffd166,#ff7b54)}
+.room-card .rs{grid-column:1/-1;font-size:12.5px;color:var(--muted)}
+.room-card.done{border-color:#ffd166;background:#fffbea}
+.badge{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:900;flex:none;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 2px 0 rgba(0,0,0,.12)}
+
+/* ROOM */
+#room.active{display:flex;flex-direction:column;gap:8px}
+.side{display:contents}
+.topbar{order:1;display:flex;align-items:center;gap:8px}
+.roomname{flex:1;min-width:0;text-align:center;font-size:19px;font-weight:800;color:#fff;text-shadow:0 2px 0 var(--blue-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.money{background:var(--card);border-radius:12px;padding:7px 11px;font-size:17px;box-shadow:0 3px 0 rgba(0,0,0,.12);display:flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+.money.bump{animation:bump .4s}
+@keyframes bump{50%{transform:scale(1.18)}}
+.thermo{order:2;display:flex;align-items:center;gap:8px;background:var(--card);border-radius:14px;padding:7px 12px;box-shadow:0 3px 0 rgba(0,0,0,.1)}
+.thermo .bar{flex:1;height:14px;background:#e4ecf7;border-radius:8px;overflow:hidden}
+#tempFill{height:100%;width:0;border-radius:8px;transition:width .8s,background .8s}
+#tempText{min-width:56px;text-align:right;font-size:18px;font-variant-numeric:tabular-nums}
+.btn-quiz{order:3;width:100%}
+.stageCol{order:4;min-width:0}
+.progress{order:5;text-align:center;font-size:15px;color:#1f3550;font-weight:800;margin:0}
+.sideRow{order:6;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hint{order:7;font-size:13px;color:#2c4460;text-align:center;margin:0;line-height:1.6}
+#stage{position:relative;width:100%;border-radius:22px;overflow:hidden;border:5px solid #fff;box-shadow:0 6px 0 rgba(0,0,0,.12);background:radial-gradient(ellipse at 50% 30%,#3c5a8a,#1f2f4d);touch-action:manipulation}
+@media (orientation:landscape) and (min-width:600px){
+  #room.active{display:grid;grid-template-columns:minmax(0,1fr) clamp(230px,28vw,320px);gap:12px;max-width:none;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+  .side{display:flex;flex-direction:column;gap:8px;overflow:auto;min-height:0;padding-bottom:6px}
+  .stageCol{grid-column:1;grid-row:1;height:100%;min-height:0}
+  #stage{height:100%!important}
+  .topbar{flex-wrap:wrap}
+  .roomname{order:-1;flex-basis:100%;text-align:left}
+  #campus{min-width:0;max-height:calc(100dvh - 130px)}
+  .home{grid-template-columns:1fr 1fr;max-width:900px;align-items:center;margin-top:2vh}
+  .home .logo,.home .homeArt{grid-column:1}
+  .home .howto,.home .homeNote,.home .homeLinks,.home .startWrap{grid-column:2}
+  .home .logo{grid-row:1/3}
+}
+#cam{position:absolute;left:50%;top:0;width:0;height:0;transform-style:preserve-3d}
+#world{position:absolute;width:440px;height:440px;left:-220px;top:-220px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(45deg)}
+.p3{position:absolute;left:0;top:0;transform-style:preserve-3d}
+.fc{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden}
+.fi{position:absolute;inset:0;display:block;transform:scaleX(-1);font-style:normal}
+.fit{position:absolute;inset:0;display:block;font-style:normal}
+#floor{position:absolute;inset:0}
+.cells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(22,1fr);grid-template-rows:repeat(22,1fr)}
+.cell{cursor:pointer}
+.cell:hover{background:rgba(255,255,255,.16)}
+.wallW,.wallN{position:absolute;left:0;top:0;transform-origin:0 0;width:440px;height:240px;background:var(--wall)}
+.wallW{transform:translate3d(0,0,240px) rotateZ(90deg) rotateX(-90deg)}
+.wallN{transform:translate3d(440px,0,240px) rotateZ(180deg) rotateX(-90deg)}
+.wallW>.fi{background:linear-gradient(90deg,rgba(0,0,0,.10),rgba(0,0,0,0) 70%)}
+.wallN>.fi{background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(0,0,0,.04))}
+.skirt{position:absolute;left:0;right:0;bottom:0;height:16px;background:rgba(0,0,0,.18)}
+.bb{pointer-events:none}
+.bb.click{pointer-events:auto;cursor:pointer}
+.bbi{position:absolute}
+.bbi svg{width:100%;height:100%;display:block;overflow:visible}
+.marker .bbi{animation:mk 1s ease-in-out infinite}
+@keyframes mk{50%{transform:translateY(-8px)}}
+.coldtint,.discoLay{position:absolute;inset:0;pointer-events:none}
+.coldtint{background:linear-gradient(rgba(170,210,255,.45),rgba(220,240,255,.15));transition:opacity 1s}
+.discoLay{opacity:0;transition:opacity .6s;background:conic-gradient(from 0deg at 50% 10%,rgba(255,0,128,.25),rgba(0,200,255,.25),rgba(255,230,0,.25),rgba(120,255,80,.25),rgba(255,0,128,.25));animation:hue 2.5s linear infinite;mix-blend-mode:screen}
+#stage.disco .discoLay{opacity:1}
+@keyframes hue{to{filter:hue-rotate(360deg)}}
+.snowLay{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sflake{position:absolute;top:-4%;border-radius:50%;background:#fff;opacity:.9;animation:sfall linear infinite}
+@keyframes sfall{to{top:104%;transform:translateX(var(--dx,40px))}}
+.bubble{position:absolute;background:#fff;border-radius:12px;padding:4px 9px;font-size:clamp(11.5px,1.6vw + 6px,15px);width:max-content;max-width:58%;text-align:center;line-height:1.4;box-shadow:0 3px 0 rgba(0,0,0,.18);opacity:0;transition:opacity .2s;pointer-events:none;z-index:6;transform:translate(-50%,-100%)}
+.bubble::after{content:"";position:absolute;top:100%;left:50%;margin-left:-7px;border:7px solid transparent;border-top-color:#fff}
+.bubble.show{opacity:1}
+.tapdot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border:3px solid #fff;border-radius:50%;pointer-events:none;animation:tap .5s forwards;z-index:5}
+.tapdot.no{border-color:#ff8a8a}
+@keyframes tap{from{transform:scale(.3);opacity:1}to{transform:scale(1.4);opacity:0}}
+
+/* wall spot drawings */
+.ws{position:absolute;cursor:pointer}
+.ws.done{cursor:default}
+.win{position:absolute;inset:0;border:7px solid #8b5e3c;border-radius:4px;background:linear-gradient(160deg,#a8d8ff,#eaf6ff 70%);overflow:hidden}
+.win::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:5px;margin-left:-2px;background:#8b5e3c;z-index:1}
+.win::after{content:"";position:absolute;top:50%;left:0;right:0;height:5px;margin-top:-2px;background:#8b5e3c;z-index:1}
+.sill{position:absolute;left:-10px;right:-10px;bottom:-12px;height:10px;background:#7a5032;border-radius:2px}
+.crk{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.wind{position:absolute;inset:0;overflow:hidden;z-index:3}
+.wind i{position:absolute;left:-30%;height:3px;width:35%;background:rgba(255,255,255,.95);border-radius:3px;animation:wind 1.2s linear infinite}
+@keyframes wind{0%{transform:translateX(0);opacity:0}25%{opacity:1}100%{transform:translateX(380%);opacity:0}}
+.tapeX{position:absolute;inset:0;z-index:4}
+.tapeX::before,.tapeX::after{content:"";position:absolute;left:-10%;top:45%;width:120%;height:13px;background:rgba(240,225,170,.95);transform:rotate(32deg);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tapeX::after{transform:rotate(-32deg)}
+.shine{position:absolute;inset:0;z-index:2;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.85) 38%,transparent 46%,transparent 58%,rgba(255,255,255,.6) 62%,transparent 66%)}
+.cardb{position:absolute;inset:-4px;z-index:4;background:#c9965a;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 2px,transparent 2px 9px);border:2px solid #a8763f;display:flex;align-items:center;justify-content:center;color:#6b4320;font-weight:900;font-size:15px}
+.poster{position:absolute;inset:6px;z-index:4;background:#fffdf5;border:6px solid #c08a3e;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;color:#a33;font-size:16px;line-height:1.2;box-shadow:0 3px 6px rgba(0,0,0,.25)}
+.curt{position:absolute;inset:-8px -10px;z-index:4;display:flex}
+.curt i{flex:1;background:repeating-linear-gradient(90deg,#b23a48 0 10px,#8f2a37 10px 16px);border-top:8px solid #6b1f29}
+.seal{position:absolute;inset:0;z-index:4;box-shadow:inset 0 0 0 5px #59606b}
+.plank{position:absolute;inset:-4px;z-index:4;display:flex;flex-direction:column;gap:4px;padding:4px 0}
+.plank i{flex:1;background:linear-gradient(#c7925c,#a8743f);border-radius:3px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.patch{position:absolute;inset:4px;z-index:4;border-radius:10px;background:rgba(255,255,255,.35);box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}
+.foam{position:absolute;inset:-2px;z-index:4;background:#596b86;background-image:radial-gradient(circle at 50% 50%,#7d90ad 0 7px,transparent 8px);background-size:18px 18px;border-radius:4px}
+.vball{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;z-index:4;background:#fdfdfd;box-shadow:inset -6px -6px 0 rgba(0,0,0,.08)}
+.vball::before{content:"";position:absolute;inset:6px 18px;border:3px solid #3f8cff;border-radius:50%}
+.hole{position:absolute;inset:0;background:#1f2233;clip-path:polygon(8% 20%,25% 4%,46% 14%,66% 0,90% 16%,100% 45%,86% 70%,96% 92%,64% 100%,40% 86%,18% 100%,4% 74%,12% 50%,0 34%)}
+.door{position:absolute;inset:0;background:#9a6236;border:5px solid #6f4220;border-bottom:none;border-radius:4px 4px 0 0}
+.door::before{content:"";position:absolute;left:12%;right:12%;top:8%;height:36%;border:3px solid rgba(0,0,0,.15);border-radius:3px}
+.door::after{content:"";position:absolute;left:12%;right:12%;top:52%;height:36%;border:3px solid rgba(0,0,0,.15);border-radius:3px}
+.door.glass{background:linear-gradient(160deg,#b5dcf5,#e9f6ff);border-color:#8d99a6}
+.door.glass::before,.door.glass::after{display:none}
+.knob{position:absolute;right:12%;top:52%;width:9px;height:9px;border-radius:50%;background:#f2c14e;z-index:2}
+.gap{position:absolute;left:0;right:0;bottom:0;height:9px;background:#141826;z-index:3}
+.gapside{position:absolute;top:0;bottom:0;right:0;width:8px;background:#141826;z-index:3}
+.proll{position:absolute;left:-4px;right:-4px;bottom:0;height:14px;z-index:4;border-radius:7px;background:repeating-linear-gradient(90deg,#eee 0 6px,#ccc 6px 8px)}
+.sstrip{position:absolute;left:0;right:0;bottom:0;height:9px;background:#3f454f;z-index:4}
+.crackln{position:absolute;inset:0;width:100%;height:100%}
+.ac{position:absolute;inset:0;background:#f4f6f8;border-radius:8px;box-shadow:inset 0 -8px 0 #d5dbe2;border:2px solid #c3cbd4}
+.ac::after{content:"";position:absolute;left:10%;right:10%;bottom:14px;height:8px;background:repeating-linear-gradient(90deg,#9aa4b0 0 3px,transparent 3px 7px)}
+.ac.hot{background:#ffe9d6;border-color:#f0a46a}
+.air{position:absolute;left:8%;right:8%;top:100%;height:70px;overflow:hidden}
+.air i{position:absolute;top:-30%;width:4px;height:30%;border-radius:3px;background:#9fd3ff;animation:air 1s linear infinite}
+.air.warm i{background:#ffb26b}
+@keyframes air{to{top:100%}}
+.poster.deco{inset:auto;cursor:default;font-size:14px}
+.plaque{position:absolute;background:#6d4c41;color:#ffe8c2;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:18px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.clock{position:absolute;border-radius:50%;background:#fff;border:5px solid #555}
+.clock::before{content:"";position:absolute;left:50%;top:18%;width:3px;height:34%;background:#333;margin-left:-1px}
+.clock::after{content:"";position:absolute;left:50%;top:48%;width:30%;height:3px;background:#333}
+
+/* principal */
+#pr{pointer-events:none}
+.skin.ft{background:#f6cfab}.skin.fs{background:#ecc29c}.skin.fe{background:#d9ab83}.skin.fn,.skin.fw{background:#e2b48d}
+#pr.cold .skin.ft,#pr.frozen .skin.ft{background:#dbe8f6}#pr.cold .skin.fs,#pr.frozen .skin.fs{background:#c9d9ec}#pr.cold .skin.fe,#pr.frozen .skin.fe{background:#b4c6dc}#pr.cold .skin.fn,#pr.cold .skin.fw{background:#bfd0e4}
+#pr.hot .skin.fs{background:#f2b39a}
+.mC,.mO,.snot,.sweat{display:none}
+#pr.cold .mS{display:none}#pr.cold .mC{display:inline}#pr.cold .snot{display:inline}
+#pr.frozen .mS,#pr.frozen .mC,#pr.frozen .snot{display:none}#pr.frozen .mO{display:inline}
+#pr.hot .sweat{display:inline}
+.legS{transform-origin:5px 5px 38px}
+.armS{transform-origin:5px 5px 82px}
+#pr.walking .legL,#pr.walking .armR{animation:sw .32s ease-in-out infinite alternate}
+#pr.walking .legR,#pr.walking .armL{animation:sw .32s ease-in-out infinite alternate-reverse}
+@keyframes sw{from{transform:rotateX(-28deg)}to{transform:rotateX(28deg)}}
+#prBody{transform-origin:21px 15px}
+#pr.cold #prBody{animation:shiv .1s linear infinite}
+#pr.chilly #prBody{animation:shiv .45s linear infinite}
+@keyframes shiv{0%,100%{transform:translate3d(-1.5px,0,0)}50%{transform:translate3d(1.5px,0,0)}}
+#pr.dance #prBody{animation:dance .3s ease-in-out infinite alternate!important}
+#pr.dance .armL{animation:upL .3s infinite alternate!important}
+#pr.dance .armR{animation:upR .3s infinite alternate!important}
+@keyframes dance{from{transform:rotateZ(-14deg)}to{transform:rotateZ(14deg) translate3d(0,0,10px)}}
+@keyframes upL{from{transform:rotateY(130deg)}to{transform:rotateY(165deg)}}
+@keyframes upR{from{transform:rotateY(-130deg)}to{transform:rotateY(-165deg)}}
+#pr.frozen #prBody{animation:none!important}
+#pr .ice{display:none}
+#pr.frozen .ice{display:block}
+.shadowE{position:absolute;left:-6px;top:-4px;width:54px;height:36px;border-radius:50%;background:rgba(0,0,0,.25);transform:translateZ(1px)}
+
+.spin{transform-box:fill-box;transform-origin:center;animation:spinr .25s linear infinite}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.puff{animation:puff 2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes puff{0%{transform:translateY(10px) scale(.6);opacity:0}30%{opacity:.9}100%{transform:translateY(-26px) scale(1.2);opacity:0}}
+.twk{animation:twk 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes twk{50%{transform:scale(.4);opacity:.3}}
+.shiverS{animation:shiv .12s linear infinite}
+.zap{animation:zap .3s steps(2) infinite}
+@keyframes zap{50%{opacity:0}}
+
+/* MODALS */
+.modal{position:fixed;inset:0;background:rgba(20,35,70,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:calc(10px + env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+.modal.show{display:flex}
+.sheet{background:var(--paper);border-radius:24px;max-width:580px;width:100%;max-height:100%;overflow:auto;padding:16px;border:4px solid #fff;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:pop .3s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.tabs{display:flex;gap:6px}
+.tabs button{flex:1;padding:10px 4px;border-radius:12px;font-size:16px;font-weight:800;background:#e8eef7;color:#567}
+.tabs button.on{color:#fff;background:var(--blue);box-shadow:0 4px 0 var(--blue-d)}
+.q-info{display:flex;justify-content:space-between;align-items:center;margin:12px 2px 8px;font-size:15px;gap:6px;flex-wrap:wrap}
+.timer{font-weight:800;padding:3px 10px;border-radius:999px;background:#e3f7ea;color:#1f7a4a;font-variant-numeric:tabular-nums}
+.timer.mid{background:#fff3d6;color:#9a6a00}.timer.slow{background:#eef1f5;color:#678}
+.q-card{background:#fff;border-radius:18px;padding:14px;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.q-sub{font-size:13px;color:#889;margin-bottom:6px}
+.q-text{font-size:19px;font-weight:700;line-height:1.55;margin-bottom:12px}
+.opts{display:grid;gap:8px}
+@media (orientation:landscape) and (max-height:520px){.opts{grid-template-columns:1fr 1fr}.q-text{font-size:17px}}
+.opt{text-align:left;padding:12px 14px;border-radius:14px;background:#f1f5fb;font-size:17px;border:3px solid transparent;line-height:1.4}
+.opt b{color:var(--blue-d);margin-right:6px}
+.opt.right{background:#dcf6e5;border-color:var(--green)}
+.opt.wrong{background:#ffe1e7;border-color:var(--red)}
+.feedback{margin-top:12px;font-size:16px;line-height:1.6;border-radius:12px}
+.feedback.ok{background:#e7f8ee;padding:10px 12px}.feedback.no{background:#fff0e6;padding:10px 12px}
+.q-actions{display:flex;gap:8px;margin-top:12px}
+.q-actions .btn{flex:1}
+.btn:disabled{opacity:.35}
+.q-tip{font-size:12.5px;color:#789;text-align:center;margin:10px 0 0}
+.pick{display:grid;gap:10px;margin-top:10px}
+.pick button{padding:16px;border-radius:16px;font-size:20px;font-weight:800;color:#fff;box-shadow:0 5px 0 rgba(0,0,0,.18)}
+.coin{position:fixed;z-index:80;font-weight:900;font-size:22px;color:#2a69cc;text-shadow:0 2px 0 #fff;pointer-events:none;animation:coinup 1s forwards}
+@keyframes coinup{to{transform:translateY(-60px);opacity:0}}
+.spot-h{display:flex;gap:12px;align-items:center}
+.spot-h h2{margin:0;font-size:22px}
+.spot-h p{margin:4px 0 0;color:var(--muted);font-size:14.5px;line-height:1.5}
+.tools{display:grid;gap:10px;margin-top:12px}
+.tool{display:flex;gap:12px;align-items:center;text-align:left;background:#fff;border-radius:16px;padding:12px;border:3px solid #e8eef7;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+.tool:active{transform:translateY(2px)}
+.tool .tic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none;color:#fff;background:#4a5568}
+.tool .tic svg{width:28px;height:28px}
+.tool .tn{font-weight:800;font-size:17px}
+.tool .th{font-size:13.5px;margin-top:3px;line-height:1.55}
+.tool .tp{margin-left:auto;font-weight:900;font-size:16px;background:var(--green);color:#fff;border-radius:10px;padding:6px 10px;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.tool.poor .tp{background:#c9d1dc;color:#555}
+.tool.relic{border-color:var(--gold);background:linear-gradient(90deg,#fffaf0,#fff3d6)}
+.tool.relic .tic{background:linear-gradient(135deg,#d4af37,#8a6d1d)}
+.tool.relic .tp{background:#8a6d1d}
+.tool.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.btn-wide{width:100%;margin-top:12px}
+.btn-ghost{background:#e8eef7;color:#456;box-shadow:0 4px 0 #c9d3e0}
+.reveal{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(170%);z-index:60;width:min(92vw,440px);background:#fff;border-radius:20px;padding:12px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);border:3px solid #ffd166;transition:transform .35s cubic-bezier(.3,1.4,.5,1);cursor:pointer}
+.reveal.show{transform:translateX(-50%) translateY(0)}
+.reveal .tic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+.reveal .tic svg{width:26px;height:26px}
+.rv-n{font-weight:800;font-size:16px}.rv-m{font-size:14px;color:#555;line-height:1.5}.rv-t{font-weight:900;font-size:18px;white-space:nowrap}
+.up{color:#d9480f}.down{color:#1c6ed6}
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-200%);z-index:90;background:#22303f;color:#fff;border-radius:999px;padding:9px 18px;font-size:15px;transition:transform .35s;white-space:nowrap;max-width:94vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{transform:translate(-50%,0)}
+.end-head{text-align:center}
+.end-head h2{margin:8px 0 4px;font-size:24px}
+.end-head p{margin:4px 0;color:#555}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+.stats div{background:#fff;border-radius:12px;padding:8px;text-align:center;font-size:14px}
+.stats b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.achs{display:grid;gap:8px}
+.ach{display:flex;gap:10px;align-items:center;background:#fff;border-radius:14px;padding:10px;border:2px solid #f0e3b8}
+.ach .an{font-weight:800}.ach .ad{font-size:13px;color:#666}
+.ach.locked{opacity:.55;border-color:#e3e7ee;filter:grayscale(1)}
+.new{background:var(--red);color:#fff;font-size:11px;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.sec-t{font-weight:800;margin:14px 0 8px;font-size:16px}
+.confetti{position:fixed;top:-20px;z-index:70;pointer-events:none;width:10px;height:14px;border-radius:2px;animation:fall linear forwards}
+/* 失物 */
+.soulSheet{background:radial-gradient(ellipse at 50% 0%,#3a3550,var(--soul) 70%);color:#e9dfc4;border-color:#5c5236}
+.soulSheet .sh{font-family:var(--serif);font-weight:900;letter-spacing:.35em;color:var(--gold);margin:4px 0 0;font-size:15px;text-align:center}
+.soulSheet .rn{font-family:var(--serif);font-weight:900;font-size:26px;color:#fff6dc;margin:4px 0 10px;text-align:center}
+.soulSheet .rd{font-family:var(--serif);font-weight:600;line-height:1.9;color:#d3c8aa;font-size:15px;max-width:30em;margin:0 auto;text-align:center}
+.rico{width:84px;height:84px;margin:8px auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#4b4433,#1c1b26);box-shadow:0 0 30px rgba(212,175,55,.45);color:var(--gold)}
+.rico svg{width:44px;height:44px}
+.soulSheet .btn{background:#8a6d1d;color:#fff;box-shadow:0 4px 0 #5a4610}
+.bagList{display:grid;gap:10px;margin-top:12px}
+.bagItem{display:grid;grid-template-columns:54px 1fr;gap:12px;align-items:center;background:rgba(255,255,255,.05);border:1px solid #4a4333;border-radius:14px;padding:10px}
+.bagItem .rico{width:54px;height:54px;margin:0;box-shadow:0 0 14px rgba(212,175,55,.3)}
+.bagItem .rico svg{width:28px;height:28px}
+.bagItem b{font-family:var(--serif);font-size:17px;color:#fff6dc}
+.bagItem p{margin:3px 0 0;font-family:var(--serif);font-size:13.5px;line-height:1.7;color:#c9bf9f}
+.bagItem small{color:#9d9478;font-size:12px}
+.bagItem.unknown b{color:#6d6656}
+.bagItem.unknown .rico{color:#555;box-shadow:none}
+.glint .bbi{animation:mk 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.flake,.sflake{display:none}.marker .bbi,.glint .bbi,.pin,.homeArt svg,#pr #prBody{animation:none!important}}
+</style>
+
+<div id="bgSnow"></div>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+  <div class="home">
+    <h1 class="logo">救救校長！<span>校園大修繕</span></h1>
+    <div class="homeArt" id="homeArt"></div>
+    <ol class="howto">
+      <li><div><b>答題收集學魂</b>國文、英文、數學的選擇題，答對就能收集「學魂」，答錯不會扣。</div></li>
+      <li><div><b>挑一個地方修繕</b>在校園地圖上選地點，點壞掉的東西，用學魂換工具修好它。最貴的不一定最好。</div></li>
+      <li><div><b>帶校長四處走走</b>角落裡藏著失物，撿到會收進背包，說不定哪裡用得上。</div></li>
+    </ol>
+    <p class="homeNote">不會失敗。把一個地方全部修好，就能拿到那裡的成就。</p>
+    <div class="startWrap"><button class="btn btn-o btn-wide" id="btnStart" style="font-size:20px;padding:15px">開始遊戲</button></div>
+    <div class="homeLinks">
+      <button class="pill" data-open="bag">背包</button>
+      <button class="pill" data-open="ach">成就牆</button>
+      <button class="pill" id="btnMute">音效：開</button>
+      <button class="link" id="btnReset">清除進度重新開始</button>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section id="map" class="screen">
+  <div class="mapbar">
+    <button class="pill" id="btnHome">← 首頁</button>
+    <h2>校園地圖</h2>
+    <div class="pill"><span class="soulIc"></span><b class="soulNum">0</b></div>
+    <button class="pill" id="btnMapQuiz">答題</button>
+    <button class="pill" data-open="bag">背包 <b class="bagNum">0</b></button>
+    <button class="pill" data-open="ach">成就 <b id="achCount">0</b></button>
+  </div>
+  <p class="mapHint">有扳手標記的地方可以進去修繕；其他地方也點點看。<span class="swipe">地圖可以左右滑動。</span></p>
+  <div class="mapScroll" id="mapScroll"><svg id="campus" viewBox="0 0 1000 690" role="img" aria-label="校園地圖"></svg></div>
+  <div class="mapMsg" id="mapMsg"></div>
+  <div id="roomGrid" class="room-grid"></div>
+</section>
+
+<!-- ROOM -->
+<section id="room" class="screen">
+  <div class="stageCol">
+    <div id="stage">
+      <div id="cam"><div id="world"></div></div>
+      <div class="coldtint" id="coldtint"></div>
+      <div class="snowLay" id="snowLay"></div>
+      <div class="discoLay"></div>
+      <div class="bubble" id="bubble"></div>
+    </div>
+  </div>
+  <aside class="side">
+    <div class="topbar">
+      <button class="pill" id="btnMap">← 地圖</button>
+      <div class="roomname" id="roomName"></div>
+      <div class="money" id="moneyBox"><span class="soulIc"></span><b class="soulNum">0</b></div>
+    </div>
+    <div class="thermo"><span id="thermoIc"></span><div class="bar"><div id="tempFill"></div></div><b id="tempText">0℃</b></div>
+    <button class="btn btn-o btn-quiz" id="btnQuiz"><span id="bookIc"></span>答題收集學魂</button>
+    <p class="progress" id="progText"></p>
+    <div class="sideRow"><button class="pill" data-open="bag">背包 <b class="bagNum">0</b></button><button class="pill" data-open="ach">成就</button></div>
+    <p class="hint">點地板讓校長走過去，他會繞過家具。<br>點黃色扳手，挑工具修理。<br>多走走，地上可能有失物在發光。</p>
+  </aside>
+</section>
+
+<div class="modal" id="quizModal"><div class="sheet">
+  <div class="tabs" id="tabs"><button data-s="zh">國文</button><button data-s="en">英文</button><button data-s="ma">數學</button></div>
+  <div id="quizBody"></div>
+</div></div>
+<div class="modal" id="toolModal"><div class="sheet" id="toolBody"></div></div>
+<div class="modal" id="endModal"><div class="sheet" id="endBody"></div></div>
+<div class="modal" id="achModal"><div class="sheet" id="achBody"></div></div>
+<div class="modal" id="relicModal"><div class="sheet soulSheet" id="relicBody"></div></div>
+<div class="modal" id="bagModal"><div class="sheet soulSheet" id="bagBody"></div></div>
+<div class="reveal" id="reveal"></div>
+<div class="toast" id="toast"></div>
+
+<script src="/games/_shared/bridge.js"></script>
+<script>
+const QB = {
+zh:[
+ ["「畫蛇添足」比喻什麼？",["多此一舉，反而壞事","做事非常細心","畫畫技巧高超","準備充分"],0,"故事中的人替蛇畫腳，結果輸了比賽，比喻做多餘的事。"],
+ ["「他的歌聲像黃鶯一樣悅耳。」使用了哪一種修辭？",["譬喻","誇飾","排比","設問"],0,"用「像」把歌聲比作黃鶯的叫聲，是譬喻（明喻）。"],
+ ["下列哪一個成語「沒有」錯字？",["迫不及待","再接再勵","一股作氣","談笑風聲"],0,"正確寫法：再接再「厲」、一「鼓」作氣、談笑風「生」。"],
+ ["「三人行，必有我師焉」出自哪一本書？",["論語","孟子","莊子","史記"],0,"這是孔子的話，記錄在《論語》中。"],
+ ["寒冬裡送暖給校長，最適合用哪一個成語？",["雪中送炭","錦上添花","火上加油","如履薄冰"],0,"雪中送炭：在別人最需要時給予幫助。"],
+ ["「亡羊補牢」比喻什麼？",["出了問題後及時補救","養羊很辛苦","做事三心二意","貪小便宜"],0,"羊跑掉後趕快修羊圈，還來得及！就像我們修教室。"],
+ ["下列哪一個詞語形容「非常寒冷」？",["天寒地凍","春暖花開","汗流浹背","火冒三丈"],0,"天寒地凍：天氣嚴寒、地面結凍。"],
+ ["「狐假虎威」比喻什麼？",["仗著別人的勢力欺負人","狐狸很聰明","老虎很威猛","團結力量大"],0,"狐狸借老虎的威風嚇跑百獸。"],
+ ["下列哪一句使用了「轉化（擬人）」修辭？",["小鳥在枝頭唱歌，歡迎校長上班","校長每天七點到校","今天氣溫只有十度","合作社賣麵包"],0,"把小鳥當成人一樣「歡迎」，是擬人。"],
+ ["「我餓得可以吞下一頭牛。」使用了哪一種修辭？",["誇飾","譬喻","對偶","引用"],0,"故意誇大事實來加強效果，是誇飾。"],
+ ["「一石二鳥」的意思和下列哪一個相同？",["一舉兩得","一事無成","一模一樣","一鳴驚人"],0,"做一件事得到兩種好處。"],
+ ["「春眠不覺曉，處處聞啼鳥」的作者是誰？",["孟浩然","李白","杜甫","王維"],0,"這是孟浩然的〈春曉〉。"],
+ ["「近朱者赤，近墨者黑」說明什麼道理？",["環境會影響一個人","顏色要搭配","讀書要專心","寫字要工整"],0,"接近好的人容易變好，接近壞的人容易變壞。"],
+ ["「守株待兔」比喻什麼？",["死守經驗、不知變通","耐心等待成功","很會抓兔子","愛護動物"],0,"農夫等兔子再撞樹，比喻不知變通或妄想不勞而獲。"],
+ ["「杞人憂天」比喻什麼？",["沒有必要的擔憂","關心天氣","憂國憂民","天快要下雨"],0,"杞國人擔心天會塌下來，比喻多餘的憂慮。"],
+ ["孔子被後人尊稱為什麼？",["至聖先師","亞聖","詩仙","書聖"],0,"亞聖是孟子、詩仙是李白、書聖是王羲之。"],
+ ["「見賢思齊」的意思是？",["看到賢能的人就想向他看齊","看到錢就想賺","看到朋友就打招呼","想要齊心協力"],0,"出自《論語》：見賢思齊焉，見不賢而內自省也。"],
+ ["「七上八下」形容什麼？",["心神不安、緊張","爬樓梯很累","數字很亂","成績進步"],0,"形容心裡忐忑不安。"],
+ ["下列哪一個是「疊字」詞語？",["冷冷清清","冷靜","清楚","冷清"],0,"「冷冷清清」由兩組重複的字組成。"],
+ ["「五言絕句」一共有幾句？",["4 句","5 句","8 句","10 句"],0,"絕句四句，律詩八句；五言是每句五個字。"],
+ ["「愛屋及烏」中的「烏」指的是什麼？",["烏鴉","烏雲","烏龜","黑色"],0,"愛一個人，連他屋上的烏鴉都喜歡。"],
+ ["「對牛彈琴」比喻什麼？",["對不懂的人說道理，白費力氣","音樂能感動動物","農夫很會彈琴","牛很聰明"],0,"比喻說話不看對象。"],
+ ["「鍥而不捨」形容什麼精神？",["堅持到底，不放棄","做事馬虎","喜歡雕刻","輕易放棄"],0,"鍥：雕刻。一直刻下去不停止。"],
+ ["「破釜沉舟」比喻什麼？",["下定決心，不留退路","浪費資源","船壞了","煮飯失敗"],0,"項羽打破鍋子、弄沉船隻，表示決一死戰。"],
+ ["下列量詞何者使用正確？",["一頭牛","一匹狗","一條貓","一朵鳥"],0,"一頭牛、一隻狗、一隻貓、一隻鳥。"],
+ ["「一年之計在於春」的下一句是？",["一日之計在於晨","一生之計在於勤","一家之計在於和","一時之計在於忙"],0,"提醒我們要把握開始的時機。"],
+ ["「莘莘學子」的「莘」讀音是？",["ㄕㄣ","ㄒㄧㄣ","ㄒㄧㄥ","ㄕㄥ"],0,"莘莘學子，讀作ㄕㄣ ㄕㄣ。"],
+ ["「床前明月光」出自哪位詩人？",["李白","杜甫","白居易","蘇軾"],0,"李白〈靜夜思〉。"],
+ ["「家書抵萬金」形容什麼？",["家人的來信非常珍貴","寄信很貴","家裡很有錢","書比金子便宜"],0,"出自杜甫〈春望〉。"],
+ ["下列哪一個成語用來形容「時間過得很快」？",["光陰似箭","度日如年","遙遙無期","慢條斯理"],0,"光陰像射出的箭一樣快。"]
+],
+en:[
+ ["It's very ___ today. I need my coat.",["cold","hot","sunny","short"],0,"需要外套，所以天氣很冷：cold。"],
+ ["The principal ___ coffee every morning.",["drinks","drink","drinking","are drink"],0,"主詞第三人稱單數＋現在簡單式，動詞加 s。"],
+ ["There ___ two cats in the classroom.",["are","is","be","am"],0,"two cats 是複數，用 are。"],
+ ["___ you like hot chocolate?",["Do","Does","Are","Is"],0,"主詞 you 搭配助動詞 Do。"],
+ ["I ___ to the co-op store yesterday.",["went","go","goes","going"],0,"yesterday 用過去式，go 的過去式是 went。"],
+ ["「blanket」的中文意思是？",["毯子","窗戶","枕頭","外套"],0,"blanket＝毯子。"],
+ ["「window」的中文意思是？",["窗戶","門","牆壁","屋頂"],0,"window＝窗戶。"],
+ ["She is ___ than her brother.",["taller","tall","tallest","more tall"],0,"有 than，用比較級 taller。"],
+ ["Look! The birds ___ on the roof.",["are singing","sing","sang","sings"],0,"Look! 表示正在發生，用現在進行式。"],
+ ["哪一個單字「不是」顏色？",["kitchen","purple","orange","yellow"],0,"kitchen 是廚房。"],
+ ["A: How ___ is this sandwich?  B: It's 30 dollars.",["much","many","old","long"],0,"問價錢用 How much。"],
+ ["We have English class ___ Monday.",["on","in","at","of"],0,"星期幾前面用 on。"],
+ ["「freeze」的意思是？",["結冰","融化","燃燒","下雨"],0,"freeze＝結冰；校長被吹到 freeze 了！"],
+ ["He can ___ the piano.",["play","plays","playing","to play"],0,"can 後面接原形動詞。"],
+ ["This is ___ umbrella.",["an","a","the a","two"],0,"umbrella 以母音發音開頭，用 an。"],
+ ["Which month comes after November?",["December","October","January","September"],0,"November 十一月 → December 十二月。"],
+ ["The cat jumped ___ the box and hid inside.",["into","of","at","from"],0,"跳進去用 into。"],
+ ["「heater」的中文意思是？",["暖氣機","電風扇","冰箱","冷氣"],0,"heat 是熱，heater 是暖氣機。"],
+ ["If it ___ tomorrow, we will stay at home.",["rains","rained","will rain","raining"],0,"if 條件子句用現在式表示未來。"],
+ ["hot 的反義詞是？",["cold","warm","big","fast"],0,"hot 熱 ↔ cold 冷。"],
+ ["A: Thank you!  B: ___",["You're welcome.","Yes, I do.","I'm fine.","See you yesterday."],0,"回應道謝用 You're welcome."],
+ ["Tom ___ his homework yet.",["hasn't finished","didn't finished","don't finish","isn't finish"],0,"yet 常搭配現在完成式：has not + p.p."],
+ ["This book is ___. I bought it.",["mine","my","me","I"],0,"所有格代名詞 mine＝my book。"],
+ ["「星期三」的英文是？",["Wednesday","Thursday","Tuesday","Saturday"],0,"Wednesday 星期三。"],
+ ["Be quiet! The baby ___.",["is sleeping","sleeps","slept","sleep"],0,"Be quiet! 表示嬰兒正在睡，用進行式。"],
+ ["「principal」在學校是指誰？",["校長","學生","工友","廚師"],0,"principal＝校長。"],
+ ["Mary is good ___ singing.",["at","in","on","for"],0,"be good at＋V-ing，擅長某事。"],
+ ["How many ___ are there in your class?",["children","child","childs","childrens"],0,"child 的複數是 children。"],
+ ["I'm hungry. Let's ___ something.",["eat","eats","eating","ate"],0,"Let's 後接原形動詞。"],
+ ["A: What's the weather like?  B: ___",["It's snowing.","I like it.","It's Monday.","It's mine."],0,"問天氣，回答下雪了：It's snowing."]
+],
+ma:[
+ ["(−3) + 8 = ?",["5","−5","11","−11"],0,"8 − 3 = 5。"],
+ ["(−4) × (−5) = ?",["20","−20","9","−9"],0,"負負得正。"],
+ ["2x + 3 = 11，x = ?",["4","7","5","8"],0,"2x = 8，x = 4。"],
+ ["3² + 4² = ?",["25","49","14","12"],0,"9 + 16 = 25。"],
+ ["80 的 25% 是多少？",["20","25","40","16"],0,"80 × 1/4 = 20。"],
+ ["外套原價 1000 元，打八折後是多少元？",["800","200","880","920"],0,"1000 × 0.8 = 800。"],
+ ["正方形周長 20 公分，面積是多少平方公分？",["25","20","16","100"],0,"邊長 5，面積 5 × 5 = 25。"],
+ ["三角形兩個內角是 50° 和 60°，第三個角是？",["70°","80°","90°","110°"],0,"180 − 50 − 60 = 70。"],
+ ["√49 = ?",["7","9","24.5","8"],0,"7 × 7 = 49。"],
+ ["12 和 18 的最大公因數是？",["6","3","36","2"],0,"6 能同時整除 12 和 18。"],
+ ["4 和 6 的最小公倍數是？",["12","24","2","10"],0,"4、6 的倍數第一個相同的是 12。"],
+ ["(−2)³ = ?",["−8","8","−6","6"],0,"(−2)×(−2)×(−2) = −8。"],
+ ["1/2 + 1/3 = ?",["5/6","2/5","1/6","2/6"],0,"通分：3/6 + 2/6 = 5/6。"],
+ ["教室原本 −5℃，上升 12℃ 後是幾度？",["7℃","17℃","−17℃","−7℃"],0,"−5 + 12 = 7。"],
+ ["若 a = 3，2a² = ?",["18","36","12","9"],0,"a² = 9，再乘 2 = 18。"],
+ ["直角三角形兩股長 6 和 8，斜邊長是？",["10","14","12","48"],0,"6² + 8² = 100，√100 = 10。"],
+ ["0.5 × 0.4 = ?",["0.2","2","0.02","0.9"],0,"5 × 4 = 20，小數共兩位 → 0.20。"],
+ ["1, 4, 9, 16, ( ) 括號中是？",["25","20","24","32"],0,"都是平方數：5² = 25。"],
+ ["等差數列 3, 7, 11, 15, 下一項是？",["19","18","20","21"],0,"公差 4，15 + 4 = 19。"],
+ ["5x − 2 = 3x + 6，x = ?",["4","2","8","1"],0,"2x = 8，x = 4。"],
+ ["圓的半徑 3，面積是多少？",["9π","6π","3π","18π"],0,"πr² = 9π。"],
+ ["7 × 8 − 6 = ?",["50","14","62","48"],0,"先乘再減：56 − 6 = 50。"],
+ ["校長有 120 元，買 3 個 25 元的麵包，還剩多少？",["45","95","75","55"],0,"120 − 75 = 45。"],
+ ["2 : 3 = 8 : x，x = ?",["12","9","6","16"],0,"2 × 4 = 8，所以 3 × 4 = 12。"],
+ ["(−12) ÷ 3 = ?",["−4","4","−9","−36"],0,"負 ÷ 正 = 負。"],
+ ["正六邊形的內角和是多少度？",["720°","540°","360°","1080°"],0,"(6 − 2) × 180 = 720。"],
+ ["|−9| − |4| = ?",["5","−13","13","−5"],0,"9 − 4 = 5。"],
+ ["2⁵ = ?",["32","10","25","16"],0,"2×2×2×2×2 = 32。"],
+ ["y = 2x + 1，當 x = 3 時，y = ?",["7","6","9","5"],0,"2 × 3 + 1 = 7。"],
+ ["3 隻校貓和 5 隻麻雀，總共有幾隻腳？",["22","16","32","24"],0,"3×4 + 5×2 = 12 + 10 = 22。"],
+ ["0.25 化成最簡分數是？",["1/4","1/25","25/10","2/5"],0,"0.25 = 25/100 = 1/4。"]
+]};
+const SUBJ={zh:{n:"國文",c:"#e76f51"},en:{n:"英文",c:"#2a9d8f"},ma:{n:"數學",c:"#5e60ce"}};
+
+/* ===================== 圖示 ===================== */
+const IC={
+ tape:'<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3"/><path d="M10 17h11v-4"/>',
+ glass:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 15l6-6M11 17l5-5"/>',
+ box:'<path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9"/>',
+ hammer:'<path d="M14 4l6 6-3 3-6-6z"/><path d="M12.5 8.5L4 17l3 3 8.5-8.5"/>',
+ trowel:'<path d="M4 20l6-6"/><path d="M9 11l9-8 3 3-8 9z"/>',
+ frame:'<rect x="3" y="6" width="18" height="15" rx="1"/><rect x="7" y="10" width="10" height="7"/><path d="M9 6l3-3 3 3"/>',
+ hand:'<path d="M8 13V5a1.5 1.5 0 013 0v6M11 11V4a1.5 1.5 0 013 0v7M14 11V5.5a1.5 1.5 0 013 0V14c0 4-3 7-6 7s-5-2-6.5-4.5L3 13a1.5 1.5 0 012.5-1.5L8 14"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+ plug:'<path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 01-12 0zM12 17v5"/>',
+ paper:'<path d="M5 3h11l3 3v15H5z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+ seal:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 12h10"/>',
+ paw:'<circle cx="7" cy="9" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="9" r="2"/><path d="M12 12c-3 0-6 4-5 7 1 2 3 1 5 1s4 1 5-1c1-3-2-7-5-7z"/>',
+ blanket:'<path d="M3 6h18v12H3z"/><path d="M3 10h18M7 6v12"/><path d="M3 18c3 2 15 2 18 0"/>',
+ cushion:'<rect x="3" y="7" width="18" height="10" rx="5"/><path d="M8 12h8"/>',
+ rug:'<rect x="4" y="5" width="16" height="14"/><rect x="8" y="9" width="8" height="6"/><path d="M2 7h2M2 11h2M2 15h2M20 7h2M20 11h2M20 15h2"/>',
+ pack:'<rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9c1 1 1 2 0 3s-1 2 0 3M15 9c1 1 1 2 0 3s-1 2 0 3"/>',
+ curtain:'<path d="M3 3h18M5 3v18M19 3v18M5 3c3 6 3 12 0 18M19 3c-3 6-3 12 0 18"/>',
+ bread:'<path d="M5 10a7 5 0 0114 0v9H5z"/><path d="M9 13h6"/>',
+ snow:'<path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9 4l3 3 3-3M9 20l3-3 3 3"/>',
+ fire:'<path d="M12 21c-4 0-7-3-7-7 0-4 4-6 4-10 3 2 4 4 4 6 1-1 2-2 2-4 3 3 4 5 4 8 0 4-3 7-7 7z"/>',
+ pot:'<path d="M3 9h18M5 9v7a4 4 0 004 4h6a4 4 0 004-4V9"/><path d="M9 5c0-1 1-1 1-2M14 5c0-1 1-1 1-2"/>',
+ cup:'<path d="M5 8h12v6a5 5 0 01-5 5h-2a5 5 0 01-5-5z"/><path d="M17 10h2a2 2 0 010 4h-2M8 3v2M12 3v2"/>',
+ tube:'<path d="M6 18l9-9 3 3-9 9H6z"/><path d="M15 9l2-2M17 7l3-3"/>',
+ flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/><path d="M7 15h10"/>',
+ scarf:'<path d="M5 6c4 3 10 3 14 0v4c-4 3-10 3-14 0z"/><path d="M14 10v10h4V9"/>',
+ shirt:'<path d="M8 3l-5 4 3 4 2-2v12h8V9l2 2 3-4-5-4c-1 2-5 2-8 0z"/>',
+ bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 00-4-10z"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
+ note:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+ remote:'<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><path d="M10 12h4M10 15h4M10 18h4"/>',
+ star:'<path d="M12 2l3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9z"/>',
+ drum:'<ellipse cx="12" cy="8" rx="8" ry="3"/><path d="M4 8v9c0 2 4 3 8 3s8-1 8-3V8M3 3l5 5M21 3l-5 5"/>',
+ wave:'<path d="M3 6c2-2 4 2 6 0s4 2 6 0 4 2 6 0M3 12c2-2 4 2 6 0s4 2 6 0 4 2 6 0M3 18c2-2 4 2 6 0s4 2 6 0 4 2 6 0"/>',
+ book:'<path d="M4 4h6a2 2 0 012 2v14a2 2 0 00-2-2H4zM20 4h-6a2 2 0 00-2 2v14a2 2 0 012-2h6z"/>',
+ thermo:'<path d="M10 14V5a2 2 0 014 0v9a4 4 0 11-4 0z"/><path d="M12 10v7"/>',
+ key:'<circle cx="7" cy="14" r="4"/><path d="M10 11l10-10M16 5l3 3M14 7l2 2"/>',
+ coin:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2 3-2s3 .7 3 2-1.5 1.8-3 2.2-3 1-3 2.3 1.3 2 3 2 3-.6 3-2"/>',
+ whistle:'<path d="M3 11a6 6 0 1012 0V9h6V6H9a6 6 0 00-6 5z"/><circle cx="9" cy="12" r="2"/>',
+ needle:'<path d="M4 20L18 6M15 3l6 6M16 5l3 3"/><path d="M4 20c4-1 6-5 4-8"/>',
+ oil:'<path d="M4 14h10l6-6-2-2-4 4H8l-4 4z"/><path d="M20 15c0 1.5-1 3-2 3s-2-1.5-2-3 2-4 2-4 2 2.5 2 4z"/>',
+ heart:'<path d="M12 20s-8-5-8-11a4 4 0 018-1 4 4 0 018 1c0 6-8 11-8 11z"/>',
+ ball:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+ kick:'<path d="M7 3v8l-3 5c-1 2 0 4 2 4h11c2 0 3-2 2-3l-4-2-3-1V3z"/>',
+ scale:'<rect x="3" y="5" width="18" height="15" rx="3"/><path d="M8 9h8l-2 3h-4z"/>',
+ wrench:'<path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.6 2.6-2.5-.6-.6-2.5z"/>'
+};
+const ic=(k,cls="ic")=>`<svg class="${cls}" viewBox="0 0 24 24">${IC[k]||IC.wrench}</svg>`;
+const soulSvg=s=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" style="vertical-align:-.2em;flex:none" aria-hidden="true"><path d="M12 1.5c2.5 3.5 7 6.8 7 12.3a7 7 0 01-14 0c0-3.3 2-5.4 3.2-6.4.1 2 1.1 3.3 2.2 3.3-.3-4.2.6-7 1.6-9.2z" fill="#9fd8ff" stroke="#2f73d8" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="15" r="3.2" fill="#fff"/></svg>`;
+const badge=(ch,col,s=44)=>`<span class="badge" style="width:${s}px;height:${s}px;font-size:${s*.48}px;background:${col}">${ch}</span>`;
+const CUR="學魂";
+
+/* ===================== Sprites ===================== */
+const inner=svg=>svg.replace(/^<svg[^>]*>|<\/svg>$/g,"");
+const SP={
+ cat:(c="#f4a24c",spot)=>`<svg viewBox="0 0 64 56"><ellipse cx="34" cy="43" rx="20" ry="12" fill="${c}"/><path d="M52 46q12-4 8-17" stroke="${c}" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="20" cy="29" r="13" fill="${c}"/><path d="M9 23l3-13 8 8zM31 23l-3-13-8 8z" fill="${c}"/><path d="M11 19l2-5 3 3zM29 19l-2-5-3 3z" fill="#ffc9a8"/>${spot?'<ellipse cx="40" cy="40" rx="8" ry="6" fill="#e8913a"/><ellipse cx="26" cy="22" rx="5" ry="4" fill="#3b3b3b"/>':'<path d="M30 33q4 6 0 12M38 32q4 6 0 12" stroke="rgba(0,0,0,.2)" stroke-width="3" fill="none"/>'}<path d="M13 29q3 2 5 0M22 29q3 2 5 0" stroke="#4a2c12" stroke-width="1.6" fill="none"/><path d="M18.5 33l1.5 1.5 1.5-1.5z" fill="#e0607e"/></svg>`,
+ bird:(c="#8a6a4a")=>`<svg viewBox="0 0 36 30"><ellipse cx="18" cy="19" rx="12" ry="9" fill="${c}"/><ellipse cx="18" cy="22" rx="8" ry="5" fill="#ecd9bb"/><circle cx="25" cy="11" r="7" fill="${c}"/><path d="M31 11l5 2-5 2z" fill="#f4a03a"/><circle cx="27" cy="9.5" r="1.6" fill="#222"/><path d="M8 17q-6 2-7 7 6-1 9-4z" fill="${c}"/><path d="M15 27v3M20 27v3" stroke="#a46d3a" stroke-width="1.5"/></svg>`,
+ steam:(c="#fff")=>`<svg viewBox="0 0 40 60"><circle class="puff" cx="14" cy="44" r="8" fill="${c}" opacity=".9"/><circle class="puff" style="animation-delay:.6s" cx="24" cy="40" r="9" fill="${c}" opacity=".9"/><circle class="puff" style="animation-delay:1.2s" cx="18" cy="36" r="7" fill="${c}" opacity=".9"/></svg>`,
+ sparkle:()=>`<svg viewBox="0 0 50 50"><path class="twk" d="M14 4l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#ffe066"/><path class="twk" style="animation-delay:.4s" d="M36 20l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#fff3a6"/><path class="twk" style="animation-delay:.8s" d="M22 34l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#ffd43b"/></svg>`,
+ sparks:()=>`<svg viewBox="0 0 40 40"><path class="zap" d="M18 2l-8 16h8l-6 18 16-22h-9l7-12z" fill="#ffe14d" stroke="#f08c00" stroke-width="1.5"/></svg>`,
+ fan:()=>`<svg viewBox="0 0 54 90"><rect x="25" y="40" width="4" height="44" fill="#6c7a89"/><ellipse cx="27" cy="85" rx="15" ry="4" fill="#4b5663"/><circle cx="27" cy="26" r="23" fill="#dff1ff" stroke="#6c7a89" stroke-width="3"/><g class="spin"><ellipse cx="27" cy="14" rx="5" ry="11" fill="#74c0fc"/><ellipse cx="27" cy="14" rx="5" ry="11" fill="#74c0fc" transform="rotate(120 27 26)"/><ellipse cx="27" cy="14" rx="5" ry="11" fill="#74c0fc" transform="rotate(240 27 26)"/></g><circle cx="27" cy="26" r="4" fill="#4b5663"/></svg>`,
+ skeleton:(lk)=>{const sw=lk==="sweater",sc=lk==="scarf"||sw,rc=lk==="redcloth";
+   return `<svg viewBox="0 0 60 130"><g class="${lk?"":"shiverS"}"><rect x="28" y="110" width="4" height="16" fill="#777"/><ellipse cx="30" cy="127" rx="14" ry="3" fill="#555"/>
+   <circle cx="30" cy="14" r="11" fill="#f3efe2" stroke="#bbb"/><circle cx="26" cy="13" r="3" fill="#444"/><circle cx="34" cy="13" r="3" fill="#444"/><path d="M25 21h10" stroke="#888" stroke-width="2"/>
+   <path d="M30 25v48" stroke="#e8e2cf" stroke-width="4"/><path d="M20 34q10 4 20 0M19 41q11 4 22 0M20 48q10 4 20 0M22 55q8 3 16 0" stroke="#e8e2cf" stroke-width="3" fill="none"/>
+   <path d="M21 30l-8 26M39 30l8 26M24 76l-4 32M36 76l4 32" stroke="#e8e2cf" stroke-width="4" stroke-linecap="round"/><ellipse cx="30" cy="74" rx="10" ry="5" fill="#e8e2cf"/>
+   ${sw?'<path d="M16 30q14-6 28 0l6 26-8 2-4-14v24H22V44l-4 14-8-2z" fill="#3a9d5d"/>':""}
+   ${sc?'<path d="M18 27q12 6 24 0v6q-12 6-24 0z" fill="#e63946"/><path d="M36 31v18h6V30" fill="#e63946"/>':""}
+   ${rc?'<path d="M8 30q22-14 44 0l4 72q-26 10-52 0z" fill="#d62828"/><circle cx="22" cy="54" r="6" fill="#ffb703"/><circle cx="40" cy="74" r="6" fill="#ffb703"/>':""}
+   ${!lk?'<path d="M4 8l4 3M56 8l-4 3M2 20h5M58 20h-5" stroke="#9fd3ff" stroke-width="2"/>':""}</g></svg>`;},
+ plant:()=>`<svg viewBox="0 0 50 70"><path d="M14 46h22l-4 22H18z" fill="#c8693c"/><rect x="12" y="42" width="26" height="6" rx="2" fill="#a8532c"/><path d="M25 42C10 38 6 20 12 12c8 6 12 18 13 30zM25 42c15-4 19-22 13-30-8 6-12 18-13 30zM25 42c-2-14 0-26 0-36 4 10 4 24 0 36z" fill="#4caf50"/></svg>`,
+ plantDead:()=>`<svg viewBox="0 0 50 70"><path d="M14 46h22l-4 22H18z" fill="#c8693c"/><rect x="12" y="42" width="26" height="6" rx="2" fill="#a8532c"/><path d="M25 42c-6-6-14-6-18 0M25 42c6-6 14-6 18 0M25 42V20" stroke="#8a9a6a" stroke-width="3" fill="none"/></svg>`,
+ disco:()=>`<svg viewBox="0 0 50 70"><path d="M25 0v16" stroke="#999" stroke-width="2"/><g class="spin" style="animation-duration:3s"><circle cx="25" cy="38" r="20" fill="#cfd8e3"/><path d="M5 38h40M25 18v40M9 28h32M9 48h32M15 21v34M35 21v34" stroke="#8796a8" stroke-width="1.2"/></g><circle cx="18" cy="30" r="4" fill="#fff"/></svg>`,
+ cone:(c="rgba(255,230,120,.45)")=>`<svg viewBox="0 0 80 120"><path d="M30 0h20l30 120H0z" fill="${c}"/></svg>`,
+ fog:()=>`<svg viewBox="0 0 90 50"><g fill="#f4fbff" opacity=".9"><circle class="puff" cx="20" cy="34" r="14"/><circle class="puff" style="animation-delay:.5s" cx="44" cy="30" r="17"/><circle class="puff" style="animation-delay:1s" cx="68" cy="34" r="14"/></g></svg>`,
+ marker:()=>`<svg viewBox="0 0 44 54"><path d="M22 52l-7-10h14z" fill="#f59f00"/><circle cx="22" cy="22" r="19" fill="#ffd43b" stroke="#fff" stroke-width="4"/><g transform="translate(10,10)" fill="none" stroke="#7a4b00" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.6 2.6-2.5-.6-.6-2.5z"/></g></svg>`,
+ bean:(lk)=>{const col=lk==="new"?"#ef8354":"#6d9dc5";let s='<svg viewBox="0 0 100 74">';
+   if(!lk){s+=`<path d="M6 68 Q2 46 30 44 Q52 34 74 46 Q96 52 92 68 Z" fill="${col}"/><path d="M40 50l8 4-6 4" stroke="#334" stroke-width="2" fill="none"/>`+[[20,71],[30,72],[60,71],[78,72],[88,69],[12,67],[96,71]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6" fill="#f4f4f4" stroke="#bbb" stroke-width=".6"/>`).join("");}
+   else{s+=`<path d="M6 70 Q0 32 40 18 Q84 10 92 46 Q96 68 78 72 Z" fill="${col}"/><path d="M24 32 Q40 24 56 28" stroke="rgba(255,255,255,.35)" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+     if(lk==="sew")s+='<rect x="38" y="40" width="22" height="18" rx="3" fill="#e9c46a" stroke="#7a5a1a" stroke-dasharray="3 2"/>';
+     if(lk==="cat")s+=`<g transform="translate(28,-4) scale(.72)">${inner(SP.cat("#f3ede2",1))}</g>`;
+     if(lk==="cats")s+=`<g transform="translate(4,4) scale(.6)">${inner(SP.cat())}</g><g transform="translate(34,-6) scale(.66)">${inner(SP.cat("#f3ede2",1))}</g><g transform="translate(62,6) scale(.6)">${inner(SP.cat("#555"))}</g>`;}
+   return s+"</svg>";},
+ desklamp:(on,big)=>`<svg viewBox="0 0 50 70">${on?`<ellipse cx="34" cy="40" rx="${big?24:14}" ry="${big?18:10}" fill="rgba(255,214,102,.55)"/>`:""}<ellipse cx="14" cy="66" rx="12" ry="4" fill="#444"/><path d="M14 64V40l18-14" stroke="#555" stroke-width="4" fill="none"/><path d="M24 20l18-8 6 14-18 6z" fill="${on?"#ffd166":"#6b7280"}" stroke="#444" stroke-width="2"/></svg>`,
+ openbook:()=>`<svg viewBox="0 0 50 30"><path d="M25 6C18 2 8 2 2 5v22c6-3 16-3 23 1 7-4 17-4 23-1V5c-6-3-16-3-23 1z" fill="#fff8e1" stroke="#c9a24a" stroke-width="1.5"/><path d="M25 6v22" stroke="#c9a24a"/><circle cx="37" cy="14" r="5" fill="#ffb703"/></svg>`,
+ books:()=>`<svg viewBox="0 0 90 30">${[["#e76f51",4,14,-12],["#2a9d8f",26,18,8],["#e9c46a",48,12,-4],["#457b9d",68,17,15]].map(([c,x,y,r])=>`<rect x="${x}" y="${y}" width="18" height="10" rx="1" fill="${c}" transform="rotate(${r} ${x+9} ${y+5})"/>`).join("")}</svg>`,
+ kettle:(c="#c9d1da")=>`<svg viewBox="0 0 44 44"><path d="M8 40h28l-2-20a12 10 0 00-24 0z" fill="${c}" stroke="#555" stroke-width="2"/><path d="M34 26l8-6v4l-6 8" fill="${c}" stroke="#555" stroke-width="2"/><path d="M12 16q10-12 20 0" stroke="#333" stroke-width="3" fill="none"/></svg>`,
+ cooker:()=>`<svg viewBox="0 0 44 44"><rect x="6" y="16" width="32" height="24" rx="5" fill="#f4f1ea" stroke="#777" stroke-width="2"/><path d="M8 16q14-10 28 0" fill="#e8e3d8" stroke="#777" stroke-width="2"/><rect x="18" y="26" width="8" height="5" rx="1" fill="#e63946"/></svg>`,
+ hotbottle:()=>`<svg viewBox="0 0 44 30"><rect x="4" y="6" width="32" height="20" rx="8" fill="#e63946"/><rect x="34" y="12" width="8" height="8" rx="2" fill="#333"/><path d="M10 12h18M10 17h18" stroke="rgba(255,255,255,.4)" stroke-width="2"/></svg>`,
+ icepacks:()=>`<svg viewBox="0 0 90 30">${[0,22,44,66].map((x,i)=>`<rect x="${x+2}" y="${8+(i%2)*6}" width="20" height="13" rx="4" fill="#9fd3ff" stroke="#3a7bd5" stroke-width="1.5"/>`).join("")}</svg>`,
+ balls:(c,frost)=>`<svg viewBox="0 0 70 40">${[[12,30],[30,32],[48,30],[60,24],[22,18],[40,18],[56,12],[32,6]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="9" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/><path d="M${x-9} ${y}h18M${x} ${y-9}v18" stroke="rgba(0,0,0,.3)" stroke-width="1"/>`).join("")}${frost?'<path d="M4 6l60 30" stroke="rgba(255,255,255,.0)"/>'+[[12,26],[40,14],[58,22]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" fill="#fff"/>`).join(""):""}</svg>`,
+ glint:()=>`<svg viewBox="0 0 50 50"><circle cx="25" cy="30" r="12" fill="rgba(255,226,120,.45)"/><path class="twk" d="M25 8l3 12 12 3-12 3-3 12-3-12-12-3 12-3z" fill="#fff6c7" stroke="#e0b100" stroke-width="1"/></svg>`
+};
+const birdsSvg=()=>`<svg viewBox="0 0 110 34">${[0,36,72].map((x,i)=>`<g transform="translate(${x},${i===1?0:4})">${inner(SP.bird())}</g>`).join("")}</svg>`;
+
+/* ===================== 3D 工具 ===================== */
+const RX=58,RZ=45,WW=440,WH=240;
+function shade(hex,f){if(!hex.startsWith("#"))return hex;const n=parseInt(hex.slice(1),16);return `rgb(${Math.round(((n>>16)&255)*f)},${Math.round(((n>>8)&255)*f)},${Math.round((n&255)*f)})`;}
+const FT={t:(w,d,h)=>`translateZ(${h}px)`,s:(w,d,h)=>`translate3d(${w}px,${d}px,${h}px) rotateZ(180deg) rotateX(-90deg)`,e:(w,d,h)=>`translate3d(${w}px,0,${h}px) rotateZ(90deg) rotateX(-90deg)`,n:(w,d,h)=>`translate3d(0,0,${h}px) rotateX(-90deg)`,w:(w,d,h)=>`translate3d(0,${d}px,${h}px) rotateZ(-90deg) rotateX(-90deg)`};
+function box(b){
+  const f=b.f||"tse",c=b.c||"#cccccc";
+  const col={t:c,s:shade(c,.86),e:shade(c,.72),n:shade(c,.8),w:shade(c,.76)};
+  let h=`<div class="p3 ${b.cls||""}" ${b.id?`id="${b.id}"`:""} ${b.data||""} style="transform:translate3d(${b.x}px,${b.y}px,${b.z||0}px)">`;
+  for(const k of f){
+    const [fw,fh]=k==="t"?[b.w,b.d]:(k==="s"||k==="n")?[b.w,b.h]:[b.d,b.h];
+    const bg=b.skin?"":`background:${(b.cols&&b.cols[k])||col[k]};`;
+    const art=b.art&&b.art[k]?`<i class="${k==="t"?"fit":"fi"}">${b.art[k]}</i>`:"";
+    h+=`<div class="fc ${b.skin?"skin f"+k:""}" style="width:${fw}px;height:${fh}px;${bg}${b.glow?"box-shadow:0 0 18px 4px rgba(255,170,60,.55);":""}transform:${FT[k](b.w,b.d,b.h)}">${art}</div>`;
+  }
+  return h+"</div>";
+}
+const bb=(x,y,z,w,h,svg,cls="",data="",id="")=>`<div class="p3 bb ${cls}" ${data} ${id?`id="${id}"`:""} style="transform:translate3d(${x}px,${y}px,${z}px) rotateZ(-${RZ}deg) rotateX(-${RX}deg)"><div class="bbi" style="width:${w}px;height:${h}px;left:${-w/2}px;top:${-h}px">${svg}</div></div>`;
+const floorDecal=(x,y,w,d,html,data="")=>`<div class="p3" ${data} style="transform:translate3d(${x}px,${y}px,1px);width:${w}px;height:${d}px">${html}</div>`;
+function wallPos(wall,vx,vy){const z=WH-vy;return wall==="W"?{x:0,y:WW-vx,z}:{x:vx,y:0,z};}
+
+const ART={
+ grill:(hot)=>`<div style="position:absolute;inset:14% 10%;border-radius:4px;background:repeating-linear-gradient(${hot?"#ff9f43 0 4px,#ffd8a8 4px 8px":"#4b5563 0 4px,#6b7280 4px 8px"})${hot?";box-shadow:0 0 14px #ff9f43":""}"></div>`,
+ drawers:`<div style="position:absolute;inset:10% 6%;display:grid;grid-template-rows:1fr 1fr;gap:6px"><div style="border:2px solid rgba(0,0,0,.2);border-radius:3px"></div><div style="border:2px solid rgba(0,0,0,.2);border-radius:3px"></div></div>`,
+ books:`<div style="position:absolute;inset:6px;display:grid;grid-template-rows:repeat(4,1fr);gap:6px">${[0,1,2,3].map(r=>`<div style="display:flex;gap:2px;align-items:flex-end;border-bottom:4px solid rgba(0,0,0,.25)">${[...Array(9)].map((_,i)=>`<i style="flex:1;height:${70+((i*37+r*13)%30)}%;background:${["#e76f51","#2a9d8f","#e9c46a","#457b9d","#8d6e63","#f4a261"][(i+r)%6]}"></i>`).join("")}</div>`).join("")}</div>`,
+ products:`<div style="position:absolute;inset:6px;display:grid;grid-template-rows:repeat(3,1fr);gap:8px">${[0,1,2].map(r=>`<div style="display:flex;gap:4px;align-items:flex-end;border-bottom:4px solid rgba(0,0,0,.25)">${[...Array(6)].map((_,i)=>`<i style="flex:1;height:${55+((i*29+r*17)%40)}%;border-radius:3px 3px 0 0;background:${["#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#ff9f1c","#c77dff"][(i+r*2)%6]}"></i>`).join("")}</div>`).join("")}</div>`,
+ glassdoor:(open)=>`<div style="position:absolute;inset:6% 8%;border-radius:4px;background:linear-gradient(160deg,#d7f0ff,#9fd0f0);border:3px solid #b8c3cc">${open?'<div style="position:absolute;top:0;bottom:0;right:0;width:22%;background:#1f2a3a"></div>':""}<div style="position:absolute;left:10%;right:10%;top:30%;height:8%;background:rgba(255,255,255,.5)"></div></div>`,
+ keys:`<div style="position:absolute;left:4%;right:4%;top:6%;height:26%;background:repeating-linear-gradient(90deg,#fafafa 0 9px,#bbb 9px 10px)"></div><div style="position:absolute;left:4%;right:4%;top:6%;height:15%;background:repeating-linear-gradient(90deg,transparent 0 6px,#111 6px 11px,transparent 11px 20px)"></div>`,
+ frost:`<div style="position:absolute;inset:0;background:radial-gradient(circle at 25% 30%,rgba(255,255,255,.9) 0 10px,transparent 11px),radial-gradient(circle at 70% 60%,rgba(255,255,255,.85) 0 14px,transparent 15px),radial-gradient(circle at 45% 80%,rgba(230,245,255,.9) 0 9px,transparent 10px),radial-gradient(circle at 85% 20%,rgba(255,255,255,.8) 0 7px,transparent 8px)"></div>`,
+ tape:`<div style="position:absolute;left:-10%;width:120%;top:38%;height:12px;background:rgba(240,225,170,.95);transform:rotate(18deg)"></div><div style="position:absolute;left:-10%;width:120%;top:52%;height:12px;background:rgba(240,225,170,.95);transform:rotate(-14deg)"></div>`,
+ red:`<div style="position:absolute;inset:0;background:#d62828;background-image:radial-gradient(circle at 30% 35%,#ffb703 0 6px,#fb8500 6px 8px,transparent 9px),radial-gradient(circle at 72% 68%,#ffb703 0 6px,#fb8500 6px 8px,transparent 9px)"></div>`,
+ spring:`<svg viewBox="0 0 50 50" style="position:absolute;inset:0;width:100%;height:100%"><path d="M18 30c6-4 10 4 16 0s-2-8 4-12" stroke="#777" stroke-width="3" fill="none"/></svg>`,
+ tear:`<svg viewBox="0 0 50 50" style="position:absolute;inset:0;width:100%;height:100%"><path d="M14 18l8 6-4 6 10 2 6 8-12-2-6-8z" fill="#2a1d1d"/></svg>`,
+ hole:`<div style="position:absolute;left:35%;top:30%;width:30%;height:35%;background:#2a1d1d;border-radius:40%"></div>`,
+ sausage:(hot)=>`<div style="position:absolute;inset:12% 8%;background:${hot?"#fff4d6":"#cfd8e3"};border-radius:4px">${[0,1,2].map(i=>`<i style="position:absolute;left:12%;right:12%;top:${18+i*26}%;height:14%;border-radius:8px;background:${hot?"#c0392b":"#9a8c8c"}"></i>`).join("")}</div>`,
+ rugTop:`<div style="position:absolute;inset:0;background:#7b2d43;border:6px solid #e9c46a;border-radius:6px;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.12) 0 8px,transparent 8px 16px)"></div>`,
+ papers:`<div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,#e9e9e9 0 4px,#cfcfcf 4px 5px);transform:rotate(-4deg)"></div>`,
+ packs:`<div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px">${[...Array(8)].map(()=>`<i style="background:#ff8c42;border-radius:4px;box-shadow:0 0 10px rgba(255,140,66,.7)"></i>`).join("")}</div>`,
+ puzzle:`<div style="position:absolute;inset:0;background:conic-gradient(#ff9f1c 0 25%,#4d96ff 0 50%,#6bcb77 0 75%,#ff6b6b 0) 0 0/50px 50px;border-radius:4px;box-shadow:inset 0 0 0 3px rgba(0,0,0,.1)"></div>`,
+ gel:`<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(120,200,255,.85),rgba(190,235,255,.9));border-radius:10px;box-shadow:inset 0 0 0 4px rgba(255,255,255,.6)"></div>`,
+ cabDoors:`<div style="position:absolute;inset:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px"><i style="background:#9c7656;border:2px solid rgba(0,0,0,.2)"></i><i style="background:#9c7656;border:2px solid rgba(0,0,0,.2)"></i></div><div style="position:absolute;left:44%;top:46%;width:12%;height:8%;background:#c0c6cc;border-radius:2px"></div>`,
+ medCab:`<div style="position:absolute;left:50%;top:6px;width:20px;height:20px;margin-left:-10px;background:linear-gradient(#e63946,#e63946) center/100% 7px no-repeat,linear-gradient(#e63946,#e63946) center/7px 100% no-repeat"></div><div style="position:absolute;inset:32px 8px 8px;display:grid;grid-template-columns:1fr 1fr;gap:4px">${[0,1].map(()=>`<i style="background:linear-gradient(160deg,#eaf6ff,#bcdcef);border:2px solid #9fb4c7;display:flex;align-items:flex-end;gap:3px;padding:3px"><b style="flex:1;height:40%;background:#ffb4a2"></b><b style="flex:1;height:60%;background:#a2d2ff"></b><b style="flex:1;height:30%;background:#b9fbc0"></b></i>`).join("")}</div>`,
+ cones:`<div style="position:absolute;inset:8px;display:grid;grid-template-rows:1fr 1fr;gap:6px">${[0,1].map(()=>`<div style="display:flex;gap:4px;border-bottom:4px solid rgba(0,0,0,.25)">${[...Array(5)].map(()=>'<i style="flex:1;background:#f77f00;clip-path:polygon(50% 0,85% 100%,15% 100%)"></i>').join("")}</div>`).join("")}</div>`,
+ taps:`<div style="position:absolute;left:20%;top:40%;width:20%;height:10%;background:#e63946;border-radius:2px"></div><div style="position:absolute;right:20%;top:40%;width:20%;height:10%;background:#3a7bd5;border-radius:2px"></div><div style="position:absolute;left:15%;right:15%;bottom:12%;height:8%;background:#9aa5b1"></div>`
+};
+
+/* ===================== 教室資料 =====================
+   失物 tools 不在這裡，見 RELICS。t：溫度變化；look：修好後的樣子 */
+const ROOMS=[
+{id:"office",name:"校長室",ch:"校",col:"#e76f51",wall:"#eadcc2",floor:"#b98a5e",floorImg:"repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 2px,transparent 2px 55px)",
+ desc:"窗戶破、門漏風、電暖器冒火花，校長凍得說不出話。",title:"校長室守護者",thanks:"終於可以好好辦公了！謝謝你，同學！",
+ wallDeco:[{wall:"N",html:`<div class="plaque" style="left:150px;top:28px;width:110px;height:34px">校長室</div><div class="clock" style="left:300px;top:30px;width:40px;height:40px"></div>`}],
+ deco:[{col:[0,300,36,110],h:()=>box({x:0,y:300,w:36,d:110,h:170,c:"#8d6e63",art:{e:ART.books}})},
+       {col:[260,150,130,60],h:()=>box({x:260,y:150,w:130,d:60,h:62,c:"#a0714f",art:{s:ART.drawers}})},
+       {col:[384,46,30,26],h:()=>bb(398,60,0,46,64,SP.plant())}],
+ spots:[
+  {id:"win",n:"破掉的窗戶",desc:"玻璃破了一個大洞，北風一直灌進來。",kind:"window",wall:"W",vx:200,vy:46,w:140,h:100,tools:[
+    {n:"透明膠帶",ic:"tape",p:20,t:2,hint:"總務處代代相傳的黏著之物。黏得住裂痕，黏不住寒風。",look:"tape",msg:"貼成一個大叉叉……還是有點漏風。",say:"至少……不灌風了"},
+    {n:"換新玻璃",ic:"glass",p:110,t:7,hint:"澄澈如初的玻璃。價格高昂，一如所有完美之物。",look:"newglass",msg:"全新玻璃閃閃發亮，風完全擋住了！",say:"窗外的雪景好美！"},
+    {n:"拿紙箱擋住",ic:"box",p:10,t:4,hint:"合作社後門的棄物。被遺棄者，往往最懂得禦寒。",look:"cardboard",msg:"厚紙箱意外地保溫，風聲變得好遠……",say:"原來紙箱這麼暖"}]},
+  {id:"door",n:"漏風的門",desc:"門下面有一條縫，冷風咻咻地鑽進來。",kind:"door",wall:"N",vx:40,vy:70,w:80,h:170,tools:[
+    {n:"舊報紙塞門縫",ic:"paper",p:15,t:2,hint:"上個月的校刊。無人閱讀的文字，終究成了擋風的牆。",look:"paper",msg:"把報紙捲起來塞住門縫，風小多了。",say:"原來校刊這麼好用！"},
+    {n:"裝防風條",ic:"seal",p:60,t:5,hint:"五金行老闆的珍藏。他說，門縫是一切寒冷的起點。",look:"seal",msg:"防風條裝好，門縫完全密合！",say:"安靜又溫暖"},
+    {n:"請橘座來躺門口",ic:"paw",p:40,t:6,tag:"cat",hint:"橘色的守門者。牠只為值得的人而臥。",look:"cat",msg:"校貓橘座躺在門口，變成一條毛茸茸的擋風條！",say:"橘座今天好給面子！"}]},
+  {id:"hole",n:"牆上的大洞",desc:"不知道是誰的足球踢出來的洞。",kind:"hole",wall:"N",vx:300,vy:110,w:90,h:70,tools:[
+    {n:"釘上木板",ic:"hammer",p:50,t:4,hint:"舊課桌拆下的木板。承載過無數個打瞌睡的午後。",look:"planks",msg:"釘上兩塊木板，洞補起來了。",say:"有點像小木屋耶！"},
+    {n:"專業水泥補牆",ic:"trowel",p:100,t:6,hint:"總務主任親手調的灰泥。據說他年輕時是個工匠。",look:"plaster",msg:"抹得平平整整，完全看不出曾經有洞！",say:"專業的就是不一樣！"},
+    {n:"掛上校長的獎狀",ic:"frame",p:20,t:1,text:"優良<br>校長",hint:"二十年前的榮光。如今只能用來遮掩傷口。",look:"poster",msg:"用獎狀把洞遮住了，看起來很有面子。",say:"這張獎狀終於派上用場了"}]},
+  {id:"heater",n:"冒火花的電暖器",desc:"一直噼噼啪啪冒火花，就是不會熱。",kind:"heater",x:170,y:6,w:72,d:30,h:58,tools:[
+    {n:"用力拍兩下",ic:"hand",p:10,hint:"古老的修理之道。成與不成，全看機器的心情。",rand:[
+      {t:8,tag:"lucky",look:"glow",msg:"拍一拍竟然好了！老機器就是要用拍的。",say:"阿公說得對！"},
+      {t:0,tag:"unlucky",look:"dead",msg:"拍了兩下……徹底不動了。",say:"它……安息了"}]},
+    {n:"換全新零件",ic:"gear",p:90,t:5,hint:"型錄最後一頁的零件。新的，未必比舊的更有心。",look:"glow",msg:"換上新零件，暖是暖了，但總覺得少了點靈魂。",say:"嗯……還可以"},
+    {n:"把電線反過來接",ic:"plug",p:30,t:-3,fx:"freeze",hint:"傳說反過來接，會得到意想不到的力量。確實。",look:"fan",msg:"電暖器變成電風扇了！校長瞬間結冰……",say:"我需要的……不是這個……"}]},
+  {id:"chair",n:"彈簧跑出來的椅子",desc:"椅墊破了，坐上去又冰又刺。",kind:"chair",x:140,y:250,w:56,d:52,h:34,tools:[
+    {n:"膠帶纏一纏",ic:"tape",p:15,t:1,hint:"又是膠帶。它從不拒絕任何人。",look:"tape",msg:"纏了好幾圈膠帶，勉強可以坐。",say:"坐起來有點黏……"},
+    {n:"阿嬤的大紅花被",ic:"blanket",p:60,t:7,hint:"阿嬤的嫁妝。牡丹盛開之處，寒冬無法踏入。",look:"redcloth",msg:"大紅牡丹花被鋪上去，校長坐上去就不想起來了。",say:"像回到阿嬤家一樣溫暖"},
+    {n:"人體工學新椅墊",ic:"cushion",p:90,t:2,hint:"型錄說坐了會變聰明。型錄沒說會變暖。",look:"cushion",msg:"坐起來很高級，但……好像沒有比較暖。",say:"錢……花去哪了？"}]},
+  {id:"floor",n:"結霜的地板",desc:"地板冰到可以溜冰。",kind:"floor",x:60,y:330,w:160,d:90,tools:[
+    {n:"鋪舊報紙",ic:"paper",p:10,t:1,hint:"資源回收區的紙堆。曾是新聞，如今是地墊。",look:"papers",msg:"鋪滿報紙，至少不會滑倒了。",say:"順便看一下新聞"},
+    {n:"厚羊毛地毯",ic:"rug",p:80,t:5,hint:"羊毛之毯。踩上去的人，都會短暫忘記冬天。",look:"rug",msg:"鋪上厚地毯，腳底暖呼呼！",say:"我要脫鞋踩踩看"},
+    {n:"撒滿暖暖包",ic:"pack",p:45,t:6,hint:"整箱購入的暖暖包。一次性的溫暖，也是溫暖。",look:"packs",msg:"一整排暖暖包，地板變成電毯了！",say:"腳底好暖！"}]}
+ ]},
+{id:"res",name:"資源教室",ch:"資",col:"#2f9e7a",wall:"#dff3ea",floor:"#c4a57e",floorImg:"repeating-linear-gradient(90deg,rgba(0,0,0,.07) 0 2px,transparent 2px 48px)",
+ desc:"懶骨頭漏豆子、窗戶起霧又漏風，心情溫度計也凍到最低。",title:"資源教室的暖陽",thanks:"大家說，這裡是全校最溫暖的地方！",
+ wallDeco:[{wall:"N",html:`<div class="plaque" style="left:170px;top:26px;width:130px;height:34px;background:#2f9e7a;color:#fff">資源教室</div><div class="poster deco" style="position:absolute;left:180px;top:80px;width:110px;height:64px">今天也<br>辛苦了</div>`}],
+ deco:[{col:[250,170,110,94],h:()=>box({x:250,y:170,w:110,d:64,h:44,c:"#e0b05a"})+box({x:262,y:242,w:24,d:22,h:26,c:"#4d96ff"})+box({x:322,y:242,w:24,d:22,h:26,c:"#ff6b6b"})}],
+ spots:[
+  {id:"rwin",n:"起霧又漏風的窗",desc:"窗框鬆了，霧氣結成冰花。",kind:"window",wall:"W",vx:220,vy:46,w:130,h:100,tools:[
+    {n:"貼上同學畫的畫",ic:"frame",p:15,t:5,text:"我的<br>學校",hint:"資源班同學的畫作。一筆一畫，都帶著體溫。",look:"poster",msg:"一張色彩鮮豔的畫擋住了窗戶，連冷風都安靜下來欣賞。",say:"這是誰畫的？畫得真好！"},
+    {n:"換氣密窗",ic:"glass",p:100,t:6,hint:"工廠出品的完美密封。完美，也冰冷。",look:"newglass",msg:"新的氣密窗裝好了，霧氣不見了。",say:"清清楚楚，乾乾淨淨"},
+    {n:"貼泡泡紙",ic:"seal",p:40,t:3,hint:"捏一下會啵一聲。據說也能保暖。",look:"seal",msg:"窗戶貼滿泡泡紙，同學忍不住一直去捏。",say:"啵、啵、啵……停不下來"}]},
+  {id:"mood",n:"凍住的心情溫度計",desc:"牆上的心情溫度計，指針卡在最冷的地方。",kind:"gw",wall:"N",vx:40,vy:40,w:80,h:150,tools:[
+    {n:"畫上一顆太陽",ic:"sun",p:10,t:2,hint:"畫出來的太陽不會發熱。但看著它的人會。",look:"sun",msg:"溫度計旁多了一顆胖胖的太陽。",say:"看著就覺得暖"},
+    {n:"大家寫一句好話",ic:"heart",p:30,t:6,hint:"一張紙條很輕。一整面牆的紙條很重。",look:"notes",msg:"每個人寫一句好話貼上去，心情溫度計一路衝到頂！",say:"「校長加油」……誰寫的啦"},
+    {n:"換成真的溫度計",ic:"thermo",p:60,t:1,hint:"誠實的溫度計。它讓你知道很冷，僅此而已。",look:"real",msg:"換上精準的溫度計，清楚顯示：真的很冷。",say:"嗯……知道了，謝謝"}]},
+  {id:"beanbag",n:"漏豆子的懶骨頭",desc:"懶骨頭破了，保麗龍豆子撒得滿地都是。",kind:"gen",x:40,y:290,w:76,d:66,mz:96,
+   draw:(sp,lk)=>bb(sp.x+sp.w/2,sp.y+sp.d/2,0,104,76,SP.bean(lk),"click",`data-spot="beanbag"`),tools:[
+    {n:"一針一線縫起來",ic:"needle",p:30,t:3,hint:"比任何機器都慢，也比任何機器都真。",look:"sew",msg:"補上一塊黃色補丁，懶骨頭又鼓起來了。",say:"手工的最有溫度"},
+    {n:"換新懶骨頭",ic:"cushion",p:90,t:3,hint:"嶄新的懶骨頭，散發著工廠的氣味。",look:"new",msg:"新的懶骨頭很蓬，但坐起來跟縫好的差不多。",say:"嗯，是新的"},
+    {n:"請三花貓先躺上去",ic:"paw",p:25,t:5,tag:"cat",hint:"三花貓只躺在最軟的地方。牠躺過的，就是最軟的地方。",look:"cat",msg:"三花貓跳上懶骨頭，把破洞壓住了，還分一半給校長。",say:"三花，你是天使"}]},
+  {id:"cab",n:"打不開的桌遊櫃",desc:"櫃門凍住了，裡面的桌遊都拿不出來。",kind:"gen",x:330,y:6,w:96,d:36,h:110,mz:150,
+   draw:(sp,lk)=>box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:lk==="new"?"#5fa8d3":"#b08968",data:`data-spot="cab"`,art:{s:lk?ART.products:ART.cabDoors+ART.frost}}),tools:[
+    {n:"用力拉開",ic:"hand",p:10,hint:"門後有什麼？只有拉開的人知道。",rand:[
+      {t:5,tag:"lucky",look:"open",msg:"櫃門一開，掉出一條收藏多年的毛毯！",say:"這條毯子好暖"},
+      {t:2,look:"open",msg:"打開了，大家玩起桌遊，玩到忘了冷。",say:"再一局！"},
+      {t:-1,tag:"unlucky",look:"open",msg:"桌遊盒雪崩，把校長埋了一半……而且好冰。",say:"救……救命"}]},
+    {n:"上潤滑油",ic:"oil",p:40,t:3,hint:"一滴油，讓卡住的東西重新動起來。人也一樣。",look:"open",msg:"櫃門順利打開，大家一起玩大富翁。",say:"我買下這條街！"},
+    {n:"換新櫃子",ic:"box",p:100,t:2,hint:"新櫃子很漂亮。裡面的桌遊，還是那幾盒。",look:"new",msg:"新櫃子很漂亮，但桌遊還是那幾盒。",say:"至少門很好開"}]},
+  {id:"rheater",n:"停擺的暖風機",desc:"吹出來的風是冷的，還有灰塵味。",kind:"heater",x:150,y:10,w:60,d:30,h:52,tools:[
+    {n:"拍拍它",ic:"hand",p:10,t:2,hint:"溫柔地拍一拍。它不會因此變好，但會知道有人在乎。",look:"glow",msg:"拍了拍，它勉強吐出一口溫風。",say:"有比沒有好"},
+    {n:"清掉三年的灰塵",ic:"wave",p:35,t:7,hint:"濾網裡積了三年的灰。清空它，熱風就回來了。",look:"glow",msg:"濾網清乾淨，熱風呼呼地吹出來！",say:"原來是灰塵在作怪"},
+    {n:"換一台新的",ic:"gear",p:110,t:7,hint:"嶄新的機器。和清乾淨的舊機器，吹出一樣的風。",look:"glow",msg:"新暖風機很好用，但和清乾淨的舊機器一樣暖。",say:"……其實清一清就好了吧"}]},
+  {id:"mat",n:"冰冷的地墊",desc:"地板冰冰的，大家不敢坐在地上。",kind:"floor",x:150,y:290,w:140,d:96,tools:[
+    {n:"鋪報紙",ic:"paper",p:10,t:1,hint:"薄薄一層，聊勝於無。",look:"papers",msg:"鋪了一層報紙，還是有點冰。",say:"嗯……還是冷"},
+    {n:"鋪巧拼地墊",ic:"rug",p:50,t:4,hint:"一塊一塊拼起來的溫暖。缺一塊都不行。",look:"puzzle",msg:"彩色巧拼鋪滿地板，大家都坐到地上了。",say:"好像回到幼兒園"},
+    {n:"冰涼凝膠地墊",ic:"snow",p:30,t:-3,fx:"freeze",hint:"夏天的熱銷商品。商品就是商品，不看季節。",look:"gel",msg:"冰涼凝膠一鋪，校長一腳踩上去就結冰了。",say:"夏……天……再……用……"}]}
+ ]},
+{id:"coop",name:"合作社",ch:"社",col:"#f4a261",wall:"#f6e7c8",floor:"#aeb8c6",floorImg:"repeating-conic-gradient(rgba(255,255,255,.18) 0 25%,transparent 0 50%) 0 0/80px 80px",
+ desc:"自動門關不起來、冰櫃一直開著，合作社變成冷凍庫。",title:"合作社 VIP 店長",thanks:"合作社阿姨說要送你一個茶葉蛋！",
+ wallDeco:[{wall:"N",html:`<div class="plaque" style="left:250px;top:24px;width:120px;height:32px;background:#d9534f;color:#fff">合作社</div>`}],
+ deco:[{col:[0,110,40,130],h:()=>box({x:0,y:110,w:40,d:130,h:130,c:"#c8a27a",art:{e:ART.products}})},
+       {col:[270,200,150,52],h:()=>box({x:270,y:200,w:150,d:52,h:60,c:"#e07a5f",art:{s:`<div style="position:absolute;inset:18% 6%;border-radius:6px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-weight:900;color:#c0392b;font-size:18px">歡迎光臨</div>`}})}],
+ spots:[
+  {id:"autodoor",n:"關不起來的自動門",desc:"每次有人經過就開得特別開心，冷風一直灌。",kind:"glassdoor",wall:"W",vx:40,vy:60,w:110,h:180,tools:[
+    {n:"用手推回去",ic:"hand",p:10,t:1,hint:"最原始的力量：自己的雙手。只是門不會記得。",look:"closed",msg:"推回去了……下一個同學經過又打開一半。",say:"一直推好累"},
+    {n:"修好感應器",ic:"gear",p:100,t:7,hint:"廠商工程師的祕術。來一趟，代價不菲。",look:"new",msg:"感應器修好，自動門終於學會關門了！",say:"它終於懂事了"},
+    {n:"掛上厚門簾",ic:"curtain",p:50,t:5,hint:"夜市攤販傳承的厚簾。風會在這裡停下腳步。",look:"curtain",msg:"掛上厚厚的門簾，冷風被擋在外面。",say:"有種在逛夜市的感覺"}]},
+  {id:"cwin",n:"裂開的櫥窗",desc:"窗戶被風吹裂了。",kind:"window",wall:"N",vx:220,vy:70,w:120,h:90,tools:[
+    {n:"貼特價海報",ic:"frame",p:20,t:2,text:"麵包<br>買一送一",hint:"『麵包買一送一』。商人的智慧，有時也擋得住風。",look:"poster",msg:"貼上特價海報，擋風又能做生意。",say:"阿姨說這叫一舉兩得"},
+    {n:"雙層玻璃",ic:"glass",p:110,t:5,hint:"號稱保溫一流的雙層玻璃。號稱。",look:"newglass",msg:"雙層玻璃裝好了，但窗框還是有點縫。",say:"好像……沒想像中暖"},
+    {n:"撒一袋吐司邊",ic:"bread",p:15,t:6,tag:"bird",hint:"不要丟，總有一天會用到。那一天，就是今天。",look:"birds",msg:"麻雀全飛來，擠在窗邊變成一排毛茸茸的擋風牆！",say:"麻雀們，謝謝你們！"}]},
+  {id:"fridge",n:"一直開著的冰櫃",desc:"冰櫃門關不起來，冷氣一直往外跑。",kind:"fridge",x:120,y:6,w:76,d:46,h:150,tools:[
+    {n:"用力關上",ic:"hand",p:10,t:5,hint:"也許，它只是卡住了什麼。",look:"closed",msg:"砰！原來是被一包冷凍水餃卡住了。",say:"水餃兄，辛苦你了"},
+    {n:"換新門封條",ic:"seal",p:70,t:4,hint:"冰箱專用的封條。封得住冷氣，也封得住阿姨的嘆息。",look:"seal",msg:"門封條換新，冷氣一滴都跑不出來。",say:"這才對嘛"},
+    {n:"把冰棒全部試吃一遍",ic:"snow",p:30,t:-3,fx:"freeze",hint:"清空冰櫃就不會冷了。多麼天真的想法。",look:"closed",msg:"校長把每一種口味都吃了一輪……結冰了。",say:"芒果……口味……好吃……"}]},
+  {id:"pot",n:"結冰的關東煮",desc:"鍋子結了一層冰，蘿蔔變成冰塊。",kind:"pot",x:290,y:206,w:46,d:38,h:24,z:60,tools:[
+    {n:"開小火",ic:"fire",p:30,t:3,hint:"小小的火苗。耐心，是唯一的柴薪。",look:"steam",msg:"慢慢煮開了，冒出香香的熱氣。",say:"我要一支米血！"},
+    {n:"阿姨祕方湯頭",ic:"pot",p:80,t:7,hint:"阿姨不傳之祕。喝過的人，都不再談論寒冷。",look:"steambig",msg:"祕方湯頭一下去，整間合作社都香暖起來！",say:"這湯頭……太神了！"},
+    {n:"請校長試喝一口",ic:"cup",p:20,hint:"煮好了嗎？只有勇者會先嘗。",rand:[
+      {t:5,tag:"lucky",look:"steam",msg:"意外地超好喝，校長全身暖起來！",say:"再來一碗！"},
+      {t:1,look:"steam",msg:"溫溫的，還可以。",say:"嗯……還沒很熱"},
+      {t:-1,tag:"unlucky",look:"ice",msg:"是昨天剩下的冰湯……",say:"這是冰沙吧？"}]}]},
+  {id:"hotdog",n:"拔掉插頭的熱狗機",desc:"插頭不知道被誰拔掉了。",kind:"hotdog",x:356,y:208,w:48,d:34,h:32,z:60,tools:[
+    {n:"插回插頭",ic:"plug",p:10,t:4,hint:"有時候，答案就在腳邊。",look:"glow",msg:"插回去就好了！熱狗開始轉起來。",say:"原來只是沒插電"},
+    {n:"全新熱狗機",ic:"gear",p:90,t:4,hint:"可同時烤三十支。新的機器，同樣的溫度。",look:"glownew",msg:"全新熱狗機……和插回插頭的舊機器一樣暖。",say:"好像白花錢了"},
+    {n:"開到最大火",ic:"fire",p:40,t:6,hint:"火力全開。焦黑之物，亦能散發熱度。",look:"smoke",msg:"熱狗烤成焦炭……但整間合作社變得超暖。",say:"咳咳……好暖……"}]},
+  {id:"cbox",n:"被壓扁的紙箱",desc:"不知道誰把校貓的家壓扁了。",kind:"cbox",x:150,y:300,w:62,d:52,tools:[
+    {n:"摺回去",ic:"box",p:10,t:1,hint:"將它恢復原狀。但原本的主人呢？",look:"fold",msg:"紙箱摺回原狀，但空空的。",say:"貓咪們去哪了？"},
+    {n:"放進毛毯",ic:"blanket",p:50,t:3,hint:"為不在場的住客準備的寢具。",look:"blanketbox",msg:"紙箱裡鋪上毛毯，變成豪華小窩。",say:"我也想躺進去"},
+    {n:"放一個貓罐頭",ic:"paw",p:30,t:5,tag:"cat",hint:"罐頭開啟之聲，能召喚校園的流浪者。",look:"catbox",msg:"兩隻校貓馬上搬回來，還分一半位置給校長的腳。",say:"喵喵們回家了！"}]}
+ ]},
+{id:"lab",name:"自然實驗室",ch:"科",col:"#2a9d8f",wall:"#d7eee2",floor:"#97a7a8",floorImg:"repeating-linear-gradient(0deg,rgba(255,255,255,.15) 0 2px,transparent 2px 44px),repeating-linear-gradient(90deg,rgba(255,255,255,.15) 0 2px,transparent 2px 44px)",
+ desc:"窗框漏風、實驗桌結霜，連骨骼模型都在發抖。",title:"首席暖心科學家",thanks:"科學的力量，真是太溫暖了！",
+ wallDeco:[{wall:"N",html:`<div class="poster deco" style="position:absolute;left:230px;top:40px;width:120px;height:80px">元素週期表</div>`}],
+ deco:[{col:[300,330,110,50],h:()=>box({x:300,y:330,w:110,d:50,h:60,c:"#6c7a89",art:{s:ART.drawers}})}],
+ spots:[
+  {id:"lwin",n:"漏風的窗框",desc:"窗框和牆壁之間有一條大縫。",kind:"window",wall:"W",vx:180,vy:46,w:140,h:100,tools:[
+    {n:"膠帶黏一黏",ic:"tape",p:20,t:2,hint:"膠帶再度登場。它無所不在。",look:"tape",msg:"膠帶貼滿窗框，風小一點了。",say:"膠帶真是萬能"},
+    {n:"矽利康填縫",ic:"tube",p:70,t:6,hint:"擠出時柔軟，凝固後堅不可摧。像某些老師。",look:"seal",msg:"填好縫隙，固化後超級密封！",say:"一點風都沒有了！"},
+    {n:"用紙箱擋住",ic:"box",p:10,t:2,text:"實驗器材",hint:"實驗器材的包裝。黑暗之中，仍有一絲暖意。",look:"cardboard",msg:"窗戶被紙箱擋住，實驗室變暗了。",say:"有點像暗房……"}]},
+  {id:"crack",n:"牆上的裂縫",desc:"一條長長的裂縫，還會發出嗚嗚聲。",kind:"crack",wall:"N",vx:60,vy:40,w:100,h:130,tools:[
+    {n:"貼元素週期表",ic:"frame",p:20,t:1,text:"H He<br>Li Be",hint:"萬物的元素皆列於此。唯獨沒有『溫暖』。",look:"poster",msg:"再貼一張週期表擋住裂縫，學習氣氛滿分。",say:"氫、氦、鋰、鈹……"},
+    {n:"補土抹平",ic:"trowel",p:80,t:5,hint:"如抹奶油般撫平裂痕。代價是你的錢包。",look:"plaster",msg:"補土抹得平平的，裂縫消失了！",say:"跟新的一樣"},
+    {n:"釘木板",ic:"hammer",p:40,t:5,hint:"叮叮咚咚。粗糙，卻同樣可靠。",look:"planks",msg:"木板釘好，風聲停了。",say:"有點像樹屋"}]},
+  {id:"table",n:"結霜的實驗桌",desc:"桌面結了一層霜，燒杯都凍住了。",kind:"table",x:220,y:200,w:140,d:70,h:56,tools:[
+    {n:"鋪一塊桌墊",ic:"rug",p:20,t:2,hint:"一塊綠色的布。至少手不會黏在桌上。",look:"mat",msg:"鋪上綠色桌墊，手不會被凍住了。",say:"可以寫筆記了"},
+    {n:"鐵粉發熱實驗",ic:"flask",p:60,t:6,hint:"化學老師說它會自己變熱。鏽蝕，亦是一種燃燒。",look:"steam",msg:"鐵粉氧化會放熱，這就是暖暖包的原理！",say:"原來暖暖包是這樣運作的！"},
+    {n:"乾冰實驗",ic:"snow",p:40,t:-4,fx:"freeze",hint:"保證全班尖叫。尖叫的原因，你很快就會知道。",look:"fog",msg:"白煙滾滾超壯觀……校長被順便冰鎮了。",say:"零下……七十八度……"}]},
+  {id:"skel",n:"發抖的骨骼模型",desc:"它在角落站了二十年，好像也會冷。",kind:"skeleton",x:400,y:80,tools:[
+    {n:"圍上圍巾",ic:"scarf",p:15,t:2,hint:"一條紅圍巾。二十年來，第一次有人關心它。",look:"scarf",msg:"骨骼模型圍上紅圍巾，看起來精神多了。",say:"老骨頭，你也辛苦了"},
+    {n:"穿上毛衣",ic:"shirt",p:40,t:3,hint:"一針一線的手工毛衣。尺寸，剛好是骨頭的形狀。",look:"sweater",msg:"穿上綠毛衣，骨骼模型變時尚了。",say:"它比我還時髦"},
+    {n:"披上大紅被",ic:"blanket",p:70,t:2,hint:"阿嬤的另一條被子。對骨頭而言，似乎太隆重了。",look:"redcloth",msg:"骨骼模型被包成春捲……但它本來就不怕冷。",say:"嗯，它好像不需要"}]},
+  {id:"birdbox",n:"破掉的觀察箱",desc:"白頭翁一家住在這裡，屋頂破了。",kind:"birdbox",x:4,y:330,w:40,d:56,h:34,z:110,tools:[
+    {n:"膠帶補屋頂",ic:"tape",p:15,t:1,hint:"膠帶補屋頂。鳥兒會怎麼想呢？",look:"tape",msg:"屋頂補起來了，但鳥兒有點不敢進去。",say:"鳥兒們，回來吧"},
+    {n:"修好木箱",ic:"hammer",p:50,t:4,tag:"bird",hint:"生物老師叮嚀：要輕輕放。歸巢之鳥，皆會報恩。",look:"birds",msg:"白頭翁一家住回去，擠在一起取暖。",say:"今天的自然課就是你們了！"},
+    {n:"加裝暖燈",ic:"bulb",p:80,t:4,tag:"bird",hint:"給鳥兒的暖氣房。鳥很滿意，教室沒什麼變化。",look:"birdsglow",msg:"觀察箱加了暖燈，白頭翁開心地唱歌，但教室沒變暖多少。",say:"鳥兒開心就好"}]},
+  {id:"lamp",n:"不亮的植物燈",desc:"植物都快凍死了。",kind:"lamp",x:110,y:300,tools:[
+    {n:"換燈泡",ic:"bulb",p:30,t:3,hint:"普通的燈泡。普通，有時就是足夠。",look:"glow",msg:"燈亮了，植物慢慢挺起來。",say:"植物復活了！"},
+    {n:"溫室加熱燈",ic:"sun",p:90,t:6,hint:"為熱帶植物而生的燈。在這裡，它是太陽。",look:"glowbig",msg:"溫室燈全開，整個角落像熱帶雨林！",say:"我覺得我正在光合作用"},
+    {n:"把燈對準校長",ic:"sun",p:50,t:6,hint:"植物與校長，誰更需要光？",look:"glow",msg:"校長站在燈下……被當成盆栽照顧了。",say:"請幫我澆一點熱水"}]}
+ ]},
+{id:"music",name:"音樂教室",ch:"音",col:"#9d4edd",wall:"#e6dcf5",floor:"#9c5a36",floorImg:"repeating-linear-gradient(90deg,rgba(0,0,0,.1) 0 2px,transparent 2px 44px)",
+ desc:"牆壁破洞、冷氣狂吹，北風在教室裡吹口哨。",title:"校園音樂暖男",thanks:"校長宣布：下週朝會表演 Disco！",
+ wallDeco:[{wall:"W",html:`<div class="poster deco" style="position:absolute;left:30px;top:40px;width:120px;height:70px">合唱比賽<br>加油</div>`}],
+ deco:[],
+ spots:[
+  {id:"mhole",n:"隔音牆破洞",desc:"北風在教室裡吹口哨。",kind:"hole",wall:"W",vx:220,vy:60,w:110,h:90,tools:[
+    {n:"拿紙箱擋住",ic:"box",p:10,t:2,text:"樂器",hint:"樂器的包裝箱。敲起來，竟有回音。",look:"cardboard",msg:"紙箱擋住了，但敲起來咚咚響。",say:"音效不錯耶"},
+    {n:"專業隔音棉",ic:"wave",p:80,t:6,hint:"形似蛋盒的吸音之物。它吞噬聲音，也吞噬寒風。",look:"foam",msg:"隔音棉補好，安靜又溫暖！",say:"完美的音樂教室！"},
+    {n:"貼滿樂譜",ic:"note",p:25,t:3,text:"Do Re Mi<br>Fa Sol",hint:"上學期的合唱曲。紙張承載著歌聲的餘溫。",look:"poster",msg:"貼滿樂譜擋住洞，還能邊看邊唱。",say:"Do～Re～Mi～"}]},
+  {id:"mwin",n:"裂開的窗戶",desc:"窗戶玻璃裂開了。",kind:"window",wall:"N",vx:300,vy:40,w:110,h:90,tools:[
+    {n:"膠帶",ic:"tape",p:20,t:2,hint:"老朋友。始終如一，始終不夠。",look:"tape",msg:"膠帶貼成大叉叉。",say:"又是叉叉"},
+    {n:"厚絨窗簾",ic:"curtain",p:50,t:6,hint:"音樂廳舞台的帷幕。拉上它，寒冬便退場。",look:"curtain",msg:"拉上厚絨窗簾，像演奏廳一樣氣派。",say:"有表演的感覺了"},
+    {n:"換新玻璃",ic:"glass",p:110,t:6,hint:"最昂貴的選擇。然而帷幕，也做得到同樣的事。",look:"newglass",msg:"新玻璃裝好，又亮又暖。",say:"陽光照進來了！"}]},
+  {id:"ac",n:"一直吹冷風的冷氣",desc:"遙控器不見了，冷氣一直開著。",kind:"ac",wall:"N",vx:160,vy:26,w:100,h:40,tools:[
+    {n:"拔掉插頭",ic:"plug",p:10,t:3,hint:"簡單粗暴之道。沉默，有時是最好的答案。",look:"off",msg:"拔掉插頭，至少不吹冷風了。",say:"世界安靜了"},
+    {n:"換成暖氣機",ic:"gear",p:100,t:7,hint:"將冷氣整台換掉。毀滅與重生，只需一筆預算。",look:"heater",msg:"冷氣換成暖氣機，暖風呼呼吹！",say:"這才是冬天該吹的風"},
+    {n:"亂按遙控器",ic:"remote",p:30,hint:"字跡已磨滅的遙控器。每個按鈕，都是一場賭局。",rand:[
+      {t:7,tag:"lucky",look:"warm",msg:"按到暖氣模式！好險。",say:"這個錯誤我原諒你"},
+      {t:2,look:"off",msg:"按到關機，至少不吹冷風了。",say:"還算可以"},
+      {t:-2,tag:"unlucky",look:"cold",msg:"按到「強力冷氣」……",say:"不——要——啊——"}]}]},
+  {id:"piano",n:"結霜的鋼琴",desc:"琴鍵冰到彈不下去。",kind:"piano",x:120,y:12,w:130,d:50,h:70,tools:[
+    {n:"冬季合唱曲",ic:"note",p:20,t:-3,fx:"freeze",hint:"今年合唱比賽的指定曲。歌聲太過動人，連天空都回應了。",look:"snowy",msg:"大家唱太投入，教室裡真的下雪了……校長結冰了。",say:"唱……得……很好……但……好冷……"},
+    {n:"蓋上毛毯",ic:"blanket",p:50,t:4,hint:"鋼琴老師說它很怕冷。它確實是。",look:"redcloth",msg:"鋼琴蓋上大紅毛毯，校長也順便鑽進去。",say:"鋼琴和我，都很暖"},
+    {n:"請校貓合唱團",ic:"paw",p:60,t:5,tag:"cat",hint:"報名表上只有三個肉球印。",look:"cats",msg:"三隻校貓圍著鋼琴喵喵唱和聲。",say:"這是我聽過最暖的和聲"}]},
+  {id:"light",n:"不亮的舞臺燈",desc:"畢業典禮之後就沒亮過。",kind:"stagelight",x:330,y:300,tools:[
+    {n:"換燈泡",ic:"bulb",p:30,t:3,hint:"普通的燈泡。溫柔的光，足以照亮一個角落。",look:"glow",msg:"燈亮了，暖黃色的光灑下來。",say:"好溫柔的光"},
+    {n:"把燈對準校長",ic:"sun",p:50,t:5,hint:"聚光燈下，主角永遠不會冷。",look:"glowbig",msg:"校長站在聚光燈下，又暖又像巨星。",say:"謝謝大家！謝謝！"},
+    {n:"七彩 Disco 燈",ic:"star",p:90,t:4,fx:"dance",tag:"disco",hint:"畢業舞會的遺物。它帶來的不是溫暖，是狂熱。",look:"disco",msg:"七彩燈光全開！校長跳起 Disco！",say:"Let's dance！"}]},
+  {id:"drum",n:"破掉的大鼓",desc:"鼓皮破了一個洞。",kind:"drum",x:228,y:258,w:56,d:56,h:44,tools:[
+    {n:"膠帶補鼓皮",ic:"tape",p:15,t:1,hint:"膠帶補鼓皮。新的音色就此誕生。",look:"tape",msg:"補好了，敲起來啪啪聲。",say:"這是新的音色"},
+    {n:"在鼓裡放暖暖包",ic:"pack",p:40,t:5,hint:"大鼓即是暖爐。誰說樂器只能發出聲音？",look:"glow",msg:"大鼓變成暖爐，抱著就暖。",say:"抱著大鼓好舒服"},
+    {n:"換新鼓皮",ic:"drum",p:70,t:3,fx:"dance",hint:"全新的鼓皮。敲下去的那一刻，你會明白。",look:"new",msg:"換上新鼓皮，校長咚咚咚打到滿頭大汗！",say:"咚咚咚！運動最暖身！"}]}
+ ]},
+{id:"lib",name:"圖書館",ch:"書",col:"#bc6c25",wall:"#efe3cf",floor:"#8c5a3c",floorImg:"repeating-linear-gradient(90deg,rgba(0,0,0,.1) 0 2px,transparent 2px 40px)",spawn:[330,400],
+ desc:"書架倒了一排、窗戶漏雪，圖書館阿姨在櫃台後面發抖。",title:"圖書館的守夜人",thanks:"書都安全了！校長說要借三本書回家看。",
+ wallDeco:[{wall:"W",html:`<div class="plaque" style="left:20px;top:24px;width:120px;height:34px;background:#bc6c25;color:#fff">圖書館</div>`}],
+ deco:[{col:[0,170,36,170],h:()=>box({x:0,y:170,w:36,d:170,h:170,c:"#8d6e63",art:{e:ART.books}})},
+       {col:[250,0,180,34],h:()=>box({x:250,y:0,w:180,d:34,h:150,c:"#8d6e63",art:{s:ART.books}})},
+       {col:[300,250,120,50],h:()=>box({x:300,y:250,w:120,d:50,h:56,c:"#a47148",art:{s:`<div style="position:absolute;inset:18% 8%;border-radius:6px;background:#fff8e7;display:flex;align-items:center;justify-content:center;font-weight:900;color:#8a4b1f;font-size:17px">借還書</div>`}})}],
+ spots:[
+  {id:"lwin2",n:"漏雪的窗戶",desc:"窗戶卡不緊，雪花一片一片飄進來。",kind:"window",wall:"N",vx:40,vy:20,w:130,h:84,tools:[
+    {n:"用過期雜誌擋住",ic:"book",p:10,t:4,text:"過期雜誌",hint:"被時間遺忘之物，擋得住時間之外的風。",look:"cardboard",msg:"一疊過期雜誌塞滿窗框，意外地密不透風。",say:"這期封面是我耶"},
+    {n:"換新玻璃",ic:"glass",p:100,t:5,hint:"澄澈的玻璃。讀書的人，需要看得見天空。",look:"newglass",msg:"新玻璃裝好，雪景變成一幅畫。",say:"適合讀詩的天氣"},
+    {n:"貼「請保持安靜」",ic:"paper",p:20,t:1,text:"請保持<br>安靜",hint:"圖書館的鐵律。風，也必須遵守嗎？",look:"poster",msg:"風好像有比較安靜……一點點。",say:"噓——"}]},
+  {id:"shelf",n:"倒下的書架",desc:"整排書架倒在地上，書散了一地。",kind:"gen",x:80,y:360,w:150,d:40,mz:80,draw:(sp,lk)=>{const ds=`data-spot="shelf"`;
+    if(!lk)return box({x:sp.x,y:sp.y+4,w:sp.w,d:32,h:24,c:"#8d6e63",data:ds,art:{t:ART.books}})+bb(sp.x+sp.w/2,sp.y+sp.d+8,0,90,30,SP.books());
+    if(lk==="wall")return [0,1,2,3,4].map(i=>box({x:sp.x+i*30,y:sp.y+4,w:28,d:32,h:50+((i*23)%40),c:["#e76f51","#2a9d8f","#e9c46a","#457b9d","#8d6e63"][i],data:ds})).join("");
+    return box({x:sp.x,y:sp.y+4,w:sp.w,d:32,h:120,c:"#8d6e63",data:ds,art:{s:ART.books}})+(lk==="fixed"?box({x:sp.x+10,y:sp.y,w:10,d:6,h:130,c:"#7b8794"})+box({x:sp.x+sp.w-20,y:sp.y,w:10,d:6,h:130,c:"#7b8794"}):"");},tools:[
+    {n:"扶起來",ic:"hand",p:20,t:3,hint:"倒下的，總要有人扶起來。",look:"up",msg:"書架扶正，書一本一本放回去。",say:"書都回家了"},
+    {n:"用書堆成一道牆",ic:"book",p:10,t:5,hint:"一本書擋不住風。一千本書可以。",look:"wall",msg:"書疊成一道彩色的牆，把冷風全擋住了！",say:"知識就是力量，也是牆"},
+    {n:"加裝防倒固定架",ic:"gear",p:80,t:3,hint:"它再也不會倒了。但它從來不是因為冷才倒的。",look:"fixed",msg:"書架鎖上鐵架，穩穩的。教室溫度沒什麼變。",say:"安全第一"}]},
+  {id:"readlamp",n:"冰冷的閱讀燈",desc:"閱讀桌的燈不亮，桌面也冰冰的。",kind:"gen",x:150,y:150,w:110,d:60,h:44,mz:110,draw:(sp,lk)=>{const ds=`data-spot="readlamp"`;
+    let h=[[0,0],[sp.w-8,0],[0,sp.d-8],[sp.w-8,sp.d-8]].map(([a,b])=>box({x:sp.x+a,y:sp.y+b,w:8,d:8,h:sp.h-8,c:"#6d4c41"})).join("");
+    h+=box({x:sp.x,y:sp.y,z:sp.h-8,w:sp.w,d:sp.d,h:8,c:"#a1887f",data:ds,art:{t:lk?"":ART.frost}});
+    h+=bb(sp.x+20,sp.y+20,sp.h,46,64,SP.desklamp(!!lk,lk==="big"),"click",ds);
+    if(lk==="book")h+=bb(sp.x+70,sp.y+34,sp.h,50,30,SP.openbook())+bb(sp.x+70,sp.y+34,sp.h+20,36,36,SP.sparkle());
+    if(lk==="big")h+=bb(sp.x+55,sp.y+30,sp.h,90,60,SP.steam("#ffe8b0"));
+    return h;},tools:[
+    {n:"換燈泡",ic:"bulb",p:30,t:2,hint:"普通的光，照亮普通的一頁。",look:"bulb",msg:"燈亮了，可以看書了。",say:"字看得清楚了"},
+    {n:"讀一本關於夏天的書",ic:"book",p:15,t:4,hint:"書中的夏天，是真的夏天嗎？讀過的人都說是。",look:"book",msg:"校長讀了一本關於夏天的書，讀到滿頭大汗。",say:"我聞到海的味道了"},
+    {n:"換成暖黃大燈",ic:"sun",p:80,t:5,hint:"像午後陽光的燈。昂貴的午後。",look:"big",msg:"暖黃大燈一開，整張桌子都暖起來。",say:"好像在曬太陽"}]},
+  {id:"retbox",n:"卡住的還書箱",desc:"還書箱的投口被冰封住了。",kind:"gen",x:190,y:10,w:46,d:36,h:56,mz:100,draw:(sp,lk)=>box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:lk==="aunt"?"#2a9d8f":"#457b9d",data:`data-spot="retbox"`,art:{s:`<div style="position:absolute;left:15%;right:15%;top:16%;height:12%;background:${lk?"#1b263b":"#dff1ff"};border-radius:3px"></div><div style="position:absolute;inset:40% 10% 10%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:12px">還書</div>`+(lk?"":ART.frost)}})+(lk==="aunt"?bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+10,36,36,SP.sparkle()):""),tools:[
+    {n:"搖一搖",ic:"hand",p:10,hint:"箱子裡藏著被遺忘的東西。搖出什麼，就是什麼。",rand:[
+      {t:5,tag:"lucky",look:"open",msg:"搖出一條忘了還的圍巾，剛好給校長圍上。",say:"借我圍一下就好"},
+      {t:1,look:"open",msg:"搖出一本《冬天的童話》。",say:"應景"},
+      {t:-1,tag:"unlucky",look:"open",msg:"搖出一堆冰棒棍……是誰還的？",say:"這不是書吧"}]},
+    {n:"撬開",ic:"hammer",p:40,t:2,hint:"蠻力可以開門，但不保證門後的東西完好。",look:"open",msg:"撬開了，還書箱有點歪。",say:"阿姨不要生氣……"},
+    {n:"請圖書館阿姨",ic:"heart",p:60,t:4,hint:"她知道每一本書的位置，也知道每個箱子的脾氣。",look:"aunt",msg:"阿姨輕輕一按就開了，還順便泡了熱茶。",say:"阿姨萬歲"}]},
+  {id:"lrug",n:"冰涼的閱讀地毯",desc:"地毯被雪水浸濕，坐上去冰冰的。",kind:"floor",x:60,y:40,w:110,d:90,tools:[
+    {n:"鋪上厚地毯",ic:"rug",p:70,t:5,hint:"柔軟的厚毯。翻頁的聲音會變得很輕。",look:"rug",msg:"換上厚地毯，大家坐在地上讀書。",say:"好舒服"},
+    {n:"鋪舊報紙",ic:"paper",p:10,t:1,hint:"讀過的報紙，最後成了被踩的報紙。",look:"papers",msg:"鋪了一層報紙吸水，還是有點冰。",say:"還行"},
+    {n:"開冷氣除濕",ic:"snow",p:30,t:-3,fx:"freeze",hint:"書本最怕潮濕。校長最怕冷。只能二選一。",look:"frost",msg:"冷氣一開，書保住了，校長結冰了。",say:"書……比我……重要……"}]},
+  {id:"water",n:"結冰的飲水機",desc:"熱水出不來，只有冰塊卡在出水口。",kind:"gen",x:380,y:340,w:40,d:34,h:80,mz:150,draw:(sp,lk)=>{const ds=`data-spot="water"`;
+    let h=box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:lk==="new"?"#e9f2fb":"#d6dde5",data:ds,art:{s:ART.taps+(lk?"":ART.frost)}})+box({x:sp.x+8,y:sp.y+6,z:sp.h,w:24,d:22,h:28,c:"#9fd3ff",data:ds});
+    if(lk==="hot"||lk==="new")h+=bb(sp.x+sp.w/2,sp.y+sp.d,40,40,60,SP.steam());
+    if(lk==="filter"||lk==="new")h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+34,36,36,SP.sparkle());
+    return h;},tools:[
+    {n:"按下熱水鍵",ic:"hand",p:10,t:3,hint:"有時候，按下那顆紅色的按鈕就夠了。",look:"hot",msg:"按一下熱水鍵，咕嘟咕嘟……熱水出來了！",say:"原來熱水鍵在這裡"},
+    {n:"換新濾心",ic:"gear",p:60,t:2,hint:"乾淨的水。乾淨，不等於溫暖。",look:"filter",msg:"濾心換新了，水很乾淨，但還是冷的。",say:"很健康的冷水"},
+    {n:"整台換掉",ic:"box",p:120,t:4,hint:"新的飲水機，附贈一年保固。",look:"new",msg:"新飲水機到了，熱水冷水都有。",say:"終於有熱茶了"}]}
+ ]},
+{id:"health",name:"健康中心",ch:"健",col:"#e5383b",wall:"#e8f4f8",floor:"#cdd5df",floorImg:"repeating-conic-gradient(rgba(255,255,255,.25) 0 25%,transparent 0 50%) 0 0/60px 60px",
+ desc:"病床冷冰冰、熱水壺壞掉，護理師阿姨一直在搓手。",title:"健康中心的白衣天使",thanks:"護理師阿姨說，校長今天不用掛病號了！",
+ wallDeco:[{wall:"W",html:`<div class="plaque" style="left:20px;top:24px;width:130px;height:34px;background:#e5383b;color:#fff">健康中心</div>`}],
+ deco:[{col:[300,0,120,30],h:()=>box({x:300,y:0,w:120,d:30,h:140,c:"#f1f5f9",art:{s:ART.medCab}})}],
+ spots:[
+  {id:"bed",n:"冷冰冰的病床",desc:"床單像冰塊一樣，躺上去更不舒服。",kind:"gen",x:8,y:250,w:84,d:150,h:30,mz:90,draw:(sp,lk)=>{const ds=`data-spot="bed"`;
+    const top=!lk?ART.frost:lk==="eblanket"?`<div style="position:absolute;inset:6px;background:#ffb347;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 2px,transparent 2px 14px);border-radius:6px;box-shadow:0 0 12px #ffb347"></div>`:lk==="redcloth"?ART.red:"";
+    let h=box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:"#e3ebf3",data:ds,art:{t:`<div style="position:absolute;left:10px;right:10px;top:16px;height:26px;background:#fff;border-radius:8px"></div>`+top}})+box({x:sp.x,y:sp.y,w:sp.w,d:10,h:70,c:"#9fb4c7",data:ds});
+    if(lk==="hotwater")h+=bb(sp.x+sp.w/2,sp.y+90,sp.h,54,36,SP.hotbottle())+bb(sp.x+sp.w/2,sp.y+90,sp.h+16,30,46,SP.steam());
+    return h;},tools:[
+    {n:"加一條電毯",ic:"plug",p:90,t:5,hint:"插電的溫暖。拔掉插頭，就什麼都不剩。",look:"eblanket",msg:"電毯一開，病床暖洋洋。",say:"好想睡一下"},
+    {n:"灌一個熱水袋",ic:"fire",p:30,t:6,hint:"古老的溫暖。橡膠包著的，是最純粹的熱。",look:"hotwater",msg:"熱水袋塞進被窩，整張床都暖了。",say:"阿嬤家的味道"},
+    {n:"鋪上大紅被",ic:"blanket",p:60,t:4,hint:"阿嬤的被子，第三條。她到底有幾條？",look:"redcloth",msg:"大紅花被鋪上病床，健康中心變得好喜氣。",say:"像在過年"}]},
+  {id:"kettle",n:"壞掉的熱水壺",desc:"熱水壺不會燒水，護理師沒辦法泡熱茶。",kind:"gen",x:170,y:14,w:56,d:40,h:50,mz:120,draw:(sp,lk)=>{const ds=`data-spot="kettle"`;
+    let h=box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:"#b08968",data:ds,art:{s:ART.drawers}});
+    h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h,40,40,lk==="cooker"?SP.cooker():SP.kettle(lk==="steam"||lk==="ginger"?"#e76f51":"#c9d1da"),"click",ds);
+    if(lk==="steam"||lk==="cooker"||lk==="ginger")h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+30,40,60,SP.steam());
+    if(lk==="ginger")h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+60,40,40,SP.sparkle());
+    if(!lk)h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+34,30,30,SP.sparks());
+    return h;},tools:[
+    {n:"敲一敲",ic:"hand",p:10,hint:"敲擊之道，與拍擊之道同源。結果同樣難料。",rand:[
+      {t:6,tag:"lucky",look:"steam",msg:"敲了兩下，熱水壺咕嘟咕嘟地醒了。",say:"它只是在睡覺"},
+      {t:2,look:"steam",msg:"溫溫的，勉強能泡杯茶。",say:"溫開水也不錯"},
+      {t:0,tag:"unlucky",look:"dead",msg:"敲完之後，連指示燈都不亮了。",say:"對不起……"}]},
+    {n:"換新熱水壺",ic:"pot",p:80,t:5,hint:"嶄新的壺。燒水很快，忘得也很快。",look:"steam",msg:"新熱水壺三分鐘就燒開了。",say:"效率真好"},
+    {n:"用電鍋燒水",ic:"pot",p:40,t:5,hint:"大同電鍋。台灣人代代相傳的萬用法器。",look:"cooker",msg:"電鍋外鍋加水，按下開關，熱水和熱氣都有了！",say:"電鍋果然什麼都能做"}]},
+  {id:"icebox",n:"滿出來的冰敷冰箱",desc:"冰箱門關不上，冷氣一直跑出來。",kind:"gen",x:240,y:10,w:50,d:40,h:70,mz:120,draw:(sp,lk)=>{const ds=`data-spot="icebox"`;
+    let h=box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:lk==="new"?"#ffffff":"#e6edf3",data:ds,art:{s:`<div style="position:absolute;inset:8% 10%;border:2px solid #b8c3cc;border-radius:4px"></div>`+(!lk?'<div style="position:absolute;top:8%;bottom:8%;right:10%;width:22%;background:#1f2a3a"></div>':"")}});
+    if(!lk)h+=bb(sp.x+sp.w/2,sp.y+sp.d+10,30,60,40,SP.fog());
+    if(lk==="packs")h+=bb(sp.x+sp.w/2,sp.y+sp.d+26,0,90,30,SP.icepacks());
+    return h;},tools:[
+    {n:"冰敷袋全部拿出來排隊",ic:"snow",p:20,t:-3,fx:"freeze",hint:"整齊列隊的冰敷袋。校長會被誤認為傷患嗎？",look:"packs",msg:"冰敷袋排成一排……校長被誤認為傷患，全身敷滿了。",say:"我……沒有……受傷……"},
+    {n:"關好冰箱門",ic:"hand",p:10,t:3,hint:"最簡單的事，往往最常被忘記。",look:"closed",msg:"把冰敷袋塞好，冰箱門關上了。",say:"這麼簡單"},
+    {n:"換新冰箱",ic:"box",p:90,t:3,hint:"更大的冰箱。能裝更多的冰。這是好事嗎？",look:"new",msg:"新冰箱很大很安靜，跟關好門的舊冰箱一樣。",say:"嗯，很安靜"}]},
+  {id:"hwin",n:"漏風的窗戶",desc:"窗戶縫隙一直灌風，窗簾被吹得飄起來。",kind:"window",wall:"W",vx:210,vy:46,w:130,h:100,tools:[
+    {n:"拉上隔簾",ic:"curtain",p:25,t:4,hint:"病床旁的隔簾。它守護過無數個睡著的午後。",look:"curtain",msg:"把隔簾拉到窗邊，風被擋住了。",say:"隔簾也能這樣用"},
+    {n:"換新玻璃",ic:"glass",p:100,t:6,hint:"嶄新的窗。健康中心值得最好的。",look:"newglass",msg:"新窗戶裝好，又亮又暖。",say:"陽光真好"},
+    {n:"貼一片OK繃",ic:"heart",p:10,t:1,hint:"為窗戶貼上OK繃。它沒有好，但看起來被照顧了。",look:"tape",msg:"窗戶被貼上OK繃，風還是灌進來。",say:"心意到了……"}]},
+  {id:"scale",n:"亂跳的體重計",desc:"數字一直亂跳，最後停在「冷」。",kind:"gen",x:300,y:200,w:44,d:44,h:10,mz:60,draw:(sp,lk)=>box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:lk==="talk"?"#ffd166":"#e9eef3",data:`data-spot="scale"`,art:{t:`<div style="position:absolute;left:20%;right:20%;top:12%;height:26%;border-radius:3px;background:${lk?"#1b263b":"#9aa5b1"};color:#7fffb0;font:900 10px/1 monospace;display:flex;align-items:center;justify-content:center">${lk==="zero"?"0.0":lk?"??.?":""}</div>`+(lk?"":ART.frost)}})+(lk==="talk"?bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+20,40,60,SP.steam("#ffd0d0")):""),tools:[
+    {n:"站上去量一下",ic:"scale",p:10,t:3,hint:"真相就在腳下。你準備好了嗎？",look:"kg",msg:"校長站上去看了數字，臉一紅，全身都熱了。",say:"冬天胖一點是正常的！"},
+    {n:"校正歸零",ic:"gear",p:40,t:1,hint:"一切歸零。數字誠實了，房間沒有更暖。",look:"zero",msg:"體重計歸零，不再亂跳了。",say:"很準，很冷"},
+    {n:"換會說話的體重計",ic:"remote",p:70,t:5,hint:"它會大聲說出你的體重。大聲。",look:"talk",msg:"體重計大聲唸出數字，校長羞到全身發燙。",say:"這……這是祕密！"}]},
+  {id:"aid",n:"空空的急救箱",desc:"急救箱裡什麼都沒有了。",kind:"gw",wall:"N",vx:120,vy:50,w:80,h:64,tools:[
+    {n:"補一盒OK繃",ic:"heart",p:10,t:1,hint:"小小的傷口，小小的照顧。",look:"band",msg:"急救箱補滿OK繃了。",say:"有備無患"},
+    {n:"放進暖暖包",ic:"pack",p:30,t:4,hint:"急救箱裡的暖暖包。冬天最常被拿走的東西。",look:"pack",msg:"急救箱塞滿暖暖包，大家都來借。",say:"一人一個"},
+    {n:"阿嬤的薑茶",ic:"cup",p:50,t:6,hint:"薑、黑糖、時間。三者熬成的，是比藥更好的藥。",look:"tea",msg:"急救箱裡多了一壺熱薑茶，整間健康中心都是薑的香氣。",say:"喝了全身都暖了"}]}
+ ]},
+{id:"gym",name:"體育器材室",ch:"體",col:"#f77f00",wall:"#d9d4c7",floor:"#7d8a96",floorImg:"repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0 2px,transparent 2px 60px)",
+ desc:"鐵捲門關不上、軟墊結冰，籃球都凍成石頭了。",title:"器材室的熱血教練",thanks:"體育老師說：下一節課，全班跑操場暖身！",
+ wallDeco:[{wall:"W",html:`<div class="plaque" style="left:20px;top:24px;width:140px;height:34px;background:#f77f00;color:#fff">體育器材室</div>`}],
+ deco:[{col:[330,0,100,36],h:()=>box({x:330,y:0,w:100,d:36,h:90,c:"#8d99ae",art:{s:ART.cones}})}],
+ spots:[
+  {id:"shutter",n:"關不上的鐵捲門",desc:"鐵捲門卡在一半，風從下面狂灌。",kind:"gw",wall:"N",vx:60,vy:40,w:160,h:200,tools:[
+    {n:"用腳踹",ic:"kick",p:10,hint:"器材室的傳統修法。傳統，不代表有效。",rand:[
+      {t:5,tag:"lucky",look:"kick",msg:"一腳踹下去，鐵捲門應聲落下，完美密合！",say:"我還寶刀未老"},
+      {t:2,look:"half",msg:"踹了三腳，門降下一半。",say:"至少……有進步"},
+      {t:-1,tag:"unlucky",look:"half",msg:"門沒動，校長的腳倒是凍麻了。",say:"腳……沒知覺了"}]},
+    {n:"上潤滑油",ic:"oil",p:40,t:5,hint:"生鏽的軌道，只需要一點溫柔。",look:"oil",msg:"上了油，鐵捲門滑順地降下來。",say:"順！"},
+    {n:"換電動鐵捲門",ic:"remote",p:120,t:6,hint:"按一下就關。現代文明的奇蹟，也是預算的黑洞。",look:"auto",msg:"電動鐵捲門裝好，按一下就關。",say:"好有科技感"}]},
+  {id:"mats",n:"結冰的軟墊",desc:"軟墊表面結了一層冰，摸起來硬梆梆。",kind:"gen",x:20,y:250,w:90,d:120,h:40,mz:110,draw:(sp,lk)=>{const ds=`data-spot="mats"`,c=lk==="new"?"#e63946":"#3a7bd5";
+    if(lk==="fort")return box({x:sp.x,y:sp.y,w:sp.w,d:20,h:80,c,data:ds})+box({x:sp.x,y:sp.y+20,w:20,d:sp.d-20,h:80,c,data:ds})+box({x:sp.x+20,y:sp.y+20,w:sp.w-20,d:sp.d-20,h:14,c,data:ds})+bb(sp.x+60,sp.y+70,14,40,40,SP.sparkle());
+    return [0,1,2].map(i=>box({x:sp.x+i*2,y:sp.y+i*2,z:i*13,w:sp.w-i*4,d:sp.d-i*4,h:13,c:i%2?shade(c,.9):c,data:ds,art:{t:i===2&&!lk?ART.frost:""}})).join("");},tools:[
+    {n:"拍掉冰塊",ic:"hand",p:15,t:2,hint:"拍去表面的冰。底下的冷，仍在。",look:"clean",msg:"冰塊拍掉了，軟墊恢復軟軟的。",say:"可以坐了"},
+    {n:"疊成一座堡壘",ic:"box",p:20,t:5,hint:"軟墊堆成的城牆。小時候的堡壘，至今仍能抵擋寒冬。",look:"fort",msg:"軟墊疊成堡壘，校長躲進去，風完全吹不到。",say:"這是我的祕密基地"},
+    {n:"換新軟墊",ic:"cushion",p:80,t:3,hint:"鮮紅色的新軟墊。很新，很紅，很普通。",look:"new",msg:"新軟墊很漂亮，摸起來還是有點涼。",say:"顏色很熱情啦"}]},
+  {id:"balls",n:"凍成石頭的籃球",desc:"一整車籃球都凍得硬梆梆，拍不起來。",kind:"gen",x:200,y:120,w:64,d:50,h:34,mz:100,draw:(sp,lk)=>{const ds=`data-spot="balls"`;
+    let h=box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:"#6c7a89",data:ds,art:{s:'<div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 8px,rgba(0,0,0,.25) 8px 10px)"></div>'}});
+    h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h-6,76,44,SP.balls(lk?"#f08a24":"#8fa3b8",!lk),"click",ds);
+    if(lk==="warm"||lk==="dribble")h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+30,40,60,SP.steam());
+    if(lk==="new")h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h+34,36,36,SP.sparkle());
+    return h;},tools:[
+    {n:"運球二十下",ic:"ball",p:10,t:4,fx:"dance",hint:"最好的暖暖包，是自己的身體。",look:"dribble",msg:"校長抱起籃球運了二十下，全身熱起來，球也軟了！",say:"呼……呼……好熱！"},
+    {n:"打氣",ic:"wave",p:25,t:1,hint:"把空氣灌進去。冷的空氣。",look:"pump",msg:"球打飽氣了，但還是冰冰的。",say:"彈性有了，溫度沒有"},
+    {n:"換一車新球",ic:"box",p:90,t:2,hint:"全新的籃球。從倉庫裡搬出來，一樣冰。",look:"new",msg:"新球從倉庫搬出來……一樣是冰的。",say:"倉庫也很冷嘛"}]},
+  {id:"vault",n:"跳箱",desc:"跳箱的皮面結霜，摸起來像冰塊。",kind:"gen",x:300,y:200,w:90,d:50,h:64,mz:120,draw:(sp,lk)=>{const ds=`data-spot="vault"`;
+    let h=[0,1,2,3].map(i=>box({x:sp.x+i*3,y:sp.y+i*2,z:i*14,w:sp.w-i*6,d:sp.d-i*4,h:14,c:lk==="cover"?"#3a7bd5":"#c58a52",data:ds})).join("");
+    h+=box({x:sp.x+12,y:sp.y+8,z:56,w:sp.w-24,d:sp.d-16,h:10,c:lk==="cover"?"#2a5fb0":"#f1e6d0",data:ds,art:{t:lk?"":ART.frost}});
+    if(lk==="hide")h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,66,40,40,SP.sparkle());
+    if(lk==="jump")h+=bb(sp.x+sp.w/2,sp.y+sp.d/2,66,40,60,SP.steam());
+    return h;},tools:[
+    {n:"跳過去",ic:"star",p:10,t:3,fx:"dance",hint:"跳箱的意義，就是被跳過。",look:"jump",msg:"校長助跑、起跳、落地，十分！全身熱起來了。",say:"我年輕時是體育股長"},
+    {n:"拆開躲進去",ic:"box",p:20,t:5,hint:"跳箱內部，是器材室最溫暖的祕密基地。",look:"hide",msg:"把跳箱拆開，校長躲進裡面，暖呼呼的。",say:"這裡誰都找不到我"},
+    {n:"套上防塵套",ic:"blanket",p:50,t:2,hint:"保護跳箱的布套。保護的，是跳箱。",look:"cover",msg:"跳箱穿上藍色布套，不再結霜了。",say:"跳箱也要保暖"}]},
+  {id:"bucket",n:"運動員冰桶",desc:"比賽用的冰桶，冰塊一直沒倒掉。",kind:"gen",x:150,y:340,w:40,d:40,h:40,mz:90,draw:(sp,lk)=>{const ds=`data-spot="bucket"`;
+    const top=lk==="empty"?'<div style="position:absolute;inset:4px;border-radius:50%;background:#1f3a5a"></div>':lk==="foot"?'<div style="position:absolute;inset:4px;border-radius:50%;background:#ffb38a"></div>':`<div style="position:absolute;inset:4px;border-radius:6px;background:#dff1ff">${ART.frost}</div>`;
+    return box({x:sp.x,y:sp.y,w:sp.w,d:sp.d,h:sp.h,c:"#3a7bd5",data:ds,art:{t:top}})+(lk==="foot"?bb(sp.x+sp.w/2,sp.y+sp.d/2,sp.h,40,60,SP.steam()):"");},tools:[
+    {n:"教練式冰桶挑戰",ic:"snow",p:30,t:-4,fx:"freeze",hint:"勝利者的儀式。可惜今天沒有比賽。",look:"ice",msg:"一桶冰塊從頭淋下……校長成了冰雕。",say:"我們……贏了……嗎……"},
+    {n:"倒掉冰塊",ic:"hand",p:10,t:2,hint:"倒掉就好。真的，就這樣。",look:"empty",msg:"冰塊倒掉，器材室少了一個冷源。",say:"早該倒了"},
+    {n:"改成熱水泡腳桶",ic:"fire",p:60,t:6,hint:"從冰桶到泡腳桶。命運的轉折，只差一壺熱水。",look:"foot",msg:"倒進熱水，校長脫鞋泡腳，舒服到發出聲音。",say:"啊……人生……"}]},
+  {id:"ghole",n:"牆上的破洞",desc:"被球砸出來的洞，風一直灌。",kind:"hole",wall:"W",vx:280,vy:70,w:90,h:70,tools:[
+    {n:"掛上冠軍獎旗",ic:"frame",p:20,t:2,text:"全校<br>冠軍",hint:"去年的榮耀。它曾經在風中飄揚，如今為你擋風。",look:"poster",msg:"冠軍獎旗遮住破洞，器材室士氣大振。",say:"今年也要拿冠軍！"},
+    {n:"補水泥",ic:"trowel",p:90,t:5,hint:"專業的修補。牆會記得這份工整。",look:"plaster",msg:"破洞補得平平整整。",say:"很專業"},
+    {n:"塞進一顆舊排球",ic:"ball",p:10,t:3,hint:"破洞的形狀，恰好是一顆排球。巧合嗎？",look:"ball",msg:"一顆舊排球剛好塞滿破洞，嚴絲合縫。",say:"剛剛好！"}]}
+ ]}
+];
+const ROOM=id=>ROOMS.find(r=>r.id===id);
+
+/* 牆上自繪物件 */
+const GW={
+ mood:(lk)=>{const lvl=!lk?10:lk==="sun"?45:lk==="notes"?92:18,hot=lvl>40,c=hot?"#e63946":"#74c0fc";
+   return `<div style="position:absolute;inset:0;background:#fffdf7;border-radius:10px;border:4px solid #e9c46a;box-shadow:0 3px 6px rgba(0,0,0,.2)"></div><div style="position:absolute;left:4px;right:4px;top:8px;text-align:center;font-weight:900;color:#6b5a3a;font-size:12px">心情溫度計</div><div style="position:absolute;left:50%;margin-left:-7px;top:30px;bottom:28px;width:14px;border-radius:7px;background:#eee;border:2px solid #bbb;overflow:hidden"><i style="position:absolute;left:0;right:0;bottom:0;height:${lvl}%;background:${c}"></i></div><div style="position:absolute;left:50%;margin-left:-13px;bottom:8px;width:26px;height:26px;border-radius:50%;background:${c};border:2px solid #bbb"></div>`
+   +(!lk?ART.frost:"")+(lk==="sun"?'<div style="position:absolute;left:4px;top:30px;width:22px;height:22px;border-radius:50%;background:#ffd166;box-shadow:0 0 0 4px rgba(255,209,102,.4)"></div>':"")
+   +(lk==="notes"?[[2,34,"#ffd6a5"],[52,44,"#caffbf"],[4,80,"#a0c4ff"],[54,92,"#ffc6ff"],[6,112,"#fdffb6"]].map(([x,y,c])=>`<div style="position:absolute;left:${x}px;top:${y}px;width:22px;height:18px;background:${c};transform:rotate(${(x%7)-3}deg);box-shadow:0 1px 2px rgba(0,0,0,.2)"></div>`).join(""):"")
+   +(lk==="real"?'<div style="position:absolute;left:50%;margin-left:10px;top:34px;bottom:34px;width:8px;background:repeating-linear-gradient(#555 0 2px,transparent 2px 10px)"></div>':"");},
+ aid:(lk)=>`<div style="position:absolute;inset:0;background:#fff;border:3px solid #ccd5df;border-radius:6px"></div><div style="position:absolute;left:50%;top:4px;width:14px;height:14px;margin-left:-7px;background:linear-gradient(#e63946,#e63946) center/100% 5px no-repeat,linear-gradient(#e63946,#e63946) center/5px 100% no-repeat"></div>`
+   +(!lk?'<div style="position:absolute;inset:22px 8px 8px;background:#2a2f3a;border-radius:3px"></div>':
+     lk==="band"?'<div style="position:absolute;inset:22px 8px 8px;background:#f6f1e8;border-radius:3px;background-image:repeating-linear-gradient(90deg,#f3c8a5 0 10px,transparent 10px 14px)"></div>':
+     lk==="pack"?'<div style="position:absolute;inset:22px 8px 8px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px">'+'<i style="background:#ff8c42;border-radius:3px;box-shadow:0 0 8px rgba(255,140,66,.7)"></i>'.repeat(3)+'</div>':
+     '<div style="position:absolute;inset:22px 8px 8px;background:#fff3e0;border-radius:3px;display:flex;align-items:center;justify-content:center"><i style="width:22px;height:18px;background:#c1693c;border-radius:0 0 8px 8px;box-shadow:0 0 10px rgba(255,170,90,.8)"></i></div>'),
+ shutter:(lk)=>{const down=!lk?.55:lk==="half"?.75:1;
+   return `<div style="position:absolute;inset:0;background:#20252f;border:6px solid #5c6670;border-top-width:16px"></div><div style="position:absolute;left:6px;right:6px;top:16px;height:calc(${down*100}% - ${Math.round(down*22)}px);background:repeating-linear-gradient(#9aa5b1 0 10px,#7d8894 10px 12px)${lk==="oil"||lk==="auto"?",linear-gradient(120deg,transparent 30%,rgba(255,255,255,.5) 40%,transparent 50%)":""}"></div>`
+   +(down<1?`<div class="wind" style="top:${down*100-4}%"><i style="top:20%"></i><i style="top:55%;animation-delay:.4s"></i></div>`:"")
+   +(lk==="kick"?'<div style="position:absolute;left:30%;top:60%;width:26px;height:16px;border-radius:50%;background:rgba(0,0,0,.25)"></div>':"")
+   +(lk==="auto"?'<div style="position:absolute;right:-4px;top:-2px;width:30px;height:20px;background:#3f454f;border-radius:4px"><i style="position:absolute;right:6px;top:6px;width:8px;height:8px;border-radius:50%;background:#7fffb0"></i></div>':"");}
+};
+
+/* ===================== 失物 ===================== */
+const RELICS={
+ masterkey:{at:["office",78,262],n:"總務處的萬能鑰匙",ic:"key",desc:"沉甸甸的黃銅鑰匙。能打開學校的任何一扇門，也能鎖上任何一扇。",
+   use:["coop","autodoor"],tool:{n:"用萬能鑰匙鎖成手動門",ic:"key",t:8,look:"new",msg:"把失控的自動門鎖成手動門，冷風終於進不來了。",say:"早該這麼做了"}},
+ feather:{at:["res",400,250],n:"一根溫暖的羽毛",ic:"bread",desc:"白頭翁掉落的羽毛，摸起來竟然是溫的。也許牠在等誰歸還。",
+   use:["lab","birdbox"],tool:{n:"把羽毛歸還給白頭翁",ic:"bread",t:7,tag:"bird",look:"birdsglow",msg:"白頭翁一家飛回來，還帶了整群朋友擠在一起取暖。",say:"牠們回來報恩了！"}},
+ ladle:{at:["coop",392,300],n:"阿姨遺落的湯勺",ic:"pot",desc:"合作社阿姨用了三十年的湯勺。湯頭的祕密，都刻在它的凹痕裡。",
+   use:["health","kettle"],tool:{n:"用祕傳湯勺熬一壺薑茶",ic:"pot",t:9,look:"ginger",msg:"湯勺在壺裡攪了三圈，薑茶的香氣瞬間充滿健康中心。",say:"就是這個味道！"}},
+ solarcell:{at:["lab",165,250],n:"舊太陽能電池",ic:"sun",desc:"從屋頂拆下的太陽能電池。裡面儲存著某一個夏天的陽光。",
+   use:["music","light"],tool:{n:"接上夏天的陽光",ic:"sun",t:8,look:"glowbig",msg:"舞臺燈亮起夏天的顏色，整間教室暖得像暑假。",say:"暑假的感覺回來了！"}},
+ bell:{at:["music",300,110],n:"校貓的鈴鐺",ic:"paw",desc:"橘座項圈上掉下來的鈴鐺。據說搖響它，貓就會出現。據說。",
+   use:["res","beanbag"],tool:{n:"搖響鈴鐺",ic:"paw",t:8,tag:"cat",look:"cats",msg:"叮鈴一聲，三隻校貓從窗外跳進來，窩在懶骨頭上。",say:"真的出現了！"}},
+ scarf:{at:["lib",100,300],n:"畢業生留下的圍巾",ic:"scarf",desc:"某屆畢業生遺落在圖書館的圍巾，上面繡著「謝謝校長」。",
+   use:["lab","skel"],tool:{n:"圍上畢業生的圍巾",ic:"scarf",t:6,look:"scarf",msg:"骨骼模型圍上繡著「謝謝校長」的圍巾，校長看了眼眶泛紅。",say:"我……沒有哭"}},
+ frostpack:{at:["health",400,140],n:"結霜的暖暖包",ic:"pack",desc:"藥櫃深處找到的暖暖包。被冰封了一整個冬天，卻仍未失去溫度。",
+   use:["music","drum"],tool:{n:"把冰封的暖暖包塞進鼓裡",ic:"pack",t:7,look:"glow",msg:"暖暖包一解凍就熱得驚人，大鼓變成一座暖爐。",say:"鼓聲都變溫暖了"}},
+ screwdriver:{at:["gym",400,300],n:"老工友的螺絲起子",ic:"gear",desc:"老工友退休前留下的螺絲起子，握柄被磨得發亮。他說，每台機器都有自己的脾氣。",
+   use:["office","heater"],tool:{n:"以老工友的方式修理",ic:"gear",t:9,look:"glow",msg:"按照老工友的手法擰了三下，電暖器發出滿足的嗡嗡聲。",say:"老工友……謝謝你"}},
+ coin:{at:["map","pond"],n:"許願池的銅板",ic:"coin",desc:"從結冰的水池底撈起的銅板。不知是誰許下的願望，至今仍帶著體溫。",
+   use:["coop","hotdog"],tool:{n:"投進那枚許願的銅板",ic:"coin",t:8,look:"glownew",msg:"銅板投進熱狗機……它以畢生之力運轉起來！",say:"願望實現了！"}},
+ whistle:{at:["map","field"],n:"體育老師的哨子",ic:"whistle",desc:"掉在跑道上的銀色哨子。吹響它的人，會想起全力奔跑的感覺。",
+   use:["gym","balls"],tool:{n:"吹響哨子，全員運球",ic:"whistle",t:8,fx:"dance",look:"warm",msg:"哨聲一響，校長抱起籃球全場運球，熱到冒煙！",say:"再一圈！再一圈！"}}
+};
+const RELIC_N=Object.keys(RELICS).length;
+
+/* ===================== 地圖 ===================== */
+const MAPROOMS={office:{r:[352,316,38,30],pin:[371,306]},res:{r:[444,432,66,32],pin:[477,424]},coop:{r:[728,476,46,32],pin:[751,468]},
+  lab:{r:[485,75,215,74],pin:[600,70]},music:{r:[300,103,114,25],pin:[426,110]},lib:{r:[300,128,114,22],pin:[426,140]},
+  health:{r:[752,348,50,24],pin:[777,340]},gym:{r:[672,384,42,52],pin:[693,378]}};
+const MARKS={
+ field:{n:"操場",t:"寒風在跑道上一圈又一圈地奔跑，沒有人追得上它。"},
+ pond:{n:"水池",t:"結冰的水池。冰層底下，好像有什麼東西在發光。"},
+ center:{n:"活動中心",t:"鐵門深鎖。裡面傳來籃球彈跳的回音，卻空無一人。"},
+ tennis:{n:"網球場",t:"球網結滿冰柱，像一串垂落的風鈴。"},
+ courts:{n:"排球場",t:"排球網被風吹得鼓起來，像一面船帆。"},
+ kitchen:{n:"午餐廚房",t:"大鍋還是冷的。廚房阿姨說，等中午就會熱起來。"},
+ guard:{n:"傳達室",t:"警衛伯伯泡了一壺熱茶。他說這壺不分人，但杯子只有一個。"},
+ garden:{n:"會心園",t:"安靜的小庭園。據說在這裡說的心事，風會幫忙保密。"},
+ gate:{n:"校門",t:"寒流從校門口大搖大擺地走進來，沒有人攔得住。"},
+ backgate:{n:"後門",t:"白色手推門被凍住了。今天，誰也別想從這裡翹課。"},
+ stage:{n:"中興台",t:"司令台上空無一人。升旗典禮因寒流暫停。"},
+ dining:{n:"餐廳",t:"餐桌上留著半碗冷掉的湯。是誰的呢？"},
+ plaza:{n:"中庭",t:"中庭的花圃積了一層薄雪，麻雀在上面踩出小小的腳印。"}
+};
+function mapSVG(){
+  const g=(id,kind,inner)=>`<g class="${kind}" data-${kind==="mroom"?"room":"mark"}="${id}" tabindex="0">${inner}</g>`;
+  const t=(x,y,s,txt,c="#2b3440",w=700)=>`<text x="${x}" y="${y}" font-size="${s}" fill="${c}" font-weight="${w}" text-anchor="middle" dominant-baseline="middle">${txt}</text>`;
+  const garden=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#9fd08a"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="url(#snowdots)"/>`;
+  let s=`<defs><pattern id="snowdots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="4" cy="5" r="1.6" fill="#fff" opacity=".8"/><circle cx="13" cy="13" r="1.3" fill="#fff" opacity=".7"/></pattern>
+    <filter id="sh" x="-10%" y="-10%" width="130%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-opacity=".22"/></filter></defs>`;
+  s+=`<rect width="1000" height="690" fill="#cfe3c4"/><rect x="14" y="24" width="972" height="640" rx="14" fill="#ece5d6" stroke="#5b6b7a" stroke-width="6"/>`;
+  [[268,272,250,22],[880,265,395,22],[655,265,245,22],[86,382,128,22],[86,520,250,42],[230,520,140,42],[385,382,125,48],[525,382,125,48],[440,520,130,42],[690,520,110,40],[905,58,170,42],[1012,58,130,36],[12,170,68,46]].forEach(([x,y,w,h])=>s+=garden(x/2,y/2,w/2,h/2));
+  s+=garden(170,382,125,70)+garden(860,165,10,10);
+  [[904,44],[922,50],[947,46],[967,52],[455,40],[318,272],[455,630],[465,612]].forEach(([x,y])=>s+=`<circle cx="${x}" cy="${y}" r="11" fill="#4f9d5a"/><circle cx="${x-3}" cy="${y-3}" r="4" fill="#fff" opacity=".7"/>`);
+  // track
+  s+=g("field","mmark",`<rect class="bld" x="880" y="46" width="102" height="604" rx="51" fill="#d0875b" filter="url(#sh)"/><rect x="897" y="64" width="68" height="568" rx="34" fill="#86c46f"/><rect x="897" y="64" width="68" height="568" rx="34" fill="url(#snowdots)"/>${t(931,348,22,"操場","#fff",900)}`);
+  // courts
+  s+=g("tennis","mmark",`<rect class="bld" x="708" y="66" width="58" height="82" rx="4" fill="#9a2f2f" filter="url(#sh)"/>${t(737,108,15,"網球場","#fff")}`);
+  s+=`<rect x="768" y="60" width="94" height="17" rx="3" fill="#e9a6d6"/>${t(815,69,11,"看台")}<rect x="768" y="78" width="48" height="70" rx="3" fill="#a3602f"/>${t(792,113,12,"躲避球","#fff")}<rect x="818" y="78" width="44" height="70" rx="3" fill="#2f6e3b"/>${t(840,113,12,"籃球場","#fff")}`;
+  s+=g("courts","mmark",`<g class="bld">${[668,722,774].map(x=>`<rect x="${x}" y="167" width="40" height="70" rx="3" fill="#6f78d8" filter="url(#sh)"/>`).join("")}<rect x="826" y="167" width="38" height="70" rx="3" fill="#2f6e3b"/></g>${t(688,202,12,"排球","#fff")}${t(742,202,12,"排球","#fff")}${t(794,202,12,"排球","#fff")}${t(845,202,12,"籃球","#fff")}`);
+  // buildings
+  s+=g("center","mmark",`<rect class="bld" x="84" y="38" width="174" height="144" rx="6" fill="#5b84b1" filter="url(#sh)"/>${t(171,110,20,"活動中心","#fff",900)}`);
+  s+=`<rect x="300" y="70" width="128" height="104" rx="5" fill="#f2b9a0" filter="url(#sh)"/><rect x="414" y="70" width="14" height="104" fill="#c9a08d"/>${t(357,86,14,"演藝廳 3F")}<rect x="300" y="150" width="114" height="24" fill="#e6a68b"/>${t(357,162,11,"B1 重量訓練室・古箏")}`;
+  s+=`<rect x="485" y="75" width="215" height="74" rx="5" fill="#f7e9a0" filter="url(#sh)"/>`;
+  s+=`<rect x="72" y="290" width="752" height="84" rx="5" fill="#f6efd8" stroke="#d8cba6" stroke-width="2" filter="url(#sh)"/><path d="M72 318h752M72 346h752" stroke="#e1d6b7" stroke-width="2"/>${t(220,304,13,"201–210")}${t(220,332,13,"301–310")}${t(220,360,13,"101–108")}${t(570,304,13,"204–208・數資班")}${t(570,332,13,"304–312")}${t(570,360,13,"104–110")}<rect x="352" y="290" width="38" height="26" fill="#c9a6e8"/>${t(371,303,10,"會議室")}`;
+  s+=`<rect x="85" y="430" width="640" height="80" rx="5" fill="#f6efd8" stroke="#d8cba6" stroke-width="2" filter="url(#sh)"/><path d="M85 466h640" stroke="#e1d6b7" stroke-width="2"/>${t(200,448,12,"國際教室・本土語")}${t(320,448,12,"靜思書軒・教具室")}${t(610,448,12,"職探中心")}${t(200,492,12,"總務處・人事・會計")}${t(330,492,12,"教務處")}${t(450,492,12,"導師室・學務處")}${t(625,492,12,"輔導室")}`;
+  s+=`<rect x="655" y="384" width="160" height="126" rx="5" fill="#f6efd8" stroke="#d8cba6" stroke-width="2" filter="url(#sh)"/>${t(760,410,12,"正方形舞蹈教室")}${t(760,450,11,"長方形舞蹈教室")}`;
+  // landmarks
+  s+=g("dining","mmark",`<rect class="bld" x="774" y="476" width="40" height="32" fill="#ffe0b8"/>${t(794,492,12,"餐廳")}`);
+  s+=g("pond","mmark",`<circle class="bld" cx="374" cy="567" r="30" fill="#b8def7" stroke="#7fb3d5" stroke-width="4"/><path d="M360 560l10 6 8-8 6 10" stroke="#fff" stroke-width="2" fill="none"/>${t(374,610,13,"水池")}<g class="pondGlint">${S&&S.relics&&S.relics.coin?"":`<path class="twk" d="M392 548l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#fff6c7" stroke="#e0b100"/>`}</g>`);
+  s+=g("kitchen","mmark",`<rect class="bld" x="607" y="598" width="116" height="44" rx="4" fill="#b8e3f0" filter="url(#sh)"/>${t(665,620,15,"午餐廚房")}`);
+  s+=g("guard","mmark",`<rect class="bld" x="243" y="622" width="36" height="27" rx="3" fill="#f6e58d"/>${t(261,636,10,"傳達室")}`);
+  s+=`<rect x="104" y="627" width="138" height="22" rx="3" fill="#b9bec4"/>${t(173,638,12,"車棚")}<rect x="473" y="627" width="92" height="22" rx="3" fill="#b9bec4"/>${t(519,638,12,"車棚")}`;
+  s+=g("garden","mmark",`<rect class="bld" x="23" y="565" width="37" height="72" rx="4" fill="#bdbdbd"/>${t(41,601,12,"會心園")}`);
+  s+=g("stage","mmark",`<rect class="bld" x="852" y="305" width="18" height="48" rx="3" fill="#f2a8d8"/><text x="861" y="329" font-size="10" fill="#2b3440" font-weight="700" text-anchor="middle" dominant-baseline="middle" writing-mode="tb">中興台</text>`);
+  s+=g("plaza","mmark",`<circle class="bld" cx="362" cy="228" r="42" fill="#ddd6c8" stroke="#a8a196" stroke-width="8" stroke-dasharray="40 14"/>${t(362,228,12,"中庭")}`);
+  s+=g("gate","mmark",`<rect class="hit" x="320" y="650" width="110" height="36"/><rect x="335" y="660" width="80" height="10" rx="3" fill="#5b6b7a"/>${t(375,680,14,"校門",'#2b3440',900)}`);
+  s+=g("backgate","mmark",`<rect class="hit" x="350" y="6" width="90" height="30"/><rect x="360" y="20" width="70" height="8" rx="3" fill="#5b6b7a"/>${t(395,12,12,"後門",'#2b3440',900)}`);
+  // repairable rooms
+  const roomBld={office:"#d62828",res:"#2f9e7a",coop:"#f4a261",lab:"#f7e9a0",music:"#f08a6c",lib:"#e6a68b",health:"#9fd8cf",gym:"#f77f00"};
+  for(const [id,m] of Object.entries(MAPROOMS)){const room=ROOM(id),st=S.rooms[id],done=st&&st.done;const [x,y,w,h]=m.r;
+    const lbl=id==="lab"?`${t(592,100,15,"懿德樓")}${t(592,126,13,"2F 自然實驗室")}`:t(x+w/2,y+h/2,id==="office"||id==="coop"||id==="health"?10:id==="gym"?10:12,id==="gym"?"器材室":room.name,id==="office"||id==="res"||id==="gym"?"#fff":"#2b3440",800);
+    const pin=done?`<g transform="translate(${m.pin[0]},${m.pin[1]})"><circle r="11" fill="#ffd166" stroke="#fff" stroke-width="3"/><path d="M-5 0l3 4 7-8" stroke="#7a4b00" stroke-width="2.6" fill="none"/></g>`:`<g class="pin"><g transform="translate(${m.pin[0]-13},${m.pin[1]-30})">${inner(SP.marker()).replace(/^/,'<svg width="26" height="32" viewBox="0 0 44 54">')+'</svg>'}</g></g>`;
+    s+=g(id,"mroom",`<rect class="bld" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${roomBld[id]}" stroke="${done?"#ffd166":"#fff"}" stroke-width="${done?4:2}"/><rect class="hit" x="${x-8}" y="${y-30}" width="${w+16}" height="${h+38}"/>${lbl}${pin}`);
+  }
+  // field relic glint
+  if(!S.relics.whistle)s+=`<path class="twk" d="M948 470l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#fff6c7" stroke="#e0b100" pointer-events="none"/>`;
+  return s;
+}
+
+/* ===================== 狀態 ===================== */
+const KEY="savePrincipal_v3";
+function fresh(){return {money:0,rooms:{},relics:{},marks:{},ach:[],g:{freezes:0,catRooms:[],birdRooms:[],disco:false,totalCorrect:0,walk:0},qs:{c:{zh:0,en:0,ma:0},w:0,streak:0,maxStreak:0},mute:false,subj:null};}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.g&&s.relics)return s;}catch(e){}return null;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let S=load()||fresh();
+let curRoom=null;
+const newStats=()=>({c:{zh:0,en:0,ma:0},w:0,streak:0,maxStreak:0,t0:Date.now(),maxMoney:S.money,first:null,lucky:false,unlucky:false,time:0,tiers:[]});
+function rs(id){id=id||curRoom;if(!S.rooms[id])S.rooms[id]={fixed:{},temp:0,done:false,st:newStats()};return S.rooms[id];}
+const qst=()=>curRoom?rs().st:S.qs;
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toolTier(sp,i){if(typeof i==="string")return "relic";const ps=sp.tools.map(t=>t.p);return sp.tools[i].p===Math.min(...ps)?"cheap":sp.tools[i].p===Math.max(...ps)?"pro":"mid";}
+function toolResult(sp,f){if(typeof f.i==="string")return Object.assign({p:0},RELICS[f.i.slice(2)].tool);const t=sp.tools[f.i];return f.r>=0&&t.rand?Object.assign({},t,t.rand[f.r]):t;}
+
+/* ===================== 音效 ===================== */
+let actx;
+function beep(f=660,d=.12,type="sine",v=.12,delay=0){if(S.mute)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const t=actx.currentTime+delay,o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d);}catch(e){}}
+const sfx={ok:()=>{beep(660,.1);beep(880,.15,"sine",.12,.1);},no:()=>beep(220,.25,"triangle",.12),buy:()=>{beep(523,.08);beep(659,.08,"sine",.12,.08);beep(784,.15,"sine",.12,.16);},
+  freeze:()=>{beep(1200,.3,"triangle",.08);beep(900,.4,"triangle",.08,.15);},win:()=>{[523,659,784,1047].forEach((f,i)=>beep(f,.2,"square",.07,i*.14));},step:()=>beep(300,.04,"triangle",.03),
+  relic:()=>{[392,523,659,784].forEach((f,i)=>beep(f,.35,"sine",.08,i*.12));}};
+
+/* ===================== 共用 UI ===================== */
+(function(){let h="";for(let i=0;i<30;i++){const s=3+Math.random()*6;h+=`<span class="flake" style="left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${7+Math.random()*9}s;animation-delay:${-Math.random()*15}s;--dx:${Math.random()*80-40}px"></span>`;}$("#bgSnow").innerHTML=h;})();
+$$(".soulIc").forEach(e=>e.innerHTML=soulSvg(20));$("#thermoIc").innerHTML=ic("thermo");$("#bookIc").innerHTML=ic("book");
+$("#homeArt").innerHTML=`<svg viewBox="0 0 120 172" aria-label="發抖的校長"><rect x="17" y="88" width="16" height="44" rx="8" fill="#355c9b"/><rect x="87" y="88" width="16" height="44" rx="8" fill="#355c9b"/><rect x="42" y="132" width="14" height="32" rx="5" fill="#3b3b4f"/><rect x="64" y="132" width="14" height="32" rx="5" fill="#3b3b4f"/><ellipse cx="48" cy="166" rx="11" ry="5" fill="#222"/><ellipse cx="72" cy="166" rx="11" ry="5" fill="#222"/><rect x="29" y="80" width="62" height="62" rx="18" fill="#355c9b"/><path d="M49 80L60 104 71 80z" fill="#fff"/><path d="M57 84h6l2 20-5 7-5-7z" fill="#e63946"/><circle cx="31" cy="52" r="6" fill="#dbe8f6"/><circle cx="89" cy="52" r="6" fill="#dbe8f6"/><ellipse cx="60" cy="50" rx="29" ry="31" fill="#dbe8f6"/><path d="M31 47C29 22 45 13 60 13c17 0 32 9 29 34-3-11-9-16-17-16-8-5-22-4-28 1-6 2-11 8-13 15z" fill="#1d1d1f"/><g fill="none" stroke="#3a3a3a" stroke-width="2.3"><rect x="37" y="43" width="19" height="14" rx="5"/><rect x="64" y="43" width="19" height="14" rx="5"/><path d="M56 49h8"/></g><circle cx="46.5" cy="50.5" r="2.5" fill="#222"/><circle cx="73.5" cy="50.5" r="2.5" fill="#222"/><rect x="50" y="65" width="20" height="8" rx="2" fill="#fff" stroke="#7a2e2e" stroke-width="1.8"/><path d="M55 65v8M60 65v8M65 65v8" stroke="#7a2e2e" stroke-width="1.1"/><path d="M57 60q1 6 2 7 2-2 1-7z" fill="#9fd3ff"/><path d="M6 30l8 4M114 30l-8 4M4 50h8M116 50h-8" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`;
+function updateMoney(){$$(".soulNum").forEach(e=>e.textContent=S.money);}
+function updateBagNum(){$$(".bagNum").forEach(e=>e.textContent=`${Object.keys(S.relics).length}/${RELIC_N}`);}
+function show(id){$$(".screen").forEach(s=>s.classList.toggle("active",s.id===id));window.scrollTo(0,0);if(id==="room")requestAnimationFrame(fitStage);}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(!b)return;if(b.dataset.open==="bag")showBag();else showAchWall();});
+$("#btnStart").onclick=()=>{show("map");renderMap();};
+$("#btnHome").onclick=()=>show("home");
+$("#btnMapQuiz").onclick=openQuiz;
+function renderMute(){$("#btnMute").textContent=S.mute?"音效：關":"音效：開";}
+$("#btnMute").onclick=()=>{S.mute=!S.mute;save();renderMute();};
+let resetArm=0;$("#btnReset").onclick=()=>{const b=$("#btnReset");if(Date.now()-resetArm<4000){S=fresh();REV.clear();save();renderMute();updateMoney();updateBagNum();toast("已清除進度，重新開始！");b.textContent="清除進度重新開始";resetArm=0;}else{resetArm=Date.now();b.textContent="確定要清除？再點一次";setTimeout(()=>{if(resetArm&&Date.now()-resetArm>=3900){b.textContent="清除進度重新開始";resetArm=0;}},4000);}};
+$$(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m&&m.id!=="endModal"){m.classList.remove("show");if(m.id==="quizModal")closeQuiz();}}));
+
+/* ===================== 地圖畫面 ===================== */
+function renderMap(){
+  updateMoney();updateBagNum();$("#achCount").textContent=`${S.ach.length}/${ACH.length}`;
+  $("#campus").innerHTML=mapSVG();
+  const order=["office","res","coop","lab","music","lib","health","gym"];
+  $("#roomGrid").innerHTML=order.map(id=>{const r=ROOM(id),st=S.rooms[id];const n=st?Object.keys(st.fixed).length:0,tot=r.spots.length,done=st&&st.done;
+    return `<button class="room-card ${done?"done":""}" data-room="${id}">${badge(r.ch,r.col,40)}<h3>${r.name}</h3><p>${done?`已修好！稱號「${r.title}」`:r.desc}</p><div class="rbar"><i style="width:${n/tot*100}%"></i></div><div class="rs">${done?`最終 ${st.temp}℃`:n?`修繕中 ${n}/${tot} ・ ${st.temp}℃`:"尚未開始 ・ 0℃"}</div></button>`;}).join("");
+  const sc=$("#mapScroll");if(sc.scrollWidth>sc.clientWidth&&!sc.dataset.cent){sc.scrollLeft=(sc.scrollWidth-sc.clientWidth)*.4;sc.dataset.cent=1;}
+}
+$("#roomGrid").addEventListener("click",e=>{const c=e.target.closest("[data-room]");if(c)enterRoom(c.dataset.room);});
+$("#campus").addEventListener("click",e=>{const r=e.target.closest("[data-room]");if(r){enterRoom(r.dataset.room);return;}const m=e.target.closest("[data-mark]");if(m)showMark(m.dataset.mark);});
+$("#campus").addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const r=e.target.closest("[data-room]");if(r){e.preventDefault();enterRoom(r.dataset.room);return;}const m=e.target.closest("[data-mark]");if(m){e.preventDefault();showMark(m.dataset.mark);}});
+function showMark(id){
+  const mk=MARKS[id];const el=$("#mapMsg");
+  const relic=Object.entries(RELICS).find(([k,rl])=>rl.at[0]==="map"&&rl.at[1]===id&&!S.relics[k]);
+  S.marks[id]=(S.marks[id]||0)+1;save();
+  el.innerHTML=`<b>${mk.n}</b><span class="lore">${mk.t}</span>`;el.classList.add("show");
+  if(relic){collectRelic(relic[0]);renderMap();}
+  checkGlobal();
+}
+
+/* ===================== 碰撞與尋路 ===================== */
+const GR=10,GN=44,RAD=20;
+let OBS=[],FREE=null;
+function colOf(sp){
+  if(sp.wall||sp.nocol)return null;if(sp.col)return sp.col;
+  switch(sp.kind){case "floor":case "birdbox":case "pot":case "hotdog":return null;
+    case "skeleton":return [sp.x-14,sp.y-12,28,24];case "lamp":return [sp.x-20,sp.y-12,58,24];case "stagelight":return [sp.x-6,sp.y-6,34,34];}
+  return [sp.x,sp.y,sp.w||40,sp.d||40];
+}
+function buildObstacles(room){OBS=[];room.deco.forEach(d=>d.col&&OBS.push(d.col));room.spots.forEach(sp=>{const c=colOf(sp);if(c)OBS.push(c);});
+  FREE=new Uint8Array(GN*GN);for(let j=0;j<GN;j++)for(let i=0;i<GN;i++)FREE[j*GN+i]=freePt(i*GR+GR/2,j*GR+GR/2)?1:0;}
+function freePt(x,y){if(x<RAD||y<RAD||x>WW-RAD||y>WW-RAD)return false;for(const o of OBS)if(x>o[0]-RAD&&x<o[0]+o[2]+RAD&&y>o[1]-RAD&&y<o[1]+o[3]+RAD)return false;return true;}
+function los(ax,ay,bx,by){const d=Math.hypot(bx-ax,by-ay),n=Math.max(1,Math.ceil(d/3));for(let k=1;k<=n;k++){if(!freePt(ax+(bx-ax)*k/n,ay+(by-ay)*k/n))return false;}return true;}
+function findPath(tx,ty){
+  const ci=(x)=>Math.min(GN-1,Math.max(0,Math.floor(x/GR)));
+  let s=ci(P.y)*GN+ci(P.x);
+  if(!FREE[s]){let best=-1,bd=1e9;for(let k=0;k<FREE.length;k++)if(FREE[k]){const d=Math.hypot((k%GN)*GR+5-P.x,Math.floor(k/GN)*GR+5-P.y);if(d<bd){bd=d;best=k;}}if(best<0)return null;s=best;}
+  const prev=new Int32Array(GN*GN).fill(-2);prev[s]=-1;const q=[s];let best=s,bd=Math.hypot((s%GN)*GR+5-tx,Math.floor(s/GN)*GR+5-ty);
+  const D=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+  for(let h=0;h<q.length;h++){const c=q[h],x=c%GN,y=(c/GN)|0;
+    for(const [dx,dy] of D){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=GN||ny>=GN)continue;const n=ny*GN+nx;if(!FREE[n]||prev[n]!==-2)continue;
+      if(dx&&dy&&(!FREE[y*GN+nx]||!FREE[ny*GN+x]))continue;prev[n]=c;q.push(n);const d=Math.hypot(nx*GR+5-tx,ny*GR+5-ty);if(d<bd){bd=d;best=n;}}}
+  const cells=[];for(let c=best;c!==-1;c=prev[c])cells.push(c);cells.reverse();
+  let pts=cells.map(c=>[(c%GN)*GR+5,((c/GN)|0)*GR+5]);
+  if(freePt(tx,ty)&&pts.length&&los(pts[pts.length-1][0],pts[pts.length-1][1],tx,ty))pts.push([tx,ty]);
+  const out=[];let cx=P.x,cy=P.y,i=0;
+  if(!freePt(cx,cy)&&pts.length){out.push(pts[0]);[cx,cy]=pts[0];i=1;}
+  while(i<pts.length){let j=pts.length-1;while(j>i&&!los(cx,cy,pts[j][0],pts[j][1]))j--;out.push(pts[j]);[cx,cy]=pts[j];i=j+1;}
+  return {pts:out,dist:bd};
+}
+
+/* ===================== 校長 ===================== */
+const P={x:250,y:390,rot:-45,path:[],cb:null,walkCb:null};
+function principalHTML(){
+  const suit="#34558b",pants="#2f3240",hair="#1c1c1e",F="tsenw";
+  const face=`<svg viewBox="0 0 34 32" style="position:absolute;inset:0;width:100%;height:100%"><g fill="none" stroke="#2f2f2f" stroke-width="1.6"><rect x="4" y="10" width="11" height="8" rx="3"/><rect x="19" y="10" width="11" height="8" rx="3"/><path d="M15 13h4"/></g><circle cx="9.5" cy="14" r="1.6" fill="#222"/><circle cx="24.5" cy="14" r="1.6" fill="#222"/><ellipse cx="6" cy="21" rx="3" ry="1.8" fill="#ff8fa3" opacity=".55"/><ellipse cx="28" cy="21" rx="3" ry="1.8" fill="#ff8fa3" opacity=".55"/><path class="mS" d="M12 22q5 6 10 0z" fill="#fff" stroke="#7a2e2e" stroke-width="1.3"/><g class="mC"><rect x="11.5" y="21.5" width="11" height="4.5" rx="1" fill="#fff" stroke="#7a2e2e" stroke-width="1.1"/><path d="M14.5 21.5v4.5M17 21.5v4.5M19.5 21.5v4.5" stroke="#7a2e2e" stroke-width=".7"/></g><ellipse class="mO" cx="17" cy="24" rx="2.6" ry="3.2" fill="#7a2e2e"/><path class="snot" d="M15.5 18q.5 3 1 3.5 1-1 .5-3.5z" fill="#9fd3ff"/><path class="sweat" d="M30 3q3 4 0 6-3-2 0-6z" fill="#74c0fc"/></svg>`;
+  const shirt=`<svg viewBox="0 0 34 44" style="position:absolute;inset:0;width:100%;height:100%"><path d="M10 0l7 16 7-16z" fill="#fff"/><path d="M15 2h4l1.5 16-3.5 5-3.5-5z" fill="#e63946"/><circle cx="17" cy="30" r="1.6" fill="#ffd166"/><circle cx="17" cy="38" r="1.6" fill="#ffd166"/></svg>`;
+  return `<div class="p3" id="prPos"><div class="p3" id="prRot"><div class="p3" id="prBody"><div class="shadowE"></div>
+   <div class="p3" style="transform:translate3d(9px,9px,0)"><div class="p3 legS legL">${box({x:0,y:0,w:10,d:10,h:38,c:pants,f:F})}</div></div>
+   <div class="p3" style="transform:translate3d(23px,9px,0)"><div class="p3 legS legR">${box({x:0,y:0,w:10,d:10,h:38,c:pants,f:F})}</div></div>
+   ${box({x:4,y:4,z:38,w:34,d:20,h:44,c:suit,f:F,art:{s:shirt}})}
+   <div class="p3" style="transform:translate3d(-7px,9px,0)"><div class="p3 armS armL">${box({x:0,y:0,z:44,w:10,d:10,h:38,c:suit,f:F})}${box({x:1,y:1,z:36,w:8,d:8,h:8,skin:1,f:F})}</div></div>
+   <div class="p3" style="transform:translate3d(39px,9px,0)"><div class="p3 armS armR">${box({x:0,y:0,z:44,w:10,d:10,h:38,c:suit,f:F})}${box({x:1,y:1,z:36,w:8,d:8,h:8,skin:1,f:F})}</div></div>
+   ${box({x:4,y:1,z:82,w:34,d:28,h:32,skin:1,f:F,art:{s:face}})}
+   ${box({x:2,y:-1,z:110,w:38,d:32,h:9,c:hair,f:F,id:"prTop"})}${box({x:2,y:-1,z:88,w:38,d:7,h:24,c:hair,f:F})}
+   ${box({x:2,y:4,z:96,w:3,d:16,h:16,c:hair,f:F})}${box({x:37,y:4,z:96,w:3,d:16,h:16,c:hair,f:F})}${box({x:4,y:24,z:106,w:34,d:7,h:6,c:hair,f:F})}
+   ${box({x:-14,y:-12,w:70,d:56,h:140,f:F,cls:"ice",cols:{t:"rgba(230,245,255,.55)",s:"rgba(190,230,255,.45)",e:"rgba(160,210,250,.45)",n:"rgba(190,230,255,.3)",w:"rgba(190,230,255,.3)"}})}
+  </div></div></div>`;
+}
+function placePrincipal(){const pos=$("#prPos");if(!pos)return;pos.style.transform=`translate3d(${P.x-21}px,${P.y-15}px,0)`;$("#prRot").style.transform=`rotateZ(${P.rot}deg) scale3d(1.3,1.3,1.3)`;}
+function goTo(x,y,cb){const r=findPath(x,y);if(!r){P.path=[];return false;}P.path=r.pts;P.cb=cb||null;if(!P.path.length&&cb){P.cb=null;cb();}return r;}
+function face(x,y){P.rot=Math.atan2(y-P.y,x-P.x)*180/Math.PI-90;placePrincipal();}
+let lastT=0;
+function loop(t){
+  const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;const pr=$("#pr");
+  if(pr&&curRoom){
+    if(P.path.length&&!pr.classList.contains("frozen")){
+      let mv=150*dt;
+      while(mv>0&&P.path.length){const [tx,ty]=P.path[0],dx=tx-P.x,dy=ty-P.y,d=Math.hypot(dx,dy);
+        if(d<=mv){P.x=tx;P.y=ty;mv-=d;S.g.walk+=d;P.path.shift();}else{P.x+=dx/d*mv;P.y+=dy/d*mv;S.g.walk+=mv;P.rot=Math.atan2(dy,dx)*180/Math.PI-90;mv=0;}}
+      pr.classList.add("walking");
+      if(!P.path.length){pr.classList.remove("walking");if(P.cb){const c=P.cb;P.cb=null;c();}}
+      placePrincipal();
+    }else pr.classList.remove("walking");
+    scanRelics();
+  }
+  if($("#bubble").classList.contains("show"))posBubble();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+function posBubble(){const top=$("#prTop"),stg=$("#stage");if(!top)return;const a=top.getBoundingClientRect(),b=stg.getBoundingClientRect();const bub=$("#bubble");
+  let x=a.left+a.width/2-b.left,y=a.top-b.top-10;const half=bub.offsetWidth/2;x=Math.max(half+6,Math.min(b.width-half-6,x));y=Math.max(bub.offsetHeight+4,y);bub.style.left=x+"px";bub.style.top=y+"px";}
+let sayTimer;
+function say(txt,ms=2800){const b=$("#bubble");b.textContent=txt;b.classList.add("show");posBubble();clearTimeout(sayTimer);sayTimer=setTimeout(()=>b.classList.remove("show"),ms);}
+const IDLE={cold:["好……好冷……","鼻水要結冰了……","誰……可以去答幾題……","眼鏡結霜了……"],chilly:["有好一點了！再加油！","手指頭恢復知覺了","還差一點就舒服了！"],ok:["暖呼呼的，真舒服","這才是我的教室！","同學，你真厲害！"],hot:["有點太熱了吧……","我好像在洗三溫暖……"]};
+setInterval(()=>{if(!curRoom||!$("#room").classList.contains("active")||document.querySelector(".modal.show"))return;const pr=$("#pr");if(!pr||pr.classList.contains("frozen")||pr.classList.contains("dance")||P.path.length)return;const t=rs().temp;const k=t<6?"cold":t<16?"chilly":t<30?"ok":"hot";const a=IDLE[k];say(a[Math.floor(Math.random()*a.length)]);},9000);
+
+/* ===================== 失物探索 ===================== */
+const REV=new Set();let hintSaid=new Set();
+function roomRelics(id){return Object.entries(RELICS).filter(([k,rl])=>rl.at[0]===id);}
+function glintHTML(k,rl){return bb(rl.at[1],rl.at[2],4,46,46,SP.glint(),"click glint",`data-cache="${k}"`,`glint-${k}`);}
+function scanRelics(){
+  if(document.querySelector(".modal.show"))return;
+  for(const [k,rl] of roomRelics(curRoom)){
+    if(S.relics[k])continue;const d=Math.hypot(P.x-rl.at[1],P.y-rl.at[2]);
+    if(d<30){collectRelic(k);return;}
+    if(d<100&&!REV.has(k)){REV.add(k);const w=$("#world");if(w)w.insertAdjacentHTML("beforeend",glintHTML(k,rl));say("腳下……好像有什麼在發光。",2600);sfx.ok();}
+    else if(d<170&&!REV.has(k)&&!hintSaid.has(k)&&!P.path.length){hintSaid.add(k);say("這附近……好像有什麼東西。",2400);}
+  }
+}
+function collectRelic(k){
+  const rl=RELICS[k];if(S.relics[k])return;S.relics[k]="have";save();
+  const g=document.getElementById("glint-"+k);if(g)g.remove();sfx.relic();updateBagNum();if(curRoom)updateHUD();
+  $("#relicBody").innerHTML=`<p class="sh">拾得失物</p><div class="rico">${ic(rl.ic)}</div><div class="rn">${rl.n}</div><div class="rd">${rl.desc}</div><button class="btn btn-wide" id="relicOk">收進背包</button>`;
+  $("#relicModal").classList.add("show");$("#relicOk").onclick=()=>$("#relicModal").classList.remove("show");$("#relicOk").focus();
+  checkGlobal();
+}
+function showBag(){
+  const items=Object.entries(RELICS);const own=items.filter(([k])=>S.relics[k]);
+  $("#bagBody").innerHTML=`<p class="sh">背包</p><div class="rn" style="font-size:20px">失物 ${own.length} / ${RELIC_N}</div>
+    <div class="rd" style="font-size:13.5px">失物不會告訴你它該用在哪裡。修理時，適合的失物會自己出現在工具清單裡。</div>
+    <div class="bagList">${items.map(([k,rl])=>S.relics[k]?`<div class="bagItem"><div class="rico">${ic(rl.ic)}</div><div><b>${rl.n}</b><p>${rl.desc}</p><small>${S.relics[k]==="used"?"已使用":"尚未使用"}</small></div></div>`:`<div class="bagItem unknown"><div class="rico">?</div><div><b>？？？</b><p>還沒找到。</p></div></div>`).join("")}</div>
+    <button class="btn btn-wide" id="bagClose">關閉</button>`;
+  $("#bagModal").classList.add("show");$("#bagClose").onclick=()=>$("#bagModal").classList.remove("show");
+}
+
+/* ===================== 物件繪製 ===================== */
+function spotCenter(sp){
+  if(sp.wall){const vx=sp.vx+sp.w/2,vy=sp.vy+sp.h/2;const p=wallPos(sp.wall,vx,vy);
+    return {mx:sp.wall==="W"?14:p.x,my:sp.wall==="W"?p.y:14,mz:p.z+sp.h/2+10,tx:sp.wall==="W"?RAD+18:p.x,ty:sp.wall==="W"?p.y:RAD+18,fx:sp.wall==="W"?0:p.x,fy:sp.wall==="W"?p.y:0};}
+  const w=sp.w||40,d=sp.d||40;const cx=sp.x+(sp.kind==="skeleton"||sp.kind==="lamp"||sp.kind==="stagelight"?0:w/2),cy=sp.y+(sp.kind==="skeleton"||sp.kind==="lamp"||sp.kind==="stagelight"?0:d/2);
+  const zMap={skeleton:150,lamp:150,stagelight:180,floor:40,cbox:70};
+  return {mx:cx,my:cy,mz:sp.mz||zMap[sp.kind]||(sp.z||0)+(sp.h||40)+34,tx:cx,ty:sp.kind==="floor"?cy:cy,fx:cx,fy:cy};
+}
+function wallSpotHTML(sp,lk,tool){
+  const broken=!lk,ds=`data-spot="${sp.id}"`;
+  const wind=`<div class="wind"><i style="top:20%"></i><i style="top:50%;animation-delay:.4s"></i><i style="top:78%;animation-delay:.8s"></i></div>`;
+  const crk=`<svg class="crk" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="58,0 100,0 100,46 80,30 70,40 62,18" fill="#30476b"/><polyline points="62,18 45,30 30,24 18,40" stroke="#fff" stroke-width="2.5" fill="none"/><polyline points="70,40 60,62 72,80" stroke="#fff" stroke-width="2.5" fill="none"/><polyline points="45,30 40,55 20,70" stroke="#fff" stroke-width="2" fill="none"/></svg>`;
+  const tx=(tool&&tool.text)||"";
+  const over={tape:'<div class="tapeX"></div>',newglass:'<div class="shine"></div>',cardboard:`<div class="cardb">${tx||"請勿拆"}</div>`,poster:`<div class="poster">${tx}</div>`,curtain:'<div class="curt"><i></i><i></i></div>',seal:'<div class="seal"></div><div class="shine" style="opacity:.5"></div>',planks:'<div class="plank"><i></i><i></i><i></i></div>',plaster:'<div class="patch"></div>',foam:'<div class="foam"></div>',paper:'<div class="proll"></div>',new:'<div class="shine"></div>',ball:'<div class="vball"></div>'};
+  let inner="";const st=`left:${sp.vx}px;top:${sp.vy}px;width:${sp.w}px;height:${sp.h}px`;
+  if(sp.kind==="gw")inner=GW[sp.id==="mood"?"mood":sp.id==="aid"?"aid":"shutter"](lk);
+  else if(sp.kind==="window"){
+    const cover=lk==="cardboard"||lk==="poster"||lk==="curtain";
+    inner=`<div class="win">${broken?crk+wind:(lk==="tape"?crk:"")}${lk&&!cover?(over[lk]||""):""}</div><div class="sill"></div>${cover?over[lk]:""}`;
+    if(lk==="birds")inner+=`<div style="position:absolute;left:-6px;right:-6px;bottom:-14px;height:40px;z-index:5">${birdsSvg()}</div>`;
+  }else if(sp.kind==="hole"){inner=lk?(over[lk]||""):`<div class="hole"></div>${wind}`;if(lk==="ball")inner=`<div class="hole" style="opacity:.6"></div>`+over.ball;}
+  else if(sp.kind==="crack"){inner=broken?`<svg class="crackln" viewBox="0 0 100 130" preserveAspectRatio="none"><polyline points="50,0 40,20 58,40 38,62 55,84 42,106 52,130" stroke="#3b3b4a" stroke-width="5" fill="none"/><polyline points="58,40 75,48 88,44" stroke="#3b3b4a" stroke-width="3" fill="none"/></svg>${wind}`:(over[lk]||"");}
+  else if(sp.kind==="door"||sp.kind==="glassdoor"){
+    const g=sp.kind==="glassdoor";inner=`<div class="door ${g?"glass":""}">${g?'<div class="shine" style="opacity:.6"></div>':'<div class="knob"></div>'}</div>`;
+    if(broken)inner+=(g?'<div class="gapside" style="width:34%;background:#1a2233"></div>':'<div class="gap"></div>')+wind;
+    else if(lk==="paper")inner+='<div class="proll"></div>';else if(lk==="seal")inner+='<div class="sstrip"></div>';
+    else if(lk==="curtain")inner+='<div class="curt" style="inset:-6px -8px 0"><i></i><i></i><i></i></div>';
+    else if(lk==="closed")inner+='<div class="gapside" style="width:12%;background:#1a2233"></div>';else if(lk==="new")inner+='<div class="shine"></div>';
+  }else if(sp.kind==="ac"){
+    const air=lk==="off"?"":`<div class="air ${lk==="warm"||lk==="heater"?"warm":""}">${[10,30,50,70,90].map((l,i)=>`<i style="left:${l}%;animation-delay:${i*.2}s"></i>`).join("")}</div>`;
+    inner=`<div class="ac ${lk==="heater"?"hot":""}"></div>${air}`;
+  }
+  return `<div class="ws ${broken?"":"done"}" ${ds} style="${st}">${inner}</div>`;
+}
+function objHTML(sp,lk,tool){
+  if(sp.draw)return sp.draw(sp,lk,tool);
+  const ds=`data-spot="${sp.id}"`,{x,y}=sp,z=sp.z||0;let h="";
+  switch(sp.kind){
+   case "heater":{const hot=lk==="glow";
+     h+=box({x,y,z,w:sp.w,d:sp.d,h:sp.h,c:lk==="dead"?"#6b7280":hot?"#c96b3c":"#8a96a3",glow:hot,data:ds,art:{s:ART.grill(hot)}});
+     if(!lk)h+=bb(x+sp.w/2,y+sp.d,sp.h+6,34,34,SP.sparks());
+     if(hot)h+=bb(x+sp.w/2,y+sp.d/2,sp.h,40,60,SP.steam("#ffe3c2"));
+     if(lk==="fan")h+=bb(x+sp.w/2,y+sp.d/2,sp.h,54,90,SP.fan());break;}
+   case "chair":{const c=lk==="redcloth"?"#d62828":"#7b5034";
+     h+=box({x,y,w:sp.w,d:sp.d,h:sp.h,c,data:ds,art:{t:!lk?ART.spring:lk==="tape"?ART.tape:lk==="redcloth"?ART.red:"",s:lk==="redcloth"?ART.red:""}});
+     h+=box({x,y,z:sp.h,w:sp.w,d:10,h:46,c,data:ds,art:{s:lk==="redcloth"?ART.red:""}});
+     if(lk==="cushion")h+=box({x:x+4,y:y+12,z:sp.h,w:sp.w-8,d:sp.d-16,h:10,c:"#4d96ff",data:ds});break;}
+   case "floor":{const A={papers:ART.papers,rug:ART.rugTop,packs:ART.packs,puzzle:ART.puzzle,gel:ART.gel};
+     const art=(!lk||lk==="frost")?`<div style="position:absolute;inset:0;border-radius:20px;background:rgba(220,240,255,.55)">${ART.frost}</div>`:A[lk];
+     h+=floorDecal(x,y,sp.w,sp.d,`<div style="position:absolute;inset:0;cursor:pointer">${art}</div>`,ds);break;}
+   case "fridge":{const open=!lk;
+     h+=box({x,y,w:sp.w,d:sp.d,h:sp.h,c:"#eef2f6",data:ds,art:{s:ART.glassdoor(open)+(lk==="seal"?'<div style="position:absolute;inset:4%;box-shadow:inset 0 0 0 5px #59606b;border-radius:4px"></div>':""),t:'<div style="position:absolute;inset:8px;background:#5b9bd5;border-radius:4px"></div>'}});
+     if(open)h+=bb(x+sp.w/2,y+sp.d+10,40,60,40,SP.fog());break;}
+   case "pot":{
+     h+=box({x,y,z,w:sp.w,d:sp.d,h:sp.h,c:"#9aa5b1",data:ds,art:{t:!lk||lk==="ice"?`<div style="position:absolute;inset:4px;border-radius:6px;background:#dff1ff">${ART.frost}</div>`:'<div style="position:absolute;inset:4px;border-radius:6px;background:#c98b4a;background-image:radial-gradient(circle at 30% 40%,#f1e0c5 0 5px,transparent 6px),radial-gradient(circle at 65% 60%,#7a3b2e 0 5px,transparent 6px)"></div>'}});
+     if(lk==="steam"||lk==="steambig")h+=bb(x+sp.w/2,y+sp.d/2,z+sp.h,lk==="steambig"?60:40,lk==="steambig"?90:60,SP.steam());break;}
+   case "hotdog":{const hot=!!lk;
+     h+=box({x,y,z,w:sp.w,d:sp.d,h:sp.h,c:lk==="smoke"?"#5a4a42":"#d7dde4",glow:hot,data:ds,art:{s:ART.sausage(hot)}});
+     if(lk==="smoke")h+=bb(x+sp.w/2,y+sp.d/2,z+sp.h,50,70,SP.steam("#777"));
+     if(lk==="glownew")h+=bb(x+sp.w/2,y+sp.d/2,z+sp.h+20,40,40,SP.sparkle());break;}
+   case "cbox":{const flat=!lk,hh=flat?8:40;
+     h+=box({x,y,w:sp.w,d:sp.d,h:hh,c:"#c9965a",data:ds,art:{t:flat?'<div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.1) 0 3px,transparent 3px 10px)"></div>':`<div style="position:absolute;inset:5px;background:${lk==="blanketbox"?"#d62828":"#6b4a2a"};border-radius:3px"></div>`}});
+     if(lk==="catbox"){h+=bb(x+sp.w/2-10,y+sp.d/2,hh-6,52,46,SP.cat());h+=bb(x+sp.w/2+14,y+sp.d/2+8,hh-8,46,40,SP.cat("#555"));}break;}
+   case "table":{
+     h+=[[x+4,y+4],[x+sp.w-12,y+4],[x+4,y+sp.d-12],[x+sp.w-12,y+sp.d-12]].map(([lx,ly])=>box({x:lx,y:ly,w:8,d:8,h:sp.h-8,c:"#6c7a89"})).join("");
+     h+=box({x,y,z:sp.h-8,w:sp.w,d:sp.d,h:8,c:"#2f3640",data:ds,art:{t:!lk||lk==="fog"?ART.frost:lk==="mat"?'<div style="position:absolute;inset:6px;background:#2f9e44;border-radius:4px"></div>':""}});
+     h+=bb(x+30,y+30,sp.h,26,40,`<svg viewBox="0 0 26 40"><path d="M8 0h10v14l7 22a3 3 0 01-3 4H4a3 3 0 01-3-4l7-22z" fill="${!lk?"#cfe8ff":"#a5f3c3"}" stroke="#7a8a99" stroke-width="1.5"/></svg>`);
+     if(lk==="steam")h+=bb(x+sp.w/2,y+sp.d/2,sp.h,50,70,SP.steam());
+     if(lk==="fog")h+=bb(x+sp.w/2,y+sp.d/2,sp.h,90,50,SP.fog());break;}
+   case "skeleton":h+=bb(x,y,0,60,130,SP.skeleton(lk),"click",ds);break;
+   case "birdbox":{
+     h+=box({x:0,y:y-6,z:z-6,w:50,d:sp.d+12,h:6,c:"#8b5e3c"});
+     h+=box({x,y,z,w:sp.w,d:sp.d,h:sp.h,c:lk==="birds"||lk==="birdsglow"?"#c58a52":"#9c7a5a",glow:lk==="birdsglow",data:ds,art:{t:!lk?ART.hole:lk==="tape"?ART.tape:'<div style="position:absolute;inset:0;background:#c0392b"></div>'}});
+     if(lk==="birds"||lk==="birdsglow")h+=bb(x+sp.w/2,y+sp.d/2,z+sp.h,80,26,birdsSvg());break;}
+   case "lamp":{
+     h+=bb(x,y,0,46,64,lk?SP.plant():SP.plantDead(),"click",ds);
+     h+=box({x:x+30,y:y-2,w:6,d:6,h:120,c:"#555"});
+     h+=box({x:x-24,y:y-12,z:120,w:60,d:22,h:10,c:lk?"#ffd43b":"#3d3d3d",glow:!!lk,data:ds});
+     if(lk)h+=bb(x,y,10,lk==="glowbig"?110:80,110,SP.cone(lk==="glowbig"?"rgba(255,180,90,.5)":"rgba(255,230,120,.45)"));break;}
+   case "piano":{const top=lk==="redcloth"?ART.red:(!lk||lk==="snowy")?ART.frost:"";
+     h+=box({x,y,w:sp.w,d:sp.d,h:sp.h,c:lk==="redcloth"?"#d62828":"#1f1f24",data:ds,art:{s:lk==="redcloth"?ART.red:ART.keys,t:top}});
+     if(lk==="cats"){h+=bb(x+20,y+sp.d+20,0,46,40,SP.cat());h+=bb(x+65,y+sp.d+28,0,46,40,SP.cat("#555"));h+=bb(x+110,y+sp.d+20,0,46,40,SP.cat("#eee"));}
+     if(lk==="snowy")h+=bb(x+sp.w/2,y+sp.d/2,sp.h+10,90,50,SP.fog());break;}
+   case "stagelight":{
+     h+=box({x:x-4,y:y-4,w:30,d:30,h:6,c:"#444",data:ds});
+     h+=box({x:x+8,y:y+8,z:6,w:6,d:6,h:140,c:"#666"});
+     h+=box({x:x-8,y:y+2,z:146,w:38,d:20,h:20,c:lk?"#ffd43b":"#333",glow:!!lk,data:ds});
+     if(lk==="glow"||lk==="glowbig")h+=bb(x+10,y+10,8,lk==="glowbig"?120:90,140,SP.cone(lk==="glowbig"?"rgba(255,200,90,.5)":"rgba(255,235,140,.4)"));
+     if(lk==="disco")h+=bb(x-80,y-80,230,50,70,SP.disco());break;}
+   case "drum":{const art=!lk?ART.tear:lk==="tape"?ART.tape:'<div style="position:absolute;inset:4px;border-radius:50%;background:#fffaf0"></div>';
+     h+=box({x,y,w:sp.w,d:sp.d,h:sp.h,c:"#c0392b",glow:lk==="glow",data:ds,art:{t:`<div style="position:absolute;inset:0;background:#f1e6d0">${art}</div>`,s:'<div style="position:absolute;left:0;right:0;top:15%;height:10%;background:#f6c344"></div><div style="position:absolute;left:0;right:0;bottom:15%;height:10%;background:#f6c344"></div>'}});
+     if(lk==="new")h+=bb(x+sp.w/2,y+sp.d/2,sp.h+20,40,40,SP.sparkle());break;}
+  }
+  return h;
+}
+function spotExtras(sp,lk){if(!lk)return "";const c=spotCenter(sp);let h="";
+  if(lk==="cat")h+=bb(sp.vx+sp.w/2,RAD+6,0,62,54,SP.cat());
+  if(lk==="newglass"||(lk==="new"&&sp.wall))h+=bb(c.mx,c.my,c.mz-20,46,46,SP.sparkle());
+  return h;}
+
+/* ===================== 教室 ===================== */
+function enterRoom(id){
+  curRoom=id;const room=ROOM(id),r=rs(id);if(!r.done&&Object.keys(r.fixed).length===0)r.st=newStats();save();
+  [P.x,P.y]=room.spawn||[250,390];P.path=[];P.cb=null;P.rot=-45;hintSaid=new Set();
+  show("room");buildRoom();
+  setTimeout(()=>say(r.done?room.thanks:r.temp<6?"好……好冷……救救我……":"謝謝你又來幫忙了！"),400);
+}
+$("#btnMap").onclick=()=>{curRoom=null;$("#bubble").classList.remove("show");show("map");renderMap();};
+$("#btnQuiz").onclick=openQuiz;
+function buildRoom(){
+  const room=ROOM(curRoom),r=rs(),stage=$("#stage");
+  buildObstacles(room);
+  $("#roomName").textContent=room.name;stage.style.setProperty("--wall",room.wall);
+  let h=`<div id="floor" style="background:${room.floor};background-image:${room.floorImg||"none"}"><div class="cells">${'<div class="cell"></div>'.repeat(484)}</div></div>`;
+  const ws={W:"",N:""};
+  room.spots.filter(s=>s.wall).forEach(sp=>{const f=r.fixed[sp.id];const res=f?toolResult(sp,f):null;ws[sp.wall]+=wallSpotHTML(sp,res?res.look:null,res);});
+  const wd={W:"",N:""};(room.wallDeco||[]).forEach(d=>wd[d.wall]+=d.html);
+  h+=`<div class="wallW"><i class="fi"><div class="skirt"></div>${wd.W}${ws.W}</i></div><div class="wallN"><i class="fi"><div class="skirt"></div>${wd.N}${ws.N}</i></div>`;
+  room.deco.forEach(d=>h+=d.h());
+  let disco=false;
+  room.spots.forEach(sp=>{const f=r.fixed[sp.id];const res=f?toolResult(sp,f):null;const lk=res?res.look:null;
+    if(!sp.wall)h+=objHTML(sp,lk,res);h+=spotExtras(sp,lk);if(lk==="disco")disco=true;
+    if(!f){const c=spotCenter(sp);h+=bb(c.mx,c.my,c.mz,40,50,SP.marker(),"click marker",`data-spot="${sp.id}"`);}});
+  roomRelics(curRoom).forEach(([k,rl])=>{if(!S.relics[k]&&REV.has(k))h+=glintHTML(k,rl);});
+  h+=`<div class="p3" id="pr">${principalHTML()}</div>`;
+  $("#world").innerHTML=h;stage.classList.toggle("disco",disco);
+  placePrincipal();updateHUD();fitStage();
+}
+function updateHUD(){
+  const room=ROOM(curRoom),r=rs(),t=r.temp,n=Object.keys(r.fixed).length;
+  updateMoney();updateBagNum();
+  $("#tempText").textContent=`${t}℃`;
+  const f=$("#tempFill");f.style.width=Math.max(4,Math.min(100,(t+5)/40*100))+"%";
+  f.style.background=t<6?"linear-gradient(90deg,#74c0fc,#4dabf7)":t<16?"linear-gradient(90deg,#74c0fc,#ffd43b)":t<30?"linear-gradient(90deg,#ffd43b,#ff922b)":"linear-gradient(90deg,#ff922b,#f03e3e)";
+  $("#coldtint").style.opacity=Math.max(0,Math.min(1,(16-t)/16));
+  const rr=roomRelics(curRoom),fs=rr.filter(([k])=>S.relics[k]).length;
+  $("#progText").textContent=(r.done?`全部修好了！${n}/${room.spots.length}`:`修繕進度 ${n}/${room.spots.length}`)+`　・　失物 ${fs}/${rr.length}`;
+  const pr=$("#pr");if(pr){["cold","chilly","ok","hot"].forEach(c=>pr.classList.remove(c));pr.classList.add(t<6?"cold":t<16?"chilly":t<30?"ok":"hot");}
+  const n2=Math.max(0,Math.min(36,Math.round((22-t)*1.5)));let sh="";for(let i=0;i<n2;i++){const s=3+Math.random()*5;sh+=`<span class="sflake" style="left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${3+Math.random()*4}s;animation-delay:${-Math.random()*6}s;--dx:${Math.random()*60-10}px"></span>`;}
+  $("#snowLay").innerHTML=sh;
+}
+const LAND=()=>matchMedia("(orientation:landscape) and (min-width:600px)").matches;
+function fitStage(){
+  const st=$("#stage");if(!st||!$("#room").classList.contains("active"))return;
+  const W=st.clientWidth;let H;
+  if(LAND()){st.style.height="";H=st.clientHeight;}
+  else{const s0=Math.min(W/632,(window.innerHeight*.62)/548,1.4);H=Math.round(548*s0);st.style.height=H+"px";}
+  const s=Math.min(W/632,H/548);
+  $("#cam").style.transform=`translateY(${Math.round((H-548*s)/2+384*s)}px) scale(${s})`;
+}
+window.addEventListener("resize",fitStage);window.addEventListener("orientationchange",()=>setTimeout(fitStage,200));
+
+$("#stage").addEventListener("click",e=>{
+  const cg=e.target.closest("[data-cache]");if(cg){const rl=RELICS[cg.dataset.cache];goTo(rl.at[1],rl.at[2]);return;}
+  const sp=e.target.closest("[data-spot]");if(sp){openSpot(sp.dataset.spot);return;}
+  const cell=e.target.closest(".cell");if(!cell)return;
+  const idx=[...cell.parentNode.children].indexOf(cell);const cx=(idx%22)*20+10,cy=Math.floor(idx/22)*20+10;
+  const r=goTo(cx,cy);const b=$("#stage").getBoundingClientRect();const d=document.createElement("div");d.className="tapdot"+(r&&r.dist>20?" no":"");d.style.left=(e.clientX-b.left)+"px";d.style.top=(e.clientY-b.top)+"px";$("#stage").appendChild(d);setTimeout(()=>d.remove(),500);sfx.step();
+  if(r&&r.dist>20&&Math.random()<.5)say("那邊過不去喔",1400);
+});
+
+/* ===================== 修理 ===================== */
+let curSpot=null;
+function openSpot(id){
+  const room=ROOM(curRoom),sp=room.spots.find(s=>s.id===id),r=rs();if(!sp)return;
+  const c=spotCenter(sp);goTo(c.tx,c.ty,()=>face(c.fx,c.fy));
+  if(r.fixed[id]){const res=toolResult(sp,r.fixed[id]);say(`${sp.n}已經用「${res.n}」修好囉！`);return;}
+  curSpot=sp;
+  const rel=Object.entries(RELICS).filter(([k,rl])=>S.relics[k]==="have"&&rl.use[0]===curRoom&&rl.use[1]===sp.id);
+  $("#toolBody").innerHTML=`<div class="spot-h">${badge("修","#e5484d",50)}<div><h2>${sp.n}</h2><p>${sp.desc}</p></div></div>
+   <p style="margin:12px 2px 0;font-size:14px;color:#456;display:flex;align-items:center;gap:4px;flex-wrap:wrap">選一樣工具。只能修一次，效果用了才知道。目前有 ${soulSvg(16)}<b>${S.money}</b></p>
+   <div class="tools">${sp.tools.map((t,i)=>{const poor=S.money<t.p;return `<button class="tool ${poor?"poor":""}" data-t="${i}"><div class="tic">${ic(t.ic)}</div><div><div class="tn">${t.n}</div><div class="th lore">${t.hint}</div></div><div class="tp">${poor?`差 ${t.p-S.money}`:`${soulSvg(15)}${t.p}`}</div></button>`;}).join("")}
+   ${rel.map(([k,rl])=>`<button class="tool relic" data-t="R:${k}"><div class="tic">${ic(rl.tool.ic)}</div><div><div class="tn">${rl.tool.n}</div><div class="th lore">失物・${rl.n}</div></div><div class="tp">失物</div></button>`).join("")}</div>
+   <button class="btn btn-o btn-wide" id="spotQuiz">${CUR}不夠？去答題</button>
+   <button class="btn btn-ghost btn-wide" id="spotClose">先不修</button>`;
+  $("#toolModal").classList.add("show");
+  $("#toolBody .tools").onclick=e=>{const b=e.target.closest("[data-t]");if(b)useTool(b.dataset.t.startsWith("R:")?b.dataset.t:+b.dataset.t,b);};
+  $("#spotClose").onclick=()=>$("#toolModal").classList.remove("show");
+  $("#spotQuiz").onclick=()=>{$("#toolModal").classList.remove("show");openQuiz();};
+}
+function useTool(i,el){
+  const sp=curSpot,r=rs(),isR=typeof i==="string";const t=isR?Object.assign({p:0},RELICS[i.slice(2)].tool):sp.tools[i];
+  if(S.money<t.p){el.classList.add("shake");setTimeout(()=>el.classList.remove("shake"),400);sfx.no();return;}
+  S.money-=t.p;if(isR)S.relics[i.slice(2)]="used";
+  let ri=-1;if(!isR&&t.rand){ri=Math.floor(Math.random()*t.rand.length);const o=t.rand[ri];if(o.tag==="lucky")r.st.lucky=true;if(o.tag==="unlucky")r.st.unlucky=true;}
+  r.fixed[sp.id]={i,r:ri};const res=toolResult(sp,r.fixed[sp.id]);
+  r.temp+=res.t;r.st.tiers.push(toolTier(sp,i));if(!r.st.first)r.st.first={spot:sp.id,fx:t.fx||null};
+  if(t.fx==="freeze")S.g.freezes++;
+  if(t.tag==="cat"&&!S.g.catRooms.includes(curRoom))S.g.catRooms.push(curRoom);
+  if(t.tag==="bird"&&!S.g.birdRooms.includes(curRoom))S.g.birdRooms.push(curRoom);
+  if(t.tag==="disco")S.g.disco=true;
+  save();$("#toolModal").classList.remove("show");
+  const keep={rot:P.rot,path:P.path,cb:P.cb};buildRoom();P.rot=keep.rot;P.path=keep.path;P.cb=keep.cb;placePrincipal();sfx.buy();showReveal(sp,t,res,isR);
+  const pr=$("#pr");
+  if(t.fx==="freeze"){pr.classList.add("frozen");sfx.freeze();say(res.say,3200);setTimeout(()=>{const p=$("#pr");if(p)p.classList.remove("frozen");say("呼……解凍了。我沒事，繼續！",2200);},3300);}
+  else if(t.fx==="dance"){pr.classList.add("dance");say(res.say,3500);setTimeout(()=>{const p=$("#pr");if(p)p.classList.remove("dance");},t.tag==="disco"?6000:3000);}
+  else say(res.say,3000);
+  checkGlobal();
+  const room=ROOM(curRoom);
+  if(Object.keys(r.fixed).length===room.spots.length&&!r.done){
+    r.done=true;r.st.time=Math.round((Date.now()-r.st.t0)/1000);save();
+    setTimeout(()=>{const p=$("#pr");if(!p)return;p.classList.remove("frozen");p.classList.add("dance");sfx.win();confetti();say(room.thanks,4000);setTimeout(()=>{const p2=$("#pr");if(p2)p2.classList.remove("dance");showEnding();},2800);},3600);
+  }
+}
+let revealTimer;
+function showReveal(sp,t,res,isR){const el=$("#reveal"),d=res.t;
+  el.innerHTML=`<div class="tic" style="background:${isR?"#8a6d1d":"#4a5568"}">${ic(t.ic)}</div><div style="flex:1;min-width:0"><div class="rv-n">${sp.n}・${t.n}</div><div class="rv-m">${esc(res.msg)}</div></div><div class="rv-t ${d>=0?"up":"down"}">${d>=0?"+":""}${d}℃</div>`;
+  el.classList.add("show");clearTimeout(revealTimer);revealTimer=setTimeout(()=>el.classList.remove("show"),4200);}
+$("#reveal").onclick=()=>$("#reveal").classList.remove("show");
+function confetti(){const cs=["#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#c77dff"];for(let i=0;i<40;i++){const s=document.createElement("span");s.className="confetti";s.style.background=cs[i%5];s.style.left=Math.random()*100+"vw";s.style.animationDuration=(2+Math.random()*2)+"s";s.style.setProperty("--dx",(Math.random()*120-60)+"px");document.body.appendChild(s);setTimeout(()=>s.remove(),4200);}}
+let toastQ=[],toasting=false;
+function toast(t){toastQ.push(t);if(!toasting)nextToast();}
+function nextToast(){const t=toastQ.shift();if(!t){toasting=false;return;}toasting=true;const el=$("#toast");el.textContent=t;el.classList.add("show");setTimeout(()=>{el.classList.remove("show");setTimeout(nextToast,400);},2300);}
+
+/* ===================== 成就 ===================== */
+const sumC=r=>r.st.c.zh+r.st.c.en+r.st.c.ma;
+const topSubj=r=>Object.entries(r.st.c).sort((a,b)=>b[1]-a[1])[0][0];
+const nonRelic=r=>r.st.tiers.filter(t=>t!=="relic");
+const ACH=[
+ {id:"just",ch:"暖",col:"#f4a261",n:"剛剛好先生",d:"一個地方的最終溫度在 18～29℃",c:r=>r.temp>=18&&r.temp<30},
+ {id:"tropic",ch:"熱",col:"#e63946",n:"熱帶教室",d:"最終溫度達 30℃ 以上，校長開始找椰子水",c:r=>r.temp>=30},
+ {id:"cool",ch:"涼",col:"#4dabf7",n:"微涼派",d:"最終溫度低於 18℃，校長決定再穿一件",c:r=>r.temp<18},
+ {id:"cheap",ch:"省",col:"#2f9e63",n:"省錢達人",d:"整個地方都選最便宜的工具",c:r=>nonRelic(r).length&&nonRelic(r).every(t=>t==="cheap")},
+ {id:"pro",ch:"專",col:"#3f8cff",n:"專業師傅",d:"整個地方都選最貴的工具",c:r=>nonRelic(r).length&&nonRelic(r).every(t=>t==="pro")},
+ {id:"mid",ch:"創",col:"#f4a261",n:"創意修繕王",d:"整個地方都選中間價位的工具",c:r=>nonRelic(r).length&&nonRelic(r).every(t=>t==="mid")},
+ {id:"mix",ch:"雜",col:"#8d99ae",n:"什麼都試試看",d:"同一個地方裡，便宜、中等、最貴的工具都用過",c:r=>["cheap","mid","pro"].every(k=>r.st.tiers.includes(k))},
+ {id:"icefirst",ch:"冰",col:"#74c0fc",n:"開局冰雕藝術家",d:"第一次修理就讓校長結冰",c:r=>!!(r.st.first&&r.st.first.fx==="freeze")},
+ {id:"piggy",ch:"存",col:"#ff8fab",n:"小豬撲滿",d:`在一個地方存到 300 ${CUR}以上`,c:r=>r.st.maxMoney>=300},
+ {id:"all3",ch:"全",col:"#7b2cbf",n:"國英數全能",d:"同一個地方裡，三科都答對至少 3 題",c:r=>r.st.c.zh>=3&&r.st.c.en>=3&&r.st.c.ma>=3},
+ {id:"zhfan",ch:"文",col:"#e76f51",n:"國文魂",d:"國文答對最多，而且至少 6 題",c:r=>topSubj(r)==="zh"&&r.st.c.zh>=6},
+ {id:"enfan",ch:"英",col:"#2a9d8f",n:"英文通",d:"英文答對最多，而且至少 6 題",c:r=>topSubj(r)==="en"&&r.st.c.en>=6},
+ {id:"mafan",ch:"數",col:"#5e60ce",n:"數學腦",d:"數學答對最多，而且至少 6 題",c:r=>topSubj(r)==="ma"&&r.st.c.ma>=6},
+ {id:"streak",ch:"連",col:"#f77f00",n:"連對機器",d:"連續答對 8 題",c:r=>r.st.maxStreak>=8},
+ {id:"perfect",ch:"百",col:"#d4a017",n:"零失誤修繕師",d:"一題都沒錯就修好整個地方（至少答 6 題）",c:r=>r.st.w===0&&sumC(r)>=6},
+ {id:"grit",ch:"勇",col:"#c1121f",n:"越挫越勇",d:"答錯 5 題以上，還是把地方修好了",c:r=>r.st.w>=5},
+ {id:"flash",ch:"快",col:"#ffb703",n:"閃電修繕隊",d:"4 分鐘內修好一個地方",c:r=>r.st.time<240},
+ {id:"lucky",ch:"運",col:"#38b000",n:"手氣王",d:"碰運氣的工具開出最好的結果",c:r=>r.st.lucky},
+ {id:"oops",ch:"囧",col:"#6c757d",n:"今天不宜碰運氣",d:"碰運氣的工具開出冷冰冰的結果",c:r=>r.st.unlucky},
+ {id:"relicuse",ch:"歸",col:"#8a6d1d",n:"物歸其所",d:"用失物修好一樣東西",c:r=>r.st.tiers.includes("relic")},
+ {id:"scav",ch:"尋",col:"#6b5a3a",n:"拾荒者",d:"找到 3 件以上的失物",g:1,c:()=>Object.keys(S.relics).length>=3},
+ {id:"allrelic",ch:"藏",col:"#c9a24a",n:"失物招領處",d:`找到全部 ${RELIC_N} 件失物`,g:1,c:()=>Object.keys(S.relics).length>=RELIC_N},
+ {id:"tourist",ch:"遊",col:"#2a9d8f",n:"校園導覽員",d:"在地圖上點過 8 個不同的地方",g:1,c:()=>Object.keys(S.marks).length>=8},
+ {id:"icecream",ch:"棒",col:"#48cae4",n:"校長冰棒",d:"讓校長結冰 3 次（他都原諒你了）",g:1,c:()=>S.g.freezes>=3},
+ {id:"catlover",ch:"貓",col:"#f4a24c",n:"校貓認證貓奴",d:"在 3 個地方請校貓來幫忙",g:1,c:()=>S.g.catRooms.length>=3},
+ {id:"birder",ch:"鳥",col:"#8a6a4a",n:"校園鳥類觀察家",d:"在 2 個地方遇見校園小鳥",g:1,c:()=>S.g.birdRooms.length>=2},
+ {id:"disco",ch:"舞",col:"#c77dff",n:"校長舞王",d:"讓校長跳起 Disco",g:1,c:()=>S.g.disco},
+ {id:"walker",ch:"步",col:"#0096c7",n:"散步好夥伴",d:"陪校長走 500 步",g:1,c:()=>S.g.walk>=5000},
+ {id:"rich",ch:"富",col:"#e9c46a",n:"知識大富翁",d:"累計答對 50 題",g:1,c:()=>S.g.totalCorrect>=50},
+ {id:"allrooms",ch:"校",col:"#e76f51",n:"全校走透透",d:`${ROOMS.length} 個地方全部修好！`,g:1,c:()=>ROOMS.every(r=>S.rooms[r.id]&&S.rooms[r.id].done)}
+];
+function checkGlobal(){ACH.filter(a=>a.g&&!S.ach.includes(a.id)&&a.c()).forEach(a=>{S.ach.push(a.id);toast(`解鎖成就：${a.n}`);});save();}
+setInterval(()=>{if(curRoom)checkGlobal();},5000);
+
+/* ===================== 答題 ===================== */
+const Q={subj:null,deck:{zh:[],en:[],ma:[]},cur:null,t0:0,answered:false,timer:null};
+/* [題庫模式] 由平台傳入學生選的範圍題目，取代內建題庫；答案改由伺服器驗證 */
+if(window.GameBridge&&GameBridge.active){
+  const MAP={C:"zh",E:"en",M:"ma"};
+  QB.zh=[];QB.en=[];QB.ma=[];
+  GameBridge.questions().then(qs=>{
+    qs.forEach(q=>{const k=MAP[q.id.split("-")[0]];if(k)QB[k].push({bank:true,id:q.id,q:q.題幹,opts:q.選項,img:q.圖片});});
+    $$("#tabs button").forEach(b=>{b.hidden=!QB[b.dataset.s].length;});
+    const only=Object.keys(QB).filter(k=>QB[k].length);if(only.length===1)S.subj=only[0];
+  });
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function openQuiz(){
+  $("#quizModal").classList.add("show");
+  if(S.subj){setSubj(S.subj);return;}
+  $$("#tabs button").forEach(b=>b.classList.remove("on"));
+  $("#quizBody").innerHTML=`<div class="q-info"><span style="display:flex;align-items:center;gap:4px">${soulSvg(18)}<b>${S.money}</b> ${CUR}</span></div>
+    <div class="q-card"><div class="q-text">選一個科目開始收集${CUR}吧！</div><div class="pick">${Object.entries(SUBJ).filter(([k])=>QB[k].length).map(([k,v])=>`<button data-s="${k}" style="background:${v.c}">${v.n}</button>`).join("")}</div></div>
+    <p class="q-tip">答錯不扣${CUR}！隨時可以切換科目，或帶著${CUR}回去。</p><div class="q-actions"><button class="btn btn-o" id="qHome">回去</button></div>`;
+  $("#quizBody .pick").onclick=e=>{const b=e.target.closest("[data-s]");if(b)setSubj(b.dataset.s);};
+  $("#qHome").onclick=closeQuiz;
+}
+function closeQuiz(){clearInterval(Q.timer);$("#quizModal").classList.remove("show");updateMoney();if(curRoom)updateHUD();}
+$("#tabs").onclick=e=>{const b=e.target.closest("[data-s]");if(b)setSubj(b.dataset.s);};
+function setSubj(s){S.subj=s;Q.subj=s;save();$$("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.s===s));nextQ();}
+function nextQ(){
+  const s=Q.subj;if(!Q.deck[s].length)Q.deck[s]=shuffle([...QB[s].keys()]);
+  const q=QB[s][Q.deck[s].pop()];
+  if(q.bank){Q.cur={id:q.id,q:q.q,opts:q.opts,ans:null,exp:"",img:q.img};}
+  else{const order=shuffle([0,1,2,3]);Q.cur={q:q[0],opts:order.map(i=>q[1][i]),ans:order.indexOf(q[2]),exp:q[3]};}Q.answered=false;Q.t0=Date.now();
+  const st=qst();
+  $("#quizBody").innerHTML=`<div class="q-info"><span style="display:flex;align-items:center;gap:4px">${soulSvg(18)}<b id="qMoney">${S.money}</b> ${CUR}</span><span class="timer" id="qTimer">0 秒</span><span id="qStreak">${st.streak>=2?`連對 ${st.streak}`:""}</span></div>
+    <div class="q-card"><div class="q-sub">${SUBJ[s].n}練習</div><div class="q-text">${esc(Q.cur.q)}</div>${Q.cur.img?`<img src="${esc(Q.cur.img)}" alt="題目圖片" style="max-width:100%;max-height:220px;display:block;margin:0 auto 10px;background:#fff;border-radius:8px">`:""}
+    <div class="opts">${Q.cur.opts.map((o,i)=>`<button class="opt" data-i="${i}"><b>${"ABCD"[i]}</b>${esc(o)}</button>`).join("")}</div><div class="feedback" id="qFb"></div></div>
+    <div class="q-actions"><button class="btn btn-b" id="qNext" disabled>下一題 →</button><button class="btn btn-o" id="qHome">帶著${CUR}回去</button></div>
+    <p class="q-tip">8 秒內答對 +50 ・ 15 秒內 +40 ・ 其他 +30 ・ 答錯不扣</p>`;
+  $("#quizBody .opts").onclick=e=>{const b=e.target.closest("[data-i]");if(b)answer(+b.dataset.i);};
+  $("#qNext").onclick=nextQ;$("#qHome").onclick=closeQuiz;
+  clearInterval(Q.timer);Q.timer=setInterval(()=>{const el=(Date.now()-Q.t0)/1000,t=$("#qTimer");if(!t)return;t.textContent=`${Math.floor(el)} 秒`;t.className="timer"+(el>15?" slow":el>8?" mid":"");},250);
+}
+async function answer(i){
+  if(Q.answered)return;Q.answered=true;clearInterval(Q.timer);
+  if(Q.cur.id){$$(".opt").forEach(b=>b.disabled=true);
+    try{const r=await GameBridge.check(Q.cur.id,i);Q.cur.ans=r.答案;Q.cur.exp=r.解析||"";}
+    catch(e){Q.answered=false;$$(".opt").forEach(b=>b.disabled=false);toast("無法驗證答案："+e.message);return;}}
+  const el=(Date.now()-Q.t0)/1000,ok=i===Q.cur.ans,st=qst(),fb=$("#qFb");
+  $$(".opt").forEach((b,k)=>{b.disabled=true;if(k===Q.cur.ans)b.classList.add("right");else if(k===i)b.classList.add("wrong");});
+  if(ok){const rew=el<=8?50:el<=15?40:30;S.money+=rew;st.c[Q.subj]++;st.streak++;st.maxStreak=Math.max(st.maxStreak,st.streak);if("maxMoney" in st)st.maxMoney=Math.max(st.maxMoney,S.money);S.g.totalCorrect++;
+    fb.className="feedback ok";fb.innerHTML=`<b>✓ 答對了！${CUR} +${rew}</b>${rew===50?"　神速加碼！":""}${st.streak>=3?`　連對 ${st.streak} 題！`:""}<br><span style="font-size:14px;color:#555">${esc(Q.cur.exp)}</span>`;
+    $("#qMoney").textContent=S.money;$("#qStreak").textContent=st.streak>=2?`連對 ${st.streak}`:"";coin(`+${rew}`);sfx.ok();updateMoney();
+    const mb=$("#moneyBox");mb.classList.remove("bump");void mb.offsetWidth;mb.classList.add("bump");}
+  else{st.w++;st.streak=0;fb.className="feedback no";fb.innerHTML=`<b>差一點點！</b>正確答案是「${esc(Q.cur.opts[Q.cur.ans])}」<br><span style="font-size:14px;color:#555">提示：${esc(Q.cur.exp)}</span><br><span style="font-size:13px;color:#888">沒關係，不扣${CUR}！下一題加油</span>`;$("#qStreak").textContent="";sfx.no();}
+  save();checkGlobal();$("#qNext").disabled=false;$("#qNext").focus({preventScroll:true});
+}
+function coin(t){const q=$("#qMoney");const rc=q?q.getBoundingClientRect():{left:innerWidth/2,top:80};const s=document.createElement("div");s.className="coin";s.textContent=t;s.style.left=rc.left+"px";s.style.top=rc.top+"px";document.body.appendChild(s);setTimeout(()=>s.remove(),1000);}
+
+/* ===================== 結算 ===================== */
+function achRow(a,un,isNew){return `<div class="ach ${un?"":"locked"}">${badge(un?a.ch:"？",un?a.col:"#adb5bd",42)}<div><div class="an">${un?a.n:"？？？"}${isNew?'<span class="new">NEW</span>':""}</div><div class="ad">${a.d}</div></div></div>`;}
+function showEnding(){
+  const room=ROOM(curRoom),r=rs();const got=ACH.filter(a=>!a.g&&a.c(r)),newIds=[];
+  got.forEach(a=>{if(!S.ach.includes(a.id)){S.ach.push(a.id);newIds.push(a.id);}});
+  ACH.filter(a=>a.g&&a.c()).forEach(a=>{if(!S.ach.includes(a.id)){S.ach.push(a.id);newIds.push(a.id);got.push(a);}});
+  save();const m=Math.floor(r.st.time/60),s=r.st.time%60,all=ROOMS.every(x=>S.rooms[x.id]&&S.rooms[x.id].done);
+  $("#endBody").innerHTML=`<div class="end-head">${badge(room.ch,room.col,64)}<h2>${room.name} 修繕完成！</h2><p>獲得稱號：<b>${room.title}</b></p><p>校長：「${esc(room.thanks)}」</p></div>
+    <div class="stats"><div>最終溫度<b>${r.temp}℃</b></div><div>花費時間<b>${m} 分 ${s} 秒</b></div><div>答對題數<b>${sumC(r)} 題</b></div><div>最高連對<b>${r.st.maxStreak} 題</b></div></div>
+    <div class="sec-t">這裡的趣味成就</div><div class="achs">${got.length?got.map(a=>achRow(a,true,newIds.includes(a.id))).join(""):achRow({ch:"芽",col:"#2f9e63",n:"慢慢來也很棒",d:"下一個地方試試不同的工具吧！"},true,false)}</div>
+    ${all?`<div class="sec-t" style="text-align:center">${ROOMS.length} 個地方全部修好了！校長頒給你「全校最溫暖的人」獎狀！</div>`:""}
+    <button class="btn btn-b btn-wide" id="endBack">${all?"看看成就牆":"回校園地圖，修下一個地方"}</button><button class="btn btn-ghost btn-wide" id="endStay">留下來陪校長散步、找失物</button>`;
+  $("#endModal").classList.add("show");
+  $("#endBack").onclick=()=>{$("#endModal").classList.remove("show");curRoom=null;show("map");renderMap();if(all)showAchWall();};
+  $("#endStay").onclick=()=>$("#endModal").classList.remove("show");
+}
+function showAchWall(){
+  $("#achBody").innerHTML=`<div class="end-head">${badge("榮","#d4a017",60)}<h2>成就牆</h2><p>已解鎖 ${S.ach.length} / ${ACH.length}（沒有分數，只有樂趣）</p></div>
+    <div class="sec-t">地點稱號</div><div class="achs">${ROOMS.map(r=>{const d=S.rooms[r.id]&&S.rooms[r.id].done;return achRow({ch:r.ch,col:r.col,n:r.title,d:`修好「${r.name}」`},d,false);}).join("")}</div>
+    <div class="sec-t">趣味成就</div><div class="achs">${ACH.map(a=>achRow(a,S.ach.includes(a.id),false)).join("")}</div><button class="btn btn-b btn-wide" id="achClose">關閉</button>`;
+  $("#achModal").classList.add("show");$("#achClose").onclick=()=>$("#achModal").classList.remove("show");
+}
+renderMute();updateMoney();updateBagNum();
+</script>
+
+</body></html>

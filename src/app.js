@@ -8,6 +8,7 @@ const { shuffle } = require('./util');
 const { createAdminRouter, sameOriginGuard } = require('./admin');
 const { adminAuth, loginRoutes } = require('./auth');
 const { createWorkspaceRouter } = require('./workspace');
+const { lanAddresses } = require('./lan');
 const { createPublicGameRouter, createAdminGameRouter, createPreviewRouter } = require('./games');
 
 class HttpError extends Error {
@@ -108,6 +109,13 @@ function createApp(cfg) {
   app.use(createPreviewRouter(cfg));
   loginRoutes(app, cfg);
   app.use(createPublicGameRouter(cfg));
+
+  // 手機掃碼用：同一個 Wi-Fi 下連到這台電腦的網址
+  app.get('/api/lan', (req, res) => {
+    const port = req.socket.localPort || cfg.port;
+    res.set('Cache-Control', 'no-store');
+    res.json({ 網址: lanAddresses().map((ip) => `http://${ip}:${port}`) });
+  });
 
   // 版本與範圍樹（只有題數，不含題目內容與 ID）
   app.get('/api/tree', async (req, res) => {

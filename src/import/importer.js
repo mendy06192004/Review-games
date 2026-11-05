@@ -114,7 +114,7 @@ async function processFile(cfg, item, opts = {}) {
         } else if (q.有圖) {
           const box = questionBox(ex, q, qs[qi + 1]);
           const page = box && ex.頁面.find((p) => p.編號 === box.頁);
-          if (page) buf = await cropFigure(page.png, [0.03, box.上, 0.97, box.下]);
+          if (page) buf = await cropFigure(page.png, [box.左, box.上, box.右, box.下], 0.004);
           else if (ex.內嵌圖片.length) {
             // Word：依題目順序對應「[圖N]」
             const tag = String(q.題幹).match(/\[(圖\d+)\]/);
@@ -198,7 +198,11 @@ async function processFile(cfg, item, opts = {}) {
   return record;
 }
 
-/** 找出某題在 PDF 頁面上的範圍（從題號那一行到下一題開始，或頁尾） */
+/**
+ * 找出某題「圖」在 PDF 頁面上的範圍：只留圖（含圖上的標註字），不含題幹和選項。
+ * 做法：在「這題題號那一行」到「下一題」之間，找出畫出來的線條、色塊、圖片，合併後稍微留白。
+ * 找不到圖形時，退回「題幹與選項之間的空白處」，再不行才截整題。
+ */
 function questionBox(ex, q, next) {
   if (!q.頁 || !ex.頁行) return null;
   const lines = ex.頁行[q.頁 - 1] || [];
@@ -215,9 +219,51 @@ function questionBox(ex, q, next) {
     const n = findLine(norm(next.題幹), next.原題號);
     if (n && n.上 > start.上) end = n.上;
   }
-  const top = Math.max(0, start.上 - 0.006);
-  const bottom = Math.min(1, end != null ? end - 0.01 : Math.min(start.上 + 0.45, 0.97));
-  return bottom - top > 0.02 ? { 頁: q.頁, 上: top, 下: bottom } : null;
+  const bandTop = start.上;
+  const bandBottom = end != null ? end : Math.min(start.上 + 0.45, 0.97);
+  const inBand = (b) => (b.上 + b.下) / 2 > bandTop && (b.上 + b.下) / 2 < bandBottom;
+  const pad = 0.012;
+  const clamp = (b) => ({ 頁: q.頁, 左: Math.max(0, b.左 - pad), 右: Math.min(1, b.右 + pad), 上: Math.max(0, b.上 - pad), 下: Math.min(1, b.下 + pad) });
+
+  // 1. 用畫出來的圖形定位
+  const gs = ((ex.頁圖形 || [])[q.頁 - 1] || []).filter(inBand);
+  if (gs.length) {
+    const u = gs.reduce((a, g) => ({ 左: Math.min(a.左, g.左), 右: Math.max(a.右, g.右), 上: Math.min(a.上, g.上), 下: Math.max(a.下, g.下) }));
+    // 把貼在圖旁邊的短標註（A、B、6 cm…）也包進來
+    const near = 0.025;
+    // 題幹（從左邊界開始的行）不算標註
+    const isStem = (l) => l === start || (l.左 != null && start.左 != null && Math.abs(l.左 - start.左) < 0.006 && l.上 < u.上);
+    for (const l of lines) {
+      if (l.左 == null || !inBand(l) || isStem(l) || l.文字.replace(/\s/g, '').length > 12) continue;
+      if (l.右 < u.左 - near || l.左 > u.右 + near || l.下 < u.上 - near || l.上 > u.下 + near) continue;
+      u.左 = Math.min(u.左, l.左); u.右 = Math.max(u.右, l.右); u.上 = Math.min(u.上, l.上); u.下 = Math.max(u.下, l.下);
+    }
+    // 上緣不可蓋到圖上方的題幹
+    const stemBottom = Math.max(0, ...lines.filter((l) => inBand(l) && isStem(l) && l.下 != null && l.下 <= u.上 + 0.005).map((l) => l.下));
+    if (u.右 - u.左 > 0.03 && u.下 - u.上 > 0.02) {
+      const c = clamp(u);
+      c.上 = Math.max(c.上, stemBottom + 0.002);
+      return c;
+    }
+  }
+
+  // 2. 沒有可辨識的圖形（例如掃描檔）：取題幹最後一行與選項第一行之間的空白
+  const body = lines.filter((l) => l.上 >= bandTop && l.上 < bandBottom).sort((x, y) => x.上 - y.上);
+  const opt = body.find((l) => /^[（(]\s*[A-DＡ-Ｄ]\s*[)）]|^[A-D][.．、]|^[①②③④]/.test(l.文字.trim()));
+  const stem = body.filter((l) => !opt || l.上 < opt.上);
+  let gapTop = bandTop;
+  let gapBottom = opt ? opt.上 : bandBottom;
+  for (let i = 0; i < stem.length; i++) {
+    const below = i + 1 < stem.length ? stem[i + 1].上 : gapBottom;
+    const bottom = stem[i].下 != null ? stem[i].下 : stem[i].上 + 0.02;
+    if (below - bottom > 0.05) { gapTop = bottom; gapBottom = below; break; }
+  }
+  if (gapBottom - gapTop > 0.05 && gapTop > bandTop) return { 頁: q.頁, 左: 0.03, 右: 0.97, 上: gapTop, 下: Math.min(1, gapBottom) };
+
+  // 3. 最後才截整題
+  const top = Math.max(0, bandTop - 0.006);
+  const bottom = Math.min(1, end != null ? end - 0.01 : bandBottom);
+  return bottom - top > 0.02 ? { 頁: q.頁, 左: 0.03, 右: 0.97, 上: top, 下: bottom } : null;
 }
 
 async function appendLog(cfg, record) {

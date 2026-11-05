@@ -1,6 +1,8 @@
 // 學生端流程：學科 → 遊戲 →（使用題庫的遊戲才需要）版本 → 年級與冊 → 章節 → 開始 → 全螢幕遊戲
-import { runGame } from './games/host.js';
-import { SANDBOX } from './games/_shared/iframe-game.js';
+import { runGame } from './games/host.js?v=20261105';
+import { SANDBOX } from './games/_shared/iframe-game.js?v=20261105';
+
+window.__appStarted = true;
 
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, props = {}, ...kids) => {
@@ -381,6 +383,7 @@ $('#other-mode').addEventListener('click', () => pickSubject(S.subject, S.subjec
 $('#restart').addEventListener('click', buildVersions);
 
 initHome().then(() => show('subject')).catch((e) => {
+  $('#subject-cards').dataset.ok = 'err';
   $('#subject-cards').replaceChildren(el('p', { className: 'msg', textContent: '無法載入：' + e.message + '（請按 Ctrl+F5 重新整理；若還是不行，請看黑色視窗有沒有紅字）' }));
   show('subject');
 });

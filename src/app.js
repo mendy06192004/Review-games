@@ -184,10 +184,10 @@ function createApp(cfg) {
 
   app.use('/api', (req, res) => res.status(404).json({ error: `沒有這個 API：${req.method} ${req.originalUrl}` }));
   app.use('/media', express.static(cfg.imageDir, { dotfiles: 'ignore', maxAge: 0 }));
-  // 遊戲檔很少變動：讓瀏覽器快取 1 天（仍會用 ETag 檢查是否有更新）
+  // 每次都用 ETag 向伺服器確認（沒變就回 304，不重新下載），避免更新後瀏覽器還在用舊檔
   // _shared 允許跨來源載入：上傳的遊戲在沙盒（另一個來源）中也要能用 bridge.js
   app.use('/games/_shared', (req, res, next) => { res.set('Access-Control-Allow-Origin', '*'); next(); });
-  app.use('/games', express.static(path.join(__dirname, '..', 'public', 'games'), { maxAge: '1d' }));
+  app.use('/games', express.static(path.join(__dirname, '..', 'public', 'games'), { maxAge: 0 }));
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
   // eslint-disable-next-line no-unused-vars

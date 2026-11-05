@@ -37,7 +37,7 @@ export async function runGame(meta, questions, root, { onFinish, onExit }) {
   };
   // 上傳的遊戲（外部）沒有 game.js，直接以沙盒 iframe 包裝
   const factory = meta.外部
-    ? (await import('./_shared/iframe-game.js')).iframeGame(meta.入口, { sandbox: true })
+    ? (await import('./_shared/iframe-game.js?v=20261105')).iframeGame(meta.入口, { sandbox: true })
     : (await import(meta.入口)).default;
   const game = factory(host);
   current = game;

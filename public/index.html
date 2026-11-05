@@ -138,13 +138,15 @@
     (function () {
       function fail(msg) {
         var box = document.getElementById('subject-cards');
-        if (!box || box.dataset.ok === '1') return;
+        if (!box || box.dataset.ok) return; // 已成功或已顯示錯誤，就不要蓋掉
+        box.dataset.ok = 'err';
         box.innerHTML = '<p class="msg" style="grid-column:1/-1">' + msg + '</p>';
       }
-      window.addEventListener('error', function (e) { fail('網頁程式出現錯誤：' + (e.message || '未知錯誤') + '。請按 F12 查看 Console，或重新解壓縮最新版後再啟動。'); });
+      window.addEventListener('error', function (e) { fail('網頁程式出現錯誤：' + (e.message || '未知錯誤') + '。請按 Ctrl+Shift+Delete 清除「快取圖片和檔案」後重新整理。'); });
       setTimeout(function () {
         var box = document.getElementById('subject-cards');
-        if (box && box.querySelector('.zone') === null) fail('學科資料還沒有載入。請確認黑色視窗仍在執行，並開啟 <a href="/api/games">/api/games</a> 看是否有資料；若網頁程式沒有載入，請重新解壓縮最新版。');
+        if (!window.__appStarted) fail('網頁程式沒有啟動，可能是瀏覽器用了舊的快取檔。請按 Ctrl+Shift+Delete，勾選「快取圖片和檔案」後清除，再重新整理。');
+        else fail('學科資料讀取太久。請確認黑色視窗仍在執行，並開啟 <a href="/api/tree">/api/tree</a> 看是否有資料。');
       }, 8000);
     })();
   </script>

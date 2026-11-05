@@ -1,5 +1,5 @@
 // 後台：遊戲管理（新增、審核、發布、下架、預覽）
-import { iframeGame } from '/games/_shared/iframe-game.js';
+import { iframeGame } from '/games/_shared/iframe-game.js?v=20261105';
 
 const $ = (s, r = document) => r.querySelector(s);
 const el = (tag, props = {}, ...kids) => {

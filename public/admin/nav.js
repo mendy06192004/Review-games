@@ -13,7 +13,7 @@
   var brand = document.createElement('a');
   brand.href = '/admin/';
   brand.className = 'brand';
-  brand.innerHTML = '<span class="seal">習</span>後台';
+  brand.innerHTML = '<span class="seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.2 5 7.6 4.5 4 4.8v13.4c3.6-.3 6.2.2 8 1.7 1.8-1.5 4.4-2 8-1.7V4.8c-3.6-.3-6.2.2-8 1.7z"/><path d="M12 6.5v13.4"/></svg></span>後台';
   var nav = document.createElement('nav');
   nav.className = 'tabs';
   var badges = {};

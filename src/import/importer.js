@@ -1,14 +1,15 @@
 'use strict';
 /**
- * 題目匯入流程：待匯入/ → 抽取 → Claude 整理 → 待審核/（草稿）→ 原檔移到 來源/版本/年級/ → 記錄 老師/投稿紀錄.json
+ * 題目匯入流程：待匯入/ → 抽取文字 → 自動拆題與分類 → 待審核/（草稿）→ 原檔移到 來源/版本/年級/ → 記錄 老師/投稿紀錄.json
  * 絕對不會寫入 題目/：草稿必須經過 /admin 人工審核才會移入。
  */
 const fs = require('fs');
 const fsp = fs.promises;
 const path = require('path');
 const { extract, cropFigure, SUPPORTED_EXT } = require('./extract');
-const { callClaude, offlineParse } = require('./claude');
+const { offlineParse } = require('./parse');
 const D = require('../drafts');
+const { hintsFromName, guessSubject, guessDifficulty } = require('./classify');
 
 const toPosix = (p) => p.split(path.sep).join('/');
 
@@ -42,17 +43,6 @@ async function scanImportDir(cfg) {
   return out.sort((a, b) => a.rel.localeCompare(b.rel));
 }
 
-function chunksOf(ex, item, size) {
-  const base = { 檔名: item.name, 方式: ex.方式 };
-  if (!ex.頁面.length || ex.頁面.length <= size) return [{ ...base, 文字: ex.文字, 頁面: ex.頁面, 內嵌圖片: ex.內嵌圖片 }];
-  const chunks = [];
-  for (let i = 0; i < ex.頁面.length; i += size) {
-    const pages = ex.頁面.slice(i, i + size);
-    const text = (ex.頁文字 || []).slice(i, i + size).map((t, k) => (t ? `=== 第 ${i + k + 1} 頁 ===\n${t}` : '')).filter(Boolean).join('\n\n');
-    chunks.push({ ...base, 文字: text, 頁面: pages, 內嵌圖片: [] });
-  }
-  return chunks;
-}
 
 const nonEmpty = (v) => (typeof v === 'string' && v.trim() ? v.trim() : null);
 
@@ -67,73 +57,81 @@ async function processFile(cfg, item, opts = {}) {
     log(`  抽取方式：${ex.方式}${ex.頁面.length ? `，${ex.頁面.length} 頁` : ''}${ex.內嵌圖片.length ? `，內嵌圖片 ${ex.內嵌圖片.length} 張` : ''}`);
 
     const hints = { ...item.hints };
-    const claudeHints = { 科目: hints.科目, 版本: hints.版本, 年級: hints.年級 };
-    const parsed = { 題目: [], 備註: [], 模型: null };
-    const chunks = chunksOf(ex, item, cfg.claude.pagesPerRequest || 6);
-    for (const [i, chunk] of chunks.entries()) {
-      log(`  ${opts.offline ? '離線規則解析' : '交給 Claude 整理'}${chunks.length > 1 ? `（第 ${i + 1}/${chunks.length} 段）` : ''}…`);
-      const r = opts.offline
-        ? offlineParse(chunk, claudeHints)
-        : await (opts.callClaude || callClaude)(chunk, claudeHints, cfg.claude);
-      parsed.題目.push(...(r.題目 || []));
-      if (r.備註) parsed.備註.push(r.備註);
-      parsed.模型 = r.模型 || parsed.模型;
-    }
+    log('  依題號與選項自動拆題、分類…');
+    const parsed = { 題目: [], 備註: [], 模型: 'offline-rules' };
+    const r = offlineParse({ 文字: ex.文字 });
+    parsed.題目.push(...r.題目);
+    if (r.備註) parsed.備註.push(r.備註);
 
     const used = await D.collectUsedIds(cfg);
     const subjectByName = Object.fromEntries(Object.entries(cfg.subjects).map(([k, v]) => [v, k]));
+    // 自動分類：資料夾 > 檔名 > 題目內容
+    const fromFile = hintsFromName(cfg, item.name);
+    const fromHead = hintsFromName(cfg, (ex.文字 || '').replace(/=== 第 \d+ 頁 ===/g, '').slice(0, 200)); // 考卷開頭的標題
+    const fromName = Object.fromEntries(Object.keys(fromFile).map((k) => [k, fromFile[k] || fromHead[k]]));
+    const allText = parsed.題目.map((q) => `${q.題幹} ${(q.選項 || []).join(' ')}`).join('\n');
+    const fileSubject = (hints.科目 && subjectByName[hints.科目]) || (fromName.科目 && subjectByName[fromName.科目]) || guessSubject(cfg, allText);
     const drafts = [];
-    for (const q of parsed.題目) {
+    const qs = parsed.題目;
+    for (const [qi, q] of qs.entries()) {
       const key = D.newDraftKey();
       const review = new Set((q.不確定 || []).filter(Boolean));
 
-      const subject = q.科目代碼 && cfg.subjects[q.科目代碼] ? q.科目代碼 : (hints.科目 ? subjectByName[hints.科目] : null);
-      const version = nonEmpty(hints.版本) || nonEmpty(q.版本);
-      const rawGrade = nonEmpty(hints.年級) || nonEmpty(q.年級);
+      const subject = (q.科目代碼 && cfg.subjects[q.科目代碼] ? q.科目代碼 : null) || fileSubject || guessSubject(cfg, `${q.題幹} ${(q.選項 || []).join(' ')}`);
+      const version = nonEmpty(hints.版本) || nonEmpty(fromName.版本) || nonEmpty(q.版本);
+      const rawGrade = nonEmpty(hints.年級) || nonEmpty(fromName.年級) || nonEmpty(q.年級);
       const grade = D.normalizeGrade(cfg, rawGrade) || rawGrade;
       const gcode = D.gradeCode(cfg, grade);
       const id = subject && gcode ? D.allocateId(used, subject, gcode) : null;
       if (!subject) review.add('科目');
       if (!id) review.add('id');
 
-      const options = (q.選項 || []).map((s) => String(s).trim()).filter(Boolean);
+      const options = (q.選項 || []).map((x) => String(x).trim()).filter(Boolean);
       if (options.length < 2) review.add('選項');
-      let answer = Number.isInteger(q.答案) && q.答案 >= 0 && q.答案 < options.length ? q.答案 : null;
+      const answer = Number.isInteger(q.答案) && q.答案 >= 0 && q.答案 < options.length ? q.答案 : null;
       if (answer === null) review.add('答案');
 
-      const scope = { 版本: version, 年級: grade, 冊: nonEmpty(q.冊), 章: nonEmpty(q.章), 節: nonEmpty(q.節) };
+      const scope = { 版本: version, 年級: grade, 冊: nonEmpty(q.冊) || nonEmpty(fromName.冊), 章: nonEmpty(q.章), 節: nonEmpty(q.節) };
       for (const f of ['版本', '年級', '冊', '章']) if (!scope[f]) review.add(`歸屬.${f}`);
       if (grade && !gcode) review.add('歸屬.年級');
-      const difficulty = [1, 2, 3].includes(q.難度) ? q.難度 : null;
-      if (difficulty === null) review.add('難度');
+      const difficulty = [1, 2, 3].includes(q.難度) ? q.難度 : guessDifficulty({ 題幹: q.題幹, 選項: options });
 
-      // 圖表：切圖存入 圖片/匯入/
+      // 圖表：AI 給座標時照座標切；離線模式下「如圖」的題目，自動截取整題所在的區域
       let image = null;
       const figs = q.圖表 || [];
-      if (figs.length) {
-        review.add('圖片');
-        const f = figs[0];
-        try {
-          let buf = null;
+      try {
+        let buf = null;
+        if (figs.length) {
+          const f = figs[0];
           if (f.來源 === '內嵌') {
             const emb = ex.內嵌圖片.find((x) => x.代號 === f.代號);
             buf = emb && (emb.png || emb.buffer);
           } else {
             const page = ex.頁面.find((p) => p.編號 === f.頁) || (ex.頁面.length === 1 ? ex.頁面[0] : null);
-            if (page && [f.左, f.上, f.右, f.下].every((v) => typeof v === 'number')) {
-              buf = await cropFigure(page.png, [f.左, f.上, f.右, f.下]);
-            }
+            if (page && [f.左, f.上, f.右, f.下].every((v) => typeof v === 'number')) buf = await cropFigure(page.png, [f.左, f.上, f.右, f.下]);
           }
-          if (buf) {
-            const rel = `匯入/${key}.png`;
-            await fsp.mkdir(path.join(cfg.imageDir, '匯入'), { recursive: true });
-            await fsp.writeFile(path.join(cfg.imageDir, rel), buf);
-            image = rel;
+          if (figs.length > 1) parsed.備註.push(`第 ${q.原題號 || '?'} 題有 ${figs.length} 張圖，只自動切出第 1 張。`);
+        } else if (q.有圖) {
+          const box = questionBox(ex, q, qs[qi + 1]);
+          const page = box && ex.頁面.find((p) => p.編號 === box.頁);
+          if (page) buf = await cropFigure(page.png, [0.03, box.上, 0.97, box.下]);
+          else if (ex.內嵌圖片.length) {
+            // Word：依題目順序對應「[圖N]」
+            const tag = String(q.題幹).match(/\[(圖\d+)\]/);
+            const emb = tag && ex.內嵌圖片.find((x) => x.代號 === tag[1]);
+            buf = emb && (emb.png || emb.buffer);
           }
-        } catch (e) {
-          log(`  ⚠ 第 ${q.原題號 || '?'} 題切圖失敗：${e.message}`);
+          if (!buf) review.add('圖片');
         }
-        if (figs.length > 1) parsed.備註.push(`第 ${q.原題號 || '?'} 題有 ${figs.length} 張圖，只自動切出第 1 張。`);
+        if (buf) {
+          const rel = `匯入/${key}.png`;
+          await fsp.mkdir(path.join(cfg.imageDir, '匯入'), { recursive: true });
+          await fsp.writeFile(path.join(cfg.imageDir, rel), buf);
+          image = rel;
+        }
+      } catch (e) {
+        review.add('圖片');
+        log(`  ⚠ 第 ${q.原題號 || '?'} 題截圖失敗：${e.message}`);
       }
 
       drafts.push({
@@ -194,11 +192,32 @@ async function processFile(cfg, item, opts = {}) {
     log(`     原檔已移到 ${destRel}`);
   } catch (e) {
     record.錯誤 = e.message;
-    if (e.code === '金鑰') record.錯誤代碼 = '金鑰';
     log(`  ❌ 處理失敗：${e.message}（原檔保留在 待匯入/）`);
   }
   await appendLog(cfg, record);
   return record;
+}
+
+/** 找出某題在 PDF 頁面上的範圍（從題號那一行到下一題開始，或頁尾） */
+function questionBox(ex, q, next) {
+  if (!q.頁 || !ex.頁行) return null;
+  const lines = ex.頁行[q.頁 - 1] || [];
+  const norm = (t) => String(t || '').replace(/\$[^$]*\$/g, '').replace(/[\s　]/g, '').slice(0, 8);
+  const key = norm(q.題幹);
+  const findLine = (k, no) => lines.find((l) => {
+    const t = l.文字.replace(/[\s　]/g, '');
+    return (k && t.includes(k)) || (no && new RegExp(`^(\\(\\s*[A-E]?\\s*\\)|（\\s*[A-EＡ-Ｅ]?\\s*）)?${no}[.、．)]`).test(t));
+  });
+  const start = findLine(key, q.原題號);
+  if (!start) return null;
+  let end = null;
+  if (next && next.頁 === q.頁) {
+    const n = findLine(norm(next.題幹), next.原題號);
+    if (n && n.上 > start.上) end = n.上;
+  }
+  const top = Math.max(0, start.上 - 0.006);
+  const bottom = Math.min(1, end != null ? end - 0.01 : Math.min(start.上 + 0.45, 0.97));
+  return bottom - top > 0.02 ? { 頁: q.頁, 上: top, 下: bottom } : null;
 }
 
 async function appendLog(cfg, record) {

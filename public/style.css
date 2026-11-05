@@ -188,3 +188,16 @@ body.playing .topbar,body.playing .foot{display:none}
   .nav .btn{flex:1}
   .steps{font-size:.76rem}
 }
+
+/* 遊戲年級、章節標籤 */
+.gchips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.gchip{font-size:.74rem;color:var(--ink-2);border:1px solid var(--line-2);border-radius:999px;padding:0 8px;letter-spacing:.06em}
+.gchip.link{color:var(--E);border-color:color-mix(in srgb,var(--E) 45%,transparent)}
+.cover .blank-name{font-family:var(--serif);font-size:3.2rem;color:var(--ink-3);filter:none}
+.link-tip{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:var(--paper);color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:6px 16px;font-size:.88rem;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.link-tip a{color:var(--accent)}
+
+.topnav{margin:-8px 0 14px}
+.topnav .btn{padding-left:0}
+.seal svg{width:18px;height:18px;display:block}
+.nav:has(> .btn.primary:only-child){justify-content:flex-end}

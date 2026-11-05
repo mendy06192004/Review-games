@@ -48,6 +48,7 @@
       $('#summary').textContent = `共 ${data.草稿.length} 題草稿，需審核 ${needs} 題`;
       $('#broken').replaceChildren(...data.無法讀取.map((b) => el('p', { className: 'err', textContent: `⚠ 無法讀取 待審核/${b.檔案}：${b.錯誤}` })));
       list.replaceChildren(...(items.length ? items.map(card) : [el('div', { className: 'empty', textContent: '目前沒有待審核的題目 🎉' })]));
+      renderBatch(data.草稿);
     } catch (e) {
       list.textContent = '載入失敗：' + e.message;
     }
@@ -241,6 +242,39 @@
   }
 
   $('#reload').onclick = load;
+
+  // ---------- 批次處理 ----------
+  function renderBatch(all) {
+    $('#batch').hidden = !all.length;
+    const files = {};
+    for (const it of all) files[it.草稿檔] = (files[it.草稿檔] || 0) + 1;
+    const cur = $('#b-file').value;
+    $('#b-file').replaceChildren(...Object.entries(files).map(([f, n]) => el('option', { value: f, textContent: `${f.replace(/\.json$/, '')}（${n} 題）` })));
+    if (cur && files[cur]) $('#b-file').value = cur;
+    if ($('#b-subject').options.length === 1) {
+      Object.entries(META.科目).forEach(([k, v]) => $('#b-subject').append(el('option', { value: k, textContent: v })));
+    }
+    const ready = all.filter((it) => !it.題目.needs_review && it.題目.審核?.狀態 !== '退回').length;
+    $('#b-approve').textContent = `一鍵通過所有已完整的題目（${ready} 題）`;
+    $('#b-approve').disabled = !ready;
+  }
+  $('#b-apply').onclick = async () => {
+    const 歸屬 = {};
+    for (const k of ['版本', '年級', '冊', '章', '節']) 歸屬[k] = $(`#b-${k}`).value;
+    try {
+      const r = await api('/api/admin/draft-files', { method: 'PUT', body: JSON.stringify({ 檔案: $('#b-file').value, 科目代碼: $('#b-subject').value, 歸屬, 覆蓋: $('#b-override').checked }) });
+      toast(`已更新 ${r.更新題數} 題`);
+      load();
+    } catch (e) { toast(e.message); }
+  };
+  $('#b-approve').onclick = async () => {
+    if (!confirm('要把所有「資料已完整、沒有黃框」的題目一次通過，放進題庫嗎？')) return;
+    try {
+      const r = await api('/api/admin/drafts-approve-all', { method: 'POST', body: '{}' });
+      toast(`已通過 ${r.通過} 題${r.失敗.length ? `，${r.失敗.length} 題需要再修正` : ''}；題庫共 ${r.題目總數} 題`);
+      load();
+    } catch (e) { toast(e.message); }
+  };
   $('#new-q').onclick = async () => {
     try {
       await api('/api/admin/drafts-new', { method: 'POST', body: '{}' });

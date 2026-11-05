@@ -31,12 +31,6 @@
   "reviewDir": "待審核",
   "sourceDir": "來源",
   "teacherDir": "老師",
-  "claude": {
-    "model": "claude-opus-5-5",
-    "effort": "high",
-    "pagesPerRequest": 6,
-    "fallbacks": true
-  },
   "admin_password": "",
   "gamesDir": "遊戲",
   "submit_password": "",

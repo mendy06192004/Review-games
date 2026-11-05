@@ -32,7 +32,6 @@
       Object.values(INFO.科目).forEach((n) => $('#u-subject').append(el('option', { value: n, textContent: n })));
       Object.values(INFO.年級).forEach((n) => $('#u-grade').append(el('option', { value: n, textContent: n })));
     }
-    showKey(INFO);
     const box = $('#files');
     if (!INFO.檔案.length) {
       box.replaceChildren(el('p', { className: 'empty', textContent: '目前沒有待匯入的檔案，請先在上方上傳。' }));
@@ -49,7 +48,7 @@
           window.refreshAdminCounts?.();
         });
         return el('label', { className: 'file' }, cb,
-          el('span', { className: 'fname' }, el('b', { textContent: f.名稱 }), el('span', { className: 'muted small', textContent: `${tags || '未標示科目／版本／年級（由 AI 判斷）'}・${size(f.大小)}` })),
+          el('span', { className: 'fname' }, el('b', { textContent: f.名稱 }), el('span', { className: 'muted small', textContent: `${tags || '未標示科目／版本／年級（由檔名與內容判斷）'}・${size(f.大小)}` })),
           del);
       }));
     }
@@ -105,41 +104,12 @@
     } catch (e) { toast(e.message); }
   });
 
-  // ---------- 金鑰 ----------
-  let offlineSet = false;
-  function showKey(info, forceBox) {
-    if (!offlineSet) { offlineSet = true; if (!info.有金鑰) $('#offline').checked = true; }
-    $('#keystatus').hidden = !info.有金鑰;
-    $('#keystatus-text').textContent = info.有金鑰 ? `✔ 已有 Claude API 金鑰（${info.金鑰末碼 || ''}，來源：${info.金鑰來源 || '環境變數'}）` : '';
-    $('#keybox').hidden = info.有金鑰 && !forceBox;
-    $('#keybox-title').textContent = info.有金鑰 ? '更換 Claude API 金鑰。' : '還沒有 Claude API 金鑰。';
-  }
-  $('#key-change').addEventListener('click', () => { showKey(INFO, true); $('#key').focus(); });
-  $('#key-save').addEventListener('click', async () => {
-    const b = $('#key-save');
-    b.disabled = true;
-    b.textContent = '檢查中…';
-    try {
-      const r = await api('/api/admin/import/key', { method: 'POST', body: JSON.stringify({ 金鑰: $('#key').value }) });
-      $('#key').value = '';
-      Object.assign(INFO, r);
-      showKey(INFO);
-      toast('金鑰可以使用 ✔（關閉平台後清除）');
-    } catch (e) {
-      alert(e.message);
-    } finally {
-      b.disabled = false;
-      b.textContent = '檢查並使用這把金鑰';
-    }
-  });
-
   // ---------- 執行與進度 ----------
   $('#run').addEventListener('click', async () => {
     const files = checked();
-    const offline = $('#offline').checked;
-    if (!confirm(`即將處理以下 ${files.length} 個檔案：\n\n${files.join('\n')}\n\n模式：${offline ? '離線規則解析' : 'AI（Claude）整理'}\n結果會變成草稿，等你審核。確定開始嗎？`)) return;
+    if (!confirm(`即將處理以下 ${files.length} 個檔案：\n\n${files.join('\n')}\n\n結果會變成草稿，等你審核。確定開始嗎？`)) return;
     try {
-      const { 工作 } = await api('/api/admin/import/run', { method: 'POST', body: JSON.stringify({ 檔案: files, 離線: offline }) });
+      const { 工作 } = await api('/api/admin/import/run', { method: 'POST', body: JSON.stringify({ 檔案: files }) });
       showJob(工作);
       startPolling();
     } catch (e) { toast(e.message); }
@@ -159,10 +129,6 @@
       el('span', { textContent: r.錯誤 ? `失敗：${r.錯誤}（原檔留在待匯入，可修正後重試）` : `產生 ${r.題數} 題${r.需審核 ? `，其中 ${r.需審核} 題需要補資料` : ''}` }))));
     $('#job-log').textContent = job.紀錄.join('\n');
     $('#job-next').hidden = !(done && total);
-    if (done && job.金鑰錯誤) {
-      $('#job-status').textContent = '金鑰有問題，已暫停匯入，檔案都還留在清單中。請在上方按「更換金鑰」貼上正確的金鑰後再按「開始匯入」。';
-      if (INFO) showKey(INFO, true);
-    }
   }
   function startPolling() {
     clearInterval(polling);

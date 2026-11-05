@@ -2,7 +2,7 @@
 cd /d "%~dp0"
 title 考卷匯入
 echo ==========================================
-echo   考卷匯入：把 待匯入 資料夾的考卷交給 AI 整理成草稿
+echo   考卷匯入：把 待匯入 資料夾的考卷自動整理成題目草稿
 echo ==========================================
 echo.
 where node >nul 2>nul
@@ -33,17 +33,9 @@ pause
 exit /b 1
 
 :keycheck
-if not "%ANTHROPIC_API_KEY%"=="" goto run
-echo 請貼上 Claude API 金鑰，然後按 Enter。
-echo （金鑰只在這個視窗有效，不會存進檔案。沒有金鑰就直接按 Enter，改用離線模式。）
-set /p ANTHROPIC_API_KEY=金鑰：
-if not "%ANTHROPIC_API_KEY%"=="" goto run
-echo 使用離線模式（只能處理有文字層的 PDF，不會用 AI）。
-set OFFLINE=--offline
-
 :run
 echo.
-node scripts\import.js %OFFLINE%
+node scripts\import.js
 echo.
 echo 處理完成。請在瀏覽器開啟 http://localhost:3000/admin/ 審核題目。
 pause

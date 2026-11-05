@@ -37,24 +37,35 @@ async function extractPdf(file) {
 
   const texts = [];
   const pages = [];
+  const pageLines = []; // 每頁每一行的文字與位置（上緣佔頁高的比例），用來自動截取題目圖
+
   for (let n = 1; n <= doc.numPages; n++) {
     const page = await doc.getPage(n);
     const tc = await page.getTextContent();
     // 依 y 座標分行，保留閱讀順序
+    const base = page.getViewport({ scale: 1 });
     let lastY = null;
     let line = '';
+    let lineTop = 1;
     const lines = [];
+    const placed = [];
+    const flush = () => {
+      if (line.trim()) { lines.push(line); placed.push({ 文字: line.trim(), 上: Math.max(0, lineTop) }); }
+      line = ''; lineTop = 1;
+    };
     for (const it of tc.items) {
       if (!('str' in it)) continue;
       const y = Math.round(it.transform[5]);
-      if (lastY !== null && Math.abs(y - lastY) > 2) { lines.push(line); line = ''; }
+      if (lastY !== null && Math.abs(y - lastY) > 2) flush();
       line += it.str;
+      const h = Math.abs(it.transform[3]) || 10;
+      lineTop = Math.min(lineTop, 1 - (it.transform[5] + h) / base.height);
       lastY = y;
     }
-    if (line) lines.push(line);
+    flush();
     texts.push(lines.map((l) => l.trim()).filter(Boolean).join('\n'));
+    pageLines.push(placed);
 
-    const base = page.getViewport({ scale: 1 });
     const scale = PDF_RENDER_LONG_EDGE / Math.max(base.width, base.height);
     const vp = page.getViewport({ scale });
     const canvas = createCanvas(Math.ceil(vp.width), Math.ceil(vp.height));
@@ -73,6 +84,7 @@ async function extractPdf(file) {
     方式: hasText ? '文字層' : 'OCR',
     文字: hasText ? texts.map((t, i) => `=== 第 ${i + 1} 頁 ===\n${t}`).join('\n\n') : '',
     頁文字: hasText ? texts : texts.map(() => ''),
+    頁行: pageLines,
     頁面: pages,
     內嵌圖片: [],
   };

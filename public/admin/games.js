@@ -41,7 +41,7 @@ async function load() {
 
 function card(g) {
   const c = el('article', { className: `card game${g.狀態 === '待審核' ? ' needs' : ''}${g.狀態 === '已退回' ? ' rejected' : ''}${g.狀態 === '已下架' ? ' done' : ''}` });
-  const thumb = el('div', { className: 'thumb' }, g.有封面 ? el('img', { src: `/api/admin/games/${g.id}/cover?t=${encodeURIComponent(g.更新時間)}`, alt: '' }) : el('span', { textContent: g.圖示 || '🎮' }));
+  const thumb = el('div', { className: 'thumb' }, g.有封面 ? el('img', { src: `/api/admin/games/${g.id}/cover?t=${encodeURIComponent(g.更新時間)}`, alt: '' }) : el('span', { className: 'thumb-name', textContent: g.圖示 || (g.名稱 || '？')[0] }));
   const subj = (g.科目 || []).map((s) => META.科目[s] || s).join('、');
   const info = el('div', { className: 'ginfo' },
     el('div', { className: 'meta' },
@@ -49,13 +49,15 @@ function card(g) {
       el('span', { textContent: g.來源 === '老師投稿' ? `投稿：${g.投稿者 || '未署名'}` : `管理員新增${g.投稿者 ? `（作者 ${g.投稿者}）` : ''}` }),
       g.聯絡 ? el('span', { textContent: g.聯絡 }) : null,
       el('span', { textContent: time(g.建立時間) })),
-    el('h3', { textContent: `${g.圖示 || ''} ${g.名稱}` }),
+    el('h3', { textContent: g.名稱 }),
     el('p', { textContent: g.說明 || '（沒有說明）' }),
     el('div', { className: 'meta' },
       el('span', { textContent: `分類：${g.分類}` }),
       g.領域 ? el('span', { textContent: `領域：${g.領域}` }) : null,
       el('span', { textContent: g.使用題庫 ? `使用題庫：${subj}` : `不使用題庫${subj ? `（顯示於 ${subj}）` : ''}` }),
-      el('span', { textContent: `${g.檔案數} 個檔案・${size(g.大小 || 0)}` })),
+      g.年級 ? el('span', { textContent: `年級：${g.年級}` }) : null,
+      g.章節 ? el('span', { textContent: `章節：${g.章節}` }) : null,
+      g.連結 ? el('a', { href: g.連結, target: '_blank', rel: 'noopener', textContent: '🔗 連結遊戲（開新視窗）' }) : el('span', { textContent: `${g.檔案數} 個檔案・${size(g.大小 || 0)}` })),
     g.給管理員的話 ? el('p', { className: 'note', textContent: `投稿留言：${g.給管理員的話}` }) : null,
     g.退回原因 && g.狀態 === '已退回' ? el('div', { className: 'reason', textContent: `退回原因：${g.退回原因}` }) : null);
   const btn = (label, cls, fn) => {
@@ -167,7 +169,7 @@ async function preview(g) {
     previewGame.render();
   } else {
     const f = el('iframe', { src: url, title: g.名稱, allow: 'autoplay; fullscreen' });
-    f.setAttribute('sandbox', 'allow-scripts allow-pointer-lock allow-forms allow-modals allow-popups allow-downloads');
+    if (!g.連結) f.setAttribute('sandbox', 'allow-scripts allow-pointer-lock allow-forms allow-modals allow-popups allow-downloads');
     root.replaceChildren(f);
   }
   $('#preview').showModal();

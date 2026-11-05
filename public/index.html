@@ -14,7 +14,7 @@
 </head>
 <body>
   <header class="topbar">
-    <a href="#" id="home-link" class="brand"><span class="seal">習</span>複習小書房</a>
+    <a href="#" id="home-link" class="brand"><span class="seal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.2 5 7.6 4.5 4 4.8v13.4c3.6-.3 6.2.2 8 1.7 1.8-1.5 4.4-2 8-1.7V4.8c-3.6-.3-6.2.2-8 1.7z"/><path d="M12 6.5v13.4"/></svg></span>複習小書房</a>
     <ol class="steps" id="steps" aria-label="步驟"></ol>
   </header>
 
@@ -31,6 +31,7 @@
 
     <!-- 選遊戲 -->
     <section class="step" data-step="games" hidden>
+      <div class="topnav"><button class="btn ghost small" data-back>← 回首頁</button></div>
       <div class="page-head">
         <p class="eyebrow" id="games-eyebrow"></p>
         <h1 id="games-title">選一個遊戲</h1>
@@ -38,34 +39,34 @@
       </div>
       <nav class="chips" id="game-tabs" aria-label="分類" hidden></nav>
       <div id="game-list"></div>
-      <div class="nav"><button class="btn ghost" data-back>← 回首頁</button></div>
     </section>
 
     <!-- 版本 -->
     <section class="step" data-step="version" hidden>
+      <div class="topnav"><button class="btn ghost small" data-back>← 上一步</button></div>
       <div class="page-head">
         <p class="eyebrow" data-game-name></p>
         <h1>你的課本是哪一個版本？</h1>
       </div>
       <div class="cards" id="version-cards"></div>
-      <div class="nav"><button class="btn ghost" data-back>← 上一步</button></div>
     </section>
 
     <!-- 年級與冊 -->
     <section class="step" data-step="volume" hidden>
+      <div class="topnav"><button class="btn ghost small" data-back>← 上一步</button></div>
       <div class="page-head">
         <p class="eyebrow" data-game-name></p>
         <h1>年級與冊別 <small>可多選</small></h1>
       </div>
       <div id="volume-groups"></div>
       <div class="nav">
-        <button class="btn ghost" data-back>← 上一步</button>
         <button class="btn primary" id="volume-next" disabled>下一步 →</button>
       </div>
     </section>
 
     <!-- 章節 -->
     <section class="step" data-step="chapter" hidden>
+      <div class="topnav"><button class="btn ghost small" data-back>← 上一步</button></div>
       <div class="page-head">
         <p class="eyebrow" data-game-name></p>
         <h1>要複習哪些章節？</h1>
@@ -74,13 +75,13 @@
       <div class="toolbar"><button class="btn small ghost" id="check-all">全選</button><button class="btn small ghost" id="check-none">全部取消</button></div>
       <div id="chapter-tree" class="tree"></div>
       <div class="nav">
-        <button class="btn ghost" data-back>← 上一步</button>
         <button class="btn primary" id="chapter-next" disabled>下一步 →</button>
       </div>
     </section>
 
     <!-- 開始 -->
     <section class="step" data-step="ready" hidden>
+      <div class="topnav"><button class="btn ghost small" data-back>← 換遊戲</button></div>
       <div class="page-head">
         <p class="eyebrow">準備就緒</p>
         <h1>準備好了嗎？</h1>
@@ -97,7 +98,6 @@
       </div>
       <p class="msg" id="ready-msg" role="alert"></p>
       <div class="nav">
-        <button class="btn ghost" data-back>← 換遊戲</button>
         <button class="btn primary huge" id="start">開始遊戲</button>
       </div>
     </section>

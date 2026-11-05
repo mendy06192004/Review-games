@@ -84,7 +84,7 @@ async function playBankGame(page, base, g, counts) {
         await page.addStyleTag({ content: '.play-bar{display:none!important}' });
         target = page.locator('#game-root');
       } else {
-        await page.goto(base + g.入口);
+        await page.goto(/^https?:/.test(g.入口) ? g.入口 : base + g.入口);
         target = page;
       }
       await page.waitForTimeout(3000); // 等動畫、字型載入

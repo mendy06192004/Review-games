@@ -209,7 +209,7 @@ test('網頁匯入：上傳 → 列出 → 勾選確認後處理 → 只產生�
 
     assert.strictEqual((await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [] } })).status, 400, '沒勾選不能執行');
     const before = fs.readdirSync(cfg.questionDir, { recursive: true }).length;
-    const run = await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [up.檔案], 離線: true } });
+    const run = await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [up.檔案] } });
     assert.strictEqual(run.status, 200, run.text);
     let job;
     for (let i = 0; i < 100; i++) {
@@ -230,61 +230,6 @@ test('網頁匯入：上傳 → 列出 → 勾選確認後處理 → 只產生�
   }
 });
 
-test('Claude 金鑰：無效金鑰會被擋下；匯入遇到金鑰錯誤會暫停並保留檔案；錯誤訊息為中文', async () => {
-  const express = require('express');
-  const { createWorkspaceRouter } = require('../src/workspace');
-  const { explainApiError } = require('../src/import/claude');
-  const { cfg, cleanup } = makeTempBank();
-  const oldKey = process.env.ANTHROPIC_API_KEY;
-  delete process.env.ANTHROPIC_API_KEY;
-  const app = express();
-  app.use(express.json());
-  const calls = [];
-  app.use('/w', createWorkspaceRouter(cfg, {
-    verifyKeyImpl: async (k) => { if (k !== 'sk-ant-good-key-1234567890') throw explainApiError({ status: 401, message: '401 invalid x-api-key' }); },
-    processFileImpl: async (c, f) => { calls.push(f.rel); return { 產生題數: 0, 錯誤: explainApiError({ status: 401 }).message, 錯誤代碼: '金鑰' }; },
-  }));
-  const server = app.listen(0);
-  await new Promise((r) => server.once('listening', r));
-  const base = `http://127.0.0.1:${server.address().port}/w`;
-  const post = (p, body) => fetch(base + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  try {
-    let r = await post('/import/key', { 金鑰: 'abc' });
-    assert.strictEqual(r.status, 400);
-    assert.match((await r.json()).error, /sk-ant-/);
-    r = await post('/import/key', { 金鑰: 'sk-ant-wrong-key-1234567890' });
-    assert.strictEqual(r.status, 400);
-    assert.match((await r.json()).error, /金鑰無效/);
-    assert.strictEqual(process.env.ANTHROPIC_API_KEY, undefined, '無效金鑰不可被採用');
-    r = await post('/import/key', { 金鑰: ' sk-ant-good-key-1234567890 \n' });
-    assert.strictEqual(r.status, 200);
-    assert.strictEqual((await r.json()).金鑰末碼, '…7890');
-
-    for (const n of ['a.pdf', 'b.pdf', 'c.pdf']) {
-      fs.mkdirSync(cfg.importDir, { recursive: true });
-      fs.writeFileSync(path.join(cfg.importDir, n), '%PDF');
-    }
-    r = await post('/import/run', { 檔案: ['a.pdf', 'b.pdf', 'c.pdf'] });
-    assert.strictEqual(r.status, 200);
-    let job;
-    for (let i = 0; i < 50; i++) {
-      job = (await (await fetch(base + '/import/job')).json()).工作;
-      if (job.狀態 === '完成') break;
-      await new Promise((res) => setTimeout(res, 50));
-    }
-    assert.strictEqual(job.金鑰錯誤, true);
-    assert.deepStrictEqual(calls, ['a.pdf'], '金鑰錯誤後不再處理其他檔案');
-    assert.match(job.結果[1].錯誤, /尚未處理/);
-
-    assert.match(explainApiError({ status: 400, message: 'Your credit balance is too low' }).message, /額度不足/);
-    assert.match(explainApiError({ message: 'fetch failed' }).message, /連不上/);
-  } finally {
-    server.close();
-    if (oldKey === undefined) delete process.env.ANTHROPIC_API_KEY; else process.env.ANTHROPIC_API_KEY = oldKey;
-    cleanup();
-  }
-});
-
 test('免金鑰：貼上題目文字 → 離線拆題（含題號前答案、卷末答案、數學式轉 KaTeX）；手動新增空白題目', async () => {
   const { cfg, cleanup } = makeTempBank();
   const app = await start(cfg);
@@ -293,7 +238,7 @@ test('免金鑰：貼上題目文字 → 離線拆題（含題號前答案、卷
     const up = await app.call('/api/admin/import/text', { method: 'POST', body: { 文字: text, 科目: '數學', 版本: '南一', 年級: '國二' } });
     assert.strictEqual(up.status, 200, up.text);
     assert.match(up.body.檔案, /^數學\/南一\/國二\/貼上的題目-\d+\.txt$/);
-    await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [up.body.檔案], 離線: true } });
+    await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [up.body.檔案] } });
     let job;
     for (let i = 0; i < 50; i++) {
       job = (await app.call('/api/admin/import/job')).body.工作;
@@ -312,6 +257,58 @@ test('免金鑰：貼上題目文字 → 離線拆題（含題號前答案、卷
     assert.strictEqual(n.status, 200);
     assert.strictEqual(n.body.題目.選項.length, 4);
     assert.strictEqual((await app.call('/api/admin/drafts')).body.草稿.length, 3);
+  } finally {
+    app.close();
+    cleanup();
+  }
+});
+
+test('批次設定章節 → 一鍵通過所有完整的題目（缺答案的留在審核）', async () => {
+  const { cfg, cleanup } = makeTempBank();
+  const app = await start(cfg);
+  try {
+    const pdf = fs.readFileSync(path.join(__dirname, 'fixtures', 'sample-exam.pdf'));
+    const up = await fetch(`${app.base}/api/admin/import/upload`, { method: 'POST', headers: { 'Content-Type': 'application/pdf', 'X-File-Name': encodeURIComponent('段考.pdf') }, body: pdf }).then((r) => r.json());
+    await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [up.檔案] } });
+    for (let i = 0; i < 100; i++) {
+      if ((await app.call('/api/admin/import/job')).body.工作.狀態 === '完成') break;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    let drafts = (await app.call('/api/admin/drafts')).body.草稿;
+    assert.strictEqual(drafts.length, 4);
+    assert.ok(drafts.every((d) => d.題目.needs_review), '缺章節，全部需要審核');
+    const r = await app.call('/api/admin/draft-files', { method: 'PUT', body: { 檔案: drafts[0].草稿檔, 歸屬: { 章: '第1章 乘法公式與多項式' } } });
+    assert.strictEqual(r.body.更新題數, 4);
+    drafts = (await app.call('/api/admin/drafts')).body.草稿;
+    assert.strictEqual(drafts.filter((d) => !d.題目.needs_review).length, 3);
+    const ok = await app.call('/api/admin/drafts-approve-all', { method: 'POST', body: {} });
+    assert.strictEqual(ok.body.通過, 3);
+    assert.strictEqual(ok.body.題目總數, 6);
+    assert.strictEqual((await app.call('/api/admin/drafts')).body.草稿.length, 1, '缺答案的題目留著');
+  } finally {
+    app.close();
+    cleanup();
+  }
+});
+
+test('連結遊戲：貼上網址投稿（不需檔案、不用題庫），發布後學生端以外部連結開啟，並帶年級、章節標籤', async () => {
+  const { cfg, cleanup } = makeTempBank();
+  const app = await start(cfg);
+  try {
+    let r = await app.call('/api/submit/games', { method: 'POST', body: { 連結: 'javascript:alert(1)', 資訊: info() } });
+    assert.strictEqual(r.status, 400, '只接受 http(s)');
+    r = await app.call('/api/submit/games', { method: 'POST', body: { 連結: 'https://gemini.google.com/share/abc123', 資訊: info({ 分類: '學科練習', 使用題庫: true, 科目: ['M'], 年級: '國二', 章節: '第2章 一元二次方程式' }) } });
+    assert.strictEqual(r.status, 200, r.text);
+    const id = r.body.編號;
+    await app.call(`/api/admin/games/${id}/publish`, { method: 'POST', body: {} });
+    const g = (await app.call('/api/games')).body.遊戲.find((x) => x.id === id);
+    assert.strictEqual(g.入口, 'https://gemini.google.com/share/abc123');
+    assert.strictEqual(g.連結遊戲, true);
+    assert.strictEqual(g.使用題庫, false, '連結遊戲一律不使用題庫');
+    assert.strictEqual(g.年級, '國二');
+    assert.strictEqual(g.章節, '第2章 一元二次方程式');
+    const admin = (await app.call('/api/admin/games')).body.遊戲.find((x) => x.id === id);
+    assert.strictEqual(admin.預覽網址, 'https://gemini.google.com/share/abc123');
   } finally {
     app.close();
     cleanup();

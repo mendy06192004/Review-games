@@ -166,12 +166,13 @@ function createAdminRouter(cfg) {
   });
 
   // 通過：驗證 → 寫入 題目/<科目>/<id>.json → 從草稿移除 → 更新索引
-  r.post('/drafts/:key/approve', async (req, res) => {
-    const f0 = await findDraft(cfg, req.params.key);
-    const result = await withLock(f0.abs, async () => {
-      const f = await findDraft(cfg, req.params.key);
+  // 通過：驗證 → 寫入 題目/<科目>/<id>.json → 從草稿移除
+  async function approveDraft(key, edits) {
+    const f0 = await findDraft(cfg, key);
+    return withLock(f0.abs, async () => {
+      const f = await findDraft(cfg, key);
       const item = f.data.題目[f.idx];
-      if (req.body?.題目) applyEdits(item, req.body.題目);
+      if (edits) applyEdits(item, edits);
 
       const used = await D.collectUsedIds(cfg);
       used.delete(item.id); // 草稿自己的暫定編號不算衝突
@@ -199,8 +200,63 @@ function createAdminRouter(cfg) {
       else await fsp.unlink(f.abs);
       return { id: final.id, 檔案: path.relative(cfg.dataDir, target).split(path.sep).join('/') };
     });
+  }
+
+  r.post('/drafts/:key/approve', async (req, res) => {
+    const result = await approveDraft(req.params.key, req.body?.題目);
     const idx = await ensureIndex(cfg);
     res.json({ ...result, 題目總數: idx.題目總數 });
+  });
+
+  // 一鍵通過：所有「資料已完整」（不需審核、沒被退回）的草稿
+  r.post('/drafts-approve-all', async (req, res) => {
+    const keys = [];
+    for (const f of await D.readDraftFiles(cfg)) {
+      if (f.error) continue;
+      for (const q of f.data.題目 || []) if (!q.needs_review && q.審核?.狀態 !== '退回') keys.push(q.草稿編號);
+    }
+    let ok = 0;
+    const failed = [];
+    for (const k of keys) {
+      try { await approveDraft(k); ok++; } catch (e) { failed.push({ 草稿編號: k, 原因: e.message }); }
+    }
+    const idx = await ensureIndex(cfg);
+    res.json({ 通過: ok, 失敗: failed, 題目總數: idx.題目總數 });
+  });
+
+  // 批次設定：把同一份考卷（草稿檔）的科目、版本、年級、冊、章、節一次補齊
+  r.put('/draft-files', async (req, res) => {
+    const name = String(req.body?.檔案 || '');
+    const f0 = (await D.readDraftFiles(cfg)).find((f) => f.file === name && !f.error);
+    if (!f0) throw new HttpError(404, '找不到這份草稿');
+    const override = req.body?.覆蓋 === true;
+    const scope = req.body?.歸屬 || {};
+    const subject = cfg.subjects[req.body?.科目代碼] ? req.body.科目代碼 : null;
+    const count = await withLock(f0.abs, async () => {
+      const f = (await D.readDraftFiles(cfg)).find((x) => x.file === name && !x.error);
+      const used = await D.collectUsedIds(cfg);
+      let n = 0;
+      for (const item of f.data.題目 || []) {
+        if (subject && (override || !item.科目代碼)) item.科目代碼 = subject;
+        const a = (item.歸屬 && item.歸屬[0]) || {};
+        for (const k of ['版本', '年級', '冊', '章', '節']) {
+          const v = typeof scope[k] === 'string' ? scope[k].trim() : '';
+          if (v && (override || !a[k])) a[k] = v;
+        }
+        item.歸屬 = [a, ...((item.歸屬 || []).slice(1))];
+        if (!item.id) {
+          const g = D.gradeCode(cfg, a.年級);
+          if (item.科目代碼 && g) item.id = D.allocateId(used, item.科目代碼, g);
+        }
+        const problems = validateQuestion(toFinal(item), cfg).filter((i) => i.level === 'error');
+        item.needs_review = problems.length > 0;
+        item.待確認欄位 = [...new Set(problems.map((p) => p.field || '題目'))];
+        n++;
+      }
+      await D.atomicWriteJson(f.abs, f.data);
+      return n;
+    });
+    res.json({ 更新題數: count });
   });
 
   r.use((err, req, res, next) => { // eslint-disable-line no-unused-vars

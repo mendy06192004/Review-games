@@ -15,6 +15,24 @@
   </header>
   <main>
     <p class="hint">這裡是「匯入考卷」整理出來的題目草稿，也可以按「手動新增一題」自己出題。數學式用 <code>$</code> 包住會以 KaTeX 顯示，例如 <code>$\frac{1}{2}$</code>。標示「需審核」的題目排在最前面；黃色框是需要確認的欄位。按「通過」後題目才會放進 <code>題目/</code> 並立即出現在練習中。</p>
+    <section class="card batch" id="batch" hidden>
+      <h2>批次處理</h2>
+      <p class="muted small">同一份考卷的題目，章節、版本通常都一樣：在這裡填一次，就會套用到那份考卷的所有題目（預設只補空白的欄位）。</p>
+      <div class="b-grid">
+        <label>考卷<select id="b-file"></select></label>
+        <label>科目<select id="b-subject"><option value="">（不變）</option></select></label>
+        <label>版本<input type="text" id="b-版本" list="dl-版本"></label>
+        <label>年級<input type="text" id="b-年級" list="dl-年級"></label>
+        <label>冊<input type="text" id="b-冊" list="dl-冊" placeholder="例如 第三冊"></label>
+        <label>章<input type="text" id="b-章" list="dl-章" placeholder="例如 第1章 乘法公式"></label>
+        <label>節<input type="text" id="b-節" placeholder="選填"></label>
+      </div>
+      <div class="actions">
+        <label class="muted small"><input type="checkbox" id="b-override"> 已有的值也一起改掉</label>
+        <button type="button" id="b-apply">套用到這份考卷</button>
+        <button type="button" class="primary" id="b-approve">一鍵通過所有已完整的題目</button>
+      </div>
+    </section>
     <div id="broken"></div>
     <div id="list" class="list">載入中…</div>
   </main>

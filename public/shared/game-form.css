@@ -3,7 +3,7 @@
 .gf-field{display:flex;flex-direction:column;gap:4px}
 .gf-label{font-size:.88rem;color:var(--muted,#6e675d);letter-spacing:.08em}
 .gf-hint{color:var(--muted,#6e675d);font-size:.8rem;opacity:.85}
-.gf input[type=text],.gf input[type=password],.gf textarea,.gf select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--border,#d9d1c4);border-radius:4px;background:var(--card,#faf8f3);color:inherit}
+.gf input[type=text],.gf input[type=url],.gf input[type=password],.gf textarea,.gf select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--border,#d9d1c4);border-radius:4px;background:var(--card,#faf8f3);color:inherit}
 .gf textarea{min-height:72px;resize:vertical}
 .gf input[type=file]{font:inherit;font-size:.9rem}
 .gf-checks{display:flex;flex-wrap:wrap;gap:6px 16px}

@@ -2,7 +2,7 @@
 /**
  * 後台總覽與網頁匯入（/api/admin/overview、/api/admin/import/*）。
  * 匯入流程與 npm run import 相同：先列出檔案、老師勾選確認後才處理，結果只寫進 待審核/。
- * Claude API 金鑰只從環境變數讀取；也可在後台貼上，只存在這次執行的記憶體中，不寫入任何檔案。
+ * 一律用規則自動拆題與分類，不使用 AI、不需要金鑰。
  */
 const fs = require('fs');
 const fsp = fs.promises;
@@ -12,15 +12,11 @@ const D = require('./drafts');
 const { ensureIndex } = require('./indexer');
 const { scanImportDir, processFile } = require('./import/importer');
 const { SUPPORTED_EXT } = require('./import/extract');
-const { verifyKey } = require('./import/claude');
 
 class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
 }
 
-const hasKey = () => !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
-// 只顯示金鑰最後 4 碼，方便老師確認用的是哪一把
-const keyHint = () => (process.env.ANTHROPIC_API_KEY ? `…${process.env.ANTHROPIC_API_KEY.slice(-4)}` : null);
 const cleanName = (s) => String(s || '').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').replace(/^\.+/, '').trim().slice(0, 100);
 
 async function readLog(cfg) {
@@ -37,7 +33,6 @@ function createWorkspaceRouter(cfg, opts = {}) {
   const r = express.Router();
   // 一次只跑一個匯入工作，進度存在記憶體
   let job = null;
-  let keySource = hasKey() ? 'Windows 設定（設定金鑰-Windows.bat）' : null;
 
   r.get('/overview', async (req, res) => {
     const [idx, files, drafts, log] = await Promise.all([
@@ -73,7 +68,6 @@ function createWorkspaceRouter(cfg, opts = {}) {
       草稿: { 總數: 草稿, 需審核, 已退回 },
       待審遊戲,
       最近匯入: log.slice(-8).reverse(),
-      有金鑰: hasKey(),
       匯入中: !!(job && job.狀態 === '執行中'),
       資料夾: cfg.dataDir,
     });
@@ -87,7 +81,7 @@ function createWorkspaceRouter(cfg, opts = {}) {
       const st = await fsp.stat(f.abs).catch(() => null);
       out.push({ 檔案: f.rel, 名稱: f.name, 大小: st ? st.size : 0, 判斷: f.hints });
     }
-    res.json({ 檔案: out, 有金鑰: hasKey(), 金鑰末碼: keyHint(), 金鑰來源: keySource, 科目: cfg.subjects, 年級: cfg.grades, 支援: SUPPORTED_EXT });
+    res.json({ 檔案: out, 科目: cfg.subjects, 年級: cfg.grades, 支援: SUPPORTED_EXT });
   });
 
   // 上傳考卷到 待匯入/科目/版本/年級/
@@ -148,52 +142,28 @@ function createWorkspaceRouter(cfg, opts = {}) {
     res.json({ 已刪除: rel });
   });
 
-  // 金鑰：只存在記憶體，關閉平台就消失
-  r.post('/import/key', async (req, res) => {
-    const key = String(req.body?.金鑰 || '').replace(/\s+/g, '');
-    if (!/^sk-ant-[\w-]{10,}$/.test(key)) throw new HttpError(400, '金鑰格式不正確：應以 sk-ant- 開頭，是一長串英數字（請從 console.anthropic.com 的 API Keys 頁面複製）');
-    // 先向 Claude 確認金鑰有效，再採用（不會產生費用）
-    try {
-      await (opts.verifyKeyImpl || verifyKey)(key);
-    } catch (e) {
-      throw new HttpError(400, e.message);
-    }
-    process.env.ANTHROPIC_API_KEY = key;
-    keySource = '本次貼上（關閉平台後清除）';
-    res.json({ 有金鑰: true, 金鑰末碼: keyHint(), 金鑰來源: keySource });
-  });
-
   // 老師確認清單後才開始處理
   r.post('/import/run', async (req, res) => {
     if (job && job.狀態 === '執行中') throw new HttpError(409, '已經有匯入正在進行，請等它完成');
     const wanted = new Set(Array.isArray(req.body?.檔案) ? req.body.檔案 : []);
-    const offline = req.body?.離線 === true;
     if (!wanted.size) throw new HttpError(400, '請至少勾選一個檔案');
-    if (!offline && !hasKey()) throw new HttpError(400, '還沒有 Claude API 金鑰。請先貼上金鑰，或勾選「離線模式」（只能處理有文字的 PDF）');
     const files = (await scanImportDir(cfg)).filter((f) => wanted.has(f.rel));
     if (!files.length) throw new HttpError(400, '勾選的檔案已不在待匯入資料夾（可能已處理過）');
 
-    job = { 狀態: '執行中', 開始時間: new Date().toISOString(), 模式: offline ? '離線' : 'Claude', 總數: files.length, 完成: 0, 紀錄: [], 結果: [] };
+    job = { 狀態: '執行中', 開始時間: new Date().toISOString(), 總數: files.length, 完成: 0, 紀錄: [], 結果: [] };
     const current = job;
     const log = (line) => { current.紀錄.push(line); if (current.紀錄.length > 400) current.紀錄.shift(); };
     (async () => {
       for (const [i, f] of files.entries()) {
         log(`[${i + 1}/${files.length}] ${f.rel}`);
         try {
-          const rec = await processFileImpl(cfg, f, { offline, log });
+          const rec = await processFileImpl(cfg, f, { log });
           current.結果.push({ 檔案: f.rel, 題數: rec.產生題數 || 0, 需審核: rec.需審核題數 || 0, 錯誤: rec.錯誤 || null });
-          if (rec.錯誤代碼 === '金鑰') {
-            // 金鑰有問題，後面的檔案也一定失敗：停下來，檔案都留在待匯入
-            for (const rest of files.slice(i + 1)) current.結果.push({ 檔案: rest.rel, 題數: 0, 需審核: 0, 錯誤: '尚未處理（金鑰有問題，已暫停）' });
-            current.金鑰錯誤 = true;
-            current.完成 = files.length;
-            break;
-          }
         } catch (e) {
           log(`  ❌ ${e.message}`);
           current.結果.push({ 檔案: f.rel, 題數: 0, 需審核: 0, 錯誤: e.message });
         }
-        if (!current.金鑰錯誤) current.完成 = i + 1;
+        current.完成 = i + 1;
       }
       current.狀態 = '完成';
       current.結束時間 = new Date().toISOString();

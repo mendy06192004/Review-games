@@ -142,3 +142,11 @@ main>.card{margin-bottom:18px}
 .paste{margin-top:12px}
 .paste summary{cursor:pointer;color:var(--accent)}
 .paste textarea{min-height:150px;font-family:inherit}
+
+.batch h2{margin:0 0 4px;font-size:1.1rem}
+.b-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 12px;margin-top:10px}
+.b-grid label{display:flex;flex-direction:column;gap:3px;font-size:.88rem;color:var(--muted)}
+.batch .actions{align-items:center}
+main>.batch{margin-bottom:18px}
+.thumb-name{font-family:var(--serif);color:var(--muted)}
+.seal svg{width:16px;height:16px;display:block}

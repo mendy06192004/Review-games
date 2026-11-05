@@ -21,7 +21,6 @@ function resolveConfig(raw, baseDir) {
     sourceDir: path.resolve(dataDir, raw.sourceDir || '來源'),
     teacherDir: path.resolve(dataDir, raw.teacherDir || '老師'),
     gamesDir: path.resolve(dataDir, raw.gamesDir || '遊戲'),
-    claude: { model: 'claude-opus-5-5', effort: 'high', pagesPerRequest: 6, fallbacks: true, ...(raw.claude || {}) },
     // 預留：之後要加審核頁登入驗證時使用（空字串＝不驗證）
     adminPassword: process.env.ADMIN_PASSWORD || raw.admin_password || '',
     // 老師投稿遊戲頁的密碼（空字串＝知道網址的人都能投稿；投稿一律要等管理員審核後才會發布）

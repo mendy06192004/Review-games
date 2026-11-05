@@ -25,7 +25,7 @@ class HttpError extends Error {
   constructor(status, message, details) { super(message); this.status = status; this.details = details; }
 }
 
-const CATEGORIES = ['複習遊戲', '學科練習', '生活管理', '職業教育', '社會技巧'];
+const CATEGORIES = ['複習遊戲', '學科練習', '生活管理', '職業教育', '社會技巧', '邏輯推理'];
 const STATUS = ['待審核', '已發布', '已退回', '已下架'];
 const ALLOWED_EXT = new Set(['html', 'htm', 'js', 'mjs', 'css', 'json', 'txt', 'md', 'csv',
   'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'ico', 'bmp',
@@ -81,18 +81,22 @@ async function findCover(cfg, id) {
 
 /** 給學生端的遊戲資料（不含投稿者、聯絡方式等） */
 function toPublic(info, hasCover) {
+  const link = !!info.連結;
   return {
     id: info.id,
     名稱: info.名稱,
-    圖示: info.圖示 || '🎮',
+    圖示: info.圖示 || '',
+    年級: info.年級 || undefined,
+    章節: info.章節 || undefined,
+    連結遊戲: link || undefined,
     說明: info.說明 || '',
     分類: info.分類,
     領域: info.領域 || undefined,
     科目: info.科目?.length ? info.科目 : undefined,
-    使用題庫: !!info.使用題庫,
+    使用題庫: !link && !!info.使用題庫,
     類型: 'standalone',
     外部: true,
-    入口: `/ugames/${info.id}/index.html`,
+    入口: link ? info.連結 : `/ugames/${info.id}/index.html`,
     封面: hasCover ? `/api/games/${info.id}/cover?v=${encodeURIComponent(info.更新時間 || '')}` : undefined,
     題數選項: info.使用題庫 ? info.題數選項 : undefined,
     預設題數: info.使用題庫 ? info.預設題數 : undefined,
@@ -107,12 +111,14 @@ function cleanInfo(cfg, raw = {}, { partial = false, prev = {} } = {}) {
   const pick = (k) => (k in raw ? raw[k] : prev[k]);
   const out = {
     名稱: str(pick('名稱'), 40),
-    圖示: str(pick('圖示'), 8) || '🎮',
+    圖示: str(pick('圖示'), 8),
     說明: str(pick('說明'), 300),
     分類: str(pick('分類'), 20),
     領域: str(pick('領域'), 60),
     科目: Array.isArray(pick('科目')) ? [...new Set(pick('科目').map(String))] : [],
     使用題庫: pick('使用題庫') === true || pick('使用題庫') === 'true',
+    年級: Object.values(cfg.grades).includes(str(pick('年級'), 10)) ? str(pick('年級'), 10) : '',
+    章節: str(pick('章節'), 40),
     投稿者: str(pick('投稿者'), 40),
     聯絡: str(pick('聯絡'), 80),
     給管理員的話: str(pick('給管理員的話'), 500),
@@ -246,11 +252,22 @@ async function writeCover(cfg, id, cover) {
 }
 
 /** 建立一個新遊戲（管理員新增或老師投稿共用） */
+/** 連結遊戲：只接受 http(s) 網址（例如 Gemini、Canva、Wordwall 分享連結），平台只負責掛上去 */
+function cleanLink(v) {
+  const s = String(v || '').trim();
+  if (!s) return null;
+  let u;
+  try { u = new URL(s); } catch { throw new HttpError(400, '連結格式不正確，請貼上完整網址（https:// 開頭）'); }
+  if (!/^https?:$/.test(u.protocol)) throw new HttpError(400, '只接受 http 或 https 開頭的網址');
+  return u.href;
+}
+
 async function createGame(cfg, body, { 來源, 狀態 }) {
-  const info = cleanInfo(cfg, body.資訊 || {});
-  const upload = decodeUpload(body.檔案, '遊戲檔', cfg.gameUpload.maxZipMB * 1024 * 1024);
-  if (!upload) throw new HttpError(400, '請選擇遊戲檔（.zip 或 .html）');
-  const { files, cover: zipCover, skipped } = await unpackUpload(cfg, upload.buf, upload.檔名);
+  const link = cleanLink(body.連結);
+  const info = cleanInfo(cfg, link ? { ...(body.資訊 || {}), 使用題庫: false } : (body.資訊 || {}));
+  const upload = link ? null : decodeUpload(body.檔案, '遊戲檔', cfg.gameUpload.maxZipMB * 1024 * 1024);
+  if (!link && !upload) throw new HttpError(400, '請選擇遊戲檔（.zip 或 .html），或改用「貼上連結」');
+  const { files, cover: zipCover, skipped } = link ? { files: new Map(), cover: null, skipped: [] } : await unpackUpload(cfg, upload.buf, upload.檔名);
   const coverUp = decodeUpload(body.封面, '封面圖片', MAX_COVER);
   let cover = zipCover;
   if (coverUp) {
@@ -260,12 +277,14 @@ async function createGame(cfg, body, { 來源, 狀態 }) {
   }
 
   const id = `u-${crypto.randomBytes(4).toString('hex')}`;
-  await writeFiles(cfg, id, files);
+  if (link) await fsp.mkdir(dirOf(cfg, id), { recursive: true });
+  else await writeFiles(cfg, id, files);
   if (cover) await writeCover(cfg, id, cover);
   const now = new Date().toISOString();
   const full = {
     id, ...info, 來源, 狀態,
-    原始檔名: upload.檔名 || null,
+    原始檔名: upload ? upload.檔名 || null : null,
+    連結: link,
     檔案數: files.size,
     大小: [...files.values()].reduce((s, b) => s + b.length, 0),
     建立時間: now, 更新時間: now,
@@ -330,7 +349,7 @@ function createPublicGameRouter(cfg) {
     for (const info of await listGames(cfg)) {
       if (info.狀態 === '已發布') uploaded.push(toPublic(info, !!(await findCover(cfg, info.id))));
     }
-    res.json({ 遊戲: [...builtin, ...uploaded], 科目: cfg.subjects });
+    res.json({ 遊戲: [...builtin, ...uploaded], 科目: cfg.subjects, 年級: cfg.grades });
   });
 
   r.get('/api/games/:id/cover', async (req, res) => {
@@ -348,7 +367,7 @@ function createPublicGameRouter(cfg) {
 
   // 老師投稿
   r.get('/api/submit/info', (req, res) => {
-    res.json({ 需要密碼: !!cfg.submitPassword, 分類: CATEGORIES, 科目: cfg.subjects, 上限MB: cfg.gameUpload.maxZipMB });
+    res.json({ 需要密碼: !!cfg.submitPassword, 分類: CATEGORIES, 科目: cfg.subjects, 年級: cfg.grades, 上限MB: cfg.gameUpload.maxZipMB });
   });
   r.post('/api/submit/games', express.json({ limit: jsonLimit }), async (req, res) => {
     if (cfg.submitPassword && req.body?.密碼 !== cfg.submitPassword) throw new HttpError(401, '投稿密碼不正確，請向管理員詢問');
@@ -382,10 +401,10 @@ function createAdminGameRouter(cfg) {
     const list = await listGames(cfg);
     for (const g of list) {
       g.有封面 = !!(await findCover(cfg, g.id));
-      g.預覽網址 = `/gpreview/${previewToken(cfg, g.id)}/${g.id}/index.html`;
+      g.預覽網址 = g.連結 || `/gpreview/${previewToken(cfg, g.id)}/${g.id}/index.html`;
     }
     list.sort((a, b) => (ORDER[a.狀態] ?? 9) - (ORDER[b.狀態] ?? 9) || String(b.建立時間).localeCompare(String(a.建立時間)));
-    res.json({ 遊戲: list, 分類: CATEGORIES, 科目: cfg.subjects, 上限MB: cfg.gameUpload.maxZipMB });
+    res.json({ 遊戲: list, 分類: CATEGORIES, 科目: cfg.subjects, 年級: cfg.grades, 上限MB: cfg.gameUpload.maxZipMB });
   });
 
   r.post('/', express.json({ limit: jsonLimit }), async (req, res) => {
@@ -397,6 +416,10 @@ function createAdminGameRouter(cfg) {
   r.put('/:id', express.json({ limit: jsonLimit }), async (req, res) => {
     const info = await load(req.params.id);
     const patch = cleanInfo(cfg, req.body?.資訊 || {}, { prev: info });
+    if (info.連結 || req.body?.連結) {
+      const link = cleanLink(req.body?.連結 ?? info.連結);
+      if (link) { patch.連結 = link; patch.使用題庫 = false; }
+    }
     let skipped = [];
     const upload = decodeUpload(req.body?.檔案, '遊戲檔', cfg.gameUpload.maxZipMB * 1024 * 1024);
     if (upload) {

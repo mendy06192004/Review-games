@@ -90,6 +90,7 @@ async function initHome() {
   const [tree, gameData] = await Promise.all([api('/api/tree'), api('/api/games')]);
   S.games = gameData.遊戲;
   S.subjects = gameData.科目;
+  S.gradeOrder = Object.values(gameData.年級 || {});
   S.counts = Object.fromEntries(tree.科目.map((s) => [s.代碼, s.題數]));
   const zone = (code, name, char, note, meta) => {
     const b = el('button', { className: `zone z-${code}`, type: 'button' },
@@ -117,7 +118,7 @@ function cover(g) {
     fig.append(el('img', { src: g.封面, alt: '', loading: 'lazy', decoding: 'async' }));
   } else {
     fig.classList.add('blank');
-    fig.append(el('span', { textContent: g.圖示 || '🎮' }));
+    fig.append(el('span', { className: g.圖示 ? '' : 'blank-name', textContent: g.圖示 || g.名稱.slice(0, 1) }));
   }
   return fig;
 }
@@ -129,6 +130,10 @@ function gameCard(g) {
     el('span', { className: 'gbody' },
       el('span', { className: 'gname', textContent: g.名稱 }),
       g.領域 ? el('span', { className: 'gdomain', textContent: g.領域 }) : null,
+      g.年級 || g.章節 || g.連結遊戲 ? el('span', { className: 'gchips' },
+        g.年級 ? el('span', { className: 'gchip', textContent: g.年級 }) : null,
+        g.章節 ? el('span', { className: 'gchip', textContent: g.章節 }) : null,
+        g.連結遊戲 ? el('span', { className: 'gchip link', textContent: '外部連結' }) : null) : null,
       el('span', { className: 'gdesc', textContent: g.說明 }),
       el('span', { className: `gtag${g.使用題庫 ? ' bank' : ''}`, textContent: noBank ? '題庫還沒有這一科的題目' : g.使用題庫 ? '選範圍・用題庫出題' : '直接開始' })));
   b.addEventListener('click', () => pickGame(g));
@@ -139,7 +144,10 @@ function pickSubject(code, name) {
   S.subject = code;
   S.subjectName = name;
   S.game = null;
-  const list = gamesFor(code);
+  // 有標年級、章節的遊戲依年級、章節排序（沒標的維持原順序排在前面）
+  const gIdx = (g) => (g.年級 ? S.gradeOrder.indexOf(g.年級) + 1 : 0);
+  const list = gamesFor(code).map((g, i) => ({ g, i })).sort((a, b) => gIdx(a.g) - gIdx(b.g)
+    || (a.g.章節 && b.g.章節 ? a.g.章節.localeCompare(b.g.章節, 'zh-Hant-TW', { numeric: true }) : 0) || a.i - b.i).map((x) => x.g);
   const tabs = $('#game-tabs');
   if (code === 'O') {
     $('#games-eyebrow').textContent = '其他';
@@ -188,8 +196,13 @@ function playStandalone(g) {
   const root = $('#game-root');
   root.className = 'game-root frame';
   const frame = el('iframe', { src: g.入口, title: g.名稱, allow: 'autoplay; fullscreen' });
-  if (g.外部) frame.setAttribute('sandbox', SANDBOX);
+  if (g.外部 && !g.連結遊戲) frame.setAttribute('sandbox', SANDBOX);
   root.replaceChildren(frame);
+  // 外部連結（Gemini、Canva…）有些網站不允許嵌入：提供開新視窗
+  if (g.連結遊戲) {
+    root.append(el('div', { className: 'link-tip' }, '畫面空白或打不開？ ',
+      el('a', { href: g.入口, target: '_blank', rel: 'noopener', textContent: '在新視窗開啟遊戲 ↗' })));
+  }
   show('play');
   updateFsButton();
 }

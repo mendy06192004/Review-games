@@ -1,33 +1,47 @@
 @echo off
-chcp 65001 >nul
 cd /d "%~dp0"
 echo ==========================================
-echo   åœ‹è‹±æ•¸è¤‡ç¿’å¹³å°
+echo   °ê­^¼Æ½Æ²ß¥­¥x
 echo ==========================================
 where node >nul 2>nul
+if errorlevel 1 goto nonode
+if not exist src\app.js goto nosrc
+if not exist node_modules goto install
+goto run
+
+:nonode
+echo.
+echo §ä¤£¨ì Node.js¡A½Ð¥ý¨ì https://nodejs.org ¦w¸Ë LTS ª©¡A
+echo ¦w¸Ë«á½Ð­«·s¶}¾÷¡A¦AÂI¨â¤U³o­ÓÀÉ®×¡C
+pause
+exit /b
+
+:nosrc
+echo.
+echo ¿ù»~¡G§ä¤£¨ì src ¸ê®Æ§¨¡A¥Nªí¸ê®Æ§¨¤£§¹¾ã¡C
+echo ½Ð­«·s¤U¸ü§¹¾ãªº ZIP ÀÉ¡A¸ÑÀ£ÁY«á¦A¸Õ¤@¦¸¡C
+pause
+exit /b
+
+:install
+echo.
+echo ²Ä¤@¦¸±Ò°Ê¡A¥¿¦b¦w¸Ë»Ý­nªº®M¥ó¡A¬ù 1 ¨ì 3 ¤ÀÄÁ¡A½Ðµy­Ô...
+call npm install
 if errorlevel 1 (
-  echo.
-  echo æ‰¾ä¸åˆ° Node.jsï¼Œè«‹å…ˆåˆ° https://nodejs.org ä¸‹è¼‰å®‰è£ LTS ç‰ˆï¼Œè£å¥½å¾Œå†é»žå…©ä¸‹é€™å€‹æª”æ¡ˆã€‚
+  echo ¦w¸Ë¥¢±Ñ¡A½Ð½T»{ºô¸ô³s½u«á¦A¸Õ¤@¦¸¡C
   pause
   exit /b
 )
-if not exist node_modules (
-  echo.
-  echo ç¬¬ä¸€æ¬¡å•Ÿå‹•ï¼Œæ­£åœ¨å®‰è£éœ€è¦çš„å¥—ä»¶ï¼Œå¤§ç´„ 1ï½ž3 åˆ†é˜ï¼Œè«‹ç¨å€™â€¦â€¦
-  call npm install
-  if errorlevel 1 (
-    echo å®‰è£å¤±æ•—ï¼Œè«‹ç¢ºèªé›»è…¦æœ‰é€£ä¸Šç¶²è·¯å¾Œå†è©¦ä¸€æ¬¡ã€‚
-    pause
-    exit /b
-  )
-)
+
+:run
 echo.
-echo å•Ÿå‹•ä¸­â€¦â€¦ç€è¦½å™¨æœƒè‡ªå‹•æ‰“é–‹ã€‚
-echo å­¸ç”Ÿç«¯ï¼šhttp://localhost:3000
-echo å¯©æ ¸å¾Œå°ï¼šhttp://localhost:3000/admin
+echo ±Ò°Ê¤¤¡AÂsÄý¾¹·|¦Û°Ê¥´¶}¡C
+echo ¾Ç¥ÍºÝ¡Ghttp://localhost:3000
+echo ¼f®Ö«á¥x¡Ghttp://localhost:3000/admin
+echo ¨Ï¥Î´Á¶¡½Ð¤£­nÃö³¬³o­Ó¶Â¦âµøµ¡¡C
 echo.
-echo â€» ä½¿ç”¨æœŸé–“è«‹ä¸è¦é—œé–‰é€™å€‹é»‘è‰²è¦–çª—ï¼›è¦é—œé–‰å¹³å°æ™‚ï¼Œç›´æŽ¥é—œæŽ‰é€™å€‹è¦–çª—å³å¯ã€‚
-echo.
-start "" cmd /c "timeout /t 3 >nul & start http://localhost:3000"
+start "" cmd /c "timeout /t 4 >nul & start http://localhost:3000"
 call npm start
+echo.
+echo ¥­¥x¤w°±¤î¡C
 pause

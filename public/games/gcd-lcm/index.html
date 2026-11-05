@@ -1,0 +1,892 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>大因與小倍</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap">
+<style>
+/* Layout: one chalkboard column (max 60rem). Coach row on top, work area below; everything stacks to one column on phones. */
+:root{
+  --board:#1a3227; --board-hi:#20402f; --line:#41705a; --chalk:#f4f1e5; --dim:#aabdb0; --ink:#14251b;
+  --gcd:#ff929e; --gcd-wash:rgba(255,146,158,.18); --gcd-soft:#ffd2d8;
+  --lcm:#ffd862; --lcm-wash:rgba(255,216,98,.18); --lcm-soft:#ffeca8;
+  --ok:#96efab; --warn:#ffb480; --focus:#8ad9ff;
+  --paper:#fbf9f1; --paper-good:#e8f9ea; --paper-bad:#fff0e2; --sup:#b3304a;
+  --f-hand:"LXGW WenKai TC","Kaiti TC","BiauKai","DFKai-SB",serif;
+  --f-body:"Atkinson Hyperlegible","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-num:"Atkinson Hyperlegible","Noto Sans TC",sans-serif;
+  color-scheme:dark;
+}
+html{background:var(--board)}
+body{
+  background:var(--board);
+  background-image:radial-gradient(ellipse at 20% 10%,rgba(244,241,229,.05),transparent 55%),
+                   radial-gradient(ellipse at 85% 70%,rgba(244,241,229,.04),transparent 50%);
+  background-attachment:fixed;
+  color:var(--chalk);font-family:var(--f-body);font-size:clamp(18px,1.1vw + 13px,22px);line-height:1.55;
+}
+#app{max-width:60rem;margin:0 auto;padding-block:16px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:18px}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+b{font-weight:700}
+sup{font-size:.6em;line-height:0}
+
+/* buttons */
+.btn{font:inherit;font-weight:700;color:var(--chalk);background:transparent;border:3px solid var(--chalk);
+  border-radius:14px;min-height:56px;padding:8px 20px;cursor:pointer;touch-action:manipulation}
+.btn:hover{background:rgba(244,241,229,.1)}
+.btn.solid{background:var(--chalk);color:var(--ink)}
+.btn.solid:hover{background:#fff}
+.btn.big{min-height:68px;font-size:1.15em;padding:10px 30px}
+.btn.sm{min-height:48px;padding:4px 14px;font-size:.85em;border-width:2px}
+button:focus-visible{outline:4px solid var(--focus);outline-offset:3px}
+button:disabled{opacity:.35;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.row.center{justify-content:center}
+
+/* characters */
+.face{width:100%;height:auto;display:block}
+.s{fill:none;stroke:var(--chalk);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.sg{stroke:var(--gcd);stroke-width:5.5}
+.sl{stroke:var(--lcm);stroke-width:5.5}
+.dot{fill:var(--chalk)}
+.mouth-open{fill:var(--ink);stroke:var(--chalk);stroke-width:4;stroke-linejoin:round}
+.motto{font-family:var(--f-hand);font-weight:700;padding:0 .25em;border-radius:6px;color:var(--ink)}
+.motto.gcd{background:var(--gcd-soft)} .motto.lcm{background:var(--lcm-soft)}
+.tg{color:var(--gcd)} .tl{color:var(--lcm)}
+
+/* home */
+.home-head{text-align:center;display:flex;flex-direction:column;gap:6px;padding-top:8px}
+.eyebrow{color:var(--dim);letter-spacing:.12em;font-size:.85em}
+.brand{font-family:var(--f-hand);font-size:clamp(44px,9vw,76px);line-height:1.15;font-weight:700}
+.brand .and{color:var(--dim);font-size:.55em;margin:0 .2em}
+.lead{color:var(--dim)}
+.intro{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,21rem),1fr));gap:16px}
+.icard{border:3px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;background:var(--board-hi);min-width:0}
+.icard.gcd{border-color:var(--gcd)} .icard.lcm{border-color:var(--lcm)}
+.ihead{display:grid;grid-template-columns:clamp(92px,24vw,124px) minmax(0,1fr);gap:14px;align-items:center}
+.ibtn{background:var(--ink);border:3px solid var(--chalk);border-radius:18px;padding:6px;cursor:pointer}
+.icard.gcd .ibtn{border-color:var(--gcd)} .icard.lcm .ibtn{border-color:var(--lcm)}
+.iname{font-family:var(--f-hand);font-size:2.1em;font-weight:700;line-height:1.1}
+.ijob{font-size:.95em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{border:2px solid var(--dim);border-radius:999px;padding:0 12px;font-size:.8em;color:var(--dim)}
+.ispeech{background:var(--paper);color:var(--ink);border-radius:16px;padding:12px 16px;min-height:5.2em;font-size:1.05em}
+.icard.gcd .ispeech{border-left:8px solid var(--gcd)} .icard.lcm .ispeech{border-left:8px solid var(--lcm)}
+.ipager{display:flex;gap:6px;align-items:center}
+.ipager i{width:12px;height:12px;border-radius:50%;background:var(--line);display:inline-block}
+.ipager i.on{background:var(--chalk)}
+.ihow{border-top:2px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.ihow h3{font-size:1em;color:var(--dim);font-weight:700}
+.ihow .cap{text-align:center;font-family:var(--f-num);font-weight:700}
+.steps3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:12px;list-style:none;padding:0;margin:0}
+.steps3 li{border:2px dashed var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.steps3 .n{font-family:var(--f-hand);font-weight:700;font-size:1.6em;line-height:1;color:var(--lcm)}
+
+/* top bar */
+.topbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.topbar h2{font-family:var(--f-hand);font-size:1.45em;flex:1 1 12rem;min-width:0}
+.qdots{display:flex;gap:6px;align-items:center;font-size:.8em;color:var(--dim)}
+.qdots i{width:18px;height:18px;border-radius:50%;border:3px solid var(--dim);display:inline-block}
+.qdots i.now{border-color:var(--chalk)}
+.qdots i.on{background:var(--ok);border-color:var(--ok)}
+.streak{font-weight:700;color:var(--lcm);font-variant-numeric:tabular-nums}
+
+/* map */
+.stage-list{display:flex;flex-direction:column;gap:12px;list-style:none;margin:0;padding:0}
+.scard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;text-align:left;
+  font:inherit;color:var(--chalk);background:var(--board-hi);border:3px solid var(--line);border-radius:18px;padding:12px 16px;cursor:pointer;min-height:84px}
+.scard:hover:not(:disabled){border-color:var(--chalk)}
+.scard .num{width:2.2em;height:2.2em;border-radius:50%;border:3px solid var(--chalk);display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-hand);font-weight:700;font-size:1.3em}
+.scard.done .num{background:var(--ok);border-color:var(--ok);color:var(--ink)}
+.scard .tt{font-weight:700;font-size:1.1em}
+.scard .sb{color:var(--dim);font-size:.85em}
+.scard .side{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.scard .mini{width:52px}
+.scard:disabled{opacity:.45}
+.lock{font-size:.75em;color:var(--dim)}
+.stars{display:flex;gap:2px}
+.stars svg{width:24px;height:24px}
+.stars.big svg{width:clamp(56px,14vw,80px);height:auto}
+.st{fill:none;stroke:var(--dim);stroke-width:2.2;stroke-linejoin:round}
+.st.on{fill:var(--lcm);stroke:var(--lcm)}
+.mapfoot{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;color:var(--dim);font-size:.85em}
+
+/* coach */
+.coach{display:grid;grid-template-columns:clamp(92px,22vw,136px) minmax(0,1fr);gap:14px;align-items:start}
+.coachbtn{background:var(--ink);border:4px solid var(--chalk);border-radius:18px;padding:6px 6px 4px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:0;color:var(--chalk);font:inherit}
+.coachbtn.gcd{border-color:var(--gcd)} .coachbtn.lcm{border-color:var(--lcm)}
+.coachbtn .nm{font-family:var(--f-hand);font-weight:700;font-size:1.15em}
+.coachbtn .tip{font-size:.7em;color:var(--dim)}
+.coachbtn.nudge{animation:nudge 1.4s ease-in-out infinite}
+@keyframes nudge{0%,100%{box-shadow:0 0 0 0 rgba(138,217,255,0)}50%{box-shadow:0 0 0 10px rgba(138,217,255,.6)}}
+.bubble{background:var(--paper);color:var(--ink);border-radius:18px;padding:14px 18px;display:flex;flex-direction:column;gap:10px;
+  border:4px solid var(--chalk);min-width:0;font-size:1.08em}
+.bubble.gcd{border-color:var(--gcd)} .bubble.lcm{border-color:var(--lcm)}
+.bubble.good{background:var(--paper-good)} .bubble.bad{background:var(--paper-bad)}
+.bubble .who{font-size:.72em;font-weight:700;color:#4d6355}
+.bubble .tools{display:flex;flex-wrap:wrap;gap:8px}
+.bubble .tools button{font:inherit;font-size:.78em;font-weight:700;color:var(--ink);background:transparent;border:2px solid var(--ink);
+  border-radius:10px;min-height:44px;padding:2px 14px;cursor:pointer}
+
+/* work area */
+.work{border:3px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:16px;background:var(--board-hi);min-width:0}
+.ask{font-size:1.15em;font-weight:700;text-align:center}
+.eq{font-family:var(--f-num);font-weight:700;font-size:1.5em;text-align:center}
+.eq .v{font-size:.6em;color:var(--dim);font-weight:400}
+.label{color:var(--dim);text-align:center;font-weight:700}
+.flash{text-align:center;font-weight:700;min-height:1.55em}
+.flash.good{color:var(--ok)} .flash.bad{color:var(--warn)}
+
+/* short division ladder */
+.ladder-scroll{overflow-x:auto;display:flex;justify-content:center;padding:6px 4px}
+.ladder{display:grid;font-family:var(--f-num);font-size:clamp(30px,6.5vw,46px);font-weight:700;font-variant-numeric:tabular-nums;margin:0 auto}
+.ladder>*{display:flex;align-items:center;justify-content:center;padding:2px 16px;min-height:1.55em}
+.ld{color:var(--chalk)}
+.ld.empty{padding:0}
+.lv{border-bottom:4px solid var(--chalk)}
+.lv.first{border-left:4px solid var(--chalk)}
+.lb{color:var(--chalk)}
+button.ld,button.lb{font:inherit;color:var(--chalk);background:transparent;border:3px dashed var(--dim);border-radius:12px;cursor:pointer;margin:3px}
+button.ld:hover,button.lb:hover{border-color:var(--focus)}
+.sel-g{background:var(--gcd)!important;color:var(--ink)!important;border:3px solid var(--gcd)!important;border-radius:12px}
+.sel-l{background:var(--lcm)!important;color:var(--ink)!important;border:3px solid var(--lcm)!important;border-radius:12px}
+.mark{background:var(--lcm);color:var(--ink)!important;border-radius:12px}
+.glow{box-shadow:0 0 0 4px var(--focus);animation:glow 1.2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 9px rgba(138,217,255,.35)}}
+.pop{animation:pop .5s ease-out}
+@keyframes pop{0%{opacity:0;transform:translateY(-10px)}100%{opacity:1;transform:none}}
+
+.pad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:30rem;width:100%;margin:0 auto}
+.pad.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.pad button{font-family:var(--f-num);font-weight:700;font-size:2em;min-height:78px;background:var(--chalk);color:var(--ink);
+  border:none;border-radius:16px;cursor:pointer;touch-action:manipulation}
+.pad button:hover{background:#fff}
+.stopbtn{display:block;margin:0 auto;max-width:30rem;width:100%}
+
+/* factor table */
+.tbl-scroll{overflow-x:auto;padding:4px 0}
+.ftab{border-collapse:separate;border-spacing:8px;margin:0 auto}
+.ftab thead th{font-family:var(--f-num);font-size:1.2em;padding:2px 10px;border-radius:10px;color:var(--dim)}
+.ftab th.on-g{background:var(--gcd);color:var(--ink)} .ftab th.on-l{background:var(--lcm);color:var(--ink)}
+.ftab th.off,.fc.off{opacity:.3}
+.rl{font-weight:700;white-space:nowrap;text-align:right;font-size:1em;padding-right:4px}
+.ftab thead th.rl{font-family:var(--f-body);font-size:.75em}
+.fc{width:clamp(74px,17vw,118px);min-height:clamp(100px,20vw,128px);background:var(--ink);border:3px solid var(--line);border-radius:14px;
+  color:var(--chalk);font:inherit;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+button.fc{cursor:pointer}
+button.fc:hover{border-color:var(--focus)}
+.fc.on-g{border-color:var(--gcd);background:var(--gcd-wash)} .fc.on-l{border-color:var(--lcm);background:var(--lcm-wash)}
+.fc.res{border-style:dashed}
+.picked-g{box-shadow:0 0 0 4px var(--gcd),0 0 0 8px var(--chalk)}
+.picked-l{box-shadow:0 0 0 4px var(--lcm),0 0 0 8px var(--chalk)}
+.pc{font-family:var(--f-num);font-weight:700;font-size:1.6em;background:var(--chalk);color:var(--ink);border-radius:8px;padding:0 10px;line-height:1.35}
+.pc sup{color:var(--sup)}
+.blks{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;max-width:84px}
+.blk{width:14px;height:14px;border-radius:3px;background:var(--chalk);display:inline-block}
+.cn{font-size:.7em;color:var(--dim)}
+.none{color:var(--dim);font-weight:700}
+.qm{font-size:1.8em;color:var(--dim);font-family:var(--f-num)}
+
+/* build (challenge) */
+.ans{min-height:150px;border:3px dashed var(--dim);border-radius:16px;padding:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.ans .empty{color:var(--dim)}
+.ans .times{font-family:var(--f-num);font-size:2em;font-weight:700}
+.achip{background:var(--ink);border:3px solid var(--chalk);border-radius:14px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.achip.err{border-color:var(--warn);box-shadow:0 0 0 4px var(--warn)}
+.achip .pm{display:flex;gap:6px}
+.achip .pm button{font-family:var(--f-num);font-weight:700;font-size:1.4em;min-width:52px;min-height:50px;border-radius:10px;
+  border:2px solid var(--chalk);background:transparent;color:var(--chalk);cursor:pointer}
+.achip .rm{font:inherit;font-size:.72em;min-height:40px;border:2px solid var(--dim);background:transparent;color:var(--dim);border-radius:10px;padding:0 12px;cursor:pointer}
+
+.result{border:3px solid var(--ok);border-radius:16px;padding:14px;text-align:center;font-family:var(--f-num);font-weight:700;font-size:1.35em;color:var(--ok)}
+
+/* result screen */
+.finish{text-align:center;display:flex;flex-direction:column;gap:16px;align-items:center;padding:20px 0}
+.finish h2{font-family:var(--f-hand);font-size:clamp(34px,7vw,56px)}
+.finish .faces{display:flex;gap:16px;justify-content:center}
+.finish .faces div{width:clamp(96px,24vw,140px)}
+.dust{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
+.dust i{position:absolute;top:-20px;width:10px;height:10px;border-radius:2px;animation:fall 2.4s ease-in forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.2}}
+
+@media (max-width:480px){
+  .coach{grid-template-columns:88px minmax(0,1fr);gap:10px}
+  .bubble{padding:12px 14px;font-size:1em}
+  .work{padding:14px 10px}
+  .pad button{min-height:68px;font-size:1.7em}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .coachbtn.nudge{box-shadow:0 0 0 8px var(--focus)}
+}
+</style>
+
+<div id="app"></div>
+
+<script>
+/* ---------- 工具 ---------- */
+const app=document.getElementById('app');
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const ex=(F,p)=>F[p]||0;
+const PAD=[2,3,5,7];
+function factor(n){const F={};for(const p of [2,3,5,7,11,13]){while(n%p===0){F[p]=(F[p]||0)+1;n/=p}}return F}
+function val(F){let v=1;for(const p in F)v*=Math.pow(+p,F[p]);return v}
+function primesOf(...Fs){const s=new Set();Fs.forEach(F=>Object.keys(F).forEach(p=>{if(F[p]>0)s.add(+p)}));return[...s].sort((a,b)=>a-b)}
+const sup=(p,e)=>`${p}${e>1?`<sup>${e}</sup>`:''}`;
+function fmt(F){const ps=primesOf(F);return ps.length?ps.map(p=>sup(p,F[p])).join(' × '):'1'}
+function gcdF(A,B){const r={};primesOf(A,B).forEach(p=>{const m=Math.min(ex(A,p),ex(B,p));if(m>0)r[p]=m});return r}
+function lcmF(A,B){const r={};primesOf(A,B).forEach(p=>{r[p]=Math.max(ex(A,p),ex(B,p))});return r}
+function same(X,Y){const a=primesOf(X),b=primesOf(Y);return a.length===b.length&&a.every(p=>X[p]===Y[p])}
+
+/* ---------- 儲存（只存在這台裝置） ---------- */
+const KEY='dayin-xiaobei-v1';
+let SAVE={stars:{},all:false,sound:true};
+try{const t=localStorage.getItem(KEY);if(t)SAVE=Object.assign(SAVE,JSON.parse(t))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(SAVE))}catch(e){}}
+
+/* ---------- 聲音與朗讀 ---------- */
+let AC=null;
+function tone(kind){
+  if(!SAVE.sound)return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const seq=kind==='ok'?[660,880]:kind==='win'?[523,659,784,1047]:[330,262];
+    const vol=kind==='bad'?.08:.16;
+    seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+i*.12;
+      o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.02);
+      g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+.28)});
+  }catch(e){}
+}
+function speak(html){
+  if(!('speechSynthesis' in window))return;
+  const t=html.replace(/(\d+)<sup>(\d+)<\/sup>/g,'$1的$2次方').replace(/<[^>]+>/g,' ')
+    .replace(/×/g,'乘').replace(/÷/g,'除以').replace(/＝/g,'等於').replace(/＋/g,'加');
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';u.rate=.85;speechSynthesis.speak(u)}catch(e){}
+}
+function hush(){try{if('speechSynthesis' in window)speechSynthesis.cancel()}catch(e){}}
+
+/* ---------- 角色 ---------- */
+const CH={
+  gcd:{name:'大因',full:'最大公因數',trait:['善良','不貪心'],motto:'大家都有他才要、每次都拿最小的'},
+  lcm:{name:'小倍',full:'最小公倍數',trait:['貪心','什麼都要'],motto:'只要出現的他都要、每次都拿最大的'}
+};
+const motto=w=>`<span class="motto ${w}">${CH[w].motto}</span>`;
+CH.gcd.lines=[
+  '嗨！我是<b>大因</b>，我負責找<b>最大公因數</b>。',
+  '我很善良、不貪心，只拿大家都有的東西。',
+  `我的口訣：${motto('gcd')}`,
+  '用短除法的時候，我只拿<b>左邊那一排</b>，因為那是兩個數<b>都有</b>的。',
+  '用標準分解式的時候，我只拿兩個數都有的質因數，而且拿<b>指數比較小</b>的。'
+];
+CH.lcm.lines=[
+  '我是<b>小倍</b>，我負責找<b>最小公倍數</b>！',
+  '我很貪心，什麼都要，一個都不能少！',
+  `我的口訣：${motto('lcm')}`,
+  '用短除法的時候，我拿<b>左邊一排</b>加上<b>最下面一排</b>，連起來像一個大大的 L。',
+  '用標準分解式的時候，出現過的質因數我全部都要，而且拿<b>指數比較大</b>的。'
+];
+function face(w,mood='happy'){
+  const M={
+    happy:w==='gcd'?'<path class="s" d="M42 84 Q60 99 78 84"/>':'<path class="s" d="M46 88 Q60 99 74 88"/>',
+    cheer:w==='gcd'?'<path class="mouth-open" d="M40 82 Q60 108 80 82 Z"/>':'<path class="mouth-open" d="M44 86 Q60 106 76 86 Z"/>',
+    think:'<path class="s" d="M48 92 Q56 88 72 92"/>',
+    oops:'<ellipse class="s" cx="60" cy="92" rx="6" ry="7"/>'
+  }[mood];
+  const eyesUp=mood==='think'?-3:0;
+  if(w==='gcd'){
+    const eyes=mood==='cheer'?'<path class="s" d="M39 62 q5 -6 10 0"/><path class="s" d="M71 62 q5 -6 10 0"/>'
+      :`<circle class="dot" cx="45" cy="${61+eyesUp}" r="${mood==='oops'?4.5:3.5}"/><circle class="dot" cx="75" cy="${61+eyesUp}" r="${mood==='oops'?4.5:3.5}"/>`;
+    return `<svg class="face" viewBox="0 0 120 120" aria-hidden="true">
+      <path class="s" d="M36 32 Q60 8 84 32"/><path class="s" d="M44 25 Q52 13 60 23 Q68 13 76 25"/>
+      <circle class="s" cx="60" cy="66" r="42"/>
+      <circle class="s sg" cx="45" cy="61" r="13"/><circle class="s sg" cx="75" cy="61" r="13"/><path class="s sg" d="M58 61 h4"/>
+      ${eyes}${M}</svg>`;
+  }
+  const eyes=mood==='cheer'?'<path class="s" d="M36 58 q6 -6 12 0"/><path class="s" d="M72 58 q6 -6 12 0"/>'
+    :`<circle class="dot" cx="42" cy="${57+eyesUp}" r="${mood==='oops'?4.5:3.5}"/><circle class="dot" cx="78" cy="${57+eyesUp}" r="${mood==='oops'?4.5:3.5}"/>`;
+  return `<svg class="face" viewBox="0 0 120 120" aria-hidden="true">
+    <path class="s" d="M30 40 L38 18 L46 34 L54 12 L62 34 L70 12 L78 34 L86 18 L92 40"/>
+    <path class="s" d="M28 42 L92 42 L88 82 L60 110 L32 82 Z"/>
+    <path class="s sl" d="M22 56 L30 46 L52 46 L56 58 L50 70 L28 70 Z"/><path class="s sl" d="M98 56 L90 46 L68 46 L64 58 L70 70 L92 70 Z"/>
+    <path class="s sl" d="M56 58 h8"/>
+    ${eyes}${M}</svg>`;
+}
+const STAR='<path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.2 1.3-6.6L2.5 9.4l6.6-.8z"/>';
+function starsHTML(n,big){return `<span class="stars${big?' big':''}" aria-label="${n} 顆星">${[1,2,3].map(i=>`<svg viewBox="0 0 24 24"><g class="st${i<=n?' on':''}">${STAR}</g></svg>`).join('')}</span>`}
+
+/* ---------- 關卡 ---------- */
+const STAGES=[
+  {n:1,who:'lcm',title:'短除法拆數字',sub:'把一個數一直除，拆成質數，再寫成標準分解式'},
+  {n:2,who:'gcd',title:'短除法找大因',sub:'兩個數一起短除，找出最大公因數'},
+  {n:3,who:'lcm',title:'短除法找小倍',sub:'兩個數一起短除，找出最小公倍數'},
+  {n:4,who:'gcd',title:'分解式找大因',sub:'比較標準分解式：大家都有、拿小的'},
+  {n:5,who:'lcm',title:'分解式找小倍',sub:'比較標準分解式：全部都要、拿大的'},
+  {n:6,who:'both',title:'大挑戰',sub:'四種題目混在一起，看你能連對幾題'}
+];
+const unlocked=n=>SAVE.all||n===1||!!SAVE.stars[n-1];
+
+/* ---------- 路由 ---------- */
+let VIEW='home',R=null,IDLE=null,INTRO={gcd:0,lcm:0},CONFIRM=false;
+function route(){
+  hush();clearTimeout(IDLE);
+  const h=location.hash.slice(1);
+  const m=h.match(/^stage-(\d)$/);
+  if(m&&STAGES[m[1]-1]&&unlocked(+m[1]))return startStage(+m[1]);
+  if(h==='map')return showMap();
+  showHome();
+}
+function go(h){if(location.hash==='#'+h)route();else location.hash=h}
+addEventListener('hashchange',route);
+
+/* ---------- 主畫面 ---------- */
+const DEMO={nums:[12,18],rows:[{d:2,vals:[12,18]},{d:3,vals:[6,9]}],cur:[2,3]};
+function introCard(w){
+  const c=CH[w],i=INTRO[w];
+  const sel=new Set(w==='gcd'?['d0','d1']:['d0','d1','b0','b1']);
+  return `<article class="icard ${w}">
+    <div class="ihead">
+      <button class="ibtn" data-act="intro" data-w="${w}" aria-label="點${c.name}聽下一句">${face(w,i%2?'cheer':'happy')}</button>
+      <div>
+        <h2 class="iname ${w==='gcd'?'tg':'tl'}">${c.name}</h2>
+        <p class="ijob">負責找<b>${c.full}</b></p>
+        <div class="chips">${c.trait.map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+      </div>
+    </div>
+    <p class="ispeech" aria-live="polite">${c.lines[i]}</p>
+    <div class="row">
+      <button class="btn sm" data-act="intro" data-w="${w}">下一句</button>
+      <button class="btn sm" data-act="isay" data-w="${w}">唸給我聽</button>
+      <span class="ipager">${c.lines.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</span>
+    </div>
+    <div class="ihow">
+      <h3>${c.name}在短除法裡拿哪些數字？</h3>
+      ${ladderHTML(DEMO,{sel,mode:w})}
+      <p class="cap ${w==='gcd'?'tg':'tl'}">${w==='gcd'?'12 和 18 的最大公因數 ＝ 2 × 3 ＝ 6':'12 和 18 的最小公倍數 ＝ 2 × 3 × 2 × 3 ＝ 36'}</p>
+    </div>
+  </article>`;
+}
+function showHome(){
+  VIEW='home';R=null;
+  const next=STAGES.find(s=>!SAVE.stars[s.n]&&unlocked(s.n));
+  const any=Object.keys(SAVE.stars).length>0;
+  app.innerHTML=`
+  <header class="home-head">
+    <p class="eyebrow">國中數學・因數與倍數</p>
+    <h1 class="brand"><span class="tg">大因</span><span class="and">與</span><span class="tl">小倍</span></h1>
+    <p class="lead">兩位黑板朋友，帶你學會最大公因數和最小公倍數。點角色，聽聽他們的自我介紹。</p>
+  </header>
+  <section class="intro">${introCard('gcd')}${introCard('lcm')}</section>
+  <ol class="steps3">
+    <li><span class="n">1</span><span>先認識大因和小倍，記住他們的口訣。</span></li>
+    <li><span class="n">2</span><span>照著學習地圖，一關一關往下學。</span></li>
+    <li><span class="n">3</span><span>卡住了就點角色，他會給你提示。</span></li>
+  </ol>
+  <div class="row center">
+    ${next?`<button class="btn solid big" data-go="stage-${next.n}">${any?`繼續：第 ${next.n} 關`:'開始第 1 關'}</button>`:''}
+    <button class="btn big" data-go="map">學習地圖</button>
+  </div>`;
+}
+
+/* ---------- 學習地圖 ---------- */
+function showMap(){
+  VIEW='map';R=null;
+  app.innerHTML=`
+  <div class="topbar"><button class="btn sm" data-go="home">回主畫面</button><h2>學習地圖</h2>${soundBtn()}</div>
+  <p class="lead">從第 1 關開始，完成一關就會打開下一關。每一關做完可以拿到星星。</p>
+  <ol class="stage-list">
+  ${STAGES.map(s=>{const st=SAVE.stars[s.n]||0,open=unlocked(s.n);
+    return `<li><button class="scard${st?' done':''}" data-go="stage-${s.n}" ${open?'':'disabled'}>
+      <span class="num">${s.n}</span>
+      <span><span class="tt">${s.title}</span><br><span class="sb">${s.sub}</span></span>
+      <span class="side">${s.who==='both'?'':`<span class="mini">${face(s.who)}</span>`}
+        ${open?starsHTML(st):`<span class="lock">先完成第 ${s.n-1} 關</span>`}</span>
+    </button></li>`}).join('')}
+  </ol>
+  <div class="mapfoot">
+    <button class="btn sm" data-act="unlock">${SAVE.all?'老師模式：已開啟全部關卡':'老師模式：開啟全部關卡'}</button>
+    <button class="btn sm" data-act="reset">${CONFIRM?'再按一次就會清除星星':'清除學習紀錄'}</button>
+  </div>`;
+}
+function soundBtn(){return `<button class="btn sm" data-act="sound" aria-pressed="${SAVE.sound}">${SAVE.sound?'聲音：開':'聲音：關'}</button>`}
+
+/* ---------- 題目產生 ---------- */
+function genPair(d,maxV=110){
+  const gp=d===1?[2,3,5]:d===2?[4,6,9,10]:[8,12,15,18];
+  for(let k=0;k<500;k++){
+    const g=pick(gp),a=rand(2,d<3?5:7),b=rand(2,d<3?5:7);
+    if(a===b||gcd(a,b)!==1||g*a>maxV+40||g*b>maxV+40)continue;
+    return a<b?[g*a,g*b]:[g*b,g*a];
+  }
+  return [12,18];
+}
+function genForm(d){
+  for(let k=0;k<3000;k++){
+    const pool=d===1?[2,3,5]:[2,3,5,7],maxE=d===1?2:3,A={},B={};
+    pool.forEach(p=>{if(Math.random()<.65)A[p]=rand(1,maxE);if(Math.random()<.65)B[p]=rand(1,maxE)});
+    const ps=primesOf(A,B),com=ps.filter(p=>A[p]&&B[p]);
+    if(ps.length<3||!com.length||ps.length===com.length)continue;
+    if(!com.some(p=>A[p]!==B[p]))continue;
+    if(primesOf(A).length<2||primesOf(B).length<2||same(A,B))continue;
+    if(val(A)>2500||val(B)>2500)continue;
+    return [A,B];
+  }
+  return [{2:2,3:1,5:1},{2:1,3:2,7:1}];
+}
+const newSplit=n=>({t:'split',who:'lcm',n,rows:[],cur:[n],phase:'divide'});
+const newLadder=(mode,ab)=>({t:'ladder',who:mode,mode,nums:ab,rows:[],cur:ab.slice(),phase:'divide',sel:new Set()});
+const newForm=(mode,AB)=>({t:'form',who:mode,mode,A:AB[0],B:AB[1],phase:mode==='gcd'?'cols':'pick',cols:{},picks:{}});
+function newBuild(mode){
+  let AB;
+  if(mode==='gcd'&&Math.random()<.2){AB=[{2:rand(1,2),3:rand(1,2)},{5:1,7:1}]}
+  else AB=genForm(2);
+  return {t:'build',who:mode,mode,A:AB[0],B:AB[1],ans:{},one:false,phase:'build',table:false,tableHL:false,wrong:0,err:null};
+}
+function makeQuestions(n){
+  if(n===1){const pools=[[12,18,20,28,30],[24,36,40,42,45,50,54],[48,60,63,72,75,84,90]];return pools.map(p=>newSplit(pick(p)))}
+  if(n===2||n===3)return [1,2,3].map(d=>newLadder(n===2?'gcd':'lcm',genPair(d)));
+  if(n===4||n===5)return [1,2,2].map(d=>newForm(n===4?'gcd':'lcm',genForm(d)));
+  const types=shuffle(['lg','ll','bg','bl',pick(['lg','ll','bg','bl'])]);
+  return types.map(t=>t[0]==='l'?newLadder(t[1]==='g'?'gcd':'lcm',genPair(rand(2,3),150)):newBuild(t[1]==='g'?'gcd':'lcm'));
+}
+
+/* ---------- 關卡流程 ---------- */
+function startStage(n){
+  VIEW='stage';
+  R={n,st:STAGES[n-1],qs:makeQuestions(n),qi:0,mistakes:0,streak:0,best:0};
+  loadQ();
+}
+function introMsg(q){
+  if(q.t==='split')return `我們用<b>短除法</b>把 <b>${q.n}</b> 拆開。<br>點下面的質數，看 ${q.n} 能不能被它整除。一直除到剩下 <b>1</b>。`;
+  if(q.t==='ladder'){const [a,b]=q.nums;
+    return `我是${CH[q.mode].name}。${motto(q.mode)}<br>先做短除法：找一個 <b>${a} 和 ${b} 都能整除</b>的質數，點它。`}
+  if(q.t==='form')return q.mode==='gcd'
+    ?`第一步：<b>大家都有他才要</b>。<br>看每一欄，點出甲和乙<b>都有</b>的質因數。`
+    :`${motto('lcm')}<br>每一欄比一比，點<b>比較多</b>的那一格。「沒有」就是 0 個。`;
+  return `用標準分解式寫出<b>${CH[q.mode].full}</b>。<br>點下面的質數卡片放進答案區，再用 ＋ − 調整指數。記得：${motto(q.mode)}`;
+}
+function loadQ(){
+  R.q=R.qs[R.qi];R.hint=0;R.hl=new Set();R.kind='';R.mood='happy';R.anim=false;R.nudge=false;
+  R.msg=introMsg(R.q);
+  renderStage();resetIdle();
+  window.scrollTo({top:0});
+}
+function resetIdle(){
+  clearTimeout(IDLE);
+  if(R){R.nudge=false;const a=app.querySelector('.coachbtn');if(a)a.classList.remove('nudge')}
+  IDLE=setTimeout(()=>{if(VIEW==='stage'&&R&&R.q.phase!=='done'){R.nudge=true;const a=app.querySelector('.coachbtn');if(a)a.classList.add('nudge')}},25000);
+}
+function ok(msg){R.kind='good';R.mood='happy';R.msg=msg;tone('ok')}
+function bad(msg){R.kind='bad';R.mood='oops';R.msg=msg;R.mistakes++;R.streak=0;tone('bad')}
+function note(msg){R.kind='';R.mood='think';R.msg=msg}
+function finishQ(result,msg){
+  const q=R.q;q.phase='done';q.result=result;R.hl.clear();
+  R.kind='good';R.mood='cheer';R.streak++;R.best=Math.max(R.best,R.streak);R.msg=msg;tone('ok');
+}
+
+/* 整除規則說明 */
+function rule(n,p){
+  if(p===2)return n%2===0?`${n} 的個位數是 ${n%10}，是偶數，可以被 2 整除。`:`${n} 的個位數是 ${n%10}，是奇數，不能被 2 整除。`;
+  if(p===3){
+    if(n<10)return `${n} ${n%3?'不是':'是'} 3 的倍數，${n%3?'不能':'可以'}被 3 整除。`;
+    const d=String(n).split('').map(Number),t=d.reduce((a,b)=>a+b,0);
+    return `${d.join(' ＋ ')} ＝ ${t}，${t%3?'不是':'是'} 3 的倍數，所以${t%3?'不能':'可以'}被 3 整除。`;
+  }
+  if(p===5)return n%5===0?`${n} 的個位數是 ${n%10}，可以被 5 整除。`:`${n} 的個位數不是 0 也不是 5，不能被 5 整除。`;
+  return n%p===0?`${n} ÷ ${p} ＝ ${n/p}，剛好除盡。`:`${n} ÷ ${p} 除不盡。`;
+}
+const firstP=nums=>PAD.find(p=>nums.every(x=>x%p===0));
+const countOf=(q,p)=>q.rows.filter(r=>r.d===p).length;
+const ladderNeed=q=>{const k=q.rows.map((_,i)=>'d'+i);return q.mode==='lcm'?k.concat(q.cur.map((_,j)=>'b'+j)):k};
+
+/* --- 短除法：除 --- */
+function doDiv(p){
+  const q=R.q;if(q.phase!=='divide')return;
+  if(q.t==='split'){
+    const c=q.cur[0];
+    if(c%p===0){
+      q.rows.push({d:p,vals:[c]});q.cur=[c/p];R.anim=true;
+      if(c/p===1){
+        q.phase='count';q.distinct=primesOf(factor(q.n));q.ci=0;
+        ok(`對！${c} ÷ ${p} ＝ 1，除到 1 就完成了。<br>左邊這些質數，就是 ${q.n} 的質因數。現在來數一數：左邊有幾個 <b>${q.distinct[0]}</b>？`);
+      }else ok(`對！${c} ÷ ${p} ＝ ${c/p}。<br>繼續拆 <b>${c/p}</b>，再點一個質數。`);
+    }else bad(`${c} 不能被 ${p} 整除。${rule(c,p)}<br>小撇步：從最小的質數 2 開始試。`);
+    return;
+  }
+  const [a,b]=q.cur,da=a%p===0,db=b%p===0;
+  if(da&&db){
+    q.rows.push({d:p,vals:[a,b]});q.cur=[a/p,b/p];R.anim=true;
+    ok(`對！${p} 是 ${a} 和 ${b} 都有的。<br>${a} ÷ ${p} ＝ ${a/p}，${b} ÷ ${p} ＝ ${b/p}。<br>還能再除嗎？不能的話就按「停」。`);
+  }else if(da||db)bad(`${p} 只能整除 ${da?a:b}，不能整除 ${da?b:a}。<br>短除法要找<b>兩個數都能整除</b>的質數。`);
+  else bad(`${a} 和 ${b} 都不能被 ${p} 整除，換一個質數試試看。`);
+}
+function doStop(){
+  const q=R.q;if(q.t!=='ladder'||q.phase!=='divide')return;
+  const [a,b]=q.cur;
+  if(gcd(a,b)>1){bad(`還沒結束喔！${a} 和 ${b} 還可以被同一個質數整除，再找找看。`);return}
+  if(!q.rows.length){bad(`${a} 和 ${b} 有共同的質數可以除，先試試看 2、3、5。`);return}
+  q.phase='select';
+  ok(q.mode==='gcd'
+    ?`沒錯，${a} 和 ${b} 已經找不到共同的質數了，短除法完成！<br>現在換我：${motto('gcd')}<br>請點出<b>大因要拿的數字</b>。`
+    :`沒錯，${a} 和 ${b} 已經找不到共同的質數了，短除法完成！<br>現在換我：${motto('lcm')}<br>請點出<b>小倍要拿的數字</b>。`);
+}
+/* --- 短除法：拿數字 --- */
+function doSel(k){
+  const q=R.q;if(q.phase!=='select')return;
+  if(q.sel.has(k)){note('這個已經拿過了，找找看還有沒有別的。');return}
+  if(k[0]==='b'&&q.mode==='gcd'){
+    bad(`最下面的 ${q.cur.join(' 和 ')} 是兩個數<b>各自剩下</b>的，不是大家都有。<br>大因只拿<b>左邊那一排</b>。`);return;
+  }
+  q.sel.add(k);
+  const need=ladderNeed(q);
+  if(need.every(x=>q.sel.has(x))){
+    const ds=q.rows.map(r=>r.d);
+    if(q.mode==='gcd'){const g=ds.reduce((x,y)=>x*y,1);
+      finishQ(`${q.nums.join(' 和 ')} 的最大公因數 ＝ ${ds.length>1?ds.join(' × ')+' ＝ ':''}${g}`,
+        `全部拿到了！大因只拿左邊那一排，因為那是大家都有的。<br>${motto('gcd')}`);
+    }else{const all=ds.concat(q.cur),l=all.reduce((x,y)=>x*y,1);
+      finishQ(`${q.nums.join(' 和 ')} 的最小公倍數 ＝ ${all.join(' × ')} ＝ ${l}`,
+        `全部拿到了！左邊一排加上最下面一排，連成一個 L，小倍一個都沒漏。<br>${motto('lcm')}`);
+    }
+  }else{
+    const v=k[0]==='d'?q.rows[+k.slice(1)].d:q.cur[+k.slice(1)];
+    ok(k[0]==='d'?`對！左邊的 ${v} 是大家都有的，拿走。還有呢？`:`對！最下面的 ${v} 也出現了，小倍也要。還有呢？`);
+  }
+}
+/* --- 拆數字：數一數 --- */
+function doCnt(v){
+  const q=R.q;if(q.phase!=='count')return;
+  const p=q.distinct[q.ci],c=countOf(q,p);
+  if(v!==c){bad(`再數一次：左邊亮起來的 <b>${p}</b> 有幾個？用手指一個一個點著數。`);return}
+  q.ci++;
+  if(q.ci<q.distinct.length){ok(`對！有 ${c} 個 ${p}，寫成 ${sup(p,c)}。<br>接著數：左邊有幾個 <b>${q.distinct[q.ci]}</b>？`);return}
+  const F=factor(q.n);
+  finishQ(`${q.n} ＝ ${q.rows.map(r=>r.d).join(' × ')} ＝ ${fmt(F)}`,
+    `完成了！相同的質數寫在一起，個數寫在右上角，這就叫<b>標準分解式</b>。`);
+}
+/* --- 分解式對照表 --- */
+function doCell(p,s){
+  const q=R.q,{A,B}=q,a=ex(A,p),b=ex(B,p),isG=q.mode==='gcd';
+  const ps=primesOf(A,B),com=ps.filter(x=>A[x]&&B[x]);
+  if(q.phase==='cols'){
+    if(q.cols[p]){note(`${p} 這一欄已經選好了，看看別欄。`);return}
+    if(a&&b){
+      q.cols[p]=1;
+      if(com.every(x=>q.cols[x])){q.phase='pick';
+        ok(`對！大家都有的找完了：${com.join('、')}。<br>第二步：<b>每次都拿最小的</b>。在亮起來的每一欄，點<b>比較少</b>的那一格。`)}
+      else ok(`對！甲和乙都有 ${p}，大家都有，大因才要。還有別欄嗎？`);
+    }else bad(`${p} 只有${a?'甲':'乙'}有，${a?'乙':'甲'}沒有。不是大家都有，大因不要。`);
+    return;
+  }
+  if(q.phase!=='pick')return;
+  if(isG&&!(a&&b)){note(`${p} 這一欄不是大家都有，大因不拿。請點亮起來的欄。`);return}
+  if(q.picks[p]){note(`${p} 這一欄已經拿好了。`);return}
+  const e=s==='A'?a:b,m=isG?Math.min(a,b):Math.max(a,b);
+  if(e===m){
+    q.picks[p]=s;
+    const need=isG?com:ps;
+    if(need.every(x=>q.picks[x])){
+      const res=isG?gcdF(A,B):lcmF(A,B);
+      finishQ(`${CH[q.mode].full} ＝ ${fmt(res)} ＝ ${val(res)}`,
+        isG?`每一欄都拿了比較少的那一個，大因不貪心。<br>${motto('gcd')}`:`每一欄都拿了比較多的那一個，小倍一個都不放過。<br>${motto('lcm')}`);
+    }else ok(isG?`對！甲有 ${a} 個 ${p}，乙有 ${b} 個，比較少的是 ${m} 個。`:`對！${p} 最多有 ${m} 個，小倍全都要。`);
+  }else if(!isG&&e===0)bad('這一格是「沒有」，也就是 0 個。另一格比較多，小倍要拿多的。');
+  else bad(isG?`這一格有 ${e} 個 ${p}，是比較多的。大因不貪心，每次都拿最小的。`:`這一格只有 ${e} 個 ${p}，比較少。小倍很貪心，每次都拿最大的。`);
+}
+/* --- 挑戰：組合答案 --- */
+function analyze(q){
+  const{A,B,mode}=q,isG=mode==='gcd',corr=isG?gcdF(A,B):lcmF(A,B),nm=CH[mode].name;
+  const up=Object.keys(q.ans).map(Number),cp=Object.keys(corr).map(Number);
+  if(!up.length&&!q.one){
+    if(isG&&!cp.length)return{msg:'甲和乙找不到「大家都有」的質因數。這時候最大公因數是 1，請放上「1」。'};
+    return{msg:'答案區還是空的。先點下面的質數卡片，把它放進答案區。'};
+  }
+  if(q.one){
+    if(isG&&!cp.length)return up.length?{msg:'答案是 1 的時候，只要放「1」就好，其他卡片請拿掉。'}:{ok:true};
+    return{msg:isG?'甲和乙還有大家都有的質因數，最大公因數不是 1。拿掉 1 再找找看。':'小倍什麼都要，答案不會是 1。拿掉 1，把出現過的質因數都放進來。'};
+  }
+  for(const p of up)if(!ex(A,p)&&!ex(B,p))return{p,msg:`甲和乙都沒有 ${p}，題目沒出現的，${nm}也拿不到。請把 ${p} 拿掉。`};
+  if(isG)for(const p of up)if(!corr[p])return{p,msg:`哎呀！${p} 只有${ex(A,p)?'甲':'乙'}有，不是大家都有。大因說：「大家都有他才要」。`};
+  if(cp.some(p=>!q.ans[p]))return{msg:isG?'大因覺得你漏掉了一個大家都有的質因數，再對照看看甲和乙「都有」哪些？':'哎呀！小倍覺得你漏掉了某個因數，再檢查看看是不是全部都要？'};
+  for(const p of up){
+    if(q.ans[p]>corr[p])return{p,msg:isG?`${p} 的指數太大了。比比看甲和乙各有幾個 ${p}，大因每次都拿最小的。`:`${p} 的指數比甲和乙都還大了。小倍只要拿兩個裡面最大的就好。`};
+    if(q.ans[p]<corr[p])return{p,msg:isG?`${p} 的指數太小了。大因拿兩個裡面比較小的那一個，不用更少喔。`:`${p} 的指數太小了！小倍每次都拿最大的，看看甲和乙誰的 ${p} 比較多？`};
+  }
+  return{ok:true};
+}
+function doCheck(){
+  const q=R.q;if(q.phase!=='build')return;
+  const r=analyze(q);
+  if(r.ok){const res=q.mode==='gcd'?gcdF(q.A,q.B):lcmF(q.A,q.B);q.err=null;
+    finishQ(`${CH[q.mode].full} ＝ ${fmt(res)} ＝ ${val(res)}`,`答對了！${motto(q.mode)}`);return}
+  q.wrong++;q.err=r.p||null;bad(r.msg);
+  if(q.wrong>=2&&!q.table){q.table=true;R.msg+='<br>我幫你打開對照表了，一欄一欄看。'}
+}
+
+/* --- 提示（越點越清楚，第 3 次起示範一步） --- */
+function smartStep(q){
+  if(q.t==='split'){
+    if(q.phase==='divide')return doDiv(firstP(q.cur));
+    return doCnt(countOf(q,q.distinct[q.ci]));
+  }
+  if(q.t==='ladder'){
+    if(q.phase==='divide'){const p=firstP(q.cur);return p&&gcd(q.cur[0],q.cur[1])>1?doDiv(p):doStop()}
+    const k=ladderNeed(q).find(x=>!q.sel.has(x));return doSel(k);
+  }
+  if(q.t==='form'){
+    const{A,B}=q,ps=primesOf(A,B),com=ps.filter(x=>A[x]&&B[x]),isG=q.mode==='gcd';
+    if(q.phase==='cols')return doCell(com.find(x=>!q.cols[x]),'A');
+    const p=(isG?com:ps).find(x=>!q.picks[x]),a=ex(A,p),b=ex(B,p);
+    return doCell(p,isG?(a<=b?'A':'B'):(a>=b?'A':'B'));
+  }
+  const corr=q.mode==='gcd'?gcdF(q.A,q.B):lcmF(q.A,q.B),cp=primesOf(corr);
+  if(!cp.length){q.ans={};q.one=true;note('最大公因數是 1，我幫你放好了，按「檢查答案」。');return}
+  q.one=false;
+  Object.keys(q.ans).forEach(p=>{if(!corr[p])delete q.ans[p]});
+  const p=cp.find(x=>q.ans[x]!==corr[x]);
+  if(p===undefined){note('答案已經對了，按「檢查答案」吧！');return}
+  q.ans[p]=corr[p];note(`我把 ${sup(p,corr[p])} 放好了。${q.mode==='gcd'?'甲和乙比一比，拿比較少的。':'甲和乙比一比，拿比較多的。'}`);
+}
+function hint(){
+  const q=R.q;if(q.phase==='done')return;
+  R.hint++;const lv=R.hint;
+  if(lv>=3){
+    const before=R.mistakes;smartStep(q);R.mistakes=before;
+    R.msg='我做一步給你看：<br>'+R.msg;R.kind='';R.mood='think';R.hint=1;return;
+  }
+  R.kind='';R.mood='think';
+  if(q.t==='split'){
+    if(q.phase==='divide'){const c=q.cur[0],p=firstP(q.cur);
+      R.msg=lv===1?'從最小的質數開始試：2 → 3 → 5 → 7。':`試試看 <b>${p}</b>。${rule(c,p)}`}
+    else{const p=q.distinct[q.ci];R.msg=lv===1?`看左邊那一排亮起來的數字，數數看有幾個 ${p}。`:`一個一個點著數：左邊亮起來的 ${p} 一共有幾個？`}
+    return;
+  }
+  if(q.t==='ladder'){
+    const [a,b]=q.cur;
+    if(q.phase==='divide'){
+      if(lv===1){R.msg=`短除法要找 <b>${a} 和 ${b} 都能整除</b>的質數。都找不到的時候，就按「停」。`;return}
+      const p=gcd(a,b)>1?firstP(q.cur):null;
+      R.msg=p?`試試看 <b>${p}</b>：${rule(a,p)}<br>${rule(b,p)}`:`${a} 和 ${b} 已經找不到共同的質數了，請按「停，沒有共同的質數了」。`;
+      return;
+    }
+    R.msg=q.mode==='gcd'?`${motto('gcd')}<br>左邊那一排，是兩個數一起除掉的，就是「大家都有」。`:`${motto('lcm')}<br>左邊一排加上最下面一排，連起來像 L。`;
+    if(lv>=2){ladderNeed(q).filter(k=>!q.sel.has(k)).forEach(k=>R.hl.add(k));R.msg+='<br>亮起來的就是要拿的。'}
+    return;
+  }
+  if(q.t==='form'){
+    const{A,B}=q,ps=primesOf(A,B),com=ps.filter(x=>A[x]&&B[x]),isG=q.mode==='gcd';
+    if(q.phase==='cols'){
+      R.msg='看每一欄：甲和乙兩格<b>都有卡片</b>（不是「沒有」），才是大家都有。';
+      if(lv>=2){com.filter(x=>!q.cols[x]).forEach(x=>R.hl.add('c'+x));R.msg+='<br>亮起來的欄就是。'}
+      return;
+    }
+    R.msg=isG?'比一比上下兩格的小方塊，哪一格<b>比較少</b>？':'比一比上下兩格的小方塊，哪一格<b>比較多</b>？「沒有」是 0 個。';
+    if(lv>=2){(isG?com:ps).filter(x=>!q.picks[x]).forEach(x=>{const a=ex(A,x),b=ex(B,x);R.hl.add(x+(isG?(a<=b?'A':'B'):(a>=b?'A':'B')))});R.msg+='<br>亮起來的就是要點的。'}
+    return;
+  }
+  if(lv===1){R.msg=`記住口訣：${motto(q.mode)}<br>`+(q.mode==='gcd'?'先找出甲和乙「都有」的質因數。':'先把甲和乙「出現過」的質因數全部找出來。');return}
+  const has=Object.keys(q.ans).length||q.one,r=has?analyze(q):null;
+  R.msg=r&&r.ok?'目前的答案看起來沒問題，按「檢查答案」試試看！':r?r.msg:(q.mode==='gcd'?'一欄一欄看：甲和乙那一欄「都有卡片」，大因才要。':'一欄一欄看：只要那一欄「有卡片出現」，小倍就要。');
+  if(r&&!r.ok)q.err=r.p||null;
+  q.table=true;q.tableHL=true;R.msg+='<br>對照表裡亮起來的欄，就是要拿的質因數。';
+}
+
+/* ---------- 畫面 ---------- */
+function ladderHTML(q,o={}){
+  const n=q.cur.length,sel=o.sel||new Set(),mode=o.mode,click=o.click,hl=o.hl||new Set(),mark=o.mark||new Set();
+  const sc=mode==='lcm'?'sel-l':'sel-g',last=q.rows.length-1;
+  let h=`<div class="ladder-scroll"><div class="ladder" style="grid-template-columns:auto repeat(${n},minmax(2.4em,auto))" role="group" aria-label="短除法">`;
+  q.rows.forEach((r,i)=>{
+    const k='d'+i,pop=o.anim&&i===last?' pop':'';
+    const cls=`ld${sel.has(k)?' '+sc:''}${hl.has(k)?' glow':''}${mark.has(k)?' mark':''}${pop}`;
+    h+=click?`<button class="${cls}" data-act="sel" data-k="${k}" aria-label="左邊的 ${r.d}">${r.d}</button>`:`<div class="${cls}">${r.d}</div>`;
+    r.vals.forEach((v,j)=>h+=`<div class="lv${j===0?' first':''}${pop}">${v}</div>`);
+  });
+  h+='<div class="ld empty"></div>';
+  q.cur.forEach((v,j)=>{
+    const k='b'+j,cls=`lb${sel.has(k)?' '+sc:''}${hl.has(k)?' glow':''}${o.anim?' pop':''}`;
+    h+=click?`<button class="${cls}" data-act="sel" data-k="${k}" aria-label="最下面的 ${v}">${v}</button>`:`<div class="${cls}">${v}</div>`;
+  });
+  return h+'</div></div>';
+}
+function cardIn(p,e){
+  return e?`<span class="pc">${sup(p,e)}</span><span class="blks">${'<i class="blk"></i>'.repeat(e)}</span><span class="cn">${e} 個 ${p}</span>`
+          :`<span class="none">沒有</span><span class="cn">0 個</span>`;
+}
+function formTable(q,view){
+  const{A,B,mode}=q,isG=mode==='gcd',ps=primesOf(A,B),com=ps.filter(p=>A[p]&&B[p]);
+  const colCls=p=>{
+    if(view)return q.tableHL?(isG?(com.includes(p)?'on-g':'off'):'on-l'):'';
+    if(isG)return q.phase==='cols'?(q.cols[p]?'on-g':''):(com.includes(p)?'on-g':'off');
+    return 'on-l';
+  };
+  const live=!view&&q.phase!=='done',pc=isG?'picked-g':'picked-l';
+  let h=`<div class="tbl-scroll"><table class="ftab"><thead><tr><th class="rl">質因數</th>${ps.map(p=>`<th class="${colCls(p)}">${p}</th>`).join('')}</tr></thead><tbody>`;
+  [['甲',A,'A'],['乙',B,'B']].forEach(([lab,F,s])=>{
+    h+=`<tr><th class="rl" scope="row">${lab}</th>`;
+    ps.forEach(p=>{
+      const k=p+s,g=R&&(R.hl.has(k)||R.hl.has('c'+p));
+      const cls=`fc ${colCls(p)}${q.picks&&q.picks[p]===s?' '+pc:''}${g?' glow':''}`;
+      h+=`<td>${live?`<button class="${cls}" data-act="cell" data-p="${p}" data-s="${s}" aria-label="${lab}的質因數 ${p}，有 ${ex(F,p)} 個">${cardIn(p,ex(F,p))}</button>`:`<div class="${cls}">${cardIn(p,ex(F,p))}</div>`}</td>`;
+    });
+    h+='</tr>';
+  });
+  if(!view&&q.phase!=='cols'){
+    h+=`<tr><th class="rl ${isG?'tg':'tl'}" scope="row">${CH[mode].name}拿</th>`;
+    ps.forEach(p=>{
+      let inner;
+      if(isG&&!com.includes(p))inner='<span class="none">不拿</span>';
+      else if(q.picks[p]||q.phase==='done')inner=cardIn(p,isG?Math.min(ex(A,p),ex(B,p)):Math.max(ex(A,p),ex(B,p)));
+      else inner='<span class="qm">?</span>';
+      h+=`<td><div class="fc res ${colCls(p)}">${inner}</div></td>`;
+    });
+    h+='</tr>';
+  }
+  return h+'</tbody></table></div>';
+}
+function flash(){return `<p class="flash ${R.kind}" aria-hidden="true">${R.kind==='good'?'答對了！':R.kind==='bad'?'再想想看，看看上面的說明。':''}</p>`}
+function workHTML(q){
+  let h='';
+  if(q.t==='split'){
+    h+=`<p class="eq">${q.phase==='done'?'':`把 ${q.n} 拆成質數`}</p>`;
+    let mark=new Set();
+    if(q.phase==='count'){const p=q.distinct[q.ci];q.rows.forEach((r,i)=>{if(r.d===p)mark.add('d'+i)})}
+    h+=ladderHTML(q,{anim:R.anim,mark});
+    if(q.phase==='divide')h+=flash()+`<p class="label">${q.cur[0]} 可以被哪個質數整除？</p><div class="pad">${PAD.map(p=>`<button data-act="div" data-p="${p}">${p}</button>`).join('')}</div>`;
+    if(q.phase==='count'){const p=q.distinct[q.ci];
+      h+=flash()+`<p class="label">左邊有幾個 ${p}？</p><div class="pad five">${[1,2,3,4,5].map(v=>`<button data-act="cnt" data-v="${v}">${v}</button>`).join('')}</div>`}
+  }else if(q.t==='ladder'){
+    const [a,b]=q.nums;
+    h+=`<p class="ask">求 ${a} 和 ${b} 的<span class="${q.mode==='gcd'?'tg':'tl'}">${CH[q.mode].full}</span></p>`;
+    h+=ladderHTML(q,{anim:R.anim,sel:q.sel,mode:q.mode,click:q.phase==='select',hl:R.hl});
+    if(q.phase==='divide')h+=flash()+`<p class="label">${q.cur[0]} 和 ${q.cur[1]} 都能被哪個質數整除？</p>
+      <div class="pad">${PAD.map(p=>`<button data-act="div" data-p="${p}">${p}</button>`).join('')}</div>
+      <button class="btn stopbtn" data-act="stop">停，沒有共同的質數了</button>`;
+    if(q.phase==='select')h+=flash()+`<p class="label">點上面的數字，把${CH[q.mode].name}要的都拿走</p>`;
+  }else if(q.t==='form'){
+    h+=`<p class="ask">求甲和乙的<span class="${q.mode==='gcd'?'tg':'tl'}">${CH[q.mode].full}</span></p>
+      <p class="eq">甲 ＝ ${fmt(q.A)} <span class="v">＝ ${val(q.A)}</span></p>
+      <p class="eq">乙 ＝ ${fmt(q.B)} <span class="v">＝ ${val(q.B)}</span></p>`;
+    h+=formTable(q)+(q.phase!=='done'?flash()+`<p class="label">${q.phase==='cols'?'點甲乙都有的那幾欄':q.mode==='gcd'?'每一欄點比較少的那一格':'每一欄點比較多的那一格'}</p>`:'');
+  }else{
+    h+=`<p class="ask">求甲和乙的<span class="${q.mode==='gcd'?'tg':'tl'}">${CH[q.mode].full}</span>（寫成標準分解式）</p>
+      <p class="eq">甲 ＝ ${fmt(q.A)} <span class="v">＝ ${val(q.A)}</span></p>
+      <p class="eq">乙 ＝ ${fmt(q.B)} <span class="v">＝ ${val(q.B)}</span></p>
+      <div class="row center"><button class="btn sm" data-act="table">${q.table?'收起對照表':'打開對照表'}</button></div>
+      ${q.table?formTable(q,true):''}`;
+    const ps=primesOf(q.ans),dis=q.phase==='done'?'disabled':'';
+    let a='';
+    if(q.one)a+=`<div class="achip"><span class="pc">1</span><button class="rm" data-act="rmone" ${dis}>拿掉</button></div>`;
+    ps.forEach((p,i)=>{const e=q.ans[p];
+      if(i||q.one)a+='<span class="times">×</span>';
+      a+=`<div class="achip${q.err===p?' err':''}"><span class="pc">${sup(p,e)}</span>
+        <span class="pm"><button data-act="dec" data-p="${p}" aria-label="${p} 的指數減一" ${e<=1||dis?'disabled':''}>−</button><button data-act="inc" data-p="${p}" aria-label="${p} 的指數加一" ${e>=6||dis?'disabled':''}>＋</button></span>
+        <button class="rm" data-act="rm" data-p="${p}" ${dis}>拿掉</button></div>`});
+    h+=`<p class="label">你的答案</p><div class="ans">${a||'<span class="empty">點下面的卡片放進來</span>'}</div>`;
+    if(q.phase!=='done')h+=flash()+`<div class="pad five">${PAD.map(p=>`<button data-act="add" data-p="${p}" aria-label="放入 ${p}">${p}</button>`).join('')}<button data-act="add" data-p="1" aria-label="放入 1">1</button></div>
+      <div class="row center"><button class="btn" data-act="clear">全部清除</button><button class="btn solid" data-act="check">檢查答案</button></div>`;
+  }
+  if(q.phase==='done'){
+    const lastQ=R.qi===R.qs.length-1;
+    h+=`<div class="result">${q.result}</div><div class="row center"><button class="btn solid big" data-act="next">${lastQ?'完成這一關':'下一題'}</button></div>`;
+  }
+  return h;
+}
+function renderStage(){
+  const q=R.q,w=q.who,c=CH[w];
+  app.innerHTML=`
+  <div class="topbar">
+    <button class="btn sm" data-go="map">回地圖</button>
+    <h2>第 ${R.n} 關・${R.st.title}</h2>
+    <span class="qdots" aria-label="第 ${R.qi+1} 題，共 ${R.qs.length} 題">${R.qs.map((x,i)=>`<i class="${i<R.qi||(i===R.qi&&q.phase==='done')?'on':i===R.qi?'now':''}"></i>`).join('')}</span>
+    ${R.n===6?`<span class="streak">連對 ${R.streak}</span>`:''}
+    ${soundBtn()}
+  </div>
+  <section class="coach">
+    <button class="coachbtn ${w}${R.nudge?' nudge':''}" data-act="hint" aria-label="點${c.name}看提示">${face(w,R.mood)}<span class="nm">${c.name}</span><span class="tip">${q.phase==='done'?'&nbsp;':'點我提示'}</span></button>
+    <div class="bubble ${w} ${R.kind}" aria-live="polite">
+      <span class="who">${c.name}（${c.full}）</span>
+      <div class="msg">${R.msg}</div>
+      <div class="tools"><button data-act="speak">唸給我聽</button>${q.phase!=='done'?'<button data-act="hint">給我提示</button>':''}</div>
+    </div>
+  </section>
+  <section class="work">${workHTML(q)}</section>`;
+  R.anim=false;
+}
+function stageDone(){
+  const Q=R.qs.length,m=R.mistakes,stars=m<=1?3:m<=Q+1?2:1,n=R.n;
+  SAVE.stars[n]=Math.max(SAVE.stars[n]||0,stars);save();
+  VIEW='result';tone('win');burst();
+  const who=R.st.who==='both'?['gcd','lcm']:[R.st.who];
+  const words=stars===3?'太厲害了！你已經很熟練了。':stars===2?'很棒！再玩一次，有機會拿到三顆星。':'完成了！多練習幾次，會越來越順。';
+  app.innerHTML=`
+  <section class="finish" aria-live="polite">
+    <div class="faces">${who.map(w=>`<div>${face(w,'cheer')}</div>`).join('')}</div>
+    <h2>第 ${n} 關完成！</h2>
+    ${starsHTML(stars,true)}
+    <p>${words}</p>
+    <p class="lead">這一關答錯 ${m} 次${n===6?`，最多連對 ${R.best} 題`:''}。</p>
+    <div class="row center">
+      ${n<6?`<button class="btn solid big" data-go="stage-${n+1}">前往第 ${n+1} 關</button>`:''}
+      <button class="btn big" data-go="stage-${n}">再玩一次</button>
+      <button class="btn big" data-go="map">回地圖</button>
+    </div>
+  </section>`;
+  window.scrollTo({top:0});
+}
+function burst(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const d=document.createElement('div');d.className='dust';
+  const cols=['var(--gcd)','var(--lcm)','var(--chalk)','var(--ok)'];
+  for(let i=0;i<36;i++){const s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.background=cols[i%4];
+    s.style.animationDelay=(Math.random()*.6)+'s';s.style.transform=`rotate(${Math.random()*90}deg)`;d.appendChild(s)}
+  document.body.appendChild(d);setTimeout(()=>d.remove(),3400);
+}
+
+/* ---------- 點擊 ---------- */
+app.addEventListener('click',e=>{
+  const t=e.target.closest('[data-go],[data-act]');if(!t||t.disabled)return;
+  if(t.dataset.go){go(t.dataset.go);return}
+  const a=t.dataset.act,d=t.dataset;
+  if(a==='sound'){SAVE.sound=!SAVE.sound;save();if(VIEW==='stage')renderStage();else if(VIEW==='map')showMap();return}
+  if(a==='intro'){INTRO[d.w]=(INTRO[d.w]+1)%CH[d.w].lines.length;showHome();speak(CH[d.w].lines[INTRO[d.w]]);return}
+  if(a==='isay'){speak(CH[d.w].lines[INTRO[d.w]]);return}
+  if(a==='unlock'){SAVE.all=!SAVE.all;save();showMap();return}
+  if(a==='reset'){if(CONFIRM){SAVE.stars={};save();CONFIRM=false}else{CONFIRM=true;setTimeout(()=>{CONFIRM=false;if(VIEW==='map')showMap()},4000)}showMap();return}
+  if(VIEW!=='stage'||!R)return;
+  const q=R.q;
+  if(a==='speak'){speak(app.querySelector('.bubble .msg').innerHTML);return}
+  if(a==='next'){hush();if(R.qi<R.qs.length-1){R.qi++;loadQ()}else stageDone();return}
+  resetIdle();R.hl.clear();
+  if(a==='hint')hint();
+  else if(a==='div')doDiv(+d.p);
+  else if(a==='stop')doStop();
+  else if(a==='sel')doSel(d.k);
+  else if(a==='cnt')doCnt(+d.v);
+  else if(a==='cell')doCell(+d.p,d.s);
+  else if(a==='table'){q.table=!q.table;note(q.table?'對照表打開了，同一種質數排在同一欄。':'對照表收起來了。')}
+  else if(q.t==='build'&&q.phase==='build'){
+    q.err=null;R.kind='';
+    const p=+d.p;
+    if(a==='add'){if(p===1)q.one=true;else if(q.ans[p])note(`${p} 已經在答案區了。想要更多個 ${p}，請按它下面的「＋」。`);else q.ans[p]=1}
+    if(a==='inc')q.ans[p]++;
+    if(a==='dec'&&q.ans[p]>1)q.ans[p]--;
+    if(a==='rm')delete q.ans[p];
+    if(a==='rmone')q.one=false;
+    if(a==='clear'){q.ans={};q.one=false}
+    if(a==='check')doCheck();
+  }
+  renderStage();
+});
+
+route();
+</script>
+
+</body></html>

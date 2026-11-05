@@ -47,5 +47,15 @@
       return false;
     },
   };
-  if (active) post({ type: 'ready' });
+  if (active) {
+    post({ type: 'ready' });
+    // 題目中的 $...$ 數學式：載入 KaTeX，遊戲畫面有變動就自動渲染
+    var startMath = function () {
+      var s = document.createElement('script');
+      s.src = '/vendor/katex/render-math.js';
+      s.onload = function () { window.MathRender && window.MathRender.watch(document.body); };
+      document.head.appendChild(s);
+    };
+    if (document.body) startMath(); else document.addEventListener('DOMContentLoaded', startMath);
+  }
 })();

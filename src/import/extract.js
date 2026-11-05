@@ -137,7 +137,13 @@ async function extractImage(file) {
   return { 方式: '圖片OCR', 文字: '', 頁面: [{ 編號: 1, png: c.toBuffer('image/png'), 寬: c.width, 高: c.height }], 內嵌圖片: [] };
 }
 
-const SUPPORTED = { '.pdf': extractPdf, '.docx': extractDocx, '.png': extractImage, '.jpg': extractImage, '.jpeg': extractImage };
+/** 純文字（後台「貼上題目文字」存成的 .txt） */
+async function extractTxt(file) {
+  const text = fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
+  return { 方式: '文字', 文字: text, 頁面: [], 內嵌圖片: [] };
+}
+
+const SUPPORTED = { '.txt': extractTxt, '.pdf': extractPdf, '.docx': extractDocx, '.png': extractImage, '.jpg': extractImage, '.jpeg': extractImage };
 
 async function extract(file) {
   const fn = SUPPORTED[path.extname(file).toLowerCase()];

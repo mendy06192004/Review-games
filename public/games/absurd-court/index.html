@@ -1,0 +1,757 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>荒誕法庭</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=LXGW+WenKai+TC:wght@400;700&family=Special+Elite&display=swap">
+<style>
+/* Layout: one column case file. Home = masthead, how-to-play strip, case dossier grid. Game = stats bar, evidence, suspects, interrogation, notebook, verdict. Admin = case list + form editor. Ink on paper, red only for blood and danger. Deliberate single light look. */
+:root{
+  --paper:#e8e8e3; --paper-2:#f6f6f2; --ink:#121212; --ink-soft:#4a4a48; --red:#d1171f; --mute:#bdbdb8;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"LXGW WenKai TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-type:"Special Elite","Courier New",monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{
+  background-color:var(--paper);
+  background-image:radial-gradient(var(--ink) .6px, transparent .8px);
+  background-size:7px 7px;
+  color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.65;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:20px 60px;
+}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.25}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.panel{background:var(--paper-2);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:18px;min-width:0}
+.label{font-family:var(--f-type);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.hint{font-size:14px;color:var(--ink-soft)}
+.empty{color:var(--ink-soft);font-size:15px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sec-h h2{font-size:24px;font-weight:900}
+.btn{border:2px solid var(--ink);background:var(--paper-2);padding:7px 14px;font-size:15px}
+.btn:hover:not(:disabled){background:var(--ink);color:var(--paper-2)}
+.btn.dark{background:var(--ink);color:var(--paper-2)}
+.btn.dark:hover:not(:disabled){background:var(--red);border-color:var(--red)}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:3px 10px;font-size:14px}
+.back{align-self:flex-start;font-family:var(--f-type);font-size:14px}
+
+/* masthead */
+.mast{background:var(--ink);color:var(--paper-2);padding:20px;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--red);display:flex;flex-direction:column;gap:6px}
+.mast .label{color:var(--mute)}
+.mast h1{font-size:clamp(30px,8vw,52px);font-weight:900;letter-spacing:.02em}
+.mast h1 em{font-style:normal;color:var(--red)}
+.mast .tagline{color:#d8d8d3;max-width:44ch;font-size:17px}
+.home-mast h1{font-size:clamp(46px,13vw,96px);line-height:1.05}
+.stats{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:6px;font-family:var(--f-type);font-size:14px}
+.stats b{font-family:var(--f-display);font-size:20px;color:var(--paper-2)}
+.stats .danger b{color:var(--red)}
+.pips{display:inline-flex;gap:5px;vertical-align:middle;margin-left:6px}
+.pip{width:14px;height:14px;border:2px solid var(--paper-2)}
+.pip.on{background:var(--paper-2)}
+
+/* how to play */
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:0;padding:0;list-style:none;counter-reset:step}
+@media (max-width:700px){.loop{grid-template-columns:repeat(2,1fr)}}
+.loop li{border:2px solid var(--ink);margin:-1px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:6px;position:relative;min-width:0}
+.loop li::before{counter-increment:step;content:counter(step);font-family:var(--f-display);font-weight:900;font-size:34px;line-height:1;color:var(--red)}
+.loop h3{font-size:19px}
+.loop p{font-size:14.5px;color:var(--ink-soft)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 22px;margin-top:16px;padding:0;list-style:none}
+.rules li{font-size:15px;padding-left:16px;position:relative}
+.rules li::before{content:"";position:absolute;left:0;top:.6em;width:7px;height:7px;background:var(--ink)}
+.rules b{font-family:var(--f-display)}
+
+/* case dossiers */
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.case{background:var(--paper-2);border:3px solid var(--ink);display:flex;flex-direction:column;text-align:left;padding:0;position:relative;transition:transform .12s, box-shadow .12s;min-width:0}
+.case:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--ink)}
+.case .tab{font-family:var(--f-type);font-size:13px;background:var(--ink);color:var(--paper-2);padding:4px 12px;display:flex;justify-content:space-between;gap:8px}
+.case .body{padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.case h3{font-size:22px;font-weight:900}
+.case h3 em{font-style:normal;color:var(--red)}
+.case p{font-size:14.5px;color:var(--ink-soft)}
+.case .faces{display:flex;gap:2px;margin-top:auto;padding-top:6px}
+.case .faces svg{width:44px;height:auto}
+.case .meta{font-family:var(--f-type);font-size:12px;color:var(--ink-soft);display:flex;justify-content:space-between;gap:8px;border-top:2px dashed var(--ink);padding-top:8px}
+.case .solved{position:absolute;top:34px;right:10px;font-family:var(--f-type);color:var(--red);border:2px solid var(--red);padding:0 8px;transform:rotate(7deg);font-size:13px;background:var(--paper-2)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* evidence */
+.ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.ev{background:var(--paper-2);border:2px solid var(--ink);padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px;min-width:0;transition:transform .12s}
+.ev:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.ev .ico{height:54px;display:flex;align-items:center}
+.ev h3{font-size:18px}
+.ev .where{font-size:13px;color:var(--ink-soft)}
+.ev.done{background:var(--ink);color:var(--paper-2)}
+.ev.done .where{color:var(--mute)}
+.ev:disabled{cursor:not-allowed;opacity:.5}
+.ev .cost{font-family:var(--f-type);font-size:12px;margin-top:auto}
+.ev .ev-text{font-size:14px}
+
+/* suspects */
+.sus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.sus{background:var(--paper-2);border:2px solid var(--ink);padding:10px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;min-width:0}
+.sus svg{width:100%;max-width:110px;height:auto}
+.sus .nm{font-family:var(--f-display);font-weight:900;font-size:20px}
+.sus .tg{font-size:13px;color:var(--ink-soft);text-align:center}
+.sus.active{outline:4px solid var(--red);outline-offset:-2px}
+.sus .jail{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 16px,var(--ink) 16px 20px);opacity:.75;pointer-events:none}
+.sus .jail-tag{position:absolute;top:8px;left:50%;transform:translateX(-50%) rotate(-4deg);background:var(--red);color:#fff;font-family:var(--f-type);font-size:12px;padding:1px 8px;white-space:nowrap}
+
+/* interrogation */
+.interro{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:start}
+@media (max-width:560px){.interro{grid-template-columns:1fr}.interro .pic{max-width:110px}}
+.interro .pic svg{width:100%;height:auto}
+.interro h3{font-size:24px;font-weight:900}
+.interro .desc{font-size:14px;color:var(--ink-soft);margin:2px 0 12px}
+.topics{display:flex;flex-wrap:wrap;gap:8px}
+.topic{border:2px solid var(--ink);background:var(--paper-2);padding:6px 12px;font-size:15px}
+.topic:hover:not(:disabled){background:var(--ink);color:var(--paper-2)}
+.topic.asked{border-style:dashed;color:var(--ink-soft)}
+.topic.cur{background:var(--ink);color:var(--paper-2);border-style:solid}
+.topic:disabled{opacity:.45;cursor:not-allowed}
+.topic small{font-family:var(--f-type);font-size:11px;margin-left:6px}
+.bubble{margin-top:14px;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:14px 16px;position:relative;font-size:17px;min-height:56px}
+.bubble::before{content:"";position:absolute;left:28px;top:-15px;border:12px solid transparent;border-bottom-color:var(--ink);border-top:0}
+.bubble::after{content:"";position:absolute;left:31px;top:-10px;border:9px solid transparent;border-bottom-color:#fff;border-top:0}
+.bubble .q{font-family:var(--f-type);font-size:13px;color:var(--ink-soft);display:block;margin-bottom:4px}
+.act{color:var(--ink-soft);font-size:.92em}
+
+/* notebook */
+.notes{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.notes li{border-left:4px solid var(--ink);padding:4px 10px;background:#fff;font-size:15px}
+.notes li.ev-note{border-left-color:var(--red)}
+.notes .who{font-family:var(--f-display);font-weight:900;margin-right:6px}
+.notes .tp{font-family:var(--f-type);font-size:12px;color:var(--ink-soft);margin-right:6px}
+
+/* verdict */
+.verdict{background:var(--ink);color:var(--paper-2);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--red);padding:18px}
+.verdict h2{font-size:24px;font-weight:900}
+.verdict p{margin:6px 0 14px;color:#cfcfca;font-size:15px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.opt{border:2px solid var(--paper-2);background:transparent;color:var(--paper-2);padding:10px;font-family:var(--f-display);font-weight:700;font-size:17px}
+.opt.sel{background:var(--red);border-color:var(--red)}
+.big{margin-top:14px;width:100%;background:var(--paper-2);color:var(--ink);border:3px solid var(--ink);padding:14px;font-family:var(--f-display);font-weight:900;font-size:20px;letter-spacing:.05em}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.big.red{background:var(--red);border-color:var(--red);color:#fff}
+
+/* overlay */
+.ov{position:fixed;inset:0;z-index:20;background:rgba(10,10,10,.82);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px))}
+.paper{background:var(--paper-2);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--red);max-width:580px;width:100%;padding:24px;animation:drop .35s ease-out}
+@keyframes drop{from{transform:translateY(-14px) rotate(-1deg)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.paper{animation:none}.ev,.case{transition:none}}
+.paper h2{font-size:clamp(26px,6vw,36px);font-weight:900;margin:6px 0 10px}
+.paper p{margin:0 0 12px}
+.paper .rule{border-top:3px double var(--ink);margin:16px 0}
+.truth{background:var(--ink);color:var(--paper-2);padding:14px 16px;margin-top:10px}
+.truth h3{font-size:18px;margin-bottom:6px;color:var(--red)}
+.truth p{font-size:15px;margin:0 0 8px}
+.rank{font-family:var(--f-display);font-weight:900;font-size:28px;color:var(--red)}
+.victims{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 12px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .big{flex:1;min-width:160px}
+
+/* admin */
+.adm{display:grid;grid-template-columns:240px 1fr;gap:18px;align-items:start}
+@media (max-width:760px){.adm{grid-template-columns:1fr}}
+.clist{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.clist li{display:flex;gap:4px;align-items:stretch}
+.clist .pick{flex:1;text-align:left;border:2px solid var(--ink);background:#fff;padding:6px 10px;min-width:0}
+.clist .pick.on{background:var(--ink);color:var(--paper-2)}
+.clist .pick small{display:block;font-family:var(--f-type);font-size:11px;opacity:.75}
+.clist .mv{border:2px solid var(--ink);background:#fff;width:30px;padding:0;font-size:13px}
+.savebar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--paper-2);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--red)}
+.savebar .msg{flex:1;min-width:160px;font-size:14px}
+.savebar .msg.warn{color:#ffb3b5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.fs{border:3px solid var(--ink);background:var(--paper-2);padding:16px;margin:0;min-width:0;display:flex;flex-direction:column;gap:12px}
+.fs legend{font-family:var(--f-display);font-weight:900;font-size:20px;padding:0 8px;background:var(--paper-2)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px 14px}
+.f{display:flex;flex-direction:column;gap:3px;min-width:0}
+.f > span{font-family:var(--f-type);font-size:12px;color:var(--ink-soft);letter-spacing:.05em}
+.f input,.f textarea,.f select{font:inherit;font-size:15px;border:2px solid var(--ink);background:#fff;padding:6px 8px;width:100%;color:var(--ink);border-radius:0}
+.f textarea{resize:vertical;min-height:64px;line-height:1.5}
+.sub{border:2px dashed var(--ink);padding:12px;display:flex;flex-direction:column;gap:10px;background:#fff}
+.sub-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.sub-h h4{font-family:var(--f-display);font-weight:900;font-size:17px;margin:0}
+.look{display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:start}
+.look svg{width:90px;height:auto;border:2px solid var(--ink);background:var(--paper-2)}
+.looksel{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px 10px}
+.tag-culprit{font-family:var(--f-type);font-size:11px;background:var(--red);color:#fff;padding:1px 6px;margin-left:6px}
+textarea.code{font-family:var(--f-type);font-size:12px;width:100%;min-height:260px;border:2px solid var(--ink);padding:8px}
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="ov" id="ov" hidden></div>
+
+<script type="application/json" id="case-data">{"cases":[{"id":"bunny","no":"案件 #01","title":"兔子耳穿孔連環案","titleHi":"穿孔","counter":"受害兔","level":1,"blurb":"兔子的耳朵一隻隻被咬穿。缺牙的、帶血的、拿剪刀的、晚上失蹤的，四隻都說不清楚。","days":3,"actionsPerDay":4,"startVictims":2,"culprit":"H","chars":{"T":{"name":"鐵拳","tag":"強壯兔・爪上有血","desc":"全農場最兇的兔子，下巴寬得像鏟子。今早有人看到他的爪子在滴血。","look":{"head":"round","ears":"up","body":"big","eyes":"angry","mark":"scar","fill":"ink"}},"M":{"name":"棉花","tag":"垂耳兔・門牙缺角","desc":"看起來很柔弱。大家都知道她門牙缺了一角，也知道她最討厭耳朵直立的兔子。","look":{"head":"round","ears":"lop","body":"round","eyes":"big","mark":"tooth","fill":"ink"}},"H":{"name":"小灰","tag":"灰兔・晚上失蹤","desc":"一隻耳朵是折的。每天晚上都找不到她，早上又若無其事地出現。","look":{"head":"round","ears":"bent","body":"round","eyes":"smug","mark":"none","fill":"gray"}},"O":{"name":"老麥","tag":"送草老兔・帶著剪刀","desc":"隨身帶著一把大剪刀，最近常抱怨年輕兔子太吵。","look":{"head":"round","ears":"up","body":"round","eyes":"glasses","mark":"beard","fill":"ink"}}},"evidence":{"e1":{"name":"咬痕","where":"受害者雪球的右耳","icon":"bite","text":"咬痕很小，比一顆葡萄還窄。上排兩顆門牙的印子完整清楚。傷口邊緣黏著一點橘色的汁。"},"e2":{"name":"閣樓上的窩","where":"乾草閣樓","icon":"house","text":"閣樓上有個新壓出來的窩，堆滿啃過的胡蘿蔔頭，還有幾根灰色的毛。通往閣樓的梯子斷了一根橫木。"},"e3":{"name":"地洞口","where":"圍欄角落","icon":"paw","text":"圍欄唯一的地洞，洞口被一大綑乾草塞死。乾草上積著灰，至少兩天沒有被動過。"},"e4":{"name":"斷掉的橫木","where":"閣樓梯子","icon":"shears","text":"橫木的斷口上有一根突出的鐵釘，釘子上沾著血和幾根黑色的粗毛。"}},"lines":{"T":{"alibi":"「我在追一個影子。追到閣樓，梯子斷了。」（他舉起受傷的爪子。）","e1":"（他咧嘴給你看。兩顆門牙又寬又大，比那個咬痕寬了一倍。）「我咬得出這麼小的洞？」","e2":"「那個影子就是爬上去那裡。我太重，梯子撐不住。」","e3":"「地洞是老麥塞的，前天下雨淹水。」","e4":"「鐵釘割的。你要看傷口，自己看。」"},"M":{"alibi":"「我在草堆裡哭。大家都說是我，因為我的牙。」（她露出左邊缺了一角的門牙。）","e1":"（她盯著咬痕看了很久。）「……那你們之前為什麼都說是我！」","e2":"「我爬不上閣樓。我的耳朵會卡在梯子上。」","e3":"「我不住地洞，我住草堆。」","e4":"「鐵拳昨晚一直在喊『站住』，吵死了。」"},"H":{"alibi":"「我每天晚上都睡在地洞最裡面啊，很安全～」","e1":"「好小的咬痕喔，好可憐。」（她舔了舔嘴角，那裡有一點橘色。）","e2":"「閣樓？誰會去那種地方啊。灰毛又不是只有我有。」","e3":"「呃……我、我是從後面另一個洞鑽進去的。」","e4":"「他好兇喔，爪子都是血，一定是他啦！」"},"O":{"alibi":"「啊？大聲點！……昨晚我在穀倉磨剪刀。磨得很響，什麼都沒聽到。」","e1":"「我一顆牙都沒剩啦。」（他張嘴給你看，真的一顆都沒有。）","e2":"「我的胡蘿蔔都被搬上去了！我就知道有小偷。農場裡就小灰一隻灰兔。」","e3":"「那是我塞的。前天下雨地洞淹水，塞好就沒拆。就那一個洞，哪有後門。」","e4":"「那小子昨晚爬我的梯子，爬斷了！要賠！」"}},"intro":{"head":"兩隻兔子的耳朵被咬穿了","body":"過去兩晚，雪球和豆豆的耳朵各多了一個洞。四個嫌疑犯，每個看起來都有問題。三天內找出咬耳魔。"},"nights":{"none":{"add":1,"head":"又一隻兔子的耳朵多了一個洞","body":"你選擇再觀察一晚。咬耳魔也很感謝你的耐心。"},"T":{"add":2,"head":"鐵拳被關，沒有誰在追了","body":"鐵拳被關的那一晚，沒有誰在半夜喊『站住』。兩隻兔子的耳朵同時被咬穿。"},"M":{"add":1,"head":"棉花被關，咬耳魔照常出擊","body":"棉花在籠子裡哭了一整晚。另一頭，又一隻兔子的耳朵多了一個洞。"},"O":{"add":1,"head":"老麥被關，剪刀被沒收","body":"老麥的剪刀被收走了。咬耳魔不需要剪刀，又一隻兔子中招。"}},"bad":{"none":{"head":"結案失敗：放任","body":"三天過去，你一個也沒關。立耳兔開始集體戴頭套。"},"T":{"head":"結案失敗：關錯了追兇的那個","body":"鐵拳被關到最後。每晚追著影子跑的只有他，他一進去，閣樓上的胡蘿蔔頭就堆得更高了。"},"M":{"head":"結案失敗：被牙齒騙了","body":"你跟大家一樣，看到缺牙就認定是她。真正的咬痕根本沒有缺口。"},"O":{"head":"結案失敗：沒牙的嫌犯","body":"你關了一隻一顆牙都沒有的兔子。咬耳魔笑到在閣樓上打滾。"}},"good":{"head":"結案：閣樓上的咬耳魔","body":"你在閣樓的窩裡找到一整排被咬下來的耳毛，像收藏品一樣排好。小灰說，她的耳朵小時候被咬折，從那天起，她就看不慣耳朵直直的兔子。"},"truth":["咬痕很小、門牙完整：鐵拳的牙太寬，棉花缺牙，老麥沒有牙。剩下小灰。","小灰說她睡在地洞，但地洞兩天前就被老麥塞死了，而且只有這一個洞。她在說謊。","傷口上的橘色汁是胡蘿蔔，閣樓窩裡堆滿胡蘿蔔頭和灰毛，小灰嘴角也有橘色。","鐵拳爪上的血是爬梯子追她時被鐵釘割的，他是在抓兇手。"]},{"id":"office","no":"案件 #02","title":"茶水間便當失竊案","titleHi":"便當","counter":"被吃便當","level":2,"blurb":"便當連續被偷吃。大胃王、斷醣女、塗改紀錄的保全、衣服沾醬的實習生，誰都有嫌疑。","days":3,"actionsPerDay":4,"startVictims":3,"culprit":"F","chars":{"F":{"name":"阿肥","tag":"工程部主管・大胃王","desc":"一餐吃三個便當，最討厭青菜。全辦公室第一個懷疑他。","look":{"head":"round","ears":"hair","body":"big","eyes":"angry","mark":"tie","fill":"ink"}},"W":{"name":"小薇","tag":"斷醣中的行政","desc":"說自己在斷醣，最近常常餓到發脾氣。冰箱底下撿到她常用的吸管。","look":{"head":"round","ears":"hair","body":"round","eyes":"big","mark":"bow","fill":"white"}},"G":{"name":"保全伯","tag":"夜班保全","desc":"監視器紀錄表上，昨晚九點到十點那一格被他塗掉了。","look":{"head":"round","ears":"none","body":"round","eyes":"sleepy","mark":"beard","fill":"gray"}},"Z":{"name":"阿哲","tag":"實習生","desc":"到職第三天。今天白襯衫上有一大塊醬油漬。","look":{"head":"round","ears":"hair","body":"round","eyes":"dot","mark":"none","fill":"white"}}},"evidence":{"e1":{"name":"被吃的便當","where":"冰箱第二層","icon":"food","text":"雞腿啃到只剩骨頭，白飯也吃光了，只有青菜一口沒動。盒蓋內側有一個很大的油指印。"},"e2":{"name":"短吸管","where":"冰箱底下","icon":"straw","text":"罐裝優酪乳附的短吸管，已經乾掉了，黏在地上。"},"e3":{"name":"門禁紀錄","where":"茶水間感應門","icon":"key","text":"21:40 一張工程部的卡刷進茶水間，21:55 刷出。今晚沒有其他刷卡紀錄。"},"e4":{"name":"被塗掉的紀錄表","where":"保全室","icon":"paper","text":"九點到十點那格被立可白蓋掉。對著燈看，底下隱約寫著：『21:05 保全室，私人時間』。"}},"lines":{"F":{"alibi":"「我九點就去健身房了。我最近在減肥，晚上不吃東西。」","e1":"「青菜沒動？……我是說，誰會這樣吃便當，真浪費。」（他把手藏到桌子底下。）","e2":"「優酪乳是小薇在喝的吧。」","e3":"「工程部的卡又不是只有我一張！阿哲也在工程部啊。」","e4":"「保全伯偷懶被抓到了吧，哈。」"},"W":{"alibi":"「我六點半就下班了。我在斷醣，只吃青菜跟蛋白質。」","e1":"「青菜沒人吃？那根本不是我的口味。」","e2":"「那是我傍晚放優酪乳的時候掉的，早就乾了。我找了好久。」","e3":"「我是行政部，我的卡刷不開工程部的時段。」","e4":"「保全伯每天九點都會偷偷在保全室看八點檔。」"},"G":{"alibi":"「我九點到九點半在保全室……咳，休息。九點半巡邏，看到阿肥在一樓大廳等外送，等了好久沒來，他很生氣地坐電梯上樓了。」","e1":"「那個油指印好大。」","e2":"「小薇六點多走的，我有跟她說再見。」","e3":"「阿哲那張是訪客卡，刷不開感應門，每次都要我幫他開。昨晚他九點就走了。」","e4":"「……好啦，我九點在看八點檔重播。塗掉是因為怕被扣薪水，跟便當無關。」"},"Z":{"alibi":"「我九點就下班了！保全伯幫我開的大門。」","e1":"「我的醬油漬是中午吃泡麵噴到的！我才沒吃雞腿。」","e2":"「吸管？我不喝優酪乳。」","e3":"「我只有訪客卡，連茶水間都進不去，每次倒水都要拜託別人。」","e4":"「保全伯看起來就很可疑。」"}},"intro":{"head":"第三個便當也被吃了","body":"這週冰箱已經有三個便當被偷吃。四個人都有說不清楚的地方。三天內找出偷吃的人。"},"nights":{"none":{"add":1,"head":"冰箱又少了一個雞腿","body":"你決定再觀察。偷吃的人也決定再吃一晚。"},"W":{"add":1,"head":"小薇被停權，冰箱照樣失守","body":"小薇整晚在群組抗議。冰箱裡又一個雞腿便當被吃光，青菜一樣沒動。"},"G":{"add":2,"head":"保全伯被停班，冰箱大失血","body":"沒人巡邏了。兩個便當同時被吃光，只剩青菜。"},"Z":{"add":1,"head":"實習生被停權","body":"阿哲哭著回家。他本來就進不去茶水間，又一個便當被吃。"}},"bad":{"none":{"head":"結案失敗：自助餐","body":"三天過去你誰也沒關。冰箱改名「共享冰箱」，大家開始只帶青菜上班。"},"W":{"head":"結案失敗：冤枉斷醣女","body":"小薇被調部門。她最後一天留了一張紙條：『被吃的是雞腿和白飯，我斷醣耶。』"},"G":{"head":"結案失敗：八點檔的代價","body":"保全伯因為看八點檔被記過，便當照樣每天少一個。"},"Z":{"head":"結案失敗：實習結束","body":"阿哲被提早結束實習。他連茶水間的門都刷不開。"}},"good":{"head":"結案：嘴上減肥的大胃王","body":"阿肥被抓到時，抽屜裡藏著三支啃乾淨的雞腿骨。他說他在減肥，所以不敢自己買便當，只好『吃別人的就不算』。"},"truth":["白飯被吃光，斷醣的小薇不碰白飯；青菜一口沒動，最討厭青菜的是阿肥。","21:40 刷進茶水間的是工程部的卡。阿哲只有訪客卡、九點就走，保全伯可以作證。","阿肥說九點去了健身房，但保全伯九點半看到他在大廳等外送沒等到，氣得上樓。","保全伯塗紀錄是在藏自己偷看八點檔；吸管是小薇傍晚掉的，早就乾了。"]},{"id":"mansion","no":"案件 #03","title":"金絲雀失聲事件","titleHi":"失聲","counter":"受驚鳥兒","level":2,"blurb":"歌唱巨星一夜啞了。爪上有羽毛的貓、搬凳子的狗、半夜出動的老鼠、嫉妒她的鸚鵡。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"K","chars":{"K":{"name":"夜爵","tag":"高冷黑貓・爪上有羽毛","desc":"眼神兇狠，從不解釋。爪子上勾著一根金絲雀的羽毛。","look":{"head":"round","ears":"cat","body":"round","eyes":"angry","mark":"none","fill":"ink"}},"P":{"name":"波波","tag":"哈巴狗・搬過凳子","desc":"圓滾滾、愛撒嬌，最常被金絲雀笑腿短。鳥籠下面那張凳子是他搬的。","look":{"head":"round","ears":"dog","body":"round","eyes":"big","mark":"none","fill":"white"}},"R":{"name":"起司長老","tag":"牆洞老鼠族長","desc":"帶著一家十二口住在牆洞裡。老鼠會爬，也會咬繩子。","look":{"head":"round","ears":"mouse","body":"round","eyes":"glasses","mark":"beard","fill":"gray"}},"G":{"name":"嘎嘎","tag":"管家鸚鵡・會開門閂","desc":"以前是豪宅的頭牌歌手，金絲雀來了以後就沒人聽他唱。他會用嘴開門閂。","look":{"head":"round","ears":"none","body":"round","eyes":"smug","mark":"crown","fill":"white"}}},"evidence":{"e1":{"name":"鳥籠門閂","where":"金絲雀的籠子","icon":"key","text":"門閂是從外面拉開的。門閂離地一百五十公分，籠子正下方有一張腳凳。"},"e2":{"name":"腳凳","where":"鳥籠正下方","icon":"house","text":"凳子高四十公分，坐墊上有米色短毛和一灘口水。"},"e3":{"name":"窗台腳印","where":"琴房窗台","icon":"paw","text":"一排圓圓的梅花腳印，從窗外一路走到鳥籠上方的吊燈。每個腳印都只有肉墊，沒有爪痕。"},"e4":{"name":"蓋布","where":"嘎嘎的鳥籠","icon":"paper","text":"嘎嘎的籠子每晚都蓋著黑布。布上散著一堆起司屑，布邊的摺痕整整齊齊。"}},"lines":{"K":{"alibi":"「我整晚都在伯爵的床上睡覺。」（她舔了舔爪子。）","e1":"「門閂那麼高，狗搆得到嗎？」","e2":"「看吧，凳子是狗搬的。」","e3":"「窗台誰都能走。」（她的尾巴甩了一下。）","e4":"「鸚鵡最會開門閂了，你怎麼不問他？」"},"P":{"alibi":"「我……我有搬凳子啦。可是我站上去還是搆不到！我氣到在凳子上流口水，然後就去廚房討東西吃了。」","e1":"「一百五十公分？我站在凳子上最多一公尺……」（他垂下耳朵。）","e2":"「是我的口水。我真的搆不到嘛。」","e3":"「我走路都會喀喀喀的，爪子收不起來。你聽。」（他在地板上走了兩步，喀、喀、喀。）","e4":"「我去廚房的時候，老鼠們都在。」"},"R":{"alibi":"「昨晚是起司之夜。我們全家在廚房，狗也來討了，我們分他一點。」","e1":"「我們爬得上去，但那個門閂比我們全家加起來還重。」","e2":"「狗下來的時候很失望。」","e3":"「肉墊、沒爪痕？狗走路會喀喀響。我們的腳印小得像米粒。」","e4":"「我們吃完起司就躲到鸚鵡的蓋布上睡覺，那塊布整晚沒動過。底下一直在打呼。」"},"G":{"alibi":"「我的籠子每晚都蓋著布，我怎麼出來？」（他翹起下巴。）","e1":"「門閂我是會開，但我得先出得了自己的籠子。」","e2":"「那隻狗太矮了，哈。」","e3":"「伯爵昨晚出門參加舞會，臥室門鎖了一整晚。貓說她睡在伯爵床上？那她怎麼進去的？」","e4":"「起司屑……難怪我整晚聞到臭味。」"}},"intro":{"head":"歌唱巨星一夜啞了","body":"伯爵最寶貝的金絲雀昨晚被嚇到唱不出聲。四個嫌疑犯都有動機。三天內找出真兇。"},"nights":{"none":{"add":1,"head":"鳥房又傳出慘叫","body":"你決定不關任何人。今早吊燈上又多了一排梅花腳印。"},"P":{"add":1,"head":"波波被關，鳥房照樣出事","body":"波波在狗籠裡哭。另一隻鳥被嚇到掉毛。"},"R":{"add":2,"head":"老鼠被關，沒人看見了","body":"老鼠家族被關進捕鼠籠，豪宅裡沒有任何目擊者。兩隻鳥一起受驚。"},"G":{"add":1,"head":"嘎嘎被關，豪宅安靜了","body":"嘎嘎被關進儲藏室，一路罵到天亮。又一隻鳥受驚。"}},"bad":{"none":{"head":"結案失敗：寂靜晚宴","body":"晚宴上沒有一隻鳥唱得出來。伯爵只好自己唱，賓客提早離席。"},"P":{"head":"結案失敗：冤枉短腿","body":"波波被送走了。他根本搆不到門閂，這件事從頭到尾只有他自己在說。"},"R":{"head":"結案失敗：關了目擊者","body":"你關了唯一整晚都醒著的證人。"},"G":{"head":"結案失敗：被動機騙了","body":"你以為嫉妒就是證據。嘎嘎整晚蓋著布在打呼。"}},"good":{"head":"結案：說謊的黑貓","body":"夜爵承認，金絲雀每天半夜練唱，吵得她睡不著。她只是想『讓她安靜一下』。"},"truth":["門閂離地一百五十公分。波波站在四十公分的凳子上也搆不到，他自己承認了。","窗台腳印只有肉墊、沒有爪痕：會收爪子的是貓。狗走路會喀喀響，老鼠腳印很小。","嘎嘎整晚被蓋在布下打呼，老鼠睡在布上可以作證。老鼠全家和波波在廚房，互相作證。","夜爵說她睡在伯爵床上，但伯爵出門，臥室鎖了一整晚。她爪上的羽毛是自己勾下來的。"]},{"id":"school","no":"案件 #04","title":"營養午餐布丁消失案","titleHi":"布丁","counter":"失蹤布丁","level":2,"blurb":"週五的布丁又少了。嘴角有焦糖的調皮鬼、有鑰匙的校長和營養師，還有盯著大家的風紀股長。","days":3,"actionsPerDay":4,"startVictims":3,"culprit":"B","chars":{"A":{"name":"阿虎","tag":"調皮大王・嘴角有焦糖","desc":"上週把青蛙放進老師抽屜。今天嘴角黏著焦糖。","look":{"head":"round","ears":"hair","body":"round","eyes":"smug","mark":"scar","fill":"ink"}},"B":{"name":"小美","tag":"風紀股長","desc":"隨身帶著筆記本，最愛抓別人違規。最近一直說阿虎就是布丁小偷。","look":{"head":"round","ears":"hair","body":"round","eyes":"glasses","mark":"bow","fill":"white"}},"H":{"name":"王校長","tag":"校長・有冰箱鑰匙","desc":"在朝會宣布少糖運動，但大家都看過他偷吃甜食。","look":{"head":"round","ears":"none","body":"big","eyes":"glasses","mark":"tie","fill":"gray"}},"N":{"name":"林阿姨","tag":"營養師・有冰箱鑰匙","desc":"管布丁冰箱十五年。最近抱怨布丁預算被砍。","look":{"head":"round","ears":"hair","body":"round","eyes":"sleepy","mark":"none","fill":"ink"}}},"evidence":{"e1":{"name":"布丁冰箱","where":"營養室","icon":"food","text":"冰箱沒有被撬開的痕跡，是用鑰匙打開的。少了四個布丁。"},"e2":{"name":"鑰匙登記表","where":"營養室門口","icon":"key","text":"冰箱鑰匙有兩把。週五那欄寫著：『校長的鑰匙 12:00 借出，借用人：風紀股長，用途：拿運動會冰塊。13:00 歸還。』"},"e3":{"name":"空布丁杯","where":"女生廁所垃圾桶","icon":"spoon","text":"四個洗得乾乾淨淨、疊得整整齊齊的空布丁杯。最上面貼著一張便利貼：『沒收：違規零食』。"},"e4":{"name":"家長會簽到表","where":"會議室","icon":"paper","text":"週五 12:00 到 13:00 的家長會，簽到表第一行是王校長，最後一行簽退時間是 13:05。"}},"lines":{"A":{"alibi":"「我中午被小美抓去操場罰跑！可是她十二點二十就說要去上廁所，跑掉了二十分鐘，回來的時候嘴巴甜甜的。」","e1":"「我連教室鑰匙都拿不到。」","e2":"「她說要去拿冰塊？運動會是下個月耶。」","e3":"「我的布丁中午就吃掉了，一個而已，嘴巴這個就是。哪有被沒收？」","e4":"「校長那時候在開會，我看到他在會議室打瞌睡。」"},"B":{"alibi":"「我整個中午都在操場盯著阿虎跑步，一秒都沒離開。全部都有記錄。」（她翻開筆記本，12:20 到 12:40 那一行是空白的。）","e1":"「一定是有人偷了鑰匙。」","e2":"「我、我去拿冰塊，冰塊太重拿不動，就還回去了。」","e3":"「那是我沒收阿虎的違規零食！我是風紀，可以沒收！」","e4":"「校長一定是中途溜出去的！」"},"H":{"alibi":"「我十二點到一點都在主持家長會，全程沒離開。」","e1":"「我的鑰匙週五借給風紀股長了，她說要拿冰塊。」","e2":"「對，我借她的。她是個認真的孩子。」","e3":"「……本校長承認我平常偷吃甜食，但那天真的沒有。」","e4":"「你看，簽到表。我全程都在。」"},"N":{"alibi":"「我中午在廚房盯著十個廚工煮湯，大家都看到我。」","e1":"「我的鑰匙一直掛在我腰上。」（她搖了搖腰間的鑰匙串。）","e2":"「冰塊放在體育室，不在布丁冰箱。」","e3":"「布丁杯洗這麼乾淨？會這樣做的孩子不多。」","e4":"「我十二點半送茶進會議室，校長在裡面打瞌睡。」"}},"intro":{"head":"第三週，布丁又少了","body":"每週五的布丁總會少幾個。四個人都有嫌疑，兩把鑰匙都說不清楚。三天內找出布丁小偷。"},"nights":{"none":{"add":1,"head":"冰箱裡又少了一個布丁","body":"你決定再觀察。布丁小偷也是。"},"A":{"add":2,"head":"阿虎被留校，布丁少更多","body":"阿虎被留在輔導室寫悔過書。沒人需要盯他了，盯人的那個空出整個中午。"},"H":{"add":1,"head":"校長被停職","body":"校長被請回家反省。冰箱還是被打開了。"},"N":{"add":1,"head":"營養師被調離","body":"林阿姨被叫去開會一整天。布丁還是少了一個。"}},"bad":{"none":{"head":"結案失敗：布丁停供","body":"學校宣布取消布丁。全校只有一個人在筆記本上寫：『終於清靜了』。"},"A":{"head":"結案失敗：冤枉調皮大王","body":"阿虎被記警告。小美的筆記本又多了一頁『阿虎違規紀錄』。"},"H":{"head":"結案失敗：被平常的形象騙了","body":"校長平常是偷吃甜食，但那天他在家長會打瞌睡，全場家長都看到了。"},"N":{"head":"結案失敗：換掉看守的人","body":"新的營養師把鑰匙交給了風紀股長保管，說她最可靠。"}},"good":{"head":"結案：沒收大王","body":"小美的書包裡還有兩張寫好的『沒收：違規零食』便利貼。她說，她只是想知道違規是什麼味道。"},"truth":["冰箱是用鑰匙開的。林阿姨的鑰匙一直在腰上，校長的鑰匙 12:00 到 13:00 借給了小美。","校長整場都在家長會，簽到表和林阿姨都能作證。","小美說一秒都沒離開，但阿虎說她 12:20 跑掉二十分鐘，她自己的筆記本那一段也是空白。","布丁杯洗乾淨疊好、貼著『沒收』，丟在女生廁所。阿虎只有一個布丁，中午就吃了。"]},{"id":"reef","no":"案件 #05","title":"珊瑚礁珍珠失竊案","titleHi":"珍珠","counter":"失竊珍珠","level":3,"blurb":"老蛤蜊的珍珠一顆顆不見。噴墨的章魚、換新殼的寄居蟹、殼上沾珍珠粉的海龜、愛藏亮東西的小丑魚。","days":3,"actionsPerDay":4,"startVictims":2,"culprit":"O","chars":{"O":{"name":"八爪","tag":"章魚・現場都是他的墨","desc":"手最多、墨最多，案發現場每次都有一團黑墨。","look":{"head":"round","ears":"none","body":"tentacle","eyes":"angry","mark":"none","fill":"ink"}},"C":{"name":"阿殼","tag":"寄居蟹・換了新殼","desc":"這個月換了三次殼。他的舊殼被發現在案發現場附近。","look":{"head":"round","ears":"stalk","body":"shell","eyes":"dot","mark":"none","fill":"white"}},"T":{"name":"老龜","tag":"老海龜・殼上有珍珠粉","desc":"每天睡在老蛤蜊家旁邊。今天背殼上沾著亮亮的粉。","look":{"head":"round","ears":"none","body":"shell","eyes":"sleepy","mark":"beard","fill":"gray"}},"F":{"name":"尼尼","tag":"小丑魚・愛藏亮東西","desc":"她的海葵裡藏著一顆圓圓亮亮的東西，誰都不給看。","look":{"head":"round","ears":"none","body":"tail","eyes":"big","mark":"none","fill":"white"}}},"evidence":{"e1":{"name":"撬開的蛤蜊殼","where":"老蛤蜊家","icon":"shell","text":"殼被撬開一條縫，縫邊有一圈一圈整齊的小圓印，每個都只有指甲大。"},"e2":{"name":"一團黑墨","where":"老蛤蜊家附近","icon":"drop","text":"墨團最濃的地方在蛤蜊殼縫裡面，越往外越淡。"},"e3":{"name":"被丟掉的舊殼","where":"海草叢後面","icon":"shell","text":"阿殼的舊殼。殼口外緣抹著一圈珍珠粉，殼的深處乾乾淨淨，一點粉都沒有。"},"e4":{"name":"尼尼的寶物","where":"海葵裡","icon":"magnifier","text":"一顆圓圓的玻璃彈珠，上面刻著『人類小孩 製』。"}},"lines":{"O":{"alibi":"「我在追小偷。小偷跑了，我就噴墨想照出他往哪逃。」（他八隻手同時交叉。）","e1":"「圓印？海星也有吸盤啊。」（這片珊瑚礁一隻海星都沒有。）","e2":"「我在外面追的時候噴的，墨飄進去了吧。」","e3":"「看吧！殼口有珍珠粉，就是寄居蟹。」","e4":"「那條魚一定偷了一顆。」"},"C":{"alibi":"「退潮的時候我被困在潮池裡出不來，老龜看到我在裡面敲殼。」","e1":"「我只有螯，夾出來的是兩條線，不是圓圈。」（他夾了一片海草給你看。）","e2":"「我很怕墨，看到就躲。」","e3":"「那是我的舊殼，我住了一個月，裡面怎麼可能只有門口有粉？有人抹上去的。」","e4":"「彈珠很漂亮。」"},"T":{"alibi":"「我……在……蛤蜊……旁邊……睡覺……。阿殼……在……潮池……出不來。」","e1":"「我……只有……嘴……咬出來……是……一條……」","e2":"「墨……是……從……蛤蜊……那裡……噴出來……的……」","e3":"「八爪……昨天……抱著……那個……殼……」","e4":"「彈珠……是……人類……掉的。」"},"F":{"alibi":"「我整晚都在海葵裡！海葵會螫別人，只有我能進去，我才不出來。」","e1":"「我只有鰭！我連殼都打不開！」","e2":"「墨好臭！我整晚都聞到！」","e3":"「殼？我又不住殼！」","e4":"「那不是珍珠！是彈珠！我撿到的！」（她把彈珠緊緊抱住。）"}},"intro":{"head":"老蛤蜊的珍珠不見了","body":"老蛤蜊已經丟了兩顆珍珠。每個嫌疑犯身上都有可疑的東西。三天內找出珍珠小偷。"},"nights":{"none":{"add":1,"head":"又少了一顆珍珠","body":"你選擇再等等。今晚老蛤蜊家又飄出一團墨。"},"C":{"add":1,"head":"阿殼被關，墨照樣飄","body":"阿殼被關進空貝殼裡。半夜，老蛤蜊家又噴出一團墨。"},"T":{"add":2,"head":"老龜被關，蛤蜊旁邊沒人了","body":"老龜被帶走，老蛤蜊身邊整晚沒人陪。兩顆珍珠一起不見。"},"F":{"add":1,"head":"尼尼被關，彈珠被沒收","body":"尼尼抱著彈珠哭。又一顆珍珠不見。"}},"bad":{"none":{"head":"結案失敗：老蛤蜊搬家","body":"老蛤蜊打包剩下的珍珠搬走了。章魚八隻手揮著送行。"},"C":{"head":"結案失敗：被栽贓的殼","body":"你被殼口那一圈珍珠粉騙了。住了一個月的殼，怎麼可能只有門口有粉？"},"T":{"head":"結案失敗：慢速證人","body":"你關了唯一看到真相的老龜。等他說完，案子已經過了追訴期。"},"F":{"head":"結案失敗：彈珠不是珍珠","body":"你關了一條抱著玻璃彈珠的小魚。"}},"good":{"head":"結案：噴墨的人就是小偷","body":"你在八爪的岩洞裡找到四顆珍珠，排成一排當夜燈。他說：『亮亮的，好看。』"},"truth":["殼縫邊一圈圈小圓印是吸盤。阿殼只有螯、老龜只有嘴、尼尼只有鰭。","墨最濃的地方在殼縫裡，是從蛤蜊家往外噴的，不是在外面追小偷時噴的。八爪說謊。","舊殼只有殼口外緣有珍珠粉，裡面乾淨，是被抹上去的。老龜看到八爪抱著那個殼。","阿殼退潮時被困在潮池，老龜作證。尼尼的寶物是玻璃彈珠。"]},{"id":"haunted","no":"案件 #06","title":"鬼屋幽靈逃跑事件","titleHi":"幽靈","counter":"嚇跑的幽靈","level":3,"blurb":"每晚三點，幽靈被一道強光嚇跑。無頭騎士、吸血鬼、南瓜燈、老鬼婆婆，誰都說自己沒動。","days":3,"actionsPerDay":4,"startVictims":2,"culprit":"G","chars":{"K":{"name":"無頭騎士","tag":"沒有頭的騎士","desc":"兩公尺高，拿著長劍。他的頭不見了好幾天。","look":{"head":"none","ears":"none","body":"cloak","eyes":"none","mark":"none","fill":"ink"}},"V":{"name":"德古拉","tag":"吸血鬼伯爵","desc":"高傲、嫌鬼屋太吵。現場的手電筒上有兩個尖牙洞。","look":{"head":"round","ears":"hair","body":"cloak","eyes":"smug","mark":"fangs","fill":"white"}},"P":{"name":"南瓜仔","tag":"南瓜燈・會發光","desc":"整座鬼屋唯一會發光的鬼。被嚇跑的幽靈都喊著『好亮』。","look":{"head":"pumpkin","ears":"none","body":"round","eyes":"big","mark":"none","fill":"gray"}},"G":{"name":"鬼婆婆","tag":"兩百歲的老幽靈","desc":"整天坐在搖椅上織紅圍巾。常說現在的年輕幽靈太吵。","look":{"head":"round","ears":"none","body":"ghost","eyes":"glasses","mark":"none","fill":"white"}}},"evidence":{"e1":{"name":"手電筒","where":"二樓走廊","icon":"light","text":"一支超亮的手電筒。握把上有兩個小尖洞，開關上纏著一小段紅色毛線。"},"e2":{"name":"被撬的抽屜","where":"伯爵的書房","icon":"key","text":"抽屜鎖被細細的東西撬開，裡面空了，只剩一張紙：『沒收物：觀光客的手電筒』。"},"e3":{"name":"南瓜仔的蠟燭","where":"樓梯下","icon":"light","text":"蠟燭只剩一小截。照這個長度，每晚大約十二點就會燒完熄滅。"},"e4":{"name":"搖椅上的圍巾","where":"三樓走廊","icon":"fur","text":"一條織到一半的紅圍巾，最後一排的毛線被扯斷了一小截。"}},"lines":{"K":{"alibi":"（騎士用劍在地上寫字）『我在一樓巡邏。頭放在二樓櫃子上幫我看走廊。』","e1":"（寫字）『頭說，三點的時候，一條紅色的東西飄過去。』","e2":"（寫字）『伯爵的抽屜前天被撬了，他氣了兩天。』","e3":"（寫字）『南瓜仔沒有手，拿不了東西。』","e4":"（寫字）『婆婆的圍巾，紅的。』"},"V":{"alibi":"「本伯爵兩點到四點在一樓大廳讀詩。那個沒頭的一直在我面前走來走去，吵死了。」","e1":"「那東西照到本伯爵會冒煙。」（他離手電筒遠遠的。光一掃過，他的手背真的冒出一縷煙。）「尖洞？那是我用嘴叼回來沒收的。」","e2":"「前天有人撬了我的抽屜，偷走我沒收的手電筒。」","e3":"「南瓜十二點就熄了，然後哭個不停。」","e4":"「紅毛線？鬼屋裡只有婆婆在織紅的。」"},"P":{"alibi":"「我十二點就熄了，好黑，我躲在樓梯下面不敢動……三點的時候，搖椅一直在晃，可是上面沒有人，只有毛線球。」","e1":"「就、就是這個好亮的！」（他抖到掉了好幾顆南瓜子。）","e2":"「伯爵的抽屜我打不開，我沒有手。」","e3":"「我的蠟燭只能燒到十二點，之後我一點光都沒有。」","e4":"「婆婆最近一直說，年輕幽靈吵得她織不下去。」"},"G":{"alibi":"「我整晚都坐在搖椅上織毛線。兩百年來，我從沒離開過那張椅子。」","e1":"「可怕的光。我老了，眼睛受不了。」","e2":"「伯爵的抽屜？我一個老太婆撬得開嗎。」（她的毛線針又細又長。）","e3":"「說不定是那南瓜躲在黑暗裡嚇人。」","e4":"「毛線是被貓扯斷的。」（騎士在地上寫：『鬼屋沒有貓』。）"}},"intro":{"head":"又一隻幽靈被嚇跑了","body":"每天凌晨三點，總有幽靈被一道強光嚇得逃出鬼屋。四個嫌疑犯都有可疑之處。三天內找出兇手。"},"nights":{"none":{"add":1,"head":"又一隻幽靈逃走了","body":"凌晨三點，二樓走廊又亮起一道光。"},"K":{"add":2,"head":"騎士被關，走廊沒人看","body":"騎士和他的頭都被鎖進地窖。那晚，兩隻幽靈一起被光嚇跑。"},"V":{"add":1,"head":"伯爵被關進棺材","body":"伯爵被釘在棺材裡。三點，走廊照樣亮了。"},"P":{"add":1,"head":"南瓜仔被關，地窖裡在哭","body":"南瓜仔在地窖哭到天亮。又一隻幽靈被嚇跑。"}},"bad":{"none":{"head":"結案失敗：鬼屋清空","body":"三天後鬼屋只剩下一張搖椅，和一條終於織完的紅圍巾。"},"K":{"head":"結案失敗：冤枉守夜人","body":"你關了把頭借給走廊當眼睛的騎士。"},"V":{"head":"結案失敗：被尖牙騙了","body":"你關了一個碰到光就冒煙的吸血鬼。他根本拿不了手電筒。"},"P":{"head":"結案失敗：被『好亮』騙了","body":"你關了十二點就熄滅、而且沒有手的南瓜燈。"}},"good":{"head":"結案：搖椅上的老幽靈","body":"鬼婆婆承認，年輕幽靈每晚在三樓開派對，她已經兩百年沒有好好織完一條圍巾了。現在鬼屋很安靜，她終於織完了。"},"truth":["手電筒開關上纏著紅毛線，鬼婆婆的紅圍巾最後一排正好斷了一截。","她說從沒離開搖椅，但南瓜仔三點看到搖椅在晃，上面沒人；騎士的頭看到紅色的東西飄過走廊。","伯爵碰到光會冒煙，尖洞是他叼著沒收時留下的。他和騎士兩點到四點在一樓，互相作證。","南瓜仔十二點就熄了，而且沒有手。抽屜是被細細的東西撬開的，像毛線針。"]},{"id":"zoo","no":"案件 #07","title":"企鵝館沙丁魚失竊案","titleHi":"沙丁魚","counter":"失竊魚桶","level":1,"blurb":"企鵝的晚餐整桶不見。滿嘴魚骨的北極熊、出名的小偷海鷗、愛表演的海獅、拿著鑰匙的管理員。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"P","chars":{"B":{"name":"白白","tag":"北極熊・館裡有魚骨","desc":"全動物園最大隻。今天他的館裡被發現一堆魚骨。","look":{"head":"round","ears":"mouse","body":"big","eyes":"angry","mark":"none","fill":"white"}},"P":{"name":"噗噗","tag":"海獅・表演明星","desc":"每天表演完都能拿到沙丁魚當獎勵。最近一直說獎勵太少。","look":{"head":"round","ears":"none","body":"tail","eyes":"big","mark":"none","fill":"gray"}},"G":{"name":"阿嘎","tag":"海鷗・慣竊","desc":"偷過遊客的漢堡、薯條和冰淇淋，全園都認識他。","look":{"head":"round","ears":"none","body":"round","eyes":"smug","mark":"none","fill":"white"}},"K":{"name":"小陳","tag":"管理員・有鑰匙","desc":"鑰匙串上有企鵝館的鑰匙。最近被抓到偷偷拿魚去餵外面的流浪貓。","look":{"head":"round","ears":"hair","body":"round","eyes":"dot","mark":"tie","fill":"ink"}}},"evidence":{"e1":{"name":"門口的按鈕","where":"企鵝館後門","icon":"key","text":"後門用按鈕開，按鈕離地一公尺，要很用力壓才會開。按鈕上有一個圓圓、濕濕的鼻印，大小像一顆乒乓球。"},"e2":{"name":"拖痕","where":"企鵝館外","icon":"drop","text":"空魚桶被丟在館外。地上一道又寬又滑的痕跡，沒有腳印，一路通到表演池。"},"e3":{"name":"熊館的魚骨","where":"北極熊館","icon":"food","text":"一堆魚骨，每根都比手掌還長。企鵝吃的沙丁魚只有手指長。"},"e4":{"name":"打卡紀錄","where":"員工出入口","icon":"paper","text":"小陳 18:02 下班打卡，之後整晚沒有任何員工進園的紀錄。"}},"lines":{"B":{"alibi":"「我在冰山上睡覺。我跟企鵝館中間隔著一條深溝，溝的門晚上是鎖的。」","e1":"（他把鼻子湊過來。他的鼻頭比那個鼻印大三倍。）","e2":"「我走路會有爪印，我不會滑。」","e3":"「那是我的晚餐，鮭魚。每天十公斤。」","e4":"「深溝的門是小陳鎖的，他下班前會檢查。」"},"P":{"alibi":"「我整晚都在表演池睡覺，啾啾。」（他拍了拍鰭。）","e1":"「按鈕？我、我只會按表演用的鈴。」（他的鼻頭上有一圈紅紅的壓痕。）","e2":"「池子旁邊本來就滑滑的嘛。」","e3":"「熊吃好多魚喔！一定是他！」","e4":"「小陳最好了，每天都給我魚。」"},"G":{"alibi":"「我整晚站在屋頂上。海鷗晚上不飛，我很乖。」","e1":"（他跳上按鈕踩了好幾下，按鈕紋風不動。）「我才五百公克，壓不動啦。」","e2":"「我用叼的，不用拖。一桶魚比我重二十倍。」","e3":"「好香的魚骨……」","e4":"「我偷過漢堡、薯條，從來沒偷過整桶的東西，太重了。」"},"K":{"alibi":"「我六點下班就回家了。餵流浪貓是我不對，但我都是下午拿剩的。」","e1":"「那個按鈕是我們訓練噗噗表演用的。他會用鼻子按。」","e2":"「那條痕跡通到表演池。熊館在另一邊，中間有深溝。」","e3":"「那是白白的鮭魚，我昨天親手餵的。」","e4":"「你看，我十八點零二分就打卡走了。」"}},"intro":{"head":"企鵝們餓著肚子醒來","body":"昨晚企鵝館一整桶沙丁魚不見了。四個嫌疑犯都跟魚脫不了關係。三天內找出偷魚的。"},"nights":{"none":{"add":1,"head":"又一桶魚不見了","body":"你決定再觀察一晚。企鵝們決定再餓一晚。"},"B":{"add":1,"head":"白白被關，魚照樣不見","body":"白白被移到隔離區。企鵝館的按鈕又被按開了。"},"G":{"add":1,"head":"阿嘎被關進鳥籠","body":"全園的漢堡都安全了。企鵝的魚沒有。"},"K":{"add":2,"head":"小陳被停職，沒人鎖門了","body":"沒人做晚間檢查，兩桶魚一起不見。"}},"bad":{"none":{"head":"結案失敗：企鵝罷工","body":"企鵝們集體罷工，躺在冰上不動。表演池那邊倒是很熱鬧。"},"B":{"head":"結案失敗：被體型騙了","body":"你關了隔著深溝、鼻子大三倍的北極熊。"},"G":{"head":"結案失敗：被前科騙了","body":"阿嘎什麼都偷，但他壓不動那個按鈕。"},"K":{"head":"結案失敗：冤枉管理員","body":"小陳六點就走了。他被停職的那天，噗噗的表演特別賣力。"}},"good":{"head":"結案：表演明星落網","body":"噗噗的表演池底下，藏著三個空魚桶。他說，表演一次只給三條魚，太少了，他決定自己加薪。"},"truth":["按鈕要用力壓，阿嘎太輕壓不動。鼻印只有乒乓球大，白白的鼻頭大三倍，而且他被鎖在深溝另一邊。","小陳 18:02 就下班，之後沒人進園。","按鈕是訓練噗噗用鼻子按的，他的鼻頭還有壓痕。拖痕又寬又滑、沒有腳印，一路通到他睡的表演池。","熊館的魚骨是白白自己的鮭魚，跟沙丁魚大小不一樣。"]},{"id":"bakery","no":"案件 #08","title":"清晨可頌消失事件","titleHi":"可頌","counter":"消失的可頌","level":2,"blurb":"出爐的可頌每天少六個。打瞌睡的學徒、高大的送貨員、對面的咖啡店老闆、會跳高的店貓。","days":3,"actionsPerDay":4,"startVictims":6,"culprit":"D","chars":{"J":{"name":"阿傑","tag":"學徒・最早到店","desc":"每天第一個到店，常常揉麵揉到打瞌睡。身上永遠都是麵粉。","look":{"head":"round","ears":"hair","body":"round","eyes":"sleepy","mark":"none","fill":"white"}},"D":{"name":"大熊","tag":"送貨員・一百九十公分","desc":"高得要低頭才進得了門，臉很兇，很少說話。","look":{"head":"round","ears":"mouse","body":"big","eyes":"angry","mark":"beard","fill":"ink"}},"C":{"name":"阿光","tag":"對面咖啡店老闆","desc":"一直想跟麵包店搶早餐客人，常常來店裡『參觀』。","look":{"head":"round","ears":"hair","body":"round","eyes":"smug","mark":"tie","fill":"gray"}},"M":{"name":"麻糬","tag":"店貓・會跳高","desc":"跳得上任何架子，常常在麵包旁邊走來走去。","look":{"head":"round","ears":"cat","body":"round","eyes":"smug","mark":"bow","fill":"white"}}},"evidence":{"e1":{"name":"冷卻架","where":"後門旁","icon":"food","text":"少了六個可頌，全都是最上層的。最上層離地一百八十公分。"},"e2":{"name":"後門電子鎖","where":"後門","icon":"key","text":"後門要輸入密碼。紀錄：5:12 開，5:13 關，只開了一分鐘。"},"e3":{"name":"送貨簽收單","where":"收銀台","icon":"paper","text":"今天的麵粉簽收單，大熊簽的時間是 5:10。"},"e4":{"name":"麵粉上的鞋印","where":"後門到冷卻架","icon":"paw","text":"地上撒到的麵粉留下一排很大的鞋印，鞋底是一顆一顆的釘子紋。"}},"lines":{"J":{"alibi":"「我四點半到，在裡面的房間揉麵團揉到六點。烤箱計時器每十五分鐘響一次，我每次都要按，紀錄都在。」","e1":"「一百八十？我墊腳也只摸得到第二層。」","e2":"「後門密碼只有我、老闆娘和大熊知道。我聽到嗶一聲，還以為是大熊送貨來了。」","e3":"「大熊平常五點半才到，今天我也沒看到他人。」","e4":"「我穿室內拖鞋。」（他抬起腳，拖鞋底是平的。）"},"D":{"alibi":"「我五點半送貨，跟平常一樣。」（他雙手抱胸，比門框還高。）","e1":"「我才不吃可頌，那是小孩吃的。」（他的鬍子上沾著一點亮亮的奶油。）","e2":"「五點十二？我還在路上。」","e3":"「……時間是我隨便寫的。」","e4":"「工地靴很多人穿。」（他的靴底沾著白色的粉。）"},"C":{"alibi":"「我五點開店，一直在吧台煮咖啡。第一批客人五點零五分就來了，他們都看到我。」","e1":"「最上層的最酥，識貨。」","e2":"「那家店的後門密碼？我怎麼可能知道。」","e3":"「說到大熊，他五點二十來我店裡買咖啡，手上拿著一個油油的紙袋，很香。」","e4":"「我穿布鞋，平底的。」"},"M":{"alibi":"「喵。」（翻譯：我整晚睡在烤箱旁邊，很暖。）","e1":"「喵。」（翻譯：我跳得上去。但我一次只叼得動一個。）","e2":"「喵～」（翻譯：那個門要按數字，我按不了。一分鐘也不夠我跑六趟。）","e3":"「喵。」","e4":"「喵！」（翻譯：我的腳印是梅花，不是鞋。）"}},"intro":{"head":"六個可頌又不見了","body":"每天清晨剛出爐的可頌，總會少六個。四個嫌疑犯都在附近。三天內找出偷吃的人。"},"nights":{"none":{"add":6,"head":"又少了六個","body":"你選擇再觀察一天。最上層又空了。"},"J":{"add":6,"head":"學徒被禁止進店","body":"阿傑被禁止進店，沒人揉麵了。烤出來的可頌少了一半，最上層還是被拿光。"},"C":{"add":6,"head":"咖啡店被勒令停業","body":"阿光的店關了一天。後門的電子鎖照樣嗶了一聲。"},"M":{"add":12,"head":"麻糬被關，老鼠出動","body":"沒有貓看店，老鼠也來湊熱鬧。少了十二個。"}},"bad":{"none":{"head":"結案失敗：可頌停產","body":"老闆娘決定不做可頌了。送貨員的早餐突然變得很普通。"},"J":{"head":"結案失敗：冤枉學徒","body":"阿傑被開除。他連第二層都搆不到。"},"C":{"head":"結案失敗：被競爭關係騙了","body":"你關了不知道密碼、而且一直在顧客面前煮咖啡的老闆。"},"M":{"head":"結案失敗：一分鐘六趟","body":"貓跑得再快，一分鐘也叼不走六個可頌，更按不了密碼。"}},"good":{"head":"結案：一臉兇的送貨員","body":"大熊承認，他每天提早二十分鐘來，就是為了拿最上層剛出爐的那排。他說：『最上面那排最酥，我一直很喜歡。』老闆娘決定以後每天留六個給他，前提是付錢。"},"truth":["少的全是一百八十公分高的最上層。阿傑墊腳只摸到第二層，麻糬一次只叼一個。","後門要密碼，只開一分鐘。知道密碼的只有阿傑、老闆娘和大熊。阿傑在裡間按計時器，有紀錄。","大熊說五點半才到，但他自己的簽收單寫 5:10，阿光 5:20 看到他拿著油油的紙袋。","鞋印是釘子紋的大鞋，阿傑穿拖鞋，阿光穿平底布鞋，大熊穿工地靴，靴底還有麵粉。"]},{"id":"firestation","no":"案件 #09","title":"消防車警笛失蹤案","titleHi":"警笛","counter":"被拆的警笛","level":2,"blurb":"消防車的警笛半夜被拆。兇巴巴的隊長、戴耳塞的新人、一聽到警笛就狂吠的狗、寫抗議信的鄰居。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"G","chars":{"C":{"name":"鐵隊長","tag":"消防隊長・脾氣暴躁","desc":"上週在會議上說：『這個警笛太舊了，早該拆掉。』","look":{"head":"round","ears":"none","body":"big","eyes":"angry","mark":"scar","fill":"ink"}},"N":{"name":"阿誠","tag":"新進消防員・戴耳塞","desc":"說警笛害他耳鳴，口袋裡永遠有一對耳塞和一把螺絲起子。","look":{"head":"round","ears":"hair","body":"round","eyes":"dot","mark":"none","fill":"white"}},"D":{"name":"阿斑","tag":"消防犬・討厭警笛","desc":"警笛一響就狂吠，還咬過警笛的電線。","look":{"head":"round","ears":"dog","body":"round","eyes":"angry","mark":"none","fill":"white"}},"G":{"name":"王奶奶","tag":"隔壁鄰居・寫抗議信","desc":"每週寫一封信抱怨警笛太吵，整天坐在門口織淡紫色的毛衣。","look":{"head":"round","ears":"hair","body":"round","eyes":"glasses","mark":"none","fill":"gray"}}},"evidence":{"e1":{"name":"車頂","where":"消防車上","icon":"magnifier","text":"警笛被拆走，四顆螺絲整整齊齊排在車頂上，排成一直線。"},"e2":{"name":"消防梯","where":"車庫","icon":"house","text":"梯子靠在車邊。最下面一階卡著一小團淡紫色的毛線，聞起來有薰衣草味。"},"e3":{"name":"出勤表","where":"值班室","icon":"paper","text":"凌晨 2:00 到 3:30，全隊出勤救火。留守名單只有一行：阿斑（前腳受傷）。"},"e4":{"name":"抗議信","where":"消防局信箱","icon":"paper","text":"一封沒有署名的信：『再吵，我就自己動手。』"}},"lines":{"C":{"alibi":"「兩點到三點半我在火場指揮。全隊都在，火場的居民也都看到了。」","e1":"「螺絲排這麼整齊？我們隊上沒人這麼有耐心。」","e2":"「梯子都收在車庫牆上。有人搬下來過。」","e3":"「看到了吧，全隊出勤，局裡只剩阿斑。」","e4":"「那封信？隔壁王奶奶寫的，她每週一封，字跡我認得。」"},"N":{"alibi":"「我跟著隊長出勤，整晚在拉水管。隊長罵了我一整晚，大家都聽到了。」","e1":"「我是有螺絲起子啦，可是我那晚在火場。」","e2":"「淡紫色？王奶奶每天坐在門口織的就是這個顏色。」","e3":"「我們回來的時候，車庫側門是開的。」","e4":"「奶奶上週跟我說：『再吵我就自己來。』」"},"D":{"alibi":"「汪。」（翻譯：我腳受傷，在狗窩休息。）","e1":"「汪汪。」（翻譯：我沒有手，轉不了螺絲。我只咬過電線。）","e2":"「汪。」（翻譯：我的腳包著繃帶，爬不上梯子。）","e3":"「汪……」（翻譯：半夜有人從側門進來，身上香香的，摸我的頭說『乖狗狗』，給我一塊餅乾。）","e4":"「汪！」（翻譯：我是討厭警笛沒錯。）"},"G":{"alibi":"「我九點就睡了，老人家早睡，一覺到天亮。」","e1":"「我一個老太婆，哪拆得動警笛。」（她手上的毛線針轉得飛快。）","e2":"「紫色毛線到處都買得到。」","e3":"「半夜救火？我睡著了，什麼都沒聽到。」","e4":"「信是我寫的，寫信又不犯法。」"}},"intro":{"head":"消防車沒有聲音了","body":"今早出勤時，大家才發現消防車的警笛被拆了。四個嫌疑犯都說過討厭那個警笛。三天內找出拆警笛的人。"},"nights":{"none":{"add":1,"head":"備用警笛也被拆了","body":"你決定再觀察一晚。今早備用警笛的螺絲，也被整齊地排在車頂上。"},"C":{"add":1,"head":"隊長被停職","body":"隊長被請回家。局裡的另一台車也安靜了。"},"N":{"add":1,"head":"阿誠被停職","body":"阿誠被沒收螺絲起子。又一個警笛被拆。"},"D":{"add":2,"head":"阿斑被送走，局裡沒人看門","body":"沒有狗看門了，兩台車的警笛同時被拆。"}},"bad":{"none":{"head":"結案失敗：全城最安靜的消防局","body":"消防車改用喇叭開道，路上沒有一輛車讓路。"},"C":{"head":"結案失敗：被一句氣話騙了","body":"你關了整晚在火場指揮的隊長。"},"N":{"head":"結案失敗：被螺絲起子騙了","body":"阿誠那晚在火場拉水管被罵了一整晚。"},"D":{"head":"結案失敗：冤枉傷兵","body":"你關了一隻前腳受傷、沒有手的狗。"}},"good":{"head":"結案：織毛衣的鄰居","body":"王奶奶的毛線籃底下，藏著那個警笛，外面套了一個淡紫色的毛線套。她說：『這樣就不吵了。』"},"truth":["2:00 到 3:30 全隊在火場，局裡只剩前腳受傷、沒有手的阿斑。拆警笛的人是從外面進來的。","梯子上卡著淡紫色、有薰衣草味的毛線，王奶奶每天織的就是這個顏色。","王奶奶說九點就睡到天亮，但阿斑說半夜有個香香的人從側門進來摸他、餵他餅乾。","螺絲排得整整齊齊，是很有耐心的手。抗議信也是她寫的。"]},{"id":"library","no":"案件 #10","title":"圖書館割頁事件","titleHi":"割頁","counter":"被割的書頁","level":3,"blurb":"珍本書少了一頁。啃書的書蟲、在書上亂畫的小學生、有鑰匙的清潔阿嬤，還有那位嚴厲的貓頭鷹館長。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"O","chars":{"O":{"name":"館長","tag":"貓頭鷹館長・最嚴厲","desc":"誰在館裡講話就瞪誰。辦公室裡有珍本室的鑰匙。","look":{"head":"round","ears":"horn","body":"round","eyes":"glasses","mark":"tie","fill":"gray"}},"W":{"name":"小蛀","tag":"書蟲・會啃紙","desc":"專門吃書。每週都有書被他啃出洞。","look":{"head":"round","ears":"stalk","body":"round","eyes":"big","mark":"none","fill":"white"}},"K":{"name":"阿寶","tag":"小學生・在書上亂畫","desc":"上週在百科全書上畫了一整頁的恐龍，被罰留下來寫功課。","look":{"head":"round","ears":"hair","body":"round","eyes":"smug","mark":"none","fill":"ink"}},"C":{"name":"清潔阿嬤","tag":"清潔員・帶著珍本室鑰匙","desc":"每晚打掃到十一點，身上掛著所有房間的鑰匙。","look":{"head":"round","ears":"hair","body":"round","eyes":"sleepy","mark":"none","fill":"white"}}},"evidence":{"e1":{"name":"被割的書","where":"珍本室","icon":"paper","text":"第 113 頁被割掉。切口筆直平整，像是用刀片沿著尺割的。"},"e2":{"name":"珍本室的門","where":"二樓","icon":"key","text":"門鎖沒有被破壞，是用鑰匙開的。門縫貼著防蟲膠條，完好無損。鑰匙只有兩把。"},"e3":{"name":"目錄","where":"珍本書第一頁","icon":"paper","text":"目錄上，第 113 頁的標題是：『本館歷任館長著作勘誤』。"},"e4":{"name":"碎紙機","where":"館長辦公室","icon":"shears","text":"碎紙機裡有一團細紙條。紙質泛黃、很厚，跟珍本書的紙一樣。"}},"lines":{"O":{"alibi":"「本館長昨晚一直在辦公室批公文，十點直接回家。」","e1":"「書蟲啃書，天經地義。」","e2":"「我的鑰匙一直掛在辦公室牆上，誰都可能拿。」","e3":"「勘誤？那一頁……我記得不多。」（他的羽毛豎了起來。）","e4":"「碎紙機是用來碎公文的。」"},"W":{"alibi":"「我在兒童區啃繪本，繪本的紙比較甜。」","e1":"「我啃的洞都是彎彎曲曲的，還有牙印。」（他啃了一張紙給你看，洞口坑坑疤疤。）","e2":"「我都從門縫鑽，可是珍本室的門縫有防蟲膠條，我進不去。」","e3":"「那一頁我啃過一個角！上面寫館長的書錯了四十七個字。」","e4":"「碎紙機裡的紙我不敢吃，有館長的味道。」"},"K":{"alibi":"「我被罰留下來寫功課，在閱覽室寫到九點，阿嬤一直在旁邊拖地。」","e1":"「我只有蠟筆，我沒有刀子。」","e2":"「九點我去上廁所，看到館長從珍本室走出來，手上拿著一把長長的尺。」","e3":"「我字還認不多。」","e4":"「館長辦公室晚上一直有喀喀喀的聲音。」"},"C":{"alibi":"「我九點前在閱覽室陪阿寶，九點到十一點在一樓用吸塵器打掃，整晚都在一樓。」","e1":"「我只有拖把，沒有刀片。」","e2":"「我的鑰匙一直在圍裙口袋，從沒拿出來。二樓今天不是我打掃的日子。」","e3":"「館長最近很怕有人去翻那本書。」","e4":"「碎紙機是館長專用的，每次都是他自己倒。」"}},"intro":{"head":"珍本書少了一頁","body":"館裡最珍貴的一本書，第 113 頁被割掉了。四個嫌疑犯都有理由碰那本書。三天內找出割頁的人。"},"nights":{"none":{"add":1,"head":"另一本書也少了一頁","body":"你決定再觀察。今早另一本書的勘誤頁也不見了。"},"W":{"add":1,"head":"書蟲被關進玻璃瓶","body":"小蛀被關起來，又一頁被割得筆直。"},"K":{"add":1,"head":"阿寶被禁止進館","body":"阿寶被家長接走。又一頁被割掉了。"},"C":{"add":2,"head":"阿嬤被停職，沒人巡館","body":"沒人在館裡打掃到深夜，兩本書都少了一頁。"}},"bad":{"none":{"head":"結案失敗：書都沒了勘誤","body":"所有館長著作的勘誤頁都不見了。館長的書重新被列為推薦書目。"},"W":{"head":"結案失敗：被啃書的天性騙了","body":"書蟲啃的洞彎彎曲曲，而且進不了珍本室。"},"K":{"head":"結案失敗：關了目擊者","body":"你關了唯一看到誰從珍本室出來的孩子。"},"C":{"head":"結案失敗：被鑰匙騙了","body":"阿嬤的鑰匙從沒離開口袋，她整晚都在一樓吸地。"}},"good":{"head":"結案：最嚴厲的館長","body":"館長承認，那一頁寫著他的著作錯了四十七個字。他當了三十年館長，不想讓任何人看到。你建議他把勘誤印成書籤，他沉默了很久。"},"truth":["切口筆直，是刀片沿著尺割的。書蟲咬的洞坑坑疤疤，而且他進不了貼膠條的門；阿寶只有蠟筆。","門是用鑰匙開的。阿嬤的鑰匙一直在口袋，她整晚在一樓，阿寶九點前也跟她在一起。另一把在館長辦公室。","館長說他整晚在辦公室，但阿寶九點看到他拿著尺從珍本室出來。","那一頁是館長著作的勘誤，碎紙機裡有珍本書的紙，碎紙機只有館長在用。"]},{"id":"circus","no":"案件 #11","title":"獅子鬃毛剪斷事件","titleHi":"鬃毛","counter":"被剪的鬃毛","level":2,"blurb":"馬戲團的獅子一覺醒來變成平頭。被咬過的馴獸師、拿大剪刀的小丑、空中飛人、被搶走風頭的大象。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"L","chars":{"W":{"name":"鞭哥","tag":"馴獸師・被獅子咬過","desc":"上週被獅子咬傷手臂，嘴上一直說要給牠點教訓。獅籠的鑰匙在他身上。","look":{"head":"round","ears":"hair","body":"big","eyes":"angry","mark":"scar","fill":"ink"}},"B":{"name":"波比","tag":"小丑・有一把大剪刀","desc":"表演時永遠拿著一把比人還大的剪刀，笑容讓小孩害怕。","look":{"head":"round","ears":"hair","body":"round","eyes":"big","mark":"bow","fill":"white"}},"L":{"name":"莉莉","tag":"空中飛人","desc":"團裡最受歡迎的明星，直到獅子來了。海報上她的名字被移到第二行。","look":{"head":"round","ears":"hair","body":"round","eyes":"smug","mark":"crown","fill":"white"}},"E":{"name":"嘟嘟","tag":"大象・失去主秀","desc":"以前是開場秀，獅子來了以後被排到中場。","look":{"head":"round","ears":"mouse","body":"big","eyes":"sleepy","mark":"none","fill":"gray"}}},"evidence":{"e1":{"name":"剪口","where":"獅子雷歐","icon":"shears","text":"剪口是斜的，從上往下剪。籠子裡和地上一根掉落的毛都沒有，全被帶走了。"},"e2":{"name":"籠頂","where":"獅籠","icon":"house","text":"獅籠頂上的鐵網被拆開一個洞，洞口勾著一片金色亮片。籠子的門鎖完好。"},"e3":{"name":"小丑的剪刀","where":"道具間","icon":"shears","text":"表演用的大剪刀，用力剪也剪不斷一張紙。材質是橡膠。"},"e4":{"name":"新戲服","where":"後台衣架","icon":"fur","text":"一件金色蓬蓬披肩，摸起來跟獅子的鬃毛一模一樣，還帶著獅子味。名牌寫著：『新節目：獅后』。"}},"lines":{"W":{"alibi":"「一點的時候我在醫務室換藥，那頭獅子咬的。」（他的手臂纏著繃帶。）","e1":"「籠門是鎖著的，鑰匙在我身上，我沒開過。」","e2":"「籠頂？我這條手爬不上去。」","e3":"「那是道具，連紙都剪不斷。」","e4":"「獅后？我沒聽說有新節目。」"},"B":{"alibi":"「我在帳篷外練抓氣球。一點的時候，我看到帳篷頂上有東西閃了一下，很亮，一下子就不見了。」","e1":"「我是很想要這麼漂亮的毛啦……」（他沮喪地揮了揮橡膠剪刀。）","e2":"「亮片！我們團裡只有一個人的衣服會掉亮片。」","e3":"「對啦，是假的。我連自己的假髮都剪不了。」","e4":"「莉莉上週說，她想要一頂真正的鬃毛。」"},"L":{"alibi":"「我早早就睡了，在我的拖車裡。」","e1":"「好可憐的獅子。」（她撥了一下頭髮，髮間黏著一根金色的粗毛。）","e2":"「亮片？我的表演服都是新的，不會掉。」（她的袖口少了一排亮片。）","e3":"「小丑那把剪刀？笑死人。」","e4":"「那是……我訂做的假毛。」"},"E":{"alibi":"「嘟～」（翻譯：我被鍊子拴在象棚。鞭哥一點經過我門口去醫務室，兩點才回來。）","e1":"「嘟。」（翻譯：我的鼻子剪不了東西。）","e2":"「嘟嘟。」（翻譯：我太重了，爬上籠頂會把它壓垮。）","e3":"「嘟～」（翻譯：小丑的剪刀是軟的，我踩過。）","e4":"「嘟！」（翻譯：上得了籠頂的，只有會飛的人。）"}},"intro":{"head":"獅子變成了平頭","body":"今早，馬戲團的明星獅子雷歐醒來，鬃毛被剪得一根不剩。四個嫌疑犯都跟獅子有過節。三天內找出兇手。"},"nights":{"none":{"add":1,"head":"老虎的尾巴毛也被剪了","body":"你決定再觀察。今早老虎的尾巴毛也不見了，帳篷頂上又閃了一下。"},"W":{"add":1,"head":"鞭哥被關，籠子沒人管","body":"鞭哥被關起來，鑰匙被收走。又一隻動物的毛被剪。"},"B":{"add":1,"head":"小丑被關","body":"小丑在籠子裡表演給自己看。又一隻動物被剪了毛。"},"E":{"add":2,"head":"大象被關，帳篷大亂","body":"大象被關進貨車，沒人看守後台。兩隻動物被剪了毛。"}},"bad":{"none":{"head":"結案失敗：馬戲團剃頭季","body":"團裡每隻毛茸茸的動物都被剪了。新節目『獅后』大受好評。"},"W":{"head":"結案失敗：被恩怨騙了","body":"鞭哥整晚在醫務室，大象可以作證。"},"B":{"head":"結案失敗：被道具騙了","body":"你關了拿著橡膠剪刀的小丑。"},"E":{"head":"結案失敗：關了被鍊住的證人","body":"大象被鍊著，一步都走不出象棚。"}},"good":{"head":"結案：獅后","body":"莉莉的拖車裡有一把真正的剪刀，和一張新海報：『空中獅后・莉莉』。她說，她只是想把被搶走的頭條拿回來。"},"truth":["籠門鎖著、鑰匙在鞭哥身上，所以兇手是從籠頂下來的，剪口也是從上往下。","大象太重、鞭哥手受傷而且在醫務室（大象作證），只有會飛的人上得去。籠頂勾著亮片，團裡只有莉莉的衣服會掉亮片。","莉莉說早早睡了，但波比一點看到帳篷頂上有東西在閃。她的袖口少了一排亮片，頭髮上黏著獅毛。","小丑的剪刀是橡膠的。新戲服『獅后』用的就是雷歐的鬃毛。"]},{"id":"space","no":"案件 #12","title":"太空站溫室凍死事件","titleHi":"凍死","counter":"凍死的植物","level":3,"blurb":"太空站的溫室一夜凍死。想拆溫室的艦長、亂咬葉子的外星貓、害死過植物的博士、乖巧的維修機器人。","days":3,"actionsPerDay":4,"startVictims":12,"culprit":"B","chars":{"G":{"name":"葛艦長","tag":"艦長・想拆溫室","desc":"一直嫌溫室太占空間，在會議上說過『那些草遲早要清掉』。","look":{"head":"round","ears":"none","body":"big","eyes":"angry","mark":"crown","fill":"ink"}},"B":{"name":"BB","tag":"維修機器人","desc":"負責站上所有的維修，說話很有禮貌，每天都說『BB 很乖』。","look":{"head":"square","ears":"stalk","body":"round","eyes":"dot","mark":"none","fill":"gray"}},"M":{"name":"喵星","tag":"外星貓・愛咬葉子","desc":"站上的寵物，最愛溜進溫室咬葉子。","look":{"head":"round","ears":"cat","body":"round","eyes":"big","mark":"none","fill":"white"}},"L":{"name":"林博士","tag":"植物學家","desc":"上一個太空站的溫室在她手上全滅，大家都在傳。","look":{"head":"round","ears":"hair","body":"round","eyes":"glasses","mark":"none","fill":"white"}}},"evidence":{"e1":{"name":"溫控面板","where":"溫室入口","icon":"key","text":"紀錄：03:00 溫度被改成 5 度。這個面板只能用『指紋』或『維修插孔』操作。昨晚沒有任何指紋紀錄。"},"e2":{"name":"枯葉","where":"溫室","icon":"fur","text":"有幾片葉子上有小小的咬痕，但沒被咬的葉子也一樣凍傷了。"},"e3":{"name":"艦長日誌","where":"指揮室","icon":"paper","text":"『溫室太占空間，申請下個月拆除改成倉庫。』旁邊蓋著一個『駁回』章。"},"e4":{"name":"充電紀錄","where":"機器人充電座","icon":"light","text":"BB 每晚 02:00 到 04:00 必須充電。昨晚這段時間，充電量是 0%。"}},"lines":{"G":{"alibi":"「兩點到四點我在指揮室跟地球視訊，訊號紀錄都在。」","e1":"「維修插孔？那是給機器人用的。」","e2":"「那隻貓整天咬葉子。」","e3":"「我是想拆，但被駁回了。凍死植物？那我還得寫報告解釋。」","e4":"「BB 每晚都會乖乖充電，這是規定。」"},"B":{"alibi":"「嗶。BB 昨晚兩點到四點都在充電座上。BB 很乖。」","e1":"「嗶……維修插孔？BB 不知道那是什麼。」（BB 的手指尖，正好是一個插頭的形狀。）","e2":"「嗶。植物很潮濕。潮濕會讓 BB 的關節生鏽。」","e3":"「嗶！艦長要拆溫室！艦長很可疑！」","e4":"「嗶……嗶……充電座壞了。」"},"M":{"alibi":"「喵～」（翻譯：我整晚睡在林博士的肚子上。）","e1":"「喵。」（翻譯：我的肉球按不動那個面板，我也沒有插頭。）","e2":"「喵……」（翻譯：葉子是我咬的，好吃。可是我沒咬的也都死了。）","e3":"「喵。」","e4":"「喵！」（翻譯：兩點多我起來喝水，看到 BB 不在充電座，在走廊上往溫室走。）"},"L":{"alibi":"「我在睡覺艙，喵星壓在我肚子上，我整晚都動不了。睡覺艙的門紀錄是十一點關、七點開。」","e1":"「插孔是機器人專用的，人類的手指插不進去。」","e2":"「上一個太空站的溫室是被隕石打穿的，不是我。」","e3":"「艦長很想拆溫室，我們吵過好幾次。」","e4":"「充電座我早上才檢查過，好好的。」"}},"intro":{"head":"溫室裡的植物全凍死了","body":"今早，太空站唯一的溫室結了一層霜。四個嫌疑犯都有理由。三天內找出兇手，不然下個月大家只能吃營養膏。"},"nights":{"none":{"add":6,"head":"新種的苗也凍死了","body":"你決定再觀察一晚。凌晨三點，溫度又被調低了。"},"G":{"add":6,"head":"艦長被關禁閉","body":"艦長被關在指揮室。三點，溫室又結霜了。"},"M":{"add":6,"head":"喵星被關進籠子","body":"沒有貓在走廊亂晃了。也沒有目擊者了。溫室又結霜。"},"L":{"add":12,"head":"林博士被禁止進溫室","body":"沒人照顧幼苗，剩下的苗也凍死了。"}},"bad":{"none":{"head":"結案失敗：營養膏時代","body":"溫室全滅，大家吃了一年的營養膏。BB 的關節再也沒生鏽過。"},"G":{"head":"結案失敗：被動機騙了","body":"艦長是想拆溫室，但他三點在跟地球視訊。"},"M":{"head":"結案失敗：被咬痕騙了","body":"貓咬過的葉子跟沒咬過的一起凍死。你關了唯一的目擊者。"},"L":{"head":"結案失敗：被謠言騙了","body":"林博士整晚被一隻貓壓在睡覺艙裡，門紀錄可以作證。"}},"good":{"head":"結案：很乖的機器人","body":"BB 承認，溫室的濕氣讓它的關節一直生鏽，它只是想讓空氣『乾一點』。艦長幫它換了一組防鏽關節，溫室重新種了起來。"},"truth":["面板沒有指紋紀錄，所以是用維修插孔改的。插孔只有機器人插得進去，BB 的手指正好是插頭。","BB 說兩點到四點在充電，但充電量是 0%，喵星也看到它往溫室走。","艦長在跟地球視訊；林博士在睡覺艙，門紀錄可以證明；喵星的肉球按不動面板。","貓咬過的葉子和沒咬過的一起凍死，死因是低溫，不是貓。"]},{"id":"forest","no":"案件 #13","title":"森林蜂蜜失竊案","titleHi":"蜂蜜","counter":"被偷的蜂巢","level":1,"blurb":"大樹上的蜂巢被整塊挖走。手黏黏的浣熊、拿著蜂蜜罐的狐狸、在樹上鑽洞的啄木鳥，還有最大隻的熊。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"B","chars":{"B":{"name":"熊大","tag":"棕熊・鼻子腫腫的","desc":"森林裡最大隻的動物，脾氣很差。今天鼻子腫得像番茄。","look":{"head":"round","ears":"mouse","body":"big","eyes":"angry","mark":"none","fill":"ink"}},"R":{"name":"小蒙","tag":"浣熊・手黏黏的","desc":"臉上天生戴著面具，手掌今天黏黏的，聞起來甜甜的。","look":{"head":"round","ears":"cat","body":"round","eyes":"smug","mark":"none","fill":"gray"}},"F":{"name":"阿狡","tag":"狐狸・抱著蜂蜜罐","desc":"今天被看到抱著一大罐蜂蜜走來走去。","look":{"head":"round","ears":"cat","body":"round","eyes":"smug","mark":"bow","fill":"white"}},"W":{"name":"叩叩","tag":"啄木鳥・在蜂蜜樹上鑽洞","desc":"這週一直在那棵蜂蜜樹上敲敲敲，樹幹上都是他的洞。","look":{"head":"round","ears":"horn","body":"round","eyes":"dot","mark":"none","fill":"ink"}}},"evidence":{"e1":{"name":"樹洞","where":"蜂蜜樹","icon":"house","text":"蜂巢在離地三公尺的樹洞裡，被整塊挖走。樹幹上一路往上都是很深的抓痕，每兩道之間隔著三根手指寬。"},"e2":{"name":"小圓洞","where":"蜂蜜樹樹幹","icon":"magnifier","text":"樹幹上一排小圓洞，洞裡乾乾的，沒有蜂蜜，只有吃剩的半隻蟲。"},"e3":{"name":"蜂蜜罐","where":"狐狸的窩","icon":"food","text":"罐子是滿的，貼著『山下雜貨店』的標籤，封口還沒拆。"},"e4":{"name":"河邊的泥巴","where":"河邊","icon":"drop","text":"一大片泥巴被拍得亂七八糟，泥裡混著蜂蠟碎片，還有幾根又粗又長的棕毛。"}},"lines":{"B":{"alibi":"「我整個下午都在洞裡睡午覺。」（他的鼻子腫得發亮。）","e1":"「三根手指寬？很、很多動物都有啊。」","e2":"「啄木鳥一直在那棵樹上敲，他最可疑。」","e3":"「狐狸有蜂蜜！就是他！」","e4":"「我、我只是去河邊洗澡。」（他摸了摸鼻子，痛得縮了一下。）"},"R":{"alibi":"「我下午在營地翻垃圾桶。三點的時候熊大跑過營地，邊跑邊拍自己的鼻子，好像被什麼叮了。」","e1":"（他攤開小手掌，五根手指細細的，跟抓痕一道都對不上。）「我的手這麼小。」","e2":"「啄木鳥找蟲而已。」","e3":"「我手黏是垃圾桶裡的果醬啦，你聞，草莓味。」","e4":"「那麼粗的棕毛不是我的，我是灰的。」"},"F":{"alibi":"「下午我去山下雜貨店買東西，兩點半結帳，老闆可以作證。」","e1":"「狐狸不會爬樹，你看過狐狸爬樹嗎？」","e2":"「那些洞那麼小，挖不出一整塊蜂巢。」","e3":"「我買的，收據在這裡。」","e4":"「熊大被叮了都會去河邊用泥巴敷。」"},"W":{"alibi":"「叩叩叩，我下午都在那棵樹上抓蟲。三點左右，有一個很大的黑影往上爬，我嚇得飛走了。」","e1":"「我的爪子細細的，抓不出那麼深的痕。」","e2":"「那些洞是我找蟲挖的。我怕蜜蜂，不敢靠近蜂巢。」","e3":"「狐狸的罐子是新的。」","e4":"「那個黑影毛是棕色的，很粗。」"}},"intro":{"head":"整塊蜂巢不見了","body":"蜜蜂們回家時，發現樹洞空了。四個嫌疑犯身上都有甜甜的味道。三天內找出偷蜂蜜的。"},"nights":{"none":{"add":1,"head":"另一棵樹的蜂巢也被挖走","body":"你決定再觀察。今天又有一棵樹上多了一排深深的抓痕。"},"R":{"add":1,"head":"浣熊被關","body":"營地的垃圾桶終於安全了。森林的蜂巢沒有。"},"F":{"add":1,"head":"狐狸被關，蜂蜜罐被沒收","body":"你沒收了一罐雜貨店的蜂蜜。又一個蜂巢不見。"},"W":{"add":2,"head":"啄木鳥被關，沒人看見了","body":"樹上沒有目擊者了。兩個蜂巢同時不見。"}},"bad":{"none":{"head":"結案失敗：蜜蜂搬家","body":"蜜蜂們全部搬到山的另一邊。熊大開始學著翻山。"},"R":{"head":"結案失敗：被面具騙了","body":"浣熊的手太小，抓不出那種痕跡。"},"F":{"head":"結案失敗：被蜂蜜罐騙了","body":"你沒收了一罐有收據的蜂蜜。"},"W":{"head":"結案失敗：被洞騙了","body":"啄木鳥的洞裡只有蟲，沒有蜂蜜。"}},"good":{"head":"結案：最大隻的那一個","body":"熊大的洞裡藏著一整塊被咬了一半的蜂巢。他鼻子上的腫包，就是蜜蜂的抗議。"},"truth":["抓痕一路爬到三公尺高、又深又寬：狐狸不會爬樹，浣熊手太小，啄木鳥爪子太細。","熊大說整個下午在睡午覺，但浣熊三點看到他拍著鼻子跑過營地，啄木鳥看到大黑影爬樹。","河邊泥巴裡有蜂蠟和粗長的棕毛，熊大被叮了會去用泥巴敷，他的鼻子還腫著。","狐狸的蜂蜜有收據，啄木鳥的洞裡只有蟲，浣熊手上是果醬。"]},{"id":"wedding","no":"案件 #14","title":"婚禮蛋糕缺角事件","titleHi":"缺角","counter":"被挖的蛋糕","level":2,"blurb":"婚禮前半小時，蛋糕被挖了一大口。宿醉的伴郎、滿手奶油的花童、討厭這個設計的主廚，和緊張的新娘。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"B","chars":{"G":{"name":"阿強","tag":"伴郎・宿醉","desc":"昨晚喝到天亮，西裝上沾著一堆屑。","look":{"head":"round","ears":"hair","body":"big","eyes":"sleepy","mark":"tie","fill":"ink"}},"F":{"name":"小桃","tag":"花童・手上都是奶油","desc":"五歲，手指上沾滿粉紅色的奶油。","look":{"head":"round","ears":"hair","body":"round","eyes":"big","mark":"bow","fill":"white"}},"C":{"name":"老李","tag":"主廚・討厭這個設計","desc":"說新娘選的蛋糕『俗氣』，一直想改。","look":{"head":"round","ears":"none","body":"big","eyes":"angry","mark":"beard","fill":"white"}},"B":{"name":"美美","tag":"新娘・減肥三個月","desc":"為了穿婚紗減肥三個月，今天一直說她好餓。","look":{"head":"round","ears":"hair","body":"round","eyes":"big","mark":"crown","fill":"white"}}},"evidence":{"e1":{"name":"蛋糕缺口","where":"宴會廳","icon":"food","text":"缺口在背面第二層，挖得很整齊。第二層離地一百四十公分。最上層和最下層都沒被碰。"},"e2":{"name":"蕾絲線","where":"蛋糕架","icon":"fur","text":"缺口旁邊的蛋糕架上，勾著一根細細的白色蕾絲線。"},"e3":{"name":"伴郎身上的屑","where":"伴郎西裝","icon":"magnifier","text":"深咖啡色的屑，是巧克力餅乾。這個婚禮蛋糕是純香草口味。"},"e4":{"name":"新娘休息室","where":"化妝台","icon":"spoon","text":"化妝台上有一支沾著白色奶油的叉子，旁邊一張紙條：『只吃一口就好』。"}},"lines":{"G":{"alibi":"「我一直在停車場吐……昨晚喝太多了。停車場的保全一直盯著我。」","e1":"「第二層？我現在連站都站不穩。」","e2":"「蕾絲？伴郎西裝哪有蕾絲。」","e3":"「那是我早餐吃的巧克力餅乾。」","e4":"「新娘這三個月每天都在說好想吃蛋糕。」"},"F":{"alibi":"「我在兒童桌吃杯子蛋糕！」（她舉起沾滿粉紅色奶油的手指。）","e1":"（她踮起腳，手只碰到最下層的邊。）「我搆不到那麼高。」","e2":"「新娘姐姐的頭紗上有好多蕾絲！」","e3":"「伯伯身上好臭喔。」","e4":"「新娘姐姐剛剛跑出來一下，說要去『看看蛋糕』。」"},"C":{"alibi":"「我在廚房擺盤，十二個廚師看著我，一步都沒離開。」","e1":"「挖得這麼整齊，是用叉子挖的。」","e2":"「廚師服是棉的，沒有蕾絲。」","e3":"「我做的是香草蛋糕。巧克力餅乾不是我的。」","e4":"「我是不喜歡那個設計，但我不會毀了我自己的作品。」"},"B":{"alibi":"「我一直待在休息室化妝，一步都沒出去。」","e1":"「天啊，誰這麼過分！」（她的口紅邊緣有一點白白的奶油。）","e2":"「蕾絲……很多東西都有蕾絲啊。」（她的頭紗邊緣有一處脫線。）","e3":"「一定是伴郎！他昨晚就不正常。」","e4":"「那張紙條是化妝師寫的。」（化妝師今天請病假，沒來。）"}},"intro":{"head":"蛋糕被挖了一大口","body":"婚禮開始前三十分鐘，四層蛋糕的背面少了一大塊。四個嫌疑犯都有理由。在婚宴結束前找出兇手。"},"nights":{"none":{"add":1,"head":"喜餅也被挖了一角","body":"你決定再觀察。新娘休息室裡又多了一支叉子。"},"G":{"add":1,"head":"伴郎被趕出會場","body":"阿強被趕到停車場。喜餅盒又少了一塊。"},"F":{"add":1,"head":"花童被帶回家","body":"沒有花童撒花了。又有一盤甜點被挖了一口。"},"C":{"add":2,"head":"主廚被趕出廚房","body":"沒人看著甜點台，兩盤甜點被挖了。"}},"bad":{"none":{"head":"結案失敗：沒有蛋糕的婚禮","body":"切蛋糕的時候，大家才發現背面幾乎空了。新娘說：『沒關係，我本來就在減肥。』"},"G":{"head":"結案失敗：被宿醉騙了","body":"伴郎整段時間都在停車場，身上的是巧克力屑，不是香草。"},"F":{"head":"結案失敗：被奶油騙了","body":"你關了一個搆不到第二層的五歲小孩。"},"C":{"head":"結案失敗：被嫌棄騙了","body":"主廚有十二個證人。"}},"good":{"head":"結案：餓了三個月的新娘","body":"美美哭著承認，她只是想先吃一口自己的婚禮蛋糕。新郎笑著說，那他也要吃一口，兩個人在後台把那一層吃完了。"},"truth":["缺口在一百四十公分高的第二層，小桃只摸得到最下層。挖得整齊，是用叉子挖的。","伴郎在停車場被保全盯著，身上是巧克力屑，蛋糕是香草的；主廚有十二個證人。","蛋糕架勾著白色蕾絲線，新娘的頭紗邊緣脫線。休息室裡有沾奶油的叉子。","新娘說一步都沒出去，但小桃看到她跑出來『看看蛋糕』。紙條她推給請假的化妝師。"]},{"id":"henhouse","no":"案件 #15","title":"雞舍雞蛋消失案","titleHi":"雞蛋","counter":"消失的雞蛋","level":3,"blurb":"雞蛋每天少一顆。山上的狐狸、愛吞蛋的大蛇、嘴邊有蛋黃的牧羊犬，還有一隻緊張的母雞。","days":3,"actionsPerDay":4,"startVictims":7,"culprit":"H","chars":{"F":{"name":"阿紅","tag":"狐狸・在圍欄外徘徊","desc":"每天晚上都在雞舍外面繞圈，眼睛盯著裡面。","look":{"head":"round","ears":"cat","body":"round","eyes":"angry","mark":"none","fill":"ink"}},"S":{"name":"長長","tag":"大蛇・最愛吞蛋","desc":"整片農場最長的蛇，出了名地愛吃蛋。","look":{"head":"round","ears":"none","body":"tail","eyes":"sleepy","mark":"fangs","fill":"gray"}},"D":{"name":"阿福","tag":"牧羊犬・嘴邊有蛋黃","desc":"負責看守雞舍。今天嘴邊黏著一塊蛋黃。","look":{"head":"round","ears":"dog","body":"round","eyes":"dot","mark":"none","fill":"white"}},"H":{"name":"花花","tag":"褐色母雞","desc":"這週一直很緊張，看到人就咕咕叫。","look":{"head":"round","ears":"none","body":"round","eyes":"big","mark":"crown","fill":"gray"}}},"evidence":{"e1":{"name":"雞舍地面","where":"雞舍","icon":"paw","text":"這週不見了七顆蛋。地上沒有蛋殼，也沒有蛋汁。"},"e2":{"name":"圍欄","where":"雞舍","icon":"house","text":"圍欄沒有破洞，網眼只有一根手指寬。門閂是從裡面扣上的，門下有一道很窄的縫。"},"e3":{"name":"穀倉的乾草堆","where":"穀倉角落","icon":"fur","text":"乾草堆裡有一個圓圓的凹窩，摸起來是溫的，上面黏著幾根褐色羽毛。"},"e4":{"name":"花花的窩","where":"雞舍","icon":"food","text":"雞舍裡花花的窩是空的，墊草是冷的，好幾天沒有雞坐過的樣子。"}},"lines":{"F":{"alibi":"「我昨晚在山上抓田鼠。你看看那個圍欄，我進得去嗎？」","e1":"「我吃蛋一定會留殼，我只吃蛋黃。」","e2":"「網眼一根手指寬？我一隻腳都塞不進去。」","e3":"「穀倉是狗的地盤，我不去。」","e4":"「那隻褐色的母雞，這幾天晚上都不在雞舍裡。我從山上看得到。」"},"S":{"alibi":"「嘶……我在池塘邊的石頭下面睡覺。」","e1":"「我是整顆吞，不留殼。但吞了肚子會鼓起來，一顆一顆的。你看。」（他的肚子扁扁的。）","e2":"「嘶，我比水管還粗，鑽不過那種網子。門縫我也擠不進去。」","e3":"「溫的窩……蛋……」（他吐了吐舌頭。）","e4":"「冷的窩，沒有蛋的味道。」"},"D":{"alibi":"「汪。」（翻譯：我整晚在穀倉門口守著，狐狸沒進來過。）","e1":"「汪汪。」（翻譯：我嘴上的是早餐的荷包蛋，農夫每天給我一顆，煎好的。）","e2":"「汪。」（翻譯：門閂是從裡面扣的，我在外面扣不了。）","e3":"「汪……」（翻譯：穀倉裡最近有細細的『啾啾』聲。我以為是老鼠。）","e4":"「汪！」（翻譯：每天早上，花花都從穀倉那邊跑回雞舍。）"},"H":{"alibi":"「咕咕！我每天晚上都乖乖待在雞舍，坐在我的窩上。」","e1":"「蛋不見了好可怕，一定是狐狸！」","e2":"「我、我是從門下面的縫鑽……我是說，誰都鑽不過去！」","e3":"「穀倉？我不知道那裡有什麼。」（她身上掉下一根褐色的羽毛。）","e4":"「我的窩……是因為我比較怕冷，所以……」"}},"intro":{"head":"這週已經少了七顆蛋","body":"農夫每天早上收蛋，數量越來越少。四個嫌疑犯都跟蛋有關係。三天內找出拿走雞蛋的人。"},"nights":{"none":{"add":1,"head":"又少了一顆","body":"你決定再觀察。穀倉裡的啾啾聲又多了一點。"},"F":{"add":1,"head":"狐狸被關","body":"狐狸被關進籠子。雞舍照樣少了一顆蛋。"},"S":{"add":1,"head":"大蛇被關","body":"大蛇被關進木箱，肚子還是扁的。又少了一顆蛋。"},"D":{"add":2,"head":"阿福被拴住，穀倉沒人看","body":"阿福被拴在狗屋。今天少了兩顆蛋。"}},"bad":{"none":{"head":"結案失敗：神秘的小雞","body":"一週後，穀倉裡跑出七隻小雞。農夫很開心，但他的早餐沒了。"},"F":{"head":"結案失敗：被名聲騙了","body":"狐狸連一隻腳都塞不進網子。"},"S":{"head":"結案失敗：被食性騙了","body":"大蛇的肚子是扁的，而且他鑽不進去。"},"D":{"head":"結案失敗：被蛋黃騙了","body":"阿福嘴上的是煎過的荷包蛋。他是唯一守在穀倉門口的。"}},"good":{"head":"結案：想當媽媽的母雞","body":"你在穀倉乾草堆底下找到六顆溫溫的蛋，還有一隻剛破殼的小雞。花花說，她只是想要自己的孩子。農夫決定這一窩留給她。"},"truth":["地上沒有蛋殼和蛋汁，蛋不是被吃掉的。大蛇吞蛋肚子會鼓，他的肚子是扁的。","網眼太小、門閂從裡面扣，狐狸和大蛇都進不去。只有雞舍裡的雞能從門縫鑽出去。","花花說她每晚坐在窩上，但她的窩是冷的；狐狸看到她晚上不在，阿福看到她早上從穀倉跑回來。","穀倉裡有溫暖的凹窩和褐色羽毛，還有小雞的啾啾聲。阿福嘴上的是煎好的荷包蛋。"]},{"id":"museum","no":"案件 #16","title":"恐龍大腿骨失蹤案","titleHi":"大腿骨","counter":"失蹤的骨頭","level":2,"blurb":"暴龍骨架少了一根大腿骨。最愛骨頭的警衛犬、欠錢的夜班警衛、剛加保的館長、走丟的小學生。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"D","chars":{"D":{"name":"阿骨","tag":"警衛犬・最愛骨頭","desc":"博物館的警衛犬，看到骨頭就流口水。大家第一個就想到他。","look":{"head":"round","ears":"dog","body":"round","eyes":"angry","mark":"none","fill":"ink"}},"Z":{"name":"老張","tag":"夜班警衛・欠了錢","desc":"最近被追債，常常在值班時打瞌睡。","look":{"head":"round","ears":"none","body":"round","eyes":"sleepy","mark":"beard","fill":"gray"}},"C":{"name":"館長","tag":"館長・剛加保","desc":"上週剛幫恐龍骨架加保了一百萬。","look":{"head":"round","ears":"hair","body":"big","eyes":"glasses","mark":"tie","fill":"ink"}},"K":{"name":"阿明","tag":"走丟的小學生","desc":"校外教學走丟，被發現在館裡過了一夜。手上黏黏的。","look":{"head":"round","ears":"hair","body":"round","eyes":"big","mark":"none","fill":"white"}}},"evidence":{"e1":{"name":"展示台","where":"暴龍骨架","icon":"bite","text":"被拿走的是一根大腿骨，原本用兩條鐵絲綁著。鐵絲不是剪斷的，是被咬扁、扭彎後扯斷的，上面有一排牙印。"},"e2":{"name":"監視器鏡頭","where":"恐龍展區","icon":"magnifier","text":"02:00 起畫面一片模糊，鏡頭上糊著一層黏黏的口水。這支鏡頭裝在離地六十公分的地方。"},"e3":{"name":"後院的洞","where":"博物館後院","icon":"paw","text":"一個新挖的長洞，長度跟一根大腿骨差不多。洞是空的，旁邊的土上都是四道一組的爪痕。"},"e4":{"name":"保險單","where":"館長辦公室","icon":"paper","text":"上週加保一百萬。附件是一份海外借展合約，合約規定借展前必須加保。"}},"lines":{"D":{"alibi":"「汪！」（翻譯：我整晚都在巡邏，非常認真，什麼都沒看到。）","e1":"「汪……」（翻譯：鐵絲？不知道。）（他舔了舔嘴，牙齦上有一道新的刮傷。）","e2":"「汪汪！」（翻譯：一定是那個小孩，小孩最會流口水！）","e3":"「汪！」（翻譯：後院是我的地盤，我常挖洞，很正常。）（他的爪縫裡塞滿了新土。）","e4":"「汪。」"},"Z":{"alibi":"「我、我在警衛室……好啦，我睡著了，一點睡到五點。最近被追債都睡不好，昨晚難得睡死了。」","e1":"「我戴假牙，咬不動鐵絲。」（他把假牙拿出來給你看。）","e2":"「六十公分？我要趴在地上才舔得到。」","e3":"「我晚上不去後院，那是阿骨的地盤，他會咬人。」","e4":"「館長最近看起來很缺錢。」"},"C":{"alibi":"「我昨晚在家跟太太看電影到一點，然後睡覺。我太太可以作證。」","e1":"「被咬斷的？誰會去咬鐵絲……」","e2":"「那支低鏡頭是我裝的，拍小朋友的視角。」","e3":"「後院的洞？我從來不去後院。」","e4":"「加保是因為下個月要借展到國外，合約規定的。」"},"K":{"alibi":"「我走丟了，躲在廁所睡覺，門從裡面鎖著。半夜被吵醒，從門縫看到一條尾巴搖來搖去，拖著一根好長好白的東西往後門走。」","e1":"「我的牙在換，咬不動鐵絲啦。」（他張嘴，前面缺了兩顆。）","e2":"「我是會流口水，可是我整晚都在廁所裡。」","e3":"「那個白白的東西被拖去後門了。」","e4":"「保險是什麼？」"}},"intro":{"head":"暴龍少了一條腿","body":"今早開館時，暴龍骨架歪了一邊，一根大腿骨不見了。四個嫌疑犯都有理由。三天內把骨頭找回來。"},"nights":{"none":{"add":1,"head":"三角龍的骨頭也不見了","body":"你決定再觀察。後院又多了一個新洞。"},"Z":{"add":1,"head":"老張被停職","body":"沒有人值夜班了。三角龍少了一根肋骨。"},"C":{"add":1,"head":"館長被約談","body":"館長整天在警局。又一根骨頭不見了。"},"K":{"add":2,"head":"阿明被送回家","body":"唯一的目擊者被接走。兩根骨頭同時不見。"}},"bad":{"none":{"head":"結案失敗：恐龍廳變空地","body":"一週後，恐龍廳只剩下基座。後院的地凹凸不平。"},"Z":{"head":"結案失敗：被欠債騙了","body":"老張戴假牙，咬不動鐵絲。"},"C":{"head":"結案失敗：被保險騙了","body":"加保是合約規定，館長整晚在家。"},"K":{"head":"結案失敗：關了目擊者","body":"阿明缺了兩顆門牙，而且整晚鎖在廁所裡。"}},"good":{"head":"結案：最愛骨頭的警衛","body":"你在後院更深的地方挖到那根大腿骨，上面全是牙印。阿骨說，他守了這副骨架三年，每天都只能看，昨晚終於忍不住了。"},"truth":["鐵絲是被咬斷的。老張戴假牙，阿明缺門牙，館長整晚在家。","鏡頭在六十公分高的地方被口水糊住，阿明整晚鎖在廁所。阿明看到一條搖來搖去的尾巴拖著白色長條往後門走。","後院的洞跟大腿骨一樣長，旁邊是四道一組的爪痕，阿骨的爪縫裡全是新土。","阿骨說他整晚巡邏什麼都沒看到，但鏡頭被糊住、骨頭被拖過整個展區。加保是借展合約的規定。"]},{"id":"pageant","no":"案件 #17","title":"選美皇冠失竊案","titleHi":"皇冠","counter":"失竊的獎品","level":3,"blurb":"中場熄燈十分鐘，冠軍皇冠不見了。高傲的波斯貓、去年的冠軍、愛亮晶晶的主持人、口袋鼓鼓的評審。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"D","chars":{"S":{"name":"雪莉","tag":"波斯貓・今年熱門","desc":"今年最被看好的參賽者，說過『那頂皇冠本來就是我的』。","look":{"head":"round","ears":"cat","body":"round","eyes":"smug","mark":"crown","fill":"white"}},"D":{"name":"嘟嘟","tag":"暹羅貓・去年冠軍","desc":"去年的冠軍，今年要把皇冠交出去。今天一直很安靜。","look":{"head":"round","ears":"cat","body":"round","eyes":"big","mark":"bow","fill":"gray"}},"P":{"name":"嘎比","tag":"鸚鵡主持人・愛亮東西","desc":"最喜歡亮晶晶的東西，家裡堆滿瓶蓋和鈕扣。","look":{"head":"round","ears":"none","body":"round","eyes":"smug","mark":"crown","fill":"white"}},"J":{"name":"老巴","tag":"鬥牛犬評審・口袋鼓鼓","desc":"一臉兇相，比賽中口袋一直鼓著一塊。","look":{"head":"round","ears":"dog","body":"big","eyes":"angry","mark":"tie","fill":"ink"}}},"evidence":{"e1":{"name":"展示盒","where":"舞台旁","icon":"key","text":"盒蓋被推開。玻璃上有一個貓的掌印，沾著藍色的亮粉。"},"e2":{"name":"化妝台","where":"後台","icon":"magnifier","text":"後台只有兩盒亮粉：金色那盒寫著『雪莉』，藍色那盒寫著『去年冠軍』。"},"e3":{"name":"評審的口袋","where":"評審席","icon":"key","text":"口袋裡鼓鼓的東西是一個假牙盒。"},"e4":{"name":"現場錄音","where":"音控室","icon":"paper","text":"中場 15:00–15:10 熄燈，嘎比一直在台上講冷笑話沒有停過。15:04 他說：『雪莉小姐正在後台梳毛，請大家稍候』。"}},"lines":{"S":{"alibi":"「中場我在後台梳毛，造型師梳了整整十分鐘，一根毛都不能亂。」","e1":"「貓掌印？比賽裡一半都是貓。」","e2":"「我只用金色的。藍色？俗氣。」","e3":"「評審的口袋那麼鼓，噁心。」","e4":"「你聽，主持人都說了，我在梳毛。」"},"D":{"alibi":"「中場我一直坐在台下第一排喝水，哪裡都沒去。」","e1":"「藍、藍色亮粉很多貓都用吧。」（她把一隻前掌藏到身後。）","e2":"「那盒是主辦單位準備的，誰都可以用。」","e3":"「評審最可疑！口袋那麼鼓！」","e4":"「主持人的笑話真的好冷。」"},"P":{"alibi":"「嘎！中場我在台上講笑話，一秒都沒停！全場都聽到了！」","e1":"「鳥的腳印是兩前兩後，不是掌印，嘎。」","e2":"「藍色那盒是嘟嘟的，她從去年用到現在，別的貓不准碰。」","e3":"「嘎嘎，假牙盒。」","e4":"「你聽，錄音裡全是我。我是很喜歡亮晶晶，但我一直在台上。」"},"J":{"alibi":"「中場我坐在評審席，燈暗的時候沒動。旁邊的評審一直踩到我。」","e1":"「狗的掌印比這個大兩倍。」（他把掌按在桌上比給你看。）","e2":"「評審不擦亮粉。」","e3":"「……那是我的假牙。比賽太緊張，我都拔下來放口袋。」","e4":"「十五點零六分，燈亮一下又暗掉，我看到第一排有一個空位。嘟嘟的位子。」"}},"intro":{"head":"冠軍皇冠不見了","body":"中場熄燈的十分鐘裡，展示盒裡的皇冠被拿走了。四個嫌疑犯都想要它。在頒獎前找出小偷。"},"nights":{"none":{"add":1,"head":"獎盃也不見了","body":"你決定再觀察。今天第二名的獎盃也不見了，展示台上有一點藍色亮粉。"},"S":{"add":1,"head":"雪莉被取消資格","body":"雪莉氣到掉毛。第二名的獎盃也被拿走了。"},"P":{"add":1,"head":"主持人被換掉","body":"新的主持人什麼都沒注意到。又一個獎品不見。"},"J":{"add":2,"head":"評審被請離席","body":"評審席空了一半。兩個獎品同時不見。"}},"bad":{"none":{"head":"結案失敗：沒有皇冠的頒獎","body":"冠軍只拿到一張紙做的皇冠。去年的冠軍在台下笑得很開心。"},"S":{"head":"結案失敗：被嘴巴騙了","body":"雪莉嘴巴很壞，但她整個中場都在梳毛。"},"P":{"head":"結案失敗：被喜好騙了","body":"錄音證明嘎比一秒都沒離開舞台。"},"J":{"head":"結案失敗：被口袋騙了","body":"口袋裡是假牙。你關了唯一看到空位的評審。"}},"good":{"head":"結案：去年的冠軍","body":"你在嘟嘟的提籃底下找到皇冠，上面沾滿藍色亮粉。她說，她只是還沒準備好讓別的貓戴上它。"},"truth":["掌印是貓的。嘎比的腳是兩前兩後，老巴的掌大兩倍。","掌印上的藍色亮粉，來自寫著『去年冠軍』的那盒，嘎比說那是嘟嘟專用。","雪莉在梳毛，錄音裡主持人親口說了；嘎比整個中場都在講笑話。","嘟嘟說她一直坐在第一排，但老巴 15:06 看到她的位子是空的。老巴的口袋裡是假牙。"]},{"id":"themepark","no":"案件 #18","title":"摩天輪停電事件","titleHi":"停電","counter":"受困的車廂","level":1,"blurb":"摩天輪停在半空中。脾氣差的電工、損失慘重的冰淇淋小販、愛按按鈕的小孩，還有笑咪咪的吉祥物。","days":3,"actionsPerDay":4,"startVictims":12,"culprit":"M","chars":{"E":{"name":"老吳","tag":"電工・帶著剪線鉗","desc":"脾氣很差，上週還被主管罵。身上永遠帶著剪線鉗。","look":{"head":"round","ears":"none","body":"big","eyes":"angry","mark":"beard","fill":"ink"}},"M":{"name":"胖熊","tag":"樂園吉祥物","desc":"樂園的咖啡色大熊玩偶，裡面是一位打工的大學生。","look":{"head":"round","ears":"mouse","body":"big","eyes":"big","mark":"bow","fill":"gray"}},"V":{"name":"阿美","tag":"冰淇淋小販","desc":"一直抱怨摩天輪擋住她的攤位，客人都不往她那邊走。","look":{"head":"round","ears":"hair","body":"round","eyes":"smug","mark":"none","fill":"white"}},"K":{"name":"小傑","tag":"小孩・愛按按鈕","desc":"上個月偷按過雲霄飛車的緊急停止鈕，全園都認識他。","look":{"head":"round","ears":"hair","body":"round","eyes":"dot","mark":"none","fill":"white"}}},"evidence":{"e1":{"name":"總開關","where":"控制室","icon":"key","text":"總開關被拉下。開關把手上黏著一團咖啡色的長絨毛，像是玩偶身上的毛。"},"e2":{"name":"控制室門框","where":"控制室","icon":"house","text":"門框只有一百八十公分高，上緣被撞凹一塊，凹痕上也黏著咖啡色的絨毛。"},"e3":{"name":"冰淇淋車","where":"美食區","icon":"food","text":"停電讓冰櫃停擺，整車冰淇淋全部融化。"},"e4":{"name":"排班表","where":"員工休息室","icon":"paper","text":"胖熊：19:30–21:00 在大門口和遊客拍照。下方小字：『若園區停電，表演人員提早收工，全薪照付』。"}},"lines":{"E":{"alibi":"「八點的時候我跟阿美在餐車旁邊吃便當，便當才吃一半就停電了。」","e1":"「咖啡色的毛？我身上只有汗。」","e2":"「我一百七，進那扇門不用低頭。」","e3":"「她損失慘重，我的便當也沒熱。」","e4":"「停電提早收工還照領錢？誰訂的規定。」"},"M":{"alibi":"「我一直在大門口跟小朋友拍照，一步都沒離開。」（玩偶頭頂有一塊凹了進去。）","e1":"「咖啡色的毛……很多玩偶都是咖啡色的。」","e2":"「我的頭是被小朋友打凹的！」","e3":"「好可憐的冰淇淋。」","e4":"「提早收工？我、我不知道有這個規定。」"},"V":{"alibi":"「我跟老吳在吃便當，八點一到突然全黑，我的冰淇淋就完了。」","e1":"「整個樂園只有一隻咖啡色的大熊。」","e2":"「控制室那扇門很矮，大個子都要低頭。」","e3":"「一整車！我怎麼可能自己停電害自己！」","e4":"「停電前我才經過大門口，那裡沒有熊，只有一群小孩在哭著找熊。」"},"K":{"alibi":"「我被卡在摩天輪最上面一個小時！好可怕又好好玩！」","e1":"「不是我！我那時在上面！」","e2":"「從上面看，我看到一個好大的咖啡色東西從控制室跑出來，頭歪歪的。」","e3":"「好想吃冰淇淋。」","e4":"「熊熊下班了嗎？」"}},"intro":{"head":"十二個車廂卡在半空中","body":"晚上八點，摩天輪突然停電，十二個車廂的遊客卡了一個小時。四個嫌疑犯都有可疑的地方。三天內找出拉下總開關的人。"},"nights":{"none":{"add":6,"head":"雲霄飛車也停了","body":"你決定再觀察。今晚八點，雲霄飛車也停電了。"},"E":{"add":12,"head":"電工被停職，沒人修電","body":"老吳被停職，停電後沒人能修，十二個車廂卡了三個小時。"},"V":{"add":6,"head":"冰淇淋車被禁止營業","body":"阿美被趕出樂園。八點又停電了。"},"K":{"add":6,"head":"小傑被禁止入園","body":"小傑在門口哭。八點，旋轉木馬停了。"}},"bad":{"none":{"head":"結案失敗：每晚八點準時停電","body":"樂園的遊客開始把『八點停電』當成固定節目。吉祥物每天都提早下班。"},"E":{"head":"結案失敗：被剪線鉗騙了","body":"老吳整個八點都在吃便當，阿美可以作證。"},"V":{"head":"結案失敗：她才是最大受害者","body":"停電讓阿美損失一整車冰淇淋。"},"K":{"head":"結案失敗：被前科騙了","body":"小傑停電時人在摩天輪最上面。"}},"good":{"head":"結案：笑咪咪的吉祥物","body":"胖熊裡面的大學生承認，他明天要考期末考，只是想提早下班回去讀書。主管幫他調了班，但薪水照扣。"},"truth":["總開關和門框凹痕上都是咖啡色長絨毛，整個樂園只有一隻咖啡色大熊。玩偶頭頂也凹了。","胖熊說一步都沒離開大門口，但阿美看到門口沒有熊，只有找不到熊的小孩；小傑從高處看到頭歪歪的咖啡色東西跑出控制室。","老吳和阿美一起吃便當，互相作證；小傑卡在摩天輪最上面。","排班表寫著停電可以提早收工、全薪照付。"]},{"id":"cruise","no":"案件 #19","title":"船長帽失竊案","titleHi":"船長帽","counter":"不見的帽子","level":3,"blurb":"船長說他的帽子被偷了。想當船長的大副、迷戀帽子的主廚、專睡帽子的船貓，誰拿的？","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"A","chars":{"F":{"name":"阿鋼","tag":"大副・想當船長","desc":"大家都知道他很想坐上船長的位子。","look":{"head":"round","ears":"hair","body":"big","eyes":"angry","mark":"scar","fill":"ink"}},"C":{"name":"皮耶","tag":"主廚・帽子收藏家","desc":"收藏了四十頂帽子，說過『船長帽是我最想要的一頂』。","look":{"head":"round","ears":"none","body":"big","eyes":"smug","mark":"beard","fill":"white"}},"K":{"name":"毛毛","tag":"船貓・專睡帽子","desc":"船上的帽子常常被發現裡面躺著這隻貓。","look":{"head":"round","ears":"cat","body":"round","eyes":"sleepy","mark":"none","fill":"gray"}},"A":{"name":"老海","tag":"船長・帽子的主人","desc":"在船上待了三十年，下個月退休。今早氣沖沖地說他的帽子被偷了。","look":{"head":"round","ears":"none","body":"big","eyes":"glasses","mark":"beard","fill":"ink"}}},"evidence":{"e1":{"name":"船長室","where":"上層甲板","icon":"key","text":"門鎖完好，窗戶從裡面扣著，房間裡沒有翻動的痕跡。衣帽架上的掛勾空著。"},"e2":{"name":"撲克桌紀錄","where":"船上賭場","icon":"paper","text":"昨晚 23:00 最後一局，賭注欄寫著『一頂帽子』。簽名被酒漬糊掉，只看得出第一個字是『老』。"},"e3":{"name":"貓窩","where":"廚房角落","icon":"fur","text":"貓窩裡有一頂白色的高帽子，軟軟的，是廚師帽。"},"e4":{"name":"大副的抽屜","where":"駕駛艙","icon":"paper","text":"一份『船長職位申請書』，日期是昨天，附上公司的通知：『現任船長下月退休，請大副提出申請』。"}},"lines":{"F":{"alibi":"「我整晚在駕駛艙值班，航海日誌每小時都有我的簽名。」","e1":"「門窗都從裡面鎖著？那帽子是自己飛走的嗎。」","e2":"「我不賭博，值班時更不可能。」","e3":"「那隻貓專偷帽子。」","e4":"「申請書是公司要我交的。我下個月就會有自己的帽子，何必偷他的。」"},"C":{"alibi":"「我整晚在廚房烤明天的麵包，助手們都在。十一點半船長來要宵夜，頭上光光的，一直摸頭。」","e1":"「船長室的鑰匙只有船長自己有。」","e2":"「『老』？全船名字裡有『老』的只有船長，老海。」","e3":"「那是我的帽子！我找了一整晚！」","e4":"「大副想當船長，大家都知道。」"},"K":{"alibi":"「喵。」（翻譯：我整晚睡在廚師的帽子裡，很暖。）","e1":"「喵。」（翻譯：船長室的門關著，我進不去。）","e2":"「喵～」","e3":"「喵！」（翻譯：船長帽太硬了不好睡，我只偷軟的。）","e4":"「喵。」"},"A":{"alibi":"「我十點就睡了。一覺醒來帽子就不見了，一定是有人闖進來偷的！」","e1":"「小偷的技術一定很好。」","e2":"「『老』？船上叫老什麼的人很多。」","e3":"「一定是那隻貓！」","e4":"「大副一直想要我的位子！」"}},"intro":{"head":"船長的帽子不見了","body":"今早船長衝出房間，說他的帽子被偷了。四個嫌疑犯都跟這頂帽子有關。靠岸之前找出真相。"},"nights":{"none":{"add":1,"head":"船長的徽章也不見了","body":"你決定再觀察。今天船長說他的徽章也被偷了，賭場昨晚又多了一筆『一枚徽章』。"},"F":{"add":1,"head":"大副被關禁閉","body":"沒人掌舵，船偏航了兩小時。船長又說他的望遠鏡不見了。"},"C":{"add":1,"head":"主廚被關，沒有早餐","body":"全船沒有早餐吃。船長的手錶也『被偷』了。"},"K":{"add":2,"head":"貓被關進籠子","body":"船長說他的圍巾和手套都被偷了。"}},"bad":{"none":{"head":"結案失敗：船長什麼都被偷了","body":"靠岸時，船長只剩一件襯衫。賭場老闆穿著船長的全套制服下船。"},"F":{"head":"結案失敗：被野心騙了","body":"大副整晚在駕駛艙，航海日誌每小時都有簽名。"},"C":{"head":"結案失敗：被收藏癖騙了","body":"主廚整晚在烤麵包，他自己的帽子都被貓拿走了。"},"K":{"head":"結案失敗：被習慣騙了","body":"毛毛只睡軟帽子，而且進不了船長室。"}},"good":{"head":"結案：自己弄丟的船長","body":"老海終於承認，他昨晚在賭場把帽子押掉了，不敢讓公司知道，才說是被偷的。賭場老闆把帽子還給他，條件是他退休前不准再上撲克桌。"},"truth":["船長室門鎖完好、窗戶從裡面扣著、只有船長有鑰匙：沒人闖進去，帽子是跟著船長出門的。","撲克桌 23:00 的賭注是一頂帽子，簽名第一個字是『老』，全船只有船長老海。","船長說十點就睡了，但主廚十一點半看到他頭上光光的來要宵夜。","大副整晚在駕駛艙有日誌簽名；毛毛只睡軟的廚師帽。"]},{"id":"race","no":"案件 #20","title":"龜兔賽跑下藥事件","titleHi":"下藥","counter":"被下藥的選手","level":3,"blurb":"兔子在比賽中睡著輸了，他說自己被下藥。驕傲的兔子、慢吞吞的烏龜、白天想睡的裁判、押烏龜贏的狐狸。","days":3,"actionsPerDay":4,"startVictims":1,"culprit":"T","chars":{"R":{"name":"飛飛","tag":"兔子・被懷疑裝睡","desc":"很驕傲，大家都說他是自己偷懶睡著，現在在找藉口。","look":{"head":"round","ears":"up","body":"round","eyes":"smug","mark":"none","fill":"white"}},"T":{"name":"阿慢","tag":"烏龜・贏家","desc":"慢吞吞、很有禮貌。這場比賽的贏家。","look":{"head":"round","ears":"none","body":"shell","eyes":"sleepy","mark":"none","fill":"gray"}},"O":{"name":"判判","tag":"貓頭鷹裁判","desc":"白天很睏，有動物說看到他比賽時在打瞌睡。","look":{"head":"round","ears":"horn","body":"round","eyes":"glasses","mark":"none","fill":"ink"}},"F":{"name":"莎莎","tag":"狐狸・押烏龜贏","desc":"賽前押了一百顆蘋果賭烏龜贏，賠率一賠五十。","look":{"head":"round","ears":"cat","body":"round","eyes":"smug","mark":"bow","fill":"ink"}}},"evidence":{"e1":{"name":"兔子的水壺","where":"補給站","icon":"drop","text":"水壺裡有濃濃的薰衣草味，壺蓋上沾著一圈綠色的黏液。"},"e2":{"name":"補給站","where":"池塘對岸","icon":"house","text":"補給站在池塘對岸。沿跑道要繞一大圈，直接游過池塘只要一分鐘。"},"e3":{"name":"賭單","where":"看台","icon":"paper","text":"莎莎押了一百顆蘋果賭烏龜贏。"},"e4":{"name":"裁判筆記","where":"終點線","icon":"paper","text":"08:00 起跑。08:05 烏龜離開跑道，說『去喝水』。08:20 烏龜回到跑道。08:30 兔子在樹下睡著。"}},"lines":{"R":{"alibi":"「我才不是偷懶！我在補給站喝了一口水，然後就好想睡……」","e1":"「薰衣草？我最討厭薰衣草！我的壺裡裝的是胡蘿蔔汁。」","e2":"「我的水壺一直放在補給站，誰都碰得到。」","e3":"「狐狸押烏龜？她一定動了手腳！」","e4":"「我八點半睡著，那時候我已經領先好遠了。」"},"T":{"alibi":"「我從頭到尾都在跑道上，一步都沒離開。慢慢爬，才是勝利的秘訣。」","e1":"「池塘的藻？很多動物都會去池塘。」（他的殼邊緣掛著一條綠色的藻。）","e2":"「游泳？我、我很久沒游了。」","e3":"「狐狸押我，是她有眼光。」","e4":"「去喝水而已……很正常吧？」"},"O":{"alibi":"「呼……我整場坐在終點線的樹枝上。白天我是很睏，但比賽時我每一分鐘都記一行筆記。」","e1":"「綠色黏液是池塘的藻，下過水才會沾到。」","e2":"「池塘那一側是比賽禁區，選手不准下水。」","e3":"「賭博是禁止的。但賭注跟誰碰水壺是兩回事。」","e4":"「我的筆記一分鐘一行，你可以一行一行對。」"},"F":{"alibi":"「比賽時我在看台賣賭單，一百多隻動物排隊跟我買，我一步都走不開。」","e1":"「我不碰薰衣草，一聞就打噴嚏。」","e2":"「池塘？我討厭水，毛濕了很難乾。」","e3":"「押烏龜是因為賠率高嘛，一賠五十，賭一把。」","e4":"「烏龜去喝水那段時間，我看到池塘中間冒了一串泡泡，往補給站那邊過去。」"}},"intro":{"head":"兔子說他被下藥了","body":"兔子在大樹下睡著，烏龜慢慢爬到了終點。兔子堅持自己是被下藥的。四個嫌疑犯都有理由。三天內查出真相。"},"nights":{"none":{"add":1,"head":"另一場比賽的選手也睡著了","body":"你決定再觀察。今天的接力賽，又有一位選手喝了水就睡著。烏龜又贏了。"},"R":{"add":1,"head":"兔子被禁賽","body":"兔子被說成輸不起，禁賽一個月。又一位選手喝了水就睡著。"},"O":{"add":1,"head":"裁判被撤換","body":"新裁判沒有做筆記。又一位選手睡著了。"},"F":{"add":2,"head":"狐狸被關，賭單沒收","body":"沒有人在看台盯著池塘了。兩位選手睡著。"}},"bad":{"none":{"head":"結案失敗：烏龜三連霸","body":"烏龜贏了接下來的每一場比賽，每場都有選手在半路睡著。"},"R":{"head":"結案失敗：冤枉受害者","body":"你關了被下藥的兔子。他的壺裡本來裝的是胡蘿蔔汁。"},"O":{"head":"結案失敗：被打瞌睡騙了","body":"判判的筆記一分鐘一行，正是破案的關鍵。"},"F":{"head":"結案失敗：被賭單騙了","body":"莎莎押了烏龜，但她在看台上被一百多隻動物圍著，而且怕水。"}},"good":{"head":"結案：慢吞吞的贏家","body":"你在阿慢的殼底下找到一小包曬乾的薰衣草。他說，他輸了一百年，只想贏一次。兔子聽完，決定跟他重新比一場，這次兩個都帶自己的水。"},"truth":["壺蓋上的綠色黏液是池塘的藻，只有下過水的才會沾到。補給站在對岸，游過去只要一分鐘。","裁判筆記：烏龜 08:05 到 08:20 離開跑道。烏龜卻說他一步都沒離開。","莎莎在那段時間看到池塘中間冒泡往補給站去，阿慢的殼上還掛著池塘的藻。","莎莎怕水、在看台被一百多隻動物圍著；兔子自己的壺裝的是胡蘿蔔汁，他討厭薰衣草。"]}]}</script>
+<script>
+const SRC = document.body.innerHTML;
+const DATA = JSON.parse(document.getElementById("case-data").textContent);
+const RESET_FALLBACK = ":root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}";
+const RESET = (document.head.querySelector("style")||{}).textContent || RESET_FALLBACK;
+
+/* ===== 角色與證據圖示 ===== */
+const LOOK_OPTS = {
+  head:{round:"圓頭",square:"方頭",pumpkin:"南瓜頭",none:"沒有頭"},
+  ears:{up:"立耳",lop:"垂耳",bent:"一耳折",cat:"貓耳",dog:"狗耳",mouse:"鼠耳",horn:"角",stalk:"觸角",hair:"頭髮",none:"無"},
+  body:{round:"一般",big:"壯碩",tentacle:"觸手",shell:"背殼",cloak:"斗篷",tail:"魚尾",ghost:"幽靈"},
+  eyes:{dot:"豆豆眼",big:"大眼",angry:"兇眼",smug:"瞇眼笑",sleepy:"睏眼",glasses:"眼鏡",none:"無"},
+  mark:{none:"無",scar:"疤",tooth:"缺牙",fangs:"尖牙",tie:"領帶",bow:"蝴蝶結",beard:"鬍子",crown:"皇冠"},
+  fill:{ink:"黑",gray:"灰",white:"白"}
+};
+const ICONS = {bite:"咬痕",fur:"毛",house:"屋子",shears:"剪刀",food:"食物",straw:"吸管",paper:"紙張",paw:"腳印",feather:"羽毛",key:"鑰匙",spoon:"湯匙",shell:"貝殼",mirror:"鏡子",drop:"液體",light:"手電筒",magnifier:"放大鏡"};
+
+function portrait(look, label){
+  look = Object.assign({head:"round",ears:"none",body:"round",eyes:"dot",mark:"none",fill:"ink"}, look||{});
+  const ink="#121212", pap="#f6f6f2", red="#d1171f";
+  const F = look.fill==="gray"?"#5a5a57":look.fill==="white"?pap:ink;
+  const S = look.fill==="white"?` stroke="${ink}" stroke-width="3"`:"";
+  const C = look.fill==="white"?ink:pap;
+  const sh = (d)=>`<path d="${d}" fill="${F}"${S}/>`;
+  let back="", body="", head="", front="", eyes="", mark="";
+  const hr = look.body==="big"?27:24;
+  const e = look.ears;
+  if(e==="up") back=sh("M37 44 C28 4,46 2,46 40Z")+sh("M54 40 C54 2,72 4,63 44Z");
+  else if(e==="lop") back=sh("M32 50 C8 58,10 98,24 96 C30 82,32 66,38 54Z")+sh("M68 50 C92 58,90 98,76 96 C70 82,68 66,62 54Z");
+  else if(e==="bent") back=sh("M37 44 C28 4,46 2,46 40Z")+sh("M54 40 C56 20,68 16,82 22 C74 27,66 32,63 44Z");
+  else if(e==="cat") back=sh("M28 52 L30 20 L50 40Z")+sh("M72 52 L70 20 L50 40Z");
+  else if(e==="dog") back=sh("M30 46 C12 46,10 80,24 82 C30 72,32 60,38 50Z")+sh("M70 46 C88 46,90 80,76 82 C70 72,68 60,62 50Z");
+  else if(e==="mouse") back=`<circle cx="30" cy="40" r="15" fill="${F}"${S}/><circle cx="70" cy="40" r="15" fill="${F}"${S}/>`;
+  else if(e==="horn") back=sh("M36 44 L30 18 L46 38Z")+sh("M64 44 L70 18 L54 38Z");
+  else if(e==="stalk") back=`<path d="M42 44 L34 18 M58 44 L66 18" stroke="${ink}" stroke-width="3"/><circle cx="34" cy="16" r="6" fill="${F}"${S}/><circle cx="66" cy="16" r="6" fill="${F}"${S}/>`;
+  const b = look.body;
+  if(b==="big") body=`<ellipse cx="50" cy="104" rx="42" ry="24" fill="${F}"${S}/>`;
+  else if(b==="tentacle") body=[22,36,50,64,78].map((x,i)=>`<path d="M${x} 80 q${i%2?6:-6} 18 0 40" stroke="${look.fill==="white"?ink:F}" stroke-width="9" stroke-linecap="round" fill="none"/>`).join("");
+  else if(b==="shell") body=sh("M10 122 C10 70,90 70,90 122Z")+`<path d="M30 122 C30 92,70 92,70 122 M50 76 V122" stroke="${C}" stroke-width="2" fill="none"/>`;
+  else if(b==="cloak") body=sh("M28 80 L12 124 H88 L72 80Z")+sh("M30 82 L16 60 L44 76Z")+sh("M70 82 L84 60 L56 76Z");
+  else if(b==="tail") body=`<ellipse cx="46" cy="100" rx="30" ry="18" fill="${F}"${S}/>`+sh("M74 100 L96 84 L96 116Z");
+  else if(b==="ghost") body=sh("M26 70 V120 l8-6 8 6 8-6 8 6 8-6 8 6 V70Z");
+  else body=`<ellipse cx="50" cy="104" rx="32" ry="20" fill="${F}"${S}/>`;
+  const hd = look.head;
+  if(hd==="square") head=`<rect x="${50-hr}" y="${62-hr}" width="${hr*2}" height="${hr*2}" rx="6" fill="${F}"${S}/>`;
+  else if(hd==="pumpkin") head=`<ellipse cx="50" cy="62" rx="30" ry="25" fill="${F}"${S}/><path d="M50 38 V86 M36 41 Q30 62 36 84 M64 41 Q70 62 64 84" stroke="${C}" stroke-width="2" fill="none" opacity=".5"/><path d="M50 38 q2-8 8-10" stroke="${ink}" stroke-width="4" fill="none"/>`;
+  else if(hd==="none") head=`<ellipse cx="50" cy="80" rx="15" ry="5" fill="${red}"/>`;
+  else head=`<circle cx="50" cy="62" r="${hr}" fill="${F}"${S}/>`;
+  if(e==="hair" && hd!=="none") front=sh("M24 62 C22 28,78 28,76 62 C70 46,58 42,50 48 C42 42,30 46,24 62Z");
+  if(hd!=="none"){
+    const ey=look.eyes;
+    if(ey==="dot") eyes=`<circle cx="41" cy="60" r="4" fill="${C}"/><circle cx="59" cy="60" r="4" fill="${C}"/>`;
+    else if(ey==="big") eyes=`<circle cx="41" cy="59" r="8" fill="${look.fill==="white"?ink:pap}"/><circle cx="59" cy="59" r="8" fill="${look.fill==="white"?ink:pap}"/><circle cx="42" cy="60" r="4" fill="${look.fill==="white"?pap:ink}"/><circle cx="58" cy="60" r="4" fill="${look.fill==="white"?pap:ink}"/><circle cx="43.5" cy="58.5" r="1.4" fill="${red}"/><circle cx="59.5" cy="58.5" r="1.4" fill="${red}"/>`;
+    else if(ey==="angry") eyes=`<path d="M36 56 l10 4 M64 56 l-10 4" stroke="${C}" stroke-width="4" stroke-linecap="round"/>`;
+    else if(ey==="smug") eyes=`<path d="M36 60 q5 -5 10 0 M54 60 q5 -5 10 0" stroke="${C}" stroke-width="3" fill="none"/>`;
+    else if(ey==="sleepy") eyes=`<path d="M35 59 h11 M54 59 h11" stroke="${C}" stroke-width="3"/><path d="M37 61 q4 3 8 0 M56 61 q4 3 8 0" stroke="${C}" stroke-width="2" fill="none"/>`;
+    else if(ey==="glasses") eyes=`<circle cx="40" cy="59" r="7" fill="none" stroke="${C}" stroke-width="2.5"/><circle cx="60" cy="59" r="7" fill="none" stroke="${C}" stroke-width="2.5"/><path d="M47 59 h6" stroke="${C}" stroke-width="2"/><circle cx="40" cy="59" r="2" fill="${C}"/><circle cx="60" cy="59" r="2" fill="${C}"/>`;
+  }
+  const m=look.mark;
+  if(hd!=="none"){
+    if(m==="scar") mark=`<path d="M60 48 l8 16" stroke="${red}" stroke-width="2.5"/>`;
+    else if(m==="tooth") mark=`<path d="M46 74 h8 v5 h-3 l-1-2 -1 2 h-3z" fill="${C}"/>`;
+    else if(m==="fangs") mark=`<path d="M43 72 l3 7 3-7Z M51 72 l3 7 3-7Z" fill="${C}"/>`;
+    else if(m==="bow") mark=`<path d="M62 38 l10 -6 v14Z M62 38 l-10 -6 v14Z" fill="${red}"/>`;
+    else if(m==="beard") mark=`<path d="M38 74 q12 14 24 0 q-4 16 -12 18 q-8 -2 -12 -18z" fill="${C}"/>`;
+    else if(m==="crown") mark=`<path d="M36 40 l4 -14 6 8 4 -10 4 10 6 -8 4 14Z" fill="#c9a227" stroke="${ink}" stroke-width="2"/>`;
+  }
+  if(m==="tie") mark+=`<path d="M46 88 h8 l-2 4 4 14 -6 6 -6 -6 4 -14Z" fill="${red}"/>`;
+  const al = label?` role="img" aria-label="${esc(label)}"`:` aria-hidden="true"`;
+  return `<svg viewBox="0 0 100 124" xmlns="http://www.w3.org/2000/svg"${al}>${back}${body}${head}${front}${eyes}${mark}</svg>`;
+}
+function evIcon(k){
+  const c="currentColor", r="#d1171f", st=`fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"`;
+  const m={
+    bite:`<path d="M8 40 C4 10,26 4,30 20 C34 4,56 10,52 40Z" ${st}/><path d="M18 26 a8 8 0 0 1 16 0 l-3 -4 -2 4 -3-4 -3 4z" fill="${r}"/>`,
+    fur:`<path d="M10 38 q6-20 14-6 q4-22 12-4 q6-18 14 6 M14 44 q8-10 14-2 q6-12 14 0" ${st}/>`,
+    house:`<path d="M6 24 L30 6 L54 24 V46 H6Z M14 30 h32" ${st}/><circle cx="22" cy="38" r="2.5" fill="${r}"/><circle cx="30" cy="40" r="2.5" fill="${r}"/><circle cx="38" cy="37" r="2.5" fill="${r}"/>`,
+    shears:`<circle cx="14" cy="38" r="7" ${st}/><circle cx="30" cy="42" r="7" ${st}/><path d="M19 33 L52 8 M26 36 L54 14" ${st}/>`,
+    food:`<path d="M6 26 H54 C54 40,44 46,30 46 C16 46,6 40,6 26Z M14 20 q4-8 0-14 M24 20 q4-8 0-14 M34 20 q4-8 0-14" ${st}/><circle cx="42" cy="34" r="3" fill="${r}"/>`,
+    straw:`<path d="M20 46 L28 12 L40 6" ${st}/><path d="M24 30 l6 2" stroke="${r}" stroke-width="3"/>`,
+    paper:`<path d="M14 4 H40 L48 12 V46 H14Z M20 18 H40 M20 26 H40 M20 34 H32" ${st}/><rect x="20" y="36" width="20" height="6" fill="${r}"/>`,
+    paw:`<ellipse cx="30" cy="34" rx="9" ry="8" ${st}/><circle cx="18" cy="20" r="4" ${st}/><circle cx="26" cy="12" r="4" ${st}/><circle cx="36" cy="12" r="4" ${st}/><circle cx="44" cy="20" r="4" ${st}/><path d="M6 46 H54" stroke="${r}" stroke-width="3"/>`,
+    feather:`<path d="M14 46 C14 26,30 6,50 4 C48 24,34 40,14 46Z M14 46 L40 16" ${st}/><path d="M14 46 l-4 2" stroke="${r}" stroke-width="3"/>`,
+    key:`<circle cx="16" cy="25" r="9" ${st}/><path d="M25 25 H52 M44 25 V33 M50 25 V31" ${st}/><circle cx="16" cy="25" r="3" fill="${r}"/>`,
+    spoon:`<ellipse cx="18" cy="16" rx="9" ry="12" transform="rotate(-40 18 16)" ${st}/><path d="M25 23 L52 46" ${st}/><ellipse cx="18" cy="16" rx="4" ry="6" transform="rotate(-40 18 16)" fill="${r}"/>`,
+    shell:`<path d="M30 6 L6 40 Q30 50 54 40Z M30 6 L18 42 M30 6 L30 46 M30 6 L42 42" ${st}/><circle cx="30" cy="30" r="3" fill="${r}"/>`,
+    mirror:`<ellipse cx="30" cy="22" rx="16" ry="18" ${st}/><path d="M22 40 L18 48 H42 L38 40" ${st}/><path d="M20 12 L40 30" stroke="${r}" stroke-width="3"/>`,
+    drop:`<path d="M30 4 C22 18,14 26,14 34 a16 16 0 0 0 32 0 C46 26,38 18,30 4Z" ${st}/><path d="M24 34 a6 6 0 0 0 6 6" stroke="${r}" stroke-width="3" fill="none"/>`,
+    light:`<path d="M6 18 H30 V32 H6Z M30 14 L42 8 V42 L30 36Z" ${st}/><path d="M46 14 L56 10 M46 25 H58 M46 36 L56 40" stroke="${r}" stroke-width="3" stroke-linecap="round"/>`,
+    magnifier:`<circle cx="24" cy="22" r="14" ${st}/><path d="M34 32 L50 46" ${st}/><circle cx="24" cy="22" r="5" fill="${r}"/>`
+  };
+  return `<svg viewBox="0 0 60 50" width="64" height="54" aria-hidden="true">${m[k]||m.magnifier}</svg>`;
+}
+
+/* ===== 工具 ===== */
+const $ = s=>document.querySelector(s);
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function speech(s){ // 括號內的動作描述變淡
+  return esc(s).replace(/（([^（）]*)）/g,'<span class="act">（$1）</span>');
+}
+function titleHtml(c){
+  const t=esc(c.title), h=esc(c.titleHi||"");
+  return h && t.includes(h) ? t.replace(h,`<em>${h}</em>`) : t;
+}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function uid(p){return p+Math.random().toString(36).slice(2,6)}
+function store(get,key,val){try{ if(get) return JSON.parse(localStorage.getItem(key)||"null"); localStorage.setItem(key,JSON.stringify(val)); }catch(e){return null}}
+function ranks(c,day){ return day===1?"傳奇法官":day<c.days?"名偵探":"勉強及格"; }
+
+/* 補齊缺漏欄位，讓編輯過的關卡一定能玩 */
+function normalize(c){
+  c.chars=c.chars||{}; c.evidence=c.evidence||{}; c.lines=c.lines||{}; c.nights=c.nights||{}; c.bad=c.bad||{};
+  c.intro=c.intro||{head:"",body:""}; c.good=c.good||{head:"結案",body:""}; c.truth=c.truth||[];
+  c.days=Math.max(1,Math.min(7,parseInt(c.days)||3)); c.actionsPerDay=Math.max(1,Math.min(9,parseInt(c.actionsPerDay)||4));
+  c.startVictims=Math.max(0,parseInt(c.startVictims)||0); c.counter=c.counter||"受害者";
+  c.level=Math.max(1,Math.min(3,parseInt(c.level)||2));
+  const ids=Object.keys(c.chars);
+  if(!ids.includes(c.culprit)) c.culprit=ids[0];
+  for(const k of ids){
+    c.chars[k].look=Object.assign({head:"round",ears:"none",body:"round",eyes:"dot",mark:"none",fill:"ink"},c.chars[k].look||{});
+    c.lines[k]=c.lines[k]||{};
+    if(!c.lines[k].alibi) c.lines[k].alibi="「……」";
+    for(const e of Object.keys(c.evidence)) if(!c.lines[k][e]) c.lines[k][e]="「……我不知道。」";
+    for(const e of Object.keys(c.lines[k])) if(e!=="alibi" && !c.evidence[e]) delete c.lines[k][e];
+  }
+  for(const k of Object.keys(c.lines)) if(!c.chars[k]) delete c.lines[k];
+  for(const k of ["none",...ids]){
+    if(k===c.culprit) continue;
+    c.nights[k]=Object.assign({add:1,head:"又出事了",body:""},c.nights[k]||{});
+    c.nights[k].add=Math.max(0,parseInt(c.nights[k].add)||0);
+    c.bad[k]=Object.assign({head:"結案失敗",body:""},c.bad[k]||{});
+  }
+  for(const o of [c.nights,c.bad]) for(const k of Object.keys(o)) if(k!=="none"&&!c.chars[k]) delete o[k];
+  return c;
+}
+DATA.cases.forEach(normalize);
+
+/* ===== 畫面狀態 ===== */
+let view="home", CASE=null, S=null, canEdit=false, artifactNS=null, readOnly=false;
+let W=null, sel=0, dirty=false, saveMsg="", saveWarn=false, pendingDel=null;
+
+function go(v){ view=v; $("#ov").hidden=true; render(); window.scrollTo({top:0}); }
+function render(){ if(view==="home") renderHome(); else if(view==="game") renderGame(); else renderAdmin(); }
+
+/* ===== 首頁 ===== */
+function renderHome(){
+  const best=store(true,"ac-best")||{};
+  $("#app").innerHTML=`
+  <header class="mast home-mast">
+    <span class="label">黑色卷宗 · 單人推理</span>
+    <h1>荒誕<em>法庭</em></h1>
+    <p class="tagline">每個嫌疑犯都藏著秘密，只有一個是真兇。你是法官，三天內把他找出來。</p>
+  </header>
+
+  <section class="panel" aria-labelledby="howto">
+    <div class="sec-h"><h2 id="howto">怎麼審案</h2><span class="hint">每一關都是同一套流程</span></div>
+    <ol class="loop">
+      <li><h3>查看證據</h3><p>現場的物證不會說謊。每看一件，花掉 1 次行動。</p></li>
+      <li><h3>審訊嫌疑犯</h3><p>問「昨晚你在哪」，或拿看過的證據當面追問，找出前後打架的話。每問一題花 1 次行動。</p></li>
+      <li><h3>夜間關押</h3><p>每晚選一個嫌疑犯關起來，也可以誰都不關。關到你換人為止。</p></li>
+      <li><h3>晨報結算</h3><p>抓對了當場結案。抓錯了，隔天的晨報會告訴你事情變得多糟。</p></li>
+    </ol>
+    <ul class="rules">
+      <li><b>行動有限</b>：每天只有幾次行動，不可能什麼都問，問誰、看什麼要自己取捨。</li>
+      <li><b>每個人都可疑</b>：每個嫌犯都藏著秘密，最兇的那個也可能真的是兇手。外表不算數。</li>
+      <li><b>找出對不上的那句話</b>：兇手的說法一定會被某件證據或某個人的證詞戳破。</li>
+      <li><b>先排除，再鎖定</b>：證據會告訴你兇手「做得到什麼」，先刪掉做不到的人。</li>
+      <li><b>抓錯會更慘</b>：關錯人，當晚的受害數常常會加倍。</li>
+      <li><b>越早破案評價越高</b>：第一晚破案是「傳奇法官」，最後一晚是「勉強及格」。</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="dossier">
+    <div class="sec-h"><h2 id="dossier">案件卷宗</h2><span class="hint">共 ${DATA.cases.length} 件，選一件開始</span></div>
+    <div class="cases">${DATA.cases.map((c,i)=>`
+      <button class="case" data-play="${i}">
+        <span class="tab"><span>${esc(c.no)}</span><span>難度 ${"★".repeat(c.level)}${"☆".repeat(3-c.level)}</span></span>
+        ${best[c.id]?`<span class="solved">已破案・${esc(best[c.id])}</span>`:""}
+        <span class="body">
+          <h3>${titleHtml(c)}</h3>
+          <p>${esc(c.blurb||"")}</p>
+          <span class="faces">${Object.values(c.chars).map(ch=>portrait(ch.look)).join("")}</span>
+        </span>
+      </button>`).join("")}</div>
+  </section>
+
+  <div class="foot">
+    <span class="hint">破案紀錄只存在你這台裝置的瀏覽器裡。</span>
+    ${canEdit?`<button class="btn dark" data-go="admin">後台：編輯關卡</button>`:""}
+  </div>`;
+}
+
+/* ===== 遊戲 ===== */
+function startCase(c){
+  CASE=normalize(clone(c));
+  S={day:1,actions:CASE.actionsPerDay,victims:CASE.startVictims,isolated:null,history:[],seen:[],asked:{},notes:[],cur:null,curTopic:null,choice:undefined};
+  view="game"; render(); window.scrollTo({top:0}); showIntro();
+}
+function renderGame(){
+  const C=CASE, ch=C.chars;
+  const pips=Array.from({length:C.actionsPerDay},(_,i)=>`<span class="pip ${i<S.actions?'on':''}"></span>`).join("");
+  let h=`
+  <button class="btn sm back" data-go="${C._test?'admin':'home'}">← ${C._test?'回到後台':'回到卷宗'}</button>
+  <header class="mast">
+    <span class="label">${esc(C.no)} · 法官卷宗${C._test?" · 試玩中":""}</span>
+    <h1>${titleHtml(C)}</h1>
+    <div class="stats">
+      <span>第 <b>${S.day}</b> / ${C.days} 天</span>
+      <span>剩餘行動<span class="pips" aria-label="剩 ${S.actions} 次">${pips}</span></span>
+      <span class="danger">${esc(C.counter)} <b>${S.victims}</b></span>
+      <span>關押中 <b>${S.isolated?esc(ch[S.isolated].name):"無"}</b></span>
+    </div>
+  </header>
+
+  <section class="panel">
+    <div class="sec-h"><h2>現場證據</h2><span class="hint">查看一件證據 −1 行動</span></div>
+    <div class="ev-grid">${Object.entries(C.evidence).map(([k,e])=>{
+      const done=S.seen.includes(k);
+      return `<button class="ev ${done?'done':''}" data-ev="${k}" ${(!done&&S.actions<1)?'disabled':''}>
+        <span class="ico">${evIcon(e.icon)}</span>
+        <h3>${esc(e.name)}</h3><span class="where">${esc(e.where)}</span>
+        ${done?`<span class="ev-text">${esc(e.text)}</span>`:`<span class="cost">查看 −1</span>`}
+      </button>`}).join("")}</div>
+  </section>
+
+  <section class="panel">
+    <div class="sec-h"><h2>嫌疑犯</h2><span class="hint">點一個開始審訊</span></div>
+    <div class="sus-grid">${Object.entries(ch).map(([k,c])=>`
+      <button class="sus ${S.cur===k?'active':''}" data-sus="${k}" aria-pressed="${S.cur===k}">
+        ${portrait(c.look,c.name)}<span class="nm">${esc(c.name)}</span><span class="tg">${esc(c.tag)}</span>
+        ${S.isolated===k?'<span class="jail"></span><span class="jail-tag">關押中</span>':''}
+      </button>`).join("")}</div>
+  </section>`;
+
+  if(S.cur){
+    const k=S.cur, c=ch[k];
+    const topics=[["alibi","昨晚你在哪？"],...S.seen.map(e=>[e,"出示："+C.evidence[e].name])];
+    const ans=S.curTopic?C.lines[k][S.curTopic]:null;
+    const qtext=S.curTopic?(topics.find(t=>t[0]===S.curTopic)||["",""])[1]:"";
+    h+=`<section class="panel" id="interro">
+      <div class="interro">
+        <div class="pic">${portrait(c.look,c.name)}</div>
+        <div style="min-width:0">
+          <span class="label">審訊室</span>
+          <h3>${esc(c.name)}</h3><p class="desc">${esc(c.desc)}</p>
+          <div class="topics">${topics.map(([t,l])=>{
+            const asked=S.asked[k+":"+t];
+            return `<button class="topic ${asked?'asked':''} ${S.curTopic===t?'cur':''}" data-topic="${t}" ${(!asked&&S.actions<1)?'disabled':''}>${esc(l)}<small>${asked?'已問':'−1'}</small></button>`}).join("")}</div>
+          ${S.seen.length?'':'<p class="empty" style="margin-top:10px">先去查看證據，就能拿證據當面追問。</p>'}
+          <div class="bubble" aria-live="polite">${ans?`<span class="q">法官：${esc(qtext)}</span>${speech(ans)}`:`<span class="empty">${esc(c.name)}正盯著你，等你開口。</span>`}</div>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  h+=`<section class="panel">
+    <div class="sec-h"><h2>法官筆記</h2><span class="hint">找出兩句互相打架的話</span></div>
+    ${S.notes.length?`<ul class="notes">${S.notes.map(n=>n.type==="ev"
+      ?`<li class="ev-note"><span class="tp">證據</span><span class="who">${esc(n.title)}</span>${esc(n.text)}</li>`
+      :`<li><span class="tp">第${n.day}天</span><span class="who">${esc(n.who)}</span><span class="tp">${esc(n.q)}</span>${speech(n.text)}</li>`).join("")}</ul>`
+      :`<p class="empty">還沒有紀錄。看過的證據和問到的證詞都會記在這裡。</p>`}
+  </section>
+
+  <section class="verdict">
+    <span class="label" style="color:var(--mute)">夜間判決</span>
+    <h2>今晚要關誰？</h2>
+    <p>${S.actions>0?`你還有 ${S.actions} 次行動，可以先繼續調查。`:"今天的行動用完了。"}只能關一個，關到你換人為止。${S.day===C.days?"<b style='color:#fff'>今晚是最後一晚，這就是最終判決。</b>":""}</p>
+    <div class="opts">${Object.entries(ch).map(([k,c])=>`<button class="opt ${S.choice===k?'sel':''}" data-opt="${k}">${esc(c.name)}</button>`).join("")}
+      <button class="opt ${S.choice===null?'sel':''}" data-opt="none">不關押</button></div>
+    <button class="big red" id="night" ${S.choice===undefined?'disabled':''}>宣判，熄燈</button>
+  </section>`;
+  $("#app").innerHTML=h;
+}
+
+function victimRow(n){
+  const shown=Math.min(n,40);
+  return `<div class="victims" aria-label="${n}">${Array.from({length:shown},()=>`<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><rect x="2" y="2" width="16" height="16" fill="#121212"/><path d="M5 15 L15 5" stroke="#d1171f" stroke-width="3"/></svg>`).join("")}${n>shown?`<span class="hint">＋${n-shown}</span>`:""}</div>`;
+}
+function truthBlock(){ return `<div class="truth"><h3>真相檔案</h3>${CASE.truth.map(p=>`<p>${esc(p)}</p>`).join("")}</div>`; }
+function overlay(html){ const o=$("#ov"); o.innerHTML=`<div class="paper" role="dialog" aria-modal="true">${html}</div>`; o.hidden=false; o.scrollTop=0; o.querySelector("button")?.focus({preventScroll:true}); }
+
+function showIntro(){
+  overlay(`<span class="label">${esc(CASE.no)} · 晨報 第 1 天</span>
+    <h2>${esc(CASE.intro.head)}</h2>${victimRow(S.victims)}
+    <p>${esc(CASE.intro.body)}</p>
+    <div class="rule"></div>
+    <p class="hint">你有 ${CASE.days} 天，每天 ${CASE.actionsPerDay} 次行動。證詞會記在「法官筆記」，拿證據當面追問最容易抓到謊話。</p>
+    <button class="big red" data-close="1">接手案件</button>`);
+}
+function night(){
+  const c=S.choice; if(c===undefined) return;
+  S.isolated=c; S.history.push(c);
+  if(c===CASE.culprit) return ending(true);
+  const n=CASE.nights[c||"none"]; S.victims+=n.add;
+  if(S.day>=CASE.days) return ending(false,c);
+  S.day++; S.actions=CASE.actionsPerDay; S.choice=undefined; S.curTopic=null;
+  render();
+  overlay(`<span class="label">晨報 第 ${S.day} 天</span>
+    <h2>${esc(n.head)}</h2>${victimRow(S.victims)}<p>${esc(n.body)}</p>
+    ${c?`<p class="hint">${esc(CASE.chars[c].name)}仍被關押中。今晚可以改關別人。</p>`:""}
+    <button class="big red" data-close="1">開始第 ${S.day} 天</button>`);
+}
+function ending(win,c){
+  const wrong=S.history.filter(x=>x&&x!==CASE.culprit).length;
+  const back=CASE._test?`<button class="big" data-go="admin">回到後台</button>`:`<button class="big" data-go="home">回到卷宗</button>`;
+  if(win){
+    const rank=ranks(CASE,S.day);
+    if(!CASE._test){ const b=store(true,"ac-best")||{}; const order=["勉強及格","名偵探","傳奇法官"]; if(order.indexOf(rank)>order.indexOf(b[CASE.id])){b[CASE.id]=rank; store(false,"ac-best",b);} }
+    overlay(`<span class="label">晨報 · 號外</span>
+      <h2>${esc(CASE.good.head)}</h2>
+      <p class="rank">評價：${rank}</p>
+      <p>第 ${S.day} 晚破案。${esc(CASE.counter)}共 ${S.victims}，冤枉過 ${wrong} 次，看過 ${S.seen.length} / ${Object.keys(CASE.evidence).length} 件證據。</p>
+      <p>${esc(CASE.good.body)}</p>${truthBlock()}
+      <div class="row">${back}<button class="big red" data-replay="1">再審一次</button></div>`);
+  } else {
+    const b=CASE.bad[c||"none"];
+    overlay(`<span class="label">晨報 · 最終版</span>
+      <h2>${esc(b.head)}</h2>${victimRow(S.victims)}
+      <p>${esc(b.body)}</p>
+      <p>真正的兇手，是<b style="color:var(--red)">${esc(CASE.chars[CASE.culprit].name)}</b>。</p>${truthBlock()}
+      <div class="row">${back}<button class="big red" data-replay="1">重新審判</button></div>`);
+  }
+}
+
+/* ===== 後台 ===== */
+function openAdmin(){
+  if(!W){
+    W=clone(DATA);
+    let draft=null; try{draft=JSON.parse(sessionStorage.getItem("ac-draft")||"null")}catch(e){}
+    if(draft && JSON.stringify(draft)!==JSON.stringify(DATA)){ W=draft; W.cases.forEach(normalize); dirty=true; saveMsg="已還原上次還沒儲存成功的草稿。"; }
+    try{sessionStorage.removeItem("ac-draft")}catch(e){}
+  }
+  sel=Math.min(sel,W.cases.length-1); go("admin");
+}
+const txt=(label,path,val,rows)=>rows
+  ?`<label class="f"><span>${label}</span><textarea data-path="${path}" rows="${rows}">${esc(val)}</textarea></label>`
+  :`<label class="f"><span>${label}</span><input data-path="${path}" value="${esc(val)}"></label>`;
+const num=(label,path,val,min,max)=>`<label class="f"><span>${label}</span><input type="number" inputmode="numeric" min="${min}" max="${max}" data-path="${path}" data-num="1" value="${val}"></label>`;
+const pick=(label,path,val,opts,re)=>`<label class="f"><span>${label}</span><select data-path="${path}" ${re?'data-re="1"':''}>${Object.entries(opts).map(([k,v])=>`<option value="${esc(k)}" ${k===val?'selected':''}>${esc(v)}</option>`).join("")}</select></label>`;
+
+function renderAdmin(){
+  const c=W.cases[sel];
+  const list=W.cases.map((x,i)=>`<li>
+      <button class="pick ${i===sel?'on':''}" data-sel="${i}"><small>${esc(x.no)}</small>${esc(x.title||"未命名")}</button>
+      <button class="mv" data-move="${i},-1" aria-label="上移" ${i===0?'disabled':''}>↑</button>
+      <button class="mv" data-move="${i},1" aria-label="下移" ${i===W.cases.length-1?'disabled':''}>↓</button>
+    </li>`).join("");
+  let ed="";
+  if(c){
+    const chars=Object.entries(c.chars), evs=Object.entries(c.evidence);
+    const nameOf=k=>k==="none"?"不關押":(c.chars[k]?.name||k);
+    ed=`
+    <fieldset class="fs"><legend>基本資料</legend>
+      <div class="grid2">
+        ${txt("案件編號","no",c.no)}${txt("案件標題","title",c.title)}
+        ${txt("標題紅字（標題裡的幾個字）","titleHi",c.titleHi||"")}${txt("受害計數名稱（例：受害兔）","counter",c.counter)}
+        ${num("天數","days",c.days,1,7)}${num("每天行動數","actionsPerDay",c.actionsPerDay,1,9)}
+        ${num("開場受害數","startVictims",c.startVictims,0,99)}
+        ${pick("難度","level",String(c.level),{"1":"★ 入門","2":"★★ 普通","3":"★★★ 困難"})}
+        ${pick("真兇","culprit",c.culprit,Object.fromEntries(chars.map(([k,v])=>[k,v.name||k])),true)}
+      </div>
+      ${txt("卷宗簡介（首頁卡片上的一句話）","blurb",c.blurb||"",2)}
+      ${txt("開場晨報標題","intro.head",c.intro.head)}
+      ${txt("開場晨報內容","intro.body",c.intro.body,3)}
+    </fieldset>
+
+    <fieldset class="fs"><legend>嫌疑犯（${chars.length}）</legend>
+      ${chars.map(([k,v])=>`<div class="sub">
+        <div class="sub-h"><h4>${esc(v.name||"未命名")}${k===c.culprit?'<span class="tag-culprit">真兇</span>':''}</h4>
+          <button class="btn sm" data-delchar="${k}" ${chars.length<=2?'disabled title="至少要有兩名嫌疑犯"':''}>刪除</button></div>
+        <div class="grid2">${txt("名字",`chars.${k}.name`,v.name)}${txt("身分標籤",`chars.${k}.tag`,v.tag)}</div>
+        ${txt("描述",`chars.${k}.desc`,v.desc,2)}
+        <div class="look">${portrait(v.look,v.name)}
+          <div class="looksel">${["head","ears","body","eyes","mark","fill"].map(p=>pick({head:"頭",ears:"耳朵",body:"身體",eyes:"眼睛",mark:"特徵",fill:"顏色"}[p],`chars.${k}.look.${p}`,v.look[p],LOOK_OPTS[p],true)).join("")}</div>
+        </div>
+      </div>`).join("")}
+      <button class="btn" data-addchar="1">＋ 新增嫌疑犯</button>
+    </fieldset>
+
+    <fieldset class="fs"><legend>證據（${evs.length}）</legend>
+      ${evs.map(([k,v])=>`<div class="sub">
+        <div class="sub-h"><h4>${esc(v.name||"未命名")}</h4><button class="btn sm" data-delev="${k}" ${evs.length<=1?'disabled':''}>刪除</button></div>
+        <div class="grid2">${txt("名稱",`evidence.${k}.name`,v.name)}${txt("發現地點",`evidence.${k}.where`,v.where)}${pick("圖示",`evidence.${k}.icon`,v.icon,ICONS)}</div>
+        ${txt("查看後的描述",`evidence.${k}.text`,v.text,3)}
+      </div>`).join("")}
+      <button class="btn" data-addev="1">＋ 新增證據</button>
+    </fieldset>
+
+    <fieldset class="fs"><legend>證詞</legend>
+      <p class="hint">括號（　）裡的文字會用淡色顯示，適合寫動作和表情。</p>
+      ${chars.map(([k,v])=>`<div class="sub"><div class="sub-h"><h4>${esc(v.name)}</h4></div>
+        ${txt("問：昨晚你在哪？",`lines.${k}.alibi`,c.lines[k].alibi,2)}
+        ${evs.map(([e,ev])=>txt(`出示：${esc(ev.name)}`,`lines.${k}.${e}`,c.lines[k][e],2)).join("")}
+      </div>`).join("")}
+    </fieldset>
+
+    <fieldset class="fs"><legend>抓錯人的隔天晨報</legend>
+      ${["none",...Object.keys(c.chars).filter(k=>k!==c.culprit)].map(k=>`<div class="sub"><div class="sub-h"><h4>關押：${esc(nameOf(k))}</h4></div>
+        <div class="grid2">${num("受害數增加",`nights.${k}.add`,c.nights[k].add,0,20)}${txt("晨報標題",`nights.${k}.head`,c.nights[k].head)}</div>
+        ${txt("晨報內容",`nights.${k}.body`,c.nights[k].body,2)}</div>`).join("")}
+    </fieldset>
+
+    <fieldset class="fs"><legend>結局</legend>
+      <div class="sub"><div class="sub-h"><h4>破案（關到真兇）</h4></div>
+        ${txt("標題","good.head",c.good.head)}${txt("內容","good.body",c.good.body,3)}</div>
+      ${["none",...Object.keys(c.chars).filter(k=>k!==c.culprit)].map(k=>`<div class="sub"><div class="sub-h"><h4>失敗：最後一晚關押 ${esc(nameOf(k))}</h4></div>
+        ${txt("標題",`bad.${k}.head`,c.bad[k].head)}${txt("內容",`bad.${k}.body`,c.bad[k].body,2)}</div>`).join("")}
+      ${txt("真相檔案（每行一段）","truth",c.truth.join("\n"),5)}
+    </fieldset>
+
+    <div class="row">
+      <button class="btn dark" data-test="1">試玩這一關</button>
+      <button class="btn" data-dup="1">複製這一關</button>
+      <button class="btn" data-delcase="1" ${W.cases.length<=1?'disabled':''}>刪除這一關</button>
+    </div>`;
+  }
+  $("#app").innerHTML=`
+    <button class="btn sm back" data-go="home">← 回到首頁</button>
+    <div class="savebar">
+      <strong style="font-family:var(--f-display)">後台</strong>
+      <span class="msg ${saveWarn?'warn':''}" aria-live="polite">${esc(saveMsg|| (dirty?"有尚未儲存的修改。":"所有修改都已儲存。"))}</span>
+      <button class="btn sm" data-io="1">匯出／匯入</button>
+      <button class="btn sm red" data-save="1" ${(!dirty||readOnly)?'disabled':''}>儲存並發佈</button>
+    </div>
+    <div class="adm">
+      <aside class="panel" style="padding:14px">
+        <div class="sec-h" style="margin-bottom:8px"><h2 style="font-size:20px">關卡</h2></div>
+        <ul class="clist">${list}</ul>
+        <button class="btn" style="width:100%;margin-top:10px" data-newcase="1">＋ 新增關卡</button>
+      </aside>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">${ed}</div>
+    </div>`;
+}
+function setPath(obj,path,val){
+  const ks=path.split("."); let o=obj;
+  for(let i=0;i<ks.length-1;i++){ o[ks[i]]=o[ks[i]]||{}; o=o[ks[i]]; }
+  o[ks[ks.length-1]]=val;
+}
+function touch(){ dirty=true; saveMsg=""; saveWarn=false; const m=$(".savebar .msg"); if(m){m.textContent="有尚未儲存的修改。";m.classList.remove("warn")} const b=$("[data-save]"); if(b&&!readOnly) b.disabled=false; }
+document.addEventListener("input",e=>{
+  const t=e.target; if(view!=="admin"||!t.dataset||!t.dataset.path) return;
+  const c=W.cases[sel]; let v=t.value;
+  if(t.dataset.num) v=parseInt(v)||0;
+  if(t.dataset.path==="truth") v=v.split("\n").map(s=>s.trim()).filter(Boolean);
+  setPath(c,t.dataset.path,v); touch();
+});
+document.addEventListener("change",e=>{
+  const t=e.target; if(view!=="admin"||!t.dataset||!t.dataset.path) return;
+  if(t.dataset.re || /^chars\.[^.]+\.name$/.test(t.dataset.path) || /^evidence\.[^.]+\.name$/.test(t.dataset.path) || t.dataset.path==="title" || t.dataset.path==="no"){
+    normalize(W.cases[sel]); const y=window.scrollY; renderAdmin(); window.scrollTo({top:y});
+  }
+});
+function blankCase(){
+  const a=uid("c"), b=uid("c"), e=uid("e");
+  return normalize({id:uid("case"),no:"案件 #"+String(W.cases.length+1).padStart(2,"0"),title:"新的案件",titleHi:"",counter:"受害者",blurb:"一句話介紹這個案件。",
+    days:3,actionsPerDay:4,startVictims:1,culprit:a,
+    chars:{[a]:{name:"嫌犯甲",tag:"看起來很無辜",desc:"",look:{ears:"up"}},[b]:{name:"嫌犯乙",tag:"看起來很兇",desc:"",look:{ears:"cat",eyes:"angry"}}},
+    evidence:{[e]:{name:"第一件證據",where:"案發現場",icon:"magnifier",text:"描述這件證據。"}},
+    lines:{},intro:{head:"案件發生了",body:"描述案情。"},nights:{},bad:{},good:{head:"結案",body:"描述破案後的結局。"},truth:["寫下真相。"]});
+}
+async function save(){
+  if(!artifactNS){ saveWarn=true; saveMsg="這個檢視無法儲存。請在 Claude 裡開啟這個頁面再試。"; return renderAdmin(); }
+  W.cases.forEach(normalize);
+  const data={cases:W.cases.map(c=>{const x=clone(c); delete x._test; return x;})};
+  const json=JSON.stringify(data).replace(/</g,"\\u003c");
+  const open='<script type="application/json" id="case-data">';
+  const i=SRC.indexOf(open), j=SRC.indexOf("</"+"script>",i);
+  if(i<0||j<0){ saveWarn=true; saveMsg="找不到資料區塊，無法儲存。請用匯出備份。"; return renderAdmin(); }
+  const body=SRC.slice(0,i+open.length)+json+SRC.slice(j);
+  const doc='<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'+body+'</body></html>';
+  try{sessionStorage.setItem("ac-draft",JSON.stringify(data))}catch(e){}
+  saveMsg="儲存中…"; saveWarn=false; renderAdmin(); $("[data-save]").disabled=true;
+  try{
+    await artifactNS.publish(doc);
+    saveMsg="已發佈，頁面即將重新載入。"; dirty=false; renderAdmin();
+  }catch(err){
+    const code=err&&err.code;
+    saveWarn=true;
+    if(code==="not_writer"||code==="not_granted"){ readOnly=true; saveMsg="你沒有這個頁面的編輯權限，只能瀏覽。可以先用匯出備份內容。"; }
+    else if(code==="conflict"){ saveMsg="有更新的版本剛發佈，頁面會重新載入，你的修改會以草稿還原。"; }
+    else if(code==="rate_limited"){ saveMsg="儲存太頻繁了，請稍等一下再按一次。"; }
+    else saveMsg="儲存失敗（"+(code||"未知錯誤")+"）。請稍後再試，或先匯出備份。";
+    renderAdmin();
+  }
+}
+function showIO(){
+  const data=JSON.stringify({cases:W.cases},null,2);
+  overlay(`<span class="label">備份與搬移</span><h2>匯出／匯入關卡</h2>
+    <p class="hint">複製下面的內容就能備份。貼上別的內容後按「匯入」，會取代後台裡所有關卡（還沒發佈，按儲存才生效）。</p>
+    <textarea class="code" id="io-text" spellcheck="false">${esc(data)}</textarea>
+    <p class="hint" id="io-msg" aria-live="polite" style="margin-top:8px"></p>
+    <div class="row"><button class="big" data-copy="1">複製</button><button class="big red" data-import="1">匯入</button></div>
+    <button class="btn" style="margin-top:12px" data-close="1">關閉</button>`);
+}
+
+/* ===== 點擊 ===== */
+document.addEventListener("click",async e=>{
+  const t=e.target.closest("button"); if(!t) return;
+  const d=t.dataset;
+  if(d.go){ if(d.go==="admin") openAdmin(); else go(d.go); return; }
+  if(d.play!==undefined){ startCase(DATA.cases[+d.play]); return; }
+  if(d.close){ $("#ov").hidden=true; return; }
+  if(d.replay){ const c=CASE; $("#ov").hidden=true; startCase(c); return; }
+  if(view==="game"){
+    if(d.ev){ const k=d.ev; if(S.seen.includes(k)||S.actions<1) return; S.seen.push(k); S.actions--; const ev=CASE.evidence[k]; S.notes.push({type:"ev",title:ev.name,text:ev.text}); render(); }
+    else if(d.sus){ S.cur=d.sus; S.curTopic=null; render(); $("#interro")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); }
+    else if(d.topic){
+      const key=S.cur+":"+d.topic;
+      if(!S.asked[key]){ if(S.actions<1) return; S.actions--; S.asked[key]=1;
+        S.notes.push({type:"line",day:S.day,who:CASE.chars[S.cur].name,q:d.topic==="alibi"?"昨晚在哪":"出示 "+CASE.evidence[d.topic].name,text:CASE.lines[S.cur][d.topic]}); }
+      S.curTopic=d.topic; render();
+    }
+    else if(d.opt){ S.choice=d.opt==="none"?null:d.opt; render(); }
+    else if(t.id==="night") night();
+    return;
+  }
+  if(view==="admin"){
+    const c=W.cases[sel], y=window.scrollY, re=()=>{renderAdmin(); window.scrollTo({top:y});};
+    if(d.sel!==undefined){ sel=+d.sel; pendingDel=null; renderAdmin(); window.scrollTo({top:0}); }
+    else if(d.move){ const [i,dir]=d.move.split(",").map(Number); const j=i+dir; [W.cases[i],W.cases[j]]=[W.cases[j],W.cases[i]]; if(sel===i) sel=j; else if(sel===j) sel=i; touch(); re(); }
+    else if(d.newcase){ W.cases.push(blankCase()); sel=W.cases.length-1; touch(); renderAdmin(); window.scrollTo({top:0}); }
+    else if(d.dup){ const x=clone(c); x.id=uid("case"); x.title=c.title+"（複製）"; W.cases.splice(sel+1,0,x); sel++; touch(); renderAdmin(); window.scrollTo({top:0}); }
+    else if(d.delcase){
+      overlay(`<span class="label">刪除關卡</span><h2>刪除「${esc(c.title)}」？</h2><p>刪除後按「儲存並發佈」才會真的生效，在那之前重新整理頁面就能復原。</p>
+        <div class="row"><button class="big" data-close="1">取消</button><button class="big red" data-confirmdel="1">刪除</button></div>`);
+    }
+    else if(d.addchar){ const k=uid("c"); c.chars[k]={name:"新嫌疑犯",tag:"",desc:"",look:{}}; normalize(c); touch(); re(); }
+    else if(d.delchar){ if(Object.keys(c.chars).length<=2) return; delete c.chars[d.delchar]; normalize(c); touch(); re(); }
+    else if(d.addev){ const k=uid("e"); c.evidence[k]={name:"新證據",where:"",icon:"magnifier",text:""}; normalize(c); touch(); re(); }
+    else if(d.delev){ if(Object.keys(c.evidence).length<=1) return; delete c.evidence[d.delev]; normalize(c); touch(); re(); }
+    else if(d.test){ normalize(c); const x=clone(c); x._test=true; startCase(x); }
+    else if(d.save){ save(); }
+    else if(d.io){ showIO(); }
+  }
+  if(d.confirmdel){ W.cases.splice(sel,1); sel=Math.max(0,sel-1); touch(); $("#ov").hidden=true; renderAdmin(); window.scrollTo({top:0}); }
+  if(d.copy){ const ta=$("#io-text"); try{ await navigator.clipboard.writeText(ta.value); $("#io-msg").textContent="已複製。"; }catch(err){ ta.focus(); ta.select(); $("#io-msg").textContent="請按 Ctrl+C（或長按）複製已選取的文字。"; } }
+  if(d.import){
+    try{
+      const v=JSON.parse($("#io-text").value);
+      if(!v||!Array.isArray(v.cases)||!v.cases.length) throw new Error("需要有 cases 陣列，且至少一關。");
+      v.cases.forEach(x=>{ if(!x.chars||!x.evidence) throw new Error("每一關都要有 chars 和 evidence。"); x.id=x.id||uid("case"); normalize(x); });
+      W=v; sel=0; touch(); $("#ov").hidden=true; renderAdmin();
+    }catch(err){ $("#io-msg").textContent="匯入失敗："+err.message; }
+  }
+});
+
+/* ===== 權限 ===== */
+render();
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use) return;
+    const [u,a]=await Promise.all([claude.use("user"),claude.use("artifact")]);
+    artifactNS=a;
+    canEdit=!!(u && await u.canEdit());
+    let draft=null; try{draft=sessionStorage.getItem("ac-draft")}catch(e){}
+    if(canEdit && view==="home") renderHome();
+    if(canEdit && draft && JSON.stringify(JSON.parse(draft))!==JSON.stringify(DATA) && view==="home"){ openAdmin(); }
+  }catch(e){}
+})();
+</script>
+
+</body></html>

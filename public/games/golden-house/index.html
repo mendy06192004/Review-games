@@ -1,0 +1,2054 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>書中自有黃金屋</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --panel:rgba(16,18,28,.72);
+  --line:rgba(255,255,255,.08);
+  --gold:#e9c46a;
+  --gold2:#f7e2a4;
+  --text:#ebe8df;
+  --muted:#8d8b98;
+  --accent:#6ee7c8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+html,body{max-width:100%;overflow-x:hidden}
+body{
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 60%, rgba(40,90,90,.18), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 45%, rgba(90,40,130,.22), transparent 60%),
+    radial-gradient(ellipse at 50% 20%, #151827 0%, #0a0b12 55%, #050509 100%);
+  color:var(--text);
+  font-family:"Noto Sans TC",system-ui,-apple-system,sans-serif;
+  overflow:hidden;-webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit}
+.serif{font-family:"Noto Serif TC",serif}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+.main{flex:1;min-height:0;display:flex;flex-direction:column}
+
+/* ---------- HUD ---------- */
+header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:14px 22px 10px}
+.hp{min-width:0;--c1:#6ee7c8;--c2:#2bb39a}
+.hp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:8px}
+.hp.right .hp-top{flex-direction:row-reverse}
+.nm{font-family:"Noto Serif TC",serif;font-weight:700;font-size:16px;letter-spacing:.15em;color:var(--c1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.num{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em;white-space:nowrap}
+.bar{position:relative;height:10px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;border:1px solid var(--line)}
+.bar .fill,.bar .ghost{position:absolute;top:0;bottom:0;left:0;width:100%;border-radius:99px}
+.hp.right .bar .fill,.hp.right .bar .ghost{left:auto;right:0}
+.bar .ghost{background:rgba(255,255,255,.55);transition:width .9s cubic-bezier(.3,.7,.2,1) .35s}
+.bar .fill{transition:width .25s ease-out;background:linear-gradient(90deg,var(--c2),var(--c1));box-shadow:0 0 14px var(--c1)}
+.hp.right .bar .fill{background:linear-gradient(270deg,var(--c2),var(--c1))}
+.hp.active .nm::after{content:" ◆";font-size:.7em;color:var(--gold)}
+.hp.right.active .nm::after{content:""}
+.hp.right.active .nm::before{content:"◆ ";font-size:.7em;color:var(--gold)}
+
+.title{text-align:center}
+.title h1{
+  font-family:"Noto Serif TC",serif;font-weight:900;font-size:clamp(18px,2.4vw,28px);letter-spacing:.35em;padding-left:.35em;
+  background:linear-gradient(180deg,#fff6d8,#e9c46a 60%,#a8812e);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(233,196,106,.25));white-space:nowrap;
+}
+.turn{
+  --tc:#e9c46a;display:inline-block;margin-top:5px;font-size:11px;letter-spacing:.2em;padding:3px 12px 3px 14px;border-radius:99px;
+  border:1px solid color-mix(in srgb,var(--tc) 45%,transparent);color:var(--tc);background:color-mix(in srgb,var(--tc) 8%,transparent);
+  transition:all .3s;white-space:nowrap;
+}
+
+/* ---------- Stage ---------- */
+.stage-wrap{position:relative;flex:1;min-height:150px}
+canvas{position:absolute;inset:0;display:block}
+#muteBtn{left:auto;right:14px}
+#muteBtn.off{opacity:.55}
+.pill-btn{
+  position:absolute;left:14px;top:8px;z-index:2;font-size:12px;letter-spacing:.15em;color:var(--muted);
+  background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:99px;padding:5px 12px;cursor:pointer;transition:all .2s;
+}
+.pill-btn:hover{color:var(--gold2);border-color:rgba(233,196,106,.4)}
+#banner{
+  --c:#e9c46a;position:absolute;left:50%;top:10px;transform:translate(-50%,-14px);
+  max-width:min(720px,88%);text-align:center;font-family:"Noto Serif TC",serif;font-size:clamp(14px,1.8vw,19px);line-height:1.6;letter-spacing:.05em;
+  padding:12px 22px;border-radius:14px;background:linear-gradient(180deg,rgba(14,16,26,.92),rgba(14,16,26,.78));
+  border:1px solid color-mix(in srgb,var(--c) 45%,transparent);box-shadow:0 0 30px color-mix(in srgb,var(--c) 22%,transparent);
+  opacity:0;pointer-events:none;transition:opacity .35s,transform .45s cubic-bezier(.2,.9,.25,1.2);z-index:3;
+}
+#banner.show{opacity:1;transform:translate(-50%,0)}
+#banner b{color:var(--c);font-size:1.25em;font-weight:900;text-shadow:0 0 12px var(--c)}
+#banner .crit{background:var(--c);color:#111;font-size:.72em;padding:1px 7px;border-radius:5px;margin-left:4px;font-family:"Noto Sans TC";font-weight:700}
+#banner small{opacity:.65;font-size:.78em}
+.fx{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;min-height:19px}
+.hp.right .fx{justify-content:flex-end}
+.fx span{--c:#e9c46a;font-size:11px;line-height:1.5;padding:0 7px;border-radius:99px;white-space:nowrap;color:var(--c);
+  border:1px solid color-mix(in srgb,var(--c) 50%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent)}
+#banner .notes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:6px;font-size:.78em}
+#banner .notes span{padding:1px 9px;border-radius:99px;border:1px solid currentColor}
+#banner .src{margin-top:6px;font-size:.8em;color:var(--gold2);letter-spacing:.08em}
+#cast{flex:0 0 auto;min-height:48px}
+
+/* ---------- Panel ---------- */
+.panel{
+  flex:none;display:grid;grid-template-columns:minmax(0,1fr) 300px;min-width:0;gap:16px;margin:0 16px max(16px,env(safe-area-inset-bottom));padding:16px 18px;border-radius:18px;
+  background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 50px rgba(0,0,0,.45);transition:border-color .4s;
+  border-top:2px solid color-mix(in srgb,var(--accent) 55%,transparent);
+}
+.panel > div{min-width:0}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+#poem{
+  flex:1 1 200px;min-width:0;font-family:"Noto Serif TC",serif;font-size:19px;letter-spacing:.08em;color:var(--text);
+  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s;
+}
+#poem::placeholder{color:#5c5b66}
+#poem:focus{border-color:color-mix(in srgb,var(--accent) 70%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+#poem.shake{animation:shk .35s}
+@keyframes shk{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.gold-btn{
+  font-family:"Noto Serif TC",serif;font-weight:900;font-size:16px;letter-spacing:.2em;padding:0 22px 0 26px;border:none;border-radius:12px;cursor:pointer;color:#1a1306;white-space:nowrap;
+  background:linear-gradient(180deg,#fbe7a6,#e9c46a 55%,#c49536);box-shadow:0 0 22px rgba(233,196,106,.35),inset 0 1px 0 rgba(255,255,255,.6);
+  transition:transform .15s,filter .2s,opacity .2s;
+}
+.gold-btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.08)}
+.gold-btn:active:not(:disabled){transform:translateY(1px)}
+.gold-btn:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.6)}
+.ghost-btn{
+  font-family:"Noto Serif TC",serif;font-weight:700;font-size:15px;letter-spacing:.15em;padding:11px 24px;border-radius:12px;cursor:pointer;
+  color:var(--text);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);transition:all .2s;
+}
+.ghost-btn:hover{border-color:rgba(233,196,106,.5);color:var(--gold2)}
+#detect{margin-top:10px;font-size:13px;color:var(--muted);min-height:20px;line-height:1.5}
+#detect .q{color:var(--gold2);font-family:"Noto Serif TC",serif}
+.chips{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:none;font-family:"Noto Serif TC",serif;font-size:13px;padding:5px 12px;border-radius:99px;cursor:pointer;
+  color:#cfcbd8;background:rgba(255,255,255,.04);border:1px solid var(--line);transition:all .2s;
+}
+.chip:hover{border-color:rgba(233,196,106,.5);color:var(--gold2);background:rgba(233,196,106,.06)}
+.log{border-left:1px solid var(--line);padding-left:16px;min-width:0;display:flex;flex-direction:column}
+.log h3{font-size:11px;letter-spacing:.3em;color:var(--muted);font-weight:500;margin-bottom:6px}
+#log{list-style:none;overflow-y:auto;flex:1;max-height:118px;font-size:12px;line-height:1.55;color:#b9b6c4;scrollbar-width:thin}
+#log li{padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.05);animation:fadein .4s}
+#log li .who{font-weight:700;margin-right:4px}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}}
+
+/* ---------- Overlays ---------- */
+.overlay{
+  position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;
+  background:rgba(4,4,8,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  opacity:0;pointer-events:none;transition:opacity .5s;z-index:10;padding:28px 16px;
+}
+.overlay.show{opacity:1;pointer-events:auto}
+.overlay > *{margin:auto 0}
+
+/* 主畫面 */
+.menu{width:100%;max-width:920px;text-align:center}
+.logo{
+  font-family:"Noto Serif TC",serif;font-weight:900;font-size:clamp(34px,7vw,64px);letter-spacing:.3em;padding-left:.3em;line-height:1.2;
+  background:linear-gradient(180deg,#fff6d8,#e9c46a 60%,#9b7428);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 28px rgba(233,196,106,.3));
+}
+.slogan{font-family:"Noto Serif TC",serif;color:var(--muted);letter-spacing:.4em;margin-top:8px;font-size:14px}
+.sec-title{font-size:12px;letter-spacing:.4em;color:var(--gold);margin:30px 0 12px;display:flex;align-items:center;gap:12px;justify-content:center}
+.sec-title::before,.sec-title::after{content:"";height:1px;width:60px;background:linear-gradient(90deg,transparent,rgba(233,196,106,.5),transparent)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:left;max-width:720px;margin:0 auto}
+.step{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px}
+.step .n{font-family:"Noto Serif TC",serif;font-weight:900;color:var(--gold);font-size:22px;line-height:1}
+.step h4{font-family:"Noto Serif TC",serif;font-size:15px;margin:8px 0 4px;letter-spacing:.1em}
+.step p{font-size:12.5px;color:#a9a6b4;line-height:1.65}
+.step.warn{border-color:rgba(255,93,108,.3);background:rgba(255,93,108,.05)}
+.step.warn .n{color:#ff8a95}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left}
+.mode{
+  position:relative;border-radius:18px;padding:22px 22px 20px;border:1px solid var(--line);overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.01));transition:border-color .3s,transform .3s;
+}
+.mode:hover{border-color:rgba(233,196,106,.45);transform:translateY(-2px)}
+.mode::after{
+  content:attr(data-glyph);position:absolute;right:-6px;bottom:-26px;font-family:"Noto Serif TC",serif;font-weight:900;font-size:120px;
+  color:rgba(233,196,106,.06);pointer-events:none;
+}
+.mode .tagline{font-size:11px;letter-spacing:.3em;color:var(--muted)}
+.mode h3{font-family:"Noto Serif TC",serif;font-size:28px;font-weight:900;letter-spacing:.2em;margin:6px 0 8px;color:var(--gold2)}
+.mode p{font-size:13.5px;color:#b5b2c0;line-height:1.7}
+.mode .gold-btn{margin-top:14px;padding:12px 26px;font-size:15px;position:relative;z-index:1}
+.names{display:flex;align-items:center;gap:10px;margin-top:12px;position:relative;z-index:1}
+.names input{
+  flex:1;min-width:0;font-family:"Noto Serif TC",serif;font-size:15px;text-align:center;letter-spacing:.1em;color:var(--text);
+  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 8px;outline:none;
+}
+.names input:focus{border-color:rgba(233,196,106,.6)}
+.names .vs{font-family:"Noto Serif TC",serif;font-weight:900;color:var(--gold);font-size:14px}
+.dex{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.dex span{
+  font-family:"Noto Serif TC",serif;font-size:13px;padding:5px 12px;border-radius:99px;border:1px dashed rgba(255,255,255,.14);color:#55535e;
+}
+.dex span.on{border-style:solid;color:var(--c);border-color:color-mix(in srgb,var(--c) 50%,transparent);background:color-mix(in srgb,var(--c) 8%,transparent)}
+.dex-note{font-size:12px;color:var(--muted);margin-top:10px}
+
+/* 結算 */
+.card{
+  text-align:center;padding:36px 40px;border-radius:22px;max-width:460px;width:100%;
+  background:linear-gradient(180deg,rgba(24,24,36,.95),rgba(12,12,20,.95));border:1px solid rgba(233,196,106,.3);box-shadow:0 0 60px rgba(233,196,106,.15);
+}
+.card .big{font-family:"Noto Serif TC",serif;font-weight:900;font-size:64px;line-height:1;background:linear-gradient(180deg,#fff6d8,#e9c46a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card.lose .big{background:linear-gradient(180deg,#e7d6ff,#8a55e0);-webkit-background-clip:text;background-clip:text}
+.card h2{font-family:"Noto Serif TC",serif;font-size:20px;letter-spacing:.2em;margin:14px 0 8px}
+.card p{color:var(--muted);font-size:14px;line-height:1.7}
+.card .best{margin-top:14px;font-family:"Noto Serif TC",serif;color:var(--gold2);font-size:15px}
+.card .btns{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+.card .gold-btn{padding:11px 26px;font-size:15px}
+
+
+@media (max-width:760px){
+  header{padding:10px 12px 6px;gap:10px}
+  .nm{font-size:13px;letter-spacing:.08em}
+  .title h1{letter-spacing:.12em;padding-left:.12em}
+  .panel{grid-template-columns:minmax(0,1fr);margin:0 10px max(10px,env(safe-area-inset-bottom));padding:12px}
+  .log{display:none}
+  #poem{font-size:16px;padding:10px 12px}
+  #cast{padding:0 14px;font-size:14px;letter-spacing:.1em}
+  .modes{grid-template-columns:1fr}
+  .title h1{font-size:16px}
+}
+@media (max-width:420px){ .fx span{font-size:10px;padding:0 5px} }
+@media (orientation:portrait) and (max-height:640px){ .chips{display:none} #detect{display:none} .panel{padding:10px 12px} }
+/* 橫式手機／平板：操作區移到右側，畫面高度留給戰場 */
+@media (orientation:landscape) and (max-height:560px){
+  header{padding:6px 14px 4px;gap:12px}
+  .nm{font-size:13px;letter-spacing:.08em}
+  .hp-top{margin-bottom:3px}
+  .title h1{font-size:16px;letter-spacing:.15em;padding-left:.15em}
+  .turn{margin-top:2px;padding:2px 10px}
+  .main{flex-direction:row}
+  .stage-wrap{min-height:0;min-width:0}
+  .panel{width:min(320px,40vw);grid-template-columns:minmax(0,1fr);margin:0 10px max(10px,env(safe-area-inset-bottom)) 0;padding:12px;align-content:center;overflow-y:auto}
+  .log,.chips{display:none}
+  #detect{font-size:12px}
+  #poem{font-size:16px;flex-basis:100%;padding:10px 12px}
+  #cast{flex:1 0 auto;min-height:44px}
+}
+</style>
+
+<div id="app">
+  <header>
+    <div class="hp left" id="hp0">
+      <div class="hp-top"><span class="nm" id="nm0">書生</span><span class="num" id="num0">1000 / 1000</span></div>
+      <div class="bar"><div class="ghost" id="ghost0"></div><div class="fill" id="fill0"></div></div>
+      <div class="fx" id="fx0"></div>
+    </div>
+    <div class="title">
+      <h1>書中自有黃金屋</h1>
+      <span class="turn" id="turn">你的回合</span>
+    </div>
+    <div class="hp right" id="hp1">
+      <div class="hp-top"><span class="nm" id="nm1">墨魘</span><span class="num" id="num1">1200 / 1200</span></div>
+      <div class="bar"><div class="ghost" id="ghost1"></div><div class="fill" id="fill1"></div></div>
+      <div class="fx" id="fx1"></div>
+    </div>
+  </header>
+
+  <main class="main">
+  <div class="stage-wrap">
+    <canvas id="stage"></canvas>
+    <button id="homeBtn" class="pill-btn">☰ 主畫面</button>
+    <button id="muteBtn" class="pill-btn">🔊 音效開</button>
+    <div id="banner"></div>
+  </div>
+
+  <div class="panel" id="panel">
+    <div>
+      <div class="row">
+        <input id="poem" maxlength="60" autocomplete="off" enterkeyhint="send" placeholder="寫下一句詩……">
+        <button id="cast" class="gold-btn">具象化攻擊</button>
+      </div>
+      <div id="detect"></div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="log">
+      <h3>戰 鬥 紀 錄</h3>
+      <ul id="log"></ul>
+    </div>
+  </div>
+  </main>
+</div>
+
+<!-- ============ 主畫面 ============ -->
+<div class="overlay show" id="menu">
+  <div class="menu">
+    <div class="logo">書中自有黃金屋</div>
+    <div class="slogan">以 詩 為 兵 · 化 字 為 鋒</div>
+
+    <div class="sec-title">玩 法</div>
+    <div class="steps">
+      <div class="step"><div class="n">一</div><h4>寫詩</h4><p>輸入一句詩或名言。</p></div>
+      <div class="step"><div class="n">二</div><h4>化形</h4><p>文字化為意象攻擊，屬性在成形時揭曉，屬性之間會相剋、疊加。</p></div>
+      <div class="step"><div class="n">三</div><h4>制勝</h4><p>先打倒對手的人獲勝。</p></div>
+    </div>
+
+    <div class="sec-title">模 式</div>
+    <div class="modes">
+      <div class="mode" data-glyph="獨">
+        <div class="tagline">單人 · 對戰主機</div>
+        <h3>獨闖書境</h3>
+        <p>挑戰從書頁中甦醒的「墨魘」。</p>
+        <button class="gold-btn" id="startSolo">開始挑戰</button>
+      </div>
+      <div class="mode" data-glyph="論">
+        <div class="tagline">多人 · 同學對戰</div>
+        <h3>詩壇論劍</h3>
+        <p>兩人共用一台裝置，輪流出招。</p>
+        <div class="names">
+          <input id="name1" maxlength="6" value="甲方" aria-label="玩家一名稱">
+          <span class="vs">VS</span>
+          <input id="name2" maxlength="6" value="乙方" aria-label="玩家二名稱">
+        </div>
+        <button class="gold-btn" id="startMulti">詩壇開戰</button>
+      </div>
+    </div>
+
+    <div class="sec-title">意 象 圖 鑑</div>
+    <div class="dex" id="dex"></div>
+    <div class="dex-note" id="dexNote"></div>
+  </div>
+</div>
+
+<!-- ============ 結算 ============ -->
+<div class="overlay" id="over">
+  <div class="card" id="card">
+    <div class="big" id="ovBig">勝</div>
+    <h2 id="ovTitle">墨魘消散</h2>
+    <p id="ovSub"></p>
+    <div class="best" id="ovBest"></div>
+    <div class="btns">
+      <button class="gold-btn" id="againBtn">再戰一局</button>
+      <button class="ghost-btn" id="menuBtn">回主畫面</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   書中自有黃金屋 —— 文字具象對戰
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const cvs = $('#stage'), ctx = cvs.getContext('2d');
+let W = 0, H = 0, DPR = 1, S = 100;
+
+/* ---------- 工具 ---------- */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeIn = t => t * t * t;
+const rand = (a, b) => a + Math.random() * (b - a);
+const hash = i => { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const follow = (f, dt) => 1 - Math.pow(1 - f, dt * 60);
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hexRGB = h => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+const mix = (a, b, k) => { const A = hexRGB(a), B = hexRGB(b); return A.map((v, i) => Math.round(lerp(v, B[i], k))); };
+const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const hexA = (h, a) => rgba(hexRGB(h), a);
+const isWordChar = c => /[\p{L}\p{N}]/u.test(c);
+const SERIF = '"Noto Serif TC", "Songti TC", serif';
+
+/* =========================================================
+   音效引擎（Web Audio 即時合成，不需任何音檔）
+   ========================================================= */
+const SFX = (() => {
+  let ac = null, master, wet, noiseBuf, muted = false, curPan = 0;
+  try { muted = localStorage.getItem('szhjw-mute') === '1'; } catch (e) {}
+  const MIDI = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  function init() {
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ac = new AC();
+      const comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.ratio.value = 4; comp.connect(ac.destination);
+      master = ac.createGain(); master.gain.value = muted ? 0 : .7; master.connect(comp);
+      // 簡易殘響：用衰減雜訊做脈衝響應，營造殿堂空間感
+      const len = ac.sampleRate * 2.2, ir = ac.createBuffer(2, len, ac.sampleRate);
+      for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+      const conv = ac.createConvolver(); conv.buffer = ir;
+      wet = ac.createGain(); wet.gain.value = .3; wet.connect(conv); conv.connect(master);
+      noiseBuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+      const nd = noiseBuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  const ready = () => ac && !muted && ac.state !== 'closed';
+
+  function out(node, rev, pan) {
+    let n = node;
+    if (pan && ac.createStereoPanner) { const p = ac.createStereoPanner(); p.pan.value = clamp(pan, -1, 1); node.connect(p); n = p; }
+    n.connect(master);
+    if (rev > 0) { const s = ac.createGain(); s.gain.value = rev; n.connect(s); s.connect(wet); }
+  }
+  // 單一音：振盪器 + 指數包絡，可滑音、顫音
+  function tone({ f = 440, f2 = 0, type = 'sine', t = 0, dur = .3, vol = .2, a = .005, rev = .3, detune = 0, vib = 0, vibRate = 5, pan = curPan, lp = 0, lp2 = 0 } = {}) {
+    if (!ready()) return;
+    const t0 = ac.currentTime + t, o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0); o.detune.value = detune;
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    if (vib) {
+      const l = ac.createOscillator(), lg = ac.createGain();
+      l.frequency.value = vibRate; lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency); l.start(t0); l.stop(t0 + dur + .1);
+    }
+    const at = Math.min(a, dur * .8);
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + at); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    if (lp) {              // 可選的低通濾波，做出柔和或漸亮的音色
+      const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(lp, t0);
+      if (lp2) fl.frequency.exponentialRampToValueAtTime(lp2, t0 + dur); o.connect(fl); fl.connect(g);
+    } else o.connect(g);
+    out(g, rev, pan); o.start(t0); o.stop(t0 + dur + .05);
+  }
+  // 濾波雜訊：風、火、雷、刷筆聲的基礎
+  function noise({ t = 0, dur = .5, vol = .2, type = 'bandpass', f = 1000, f2 = 0, q = 1, a = .01, rev = .3, am = 0, amRate = 10, pan = curPan, pan2 = null } = {}) {
+    if (!ready()) return;
+    const t0 = ac.currentTime + t, s = ac.createBufferSource();
+    s.buffer = noiseBuf; s.loop = true;
+    const fl = ac.createBiquadFilter(); fl.type = type; fl.Q.value = q;
+    fl.frequency.setValueAtTime(f, t0); if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    const g = ac.createGain(), at = Math.min(a, dur * .8);
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + at); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    s.connect(fl); fl.connect(g);
+    let node = g;
+    if (am) {
+      const amg = ac.createGain(), l = ac.createOscillator(), lg = ac.createGain();
+      amg.gain.value = 1 - am * .5; l.frequency.value = amRate; lg.gain.value = am * .5;
+      l.connect(lg); lg.connect(amg.gain); g.connect(amg); node = amg; l.start(t0); l.stop(t0 + dur + .1);
+    }
+    if (pan2 !== null && ac.createStereoPanner) {
+      const p = ac.createStereoPanner(); p.pan.setValueAtTime(clamp(pan, -1, 1), t0); p.pan.linearRampToValueAtTime(clamp(pan2, -1, 1), t0 + dur);
+      node.connect(p); out(p, rev, 0);
+    } else out(node, rev, pan);
+    s.start(t0); s.stop(t0 + dur + .05);
+  }
+  const bell = (m, t = 0, vol = .1, dur = 1.4) => {          // 鐘聲：非整數倍泛音
+    tone({ f: MIDI(m), t, dur, vol, rev: .7 });
+    tone({ f: MIDI(m) * 2.76, t, dur: dur * .6, vol: vol * .4, rev: .7 });
+    tone({ f: MIDI(m) * 5.4, t, dur: dur * .3, vol: vol * .2, rev: .7 });
+  };
+  const thud = (t = 0, vol = .5, f = 110) => tone({ f, f2: 35, t, dur: .45, vol, a: .003, rev: .05 });
+  const R = () => Math.random();
+  const PENTA = [0, 2, 4, 7, 9];
+
+  /* ---- 17 種屬性 + 反噬：sig = 成形揭曉音，hit = 命中音 ---- */
+  const ELEM = {
+    wind: {    // 風：呼嘯旋風
+      sig() { noise({ dur: 1.4, vol: .35, f: 300, f2: 1800, q: 3, a: .4, am: .6, amRate: 6 }); noise({ t: .5, dur: 1, vol: .22, f: 1800, f2: 400, q: 4, a: .2 }); tone({ f: 55, dur: 1.3, vol: .1, vib: 4, vibRate: 3, a: .3 }); },
+      hit() { noise({ dur: .9, vol: .5, type: 'lowpass', f: 2500, f2: 300, a: .005 }); noise({ t: .05, dur: .7, vol: .25, f: 600, f2: 2500, q: 1 }); thud(0, .35); } },
+    storm: {   // 水：浪潮湧起、水滴
+      sig() { noise({ dur: 1.6, vol: .35, type: 'lowpass', f: 300, f2: 1400, q: 1, a: .7, am: .5, amRate: .8 }); noise({ t: .7, dur: .9, vol: .2, f: 1200, f2: 500, q: 1, a: .3 }); for (let i = 0; i < 8; i++) tone({ f: 700 + R() * 900, f2: 1600 + R() * 900, t: .2 + R() * 1.1, dur: .07, vol: .07, a: .003, rev: .4 }); },
+      hit() { noise({ dur: 1.1, vol: .55, type: 'lowpass', f: 3000, f2: 250, a: .003 }); noise({ t: .05, dur: .8, vol: .25, type: 'highpass', f: 2000, f2: 600, a: .01 }); thud(0, .35); } },
+    fire: {    // 火：劈啪燃燒 + 低頻轟鳴
+      sig() { for (let i = 0; i < 16; i++) noise({ t: i * .07 + R() * .05, dur: .06, vol: .22, type: 'highpass', f: 2000 + R() * 3000, a: .002, rev: .1 }); tone({ f: 55, f2: 85, type: 'sawtooth', dur: 1.3, vol: .06, a: .3 }); noise({ dur: 1.3, vol: .22, type: 'lowpass', f: 400, f2: 1000, a: .4 }); },
+      hit() { tone({ f: 120, f2: 32, dur: .9, vol: .6, a: .003 }); noise({ dur: 1.1, vol: .45, type: 'lowpass', f: 1600, f2: 180, a: .003 }); for (let i = 0; i < 6; i++) noise({ t: .1 + i * .08, dur: .05, vol: .15, type: 'highpass', f: 3000, a: .002 }); } },
+    flower: {  // 木：五聲音階風鈴
+      sig() { [72, 74, 76, 79, 81, 84].forEach((m, i) => tone({ f: MIDI(m), t: i * .09, dur: 1, type: 'triangle', vol: .12, rev: .6 })); noise({ dur: 1.2, vol: .06, type: 'highpass', f: 6000, a: .5, rev: .5 }); },
+      hit() { [84, 81, 79, 76, 72].forEach((m, i) => tone({ f: MIDI(m), t: i * .04, dur: .7, vol: .12, rev: .6 })); noise({ dur: .4, vol: .2, type: 'highpass', f: 4000, a: .003 }); } },
+    moon: {    // 月：清冷玻璃泛音
+      sig() { tone({ f: MIDI(81), dur: 1.7, vol: .12, vib: 3, vibRate: 4, a: .3, rev: .8 }); tone({ f: MIDI(88), t: .15, dur: 1.5, vol: .08, vib: 3, vibRate: 4.5, a: .3, rev: .8 }); tone({ f: MIDI(93), t: .3, dur: 1.3, vol: .05, a: .3, rev: .8 }); },
+      hit() { tone({ f: MIDI(93), f2: MIDI(81), dur: .8, vol: .15, type: 'triangle', rev: .7 }); noise({ dur: .5, vol: .2, type: 'highpass', f: 6000, a: .003, rev: .6 }); thud(0, .3); } },
+    mountain: {// 土：大地低鳴、碎石滾落
+      sig() { tone({ f: 46, f2: 38, dur: 1.5, vol: .45, a: .3 }); noise({ dur: 1.5, vol: .3, type: 'lowpass', f: 180, q: 2, a: .3 }); for (let i = 0; i < 6; i++) noise({ t: .3 + i * .17, dur: .12, vol: .18, type: 'lowpass', f: 500, a: .003, rev: .1 }); },
+      hit() { tone({ f: 90, f2: 24, dur: 1.2, vol: .85, a: .003 }); noise({ dur: 1.3, vol: .5, type: 'lowpass', f: 800, f2: 90, a: .003 }); } },
+    sword: {   // 金：三聲出鞘
+      sig() { [0, .2, .4].forEach((t, i) => { tone({ f: 2200 + i * 300, t, dur: .9, type: 'triangle', vol: .07, rev: .6 }); tone({ f: 3170 + i * 400, t, dur: .7, vol: .04, rev: .6 }); noise({ t, dur: .25, vol: .18, type: 'highpass', f: 3000, f2: 8000, a: .01 }); }); },
+      hit() { tone({ f: 1800, dur: .7, type: 'square', vol: .04, rev: .5 }); tone({ f: 2650, dur: .6, vol: .08, rev: .5 }); noise({ dur: .3, vol: .35, type: 'highpass', f: 2500, a: .002 }); thud(0, .4); } },
+    ice: {     // 冰：冰晶叮噹
+      sig() { for (let i = 0; i < 14; i++) tone({ f: 2000 + R() * 3000, t: i * .08, dur: .35, vol: .07, rev: .7 }); noise({ dur: 1.3, vol: .12, type: 'highpass', f: 7000, a: .4, rev: .5 }); },
+      hit() { for (let i = 0; i < 10; i++) tone({ f: 1500 + R() * 3500, t: i * .02, dur: .45, type: 'triangle', vol: .08, rev: .6 }); noise({ dur: .4, vol: .35, type: 'highpass', f: 3000, a: .002 }); } },
+    thunder: { // 雷：霹靂 + 滾雷
+      sig() { noise({ dur: .15, vol: .5, type: 'highpass', f: 1500, a: .002 }); noise({ t: .1, dur: 1.6, vol: .4, type: 'lowpass', f: 600, f2: 70, a: .05 }); tone({ f: 60, f2: 40, t: .1, dur: 1.3, type: 'sawtooth', vol: .07 }); for (let i = 0; i < 7; i++) noise({ t: .45 + i * .09, dur: .04, vol: .2, f: 3000, q: 2, a: .002, rev: .1 }); },
+      hit() { noise({ dur: .08, vol: .75, type: 'highpass', f: 1000, a: .001 }); noise({ t: .05, dur: 1.5, vol: .5, type: 'lowpass', f: 1200, f2: 55, a: .01 }); thud(.02, .5, 80); } },
+    wing: {    // 禽：清亮鳥鳴 + 振翅
+      sig() { for (let k = 0; k < 8; k++) { const f0 = 2200 + R() * 1400; tone({ f: f0, f2: f0 * (R() < .5 ? 1.6 : .6), t: k * .16, dur: .11, vol: .1, a: .004, rev: .4 }); } noise({ dur: 1.2, vol: .18, f: 900, q: 1.5, a: .1, am: 1, amRate: 11 }); },
+      hit() { noise({ dur: .5, vol: .4, f: 1500, f2: 400, q: 1, a: .003 }); tone({ f: 3200, f2: 1800, dur: .15, vol: .1, a: .003 }); tone({ f: 2800, f2: 4000, t: .12, dur: .12, vol: .08, a: .003 }); thud(0, .3); } },
+    sorrow: {  // 愁：小調下行，帶顫音
+      sig() { [69, 67, 64, 62, 60].forEach((m, i) => tone({ f: MIDI(m), t: i * .26, dur: .75, vol: .13, vib: 4, vibRate: 5, a: .05, rev: .8 })); tone({ f: MIDI(45), dur: 1.7, vol: .08, a: .4, rev: .6 }); },
+      hit() { tone({ f: MIDI(64), f2: MIDI(52), dur: 1, type: 'triangle', vol: .15, rev: .8 }); noise({ dur: .6, vol: .25, type: 'lowpass', f: 1200, f2: 300, a: .003 }); } },
+    love: {    // 情：溫暖大三和弦 + 心跳
+      sig() { [60, 64, 67, 72].forEach(m => tone({ f: MIDI(m), dur: 1.5, type: 'triangle', vol: .05, a: .25, rev: .7 })); [0, .22, .8, 1.02].forEach(t => thud(t, .4, 70)); },
+      hit() { tone({ f: MIDI(76), dur: .7, vol: .12, rev: .7 }); tone({ f: MIDI(79), t: .08, dur: .7, vol: .1, rev: .7 }); tone({ f: MIDI(84), t: .16, dur: .7, vol: .08, rev: .7 }); thud(0, .45, 80); } },
+    home: {    // 鄉：古箏般的撥弦小調
+      sig() { [67, 69, 72, 74, 76, 74, 72].forEach((m, i) => { tone({ f: MIDI(m), t: i * .15, dur: .9, type: 'triangle', vol: .14, a: .003, rev: .5 }); tone({ f: MIDI(m) * 2, t: i * .15, dur: .25, vol: .04, a: .003 }); }); },
+      hit() { [79, 76, 72, 67].forEach((m, i) => tone({ f: MIDI(m), t: i * .05, dur: .8, type: 'triangle', vol: .12, a: .003, rev: .6 })); thud(0, .35); } },
+    wine: {    // 醉：搖晃的滑音 + 酒泡
+      sig() { tone({ f: MIDI(64), dur: 1.5, vol: .1, vib: 25, vibRate: 2.5, a: .2, rev: .6 }); tone({ f: MIDI(67), dur: 1.5, vol: .07, vib: 30, vibRate: 2, a: .3, detune: 15, rev: .6 }); for (let i = 0; i < 9; i++) tone({ f: 300 + R() * 500, f2: 900 + R() * 700, t: .2 + R() * 1.1, dur: .08, vol: .1, a: .003, rev: .2 }); },
+      hit() { tone({ f: 2400, dur: .7, type: 'triangle', vol: .08, rev: .6 }); tone({ f: 3620, dur: .5, vol: .05, rev: .6 }); noise({ dur: .6, vol: .3, type: 'lowpass', f: 2000, f2: 400, a: .003 }); } },
+    time: {    // 時：滴答 + 古鐘
+      sig() { for (let i = 0; i < 8; i++) noise({ t: i * .16, dur: .03, vol: .3, f: i % 2 ? 2500 : 3300, q: 8, a: .001, rev: .1 }); bell(57, 0, .09, 1.8); },
+      hit() { bell(69, 0, .13, 1.6); bell(64, .02, .06, 1.2); thud(0, .35); } },
+    spirit: {  // 氣：上揚的號角
+      sig() { tone({ f: 110, f2: 440, type: 'sawtooth', dur: 1.2, vol: .07, a: .5 }); tone({ f: 165, f2: 660, type: 'sawtooth', dur: 1.2, vol: .05, a: .5, detune: 8 }); noise({ dur: 1.2, vol: .2, f: 400, f2: 3000, q: 2, a: .7 }); },
+      hit() { [60, 67, 72].forEach((m, i) => tone({ f: MIDI(m), dur: .9, type: 'sawtooth', vol: .06 - i * .01, rev: .5 })); thud(0, .55, 120); } },
+    dream: {   // 夢：空靈和聲緩緩浮起
+      sig() { [72, 76, 79, 83, 86].forEach((m, i) => tone({ f: MIDI(m), t: i * .05, dur: 1.9, vol: .05, a: .8, vib: 2, vibRate: .5 + i * .3, rev: .9 })); noise({ dur: 1.7, vol: .08, f: 2000, f2: 5000, q: 6, a: .8, rev: .9 }); },
+      hit() { [88, 84, 79, 76, 72].forEach((m, i) => tone({ f: MIDI(m), t: i * .06, dur: .9, vol: .08, rev: .9 })); } },
+    write: {   // 文：毛筆刷紙 + 木魚
+      sig() { for (let i = 0; i < 4; i++) noise({ t: i * .28, dur: .22, vol: .25, f: 2500, f2: 900, q: 1.2, a: .06, rev: .2 }); [0, .56, 1.12].forEach(t => tone({ f: 880, f2: 820, t, dur: .14, vol: .2, a: .002, rev: .4 })); },
+      hit() { tone({ f: 700, f2: 640, dur: .18, vol: .3, a: .002, rev: .4 }); noise({ dur: .3, vol: .4, f: 1800, q: .8, a: .003 }); thud(0, .35); } },
+    star: {    // 星：閃爍星光
+      sig() { for (let i = 0; i < 14; i++) tone({ f: MIDI(84 + PENTA[i % 5] + 12 * (i % 3 === 0)), t: i * .085, dur: .5, vol: .055, rev: .85 }); noise({ dur: 1.4, vol: .07, type: 'highpass', f: 8000, a: .5, rev: .7 }); },
+      hit() { [96, 91, 88, 84, 79, 76].forEach((m, i) => tone({ f: MIDI(m), t: i * .035, dur: .7, vol: .07, rev: .8 })); noise({ dur: .35, vol: .2, type: 'highpass', f: 6000, a: .002 }); } },
+    zen: {     // 禪：頌缽 + 木魚
+      sig() { bell(48, 0, .14, 2.6); tone({ f: 98, dur: 2, vol: .08, vib: 1.5, vibRate: 3, a: .4, rev: .6 }); [.9, 1.3].forEach(t => tone({ f: 720, f2: 680, t, dur: .13, vol: .2, a: .002, rev: .4 })); },
+      hit() { tone({ f: 650, f2: 600, dur: .15, vol: .3, a: .002, rev: .5 }); bell(60, .05, .12, 2); } },
+    music: {   // 樂：琵琶輪指
+      sig() { [69, 72, 74, 76, 79, 76].forEach((m, i) => { for (let r = 0; r < 4; r++) tone({ f: MIDI(m), t: i * .2 + r * .045, dur: .2, type: 'triangle', vol: .07, a: .002, rev: .45 }); }); },
+      hit() { [60, 64, 67, 72, 76].forEach((m, i) => tone({ f: MIDI(m), t: i * .025, dur: 1, type: 'triangle', vol: .09, a: .002, rev: .5 })); thud(0, .3); } },
+    nation: {  // 國：戰鼓 + 號角
+      sig() { [0, .28, .56, .7, .84].forEach(t => { thud(t, .6, 95); noise({ t, dur: .15, vol: .2, type: 'lowpass', f: 600, a: .002, rev: .2 }); }); tone({ f: MIDI(55), t: .2, dur: 1.2, type: 'sawtooth', vol: .05, a: .3, rev: .5 }); tone({ f: MIDI(62), t: .2, dur: 1.2, type: 'sawtooth', vol: .04, a: .3, rev: .5 }); },
+      hit() { tone({ f: 110, dur: 2, vol: .3, vib: 2, vibRate: 5, rev: .6 }); tone({ f: 183, dur: 1.6, vol: .12, rev: .6 }); noise({ dur: 1.8, vol: .25, f: 450, q: 1.5, a: .003, rev: .5 }); } },
+    dragon: {  // 龍：低吼 + 龍吟
+      sig() { tone({ f: 70, f2: 95, type: 'sawtooth', dur: 1.4, vol: .12, vib: 10, vibRate: 28, a: .2 }); noise({ dur: 1.4, vol: .3, type: 'lowpass', f: 250, f2: 1400, q: 3, a: .5 }); tone({ f: MIDI(76), f2: MIDI(83), t: .7, dur: .7, vol: .05, vib: 12, vibRate: 6, rev: .6 }); },
+      hit() { noise({ dur: 1, vol: .5, f: 700, f2: 150, q: 2, a: .005 }); tone({ f: 90, f2: 40, type: 'sawtooth', dur: .9, vol: .12, vib: 8, vibRate: 30 }); thud(0, .5); } },
+    light: {   // 光：聖詠般的和聲漸亮
+      sig() { [60, 64, 67, 72, 76].forEach(m => tone({ f: MIDI(m), type: 'sawtooth', dur: 1.7, vol: .03, a: .7, lp: 600, lp2: 5000, detune: R() * 14 - 7, rev: .8 })); noise({ t: .6, dur: 1.1, vol: .1, type: 'highpass', f: 7000, f2: 11000, a: .5, rev: .6 }); },
+      hit() { [72, 76, 79, 84].forEach(m => tone({ f: MIDI(m), type: 'sawtooth', dur: .9, vol: .035, lp: 5000, lp2: 900, rev: .7 })); noise({ dur: .3, vol: .35, type: 'highpass', f: 4000, a: .002 }); } },
+    friend: {  // 誼：雙聲部三度和聲
+      sig() { [[64, 67], [65, 69], [67, 71], [72, 76]].forEach(([a, b], i) => { tone({ f: MIDI(a), t: i * .25, dur: .8, vol: .08, rev: .6 }); tone({ f: MIDI(b), t: i * .25, dur: .8, vol: .07, rev: .6 }); }); },
+      hit() { tone({ f: MIDI(76), dur: .9, vol: .1, rev: .7 }); tone({ f: MIDI(79), dur: .9, vol: .09, rev: .7 }); thud(0, .3); } },
+    bamboo: {  // 節：竹梆 + 林間風
+      sig() { [500, 700, 420, 600, 760].forEach((f, i) => tone({ f, f2: f * .94, t: i * .2, dur: .13, type: 'triangle', vol: .2, a: .002, rev: .4 })); noise({ dur: 1.4, vol: .15, f: 800, q: 1, a: .4, am: .5, amRate: 1.5 }); },
+      hit() { noise({ dur: .07, vol: .5, type: 'highpass', f: 2000, a: .001 }); tone({ f: 420, f2: 380, dur: .2, type: 'triangle', vol: .3, a: .002, rev: .4 }); thud(0, .4); } },
+    tree: {    // 木：樹幹吱嘎、木頭敲擊、樹葉沙沙
+      sig() { tone({ f: 90, f2: 70, type: 'sawtooth', dur: 1, vol: .07, vib: 6, vibRate: 9, lp: 500, a: .2 }); [0, .35, .7].forEach(t => tone({ f: 180, f2: 150, t, dur: .25, type: 'triangle', vol: .35, a: .003, rev: .4 })); noise({ t: .2, dur: 1.3, vol: .15, type: 'highpass', f: 3000, a: .4, am: .7, amRate: 7 }); },
+      hit() { noise({ dur: .12, vol: .55, f: 900, q: .8, a: .001 }); tone({ f: 140, f2: 60, dur: .6, vol: .6, a: .003 }); noise({ t: .1, dur: .9, vol: .2, type: 'highpass', f: 2500, a: .05, am: .6, amRate: 9 }); } },
+    grass: {   // 草：草浪掃過 + 蘆笛
+      sig() { for (let k = 0; k < 4; k++) noise({ t: k * .3, dur: .45, vol: .22, f: 1800, f2: 3500, q: 1.5, a: .2, pan: -.6 + k * .4, pan2: .6 - k * .4 }); [74, 76, 79, 76].forEach((m, i) => tone({ f: MIDI(m), t: .2 + i * .28, dur: .5, vol: .07, vib: 5, vibRate: 5.5, a: .08, rev: .6 })); },
+      hit() { noise({ dur: .5, vol: .35, f: 2500, f2: 900, q: 1, a: .01 }); tone({ f: MIDI(79), f2: MIDI(74), dur: .4, vol: .07, vib: 5, vibRate: 5, rev: .5 }); } },
+    bug: {     // 蟲：蟬鳴嗡嗡 + 蟋蟀唧唧
+      sig() { tone({ f: 4200, type: 'sawtooth', dur: 1.4, vol: .035, vib: 400, vibRate: 55, lp: 6000, a: .2, rev: .2 }); for (let k = 0; k < 6; k++) for (let r = 0; r < 3; r++) tone({ f: 4600, t: k * .22 + r * .035, dur: .025, vol: .08, a: .002, rev: .2 }); },
+      hit() { for (let r = 0; r < 8; r++) tone({ f: 3800 + R() * 1500, t: r * .03, dur: .03, vol: .08, a: .002 }); noise({ dur: .3, vol: .3, type: 'highpass', f: 3000, a: .003 }); thud(0, .3); } },
+    food: {    // 食：熱油滋滋 + 筷子輕碰 + 碗聲
+      sig() { noise({ dur: 1.4, vol: .2, type: 'highpass', f: 3500, a: .05 }); for (let k = 0; k < 20; k++) noise({ t: R() * 1.3, dur: .03, vol: .15, type: 'highpass', f: 5000, a: .001, rev: .05 }); [.3, .45].forEach(t => tone({ f: 2600, f2: 2400, t, dur: .04, vol: .12, a: .001 })); tone({ f: 1600, t: .9, dur: .8, type: 'triangle', vol: .1, rev: .5 }); tone({ f: 2410, t: .9, dur: .6, vol: .05, rev: .5 }); },
+      hit() { tone({ f: 320, f2: 180, dur: .5, type: 'triangle', vol: .25, a: .003, rev: .4 }); noise({ dur: .6, vol: .35, type: 'highpass', f: 3000, a: .003 }); thud(0, .35); } },
+    backfire: {// 反噬：失控雜訊 + 悶爆
+      sig() { for (let i = 0; i < 18; i++) tone({ f: 100 + R() * 900, t: i * .08, dur: .07, type: 'square', vol: .05, a: .002, rev: .05 }); tone({ f: 300, f2: 55, t: .2, dur: 1.4, type: 'sawtooth', vol: .08, detune: 30 }); },
+      hit() { tone({ f: 150, f2: 28, dur: 1.1, vol: .75 }); noise({ dur: 1.3, vol: .55, type: 'lowpass', f: 3000, f2: 90, a: .002 }); tone({ f: MIDI(50), f2: MIDI(38), t: .2, dur: 1, type: 'square', vol: .05 }); } },
+  };
+
+  return {
+    init,
+    get muted() { return muted; },
+    toggle() {
+      muted = !muted;
+      try { localStorage.setItem('szhjw-mute', muted ? '1' : '0'); } catch (e) {}
+      if (ac) master.gain.setTargetAtTime(muted ? 0 : .7, ac.currentTime, .05);
+      return muted;
+    },
+    at(x) { curPan = W ? clamp((x / W) * 1.4 - .7, -.8, .8) : 0; },          // 依畫面位置做左右聲道
+    elem(id, kind) { const e = ELEM[id]; if (e && e[kind]) e[kind](); },
+    tick(k) { tone({ f: MIDI(76 + PENTA[k % 5] + 12 * (Math.floor(k / 5) % 2)), dur: .16, type: 'triangle', vol: .07, a: .002, rev: .35 }); },
+    scatter() { noise({ dur: .5, vol: .25, f: 500, f2: 4000, q: 1, a: .02 }); },
+    form() { noise({ dur: 1.4, vol: .12, f: 300, f2: 2400, q: 2, a: 1.1 }); tone({ f: 220, f2: 660, dur: 1.4, vol: .035, a: 1 }); },
+    launch(from, to) {
+      const p1 = clamp((from / W) * 1.4 - .7, -.8, .8), p2 = clamp((to / W) * 1.4 - .7, -.8, .8);
+      noise({ dur: .6, vol: .4, f: 300, f2: 2600, q: 1.2, a: .45, pan: p1, pan2: p2 });
+    },
+    crit() { tone({ f: 60, f2: 30, dur: .8, vol: .6, a: .003, rev: .2 }); noise({ t: .02, dur: .25, vol: .3, type: 'highpass', f: 5000, a: .002 }); },
+    restore() { [72, 76, 79, 84].forEach((m, i) => tone({ f: MIDI(m), t: i * .1, dur: .8, type: 'triangle', vol: .06, rev: .7, pan: 0 })); },
+    counter() { tone({ f: MIDI(84), dur: .25, type: 'square', vol: .04, lp: 3000, pan: 0 }); tone({ f: MIDI(91), t: .08, dur: .35, type: 'square', vol: .04, lp: 3000, pan: 0 }); },
+    combo() { [72, 79, 84, 91].forEach((m, i) => tone({ f: MIDI(m), t: i * .06, dur: .5, type: 'triangle', vol: .08, rev: .6, pan: 0 })); },
+    heal() { [76, 81, 88].forEach((m, i) => tone({ f: MIDI(m), t: i * .08, dur: .6, vol: .06, rev: .7 })); },
+    discover() { [84, 88, 91, 96].forEach((m, i) => tone({ f: MIDI(m), t: .1 + i * .07, dur: .6, vol: .07, rev: .8, pan: 0 })); },
+    click() { tone({ f: 1200, f2: 900, dur: .07, type: 'triangle', vol: .08, a: .002, rev: .1, pan: 0 }); },
+    turn() { tone({ f: MIDI(79), dur: .5, vol: .06, rev: .6, pan: 0 }); tone({ f: MIDI(86), t: .12, dur: .6, vol: .05, rev: .6, pan: 0 }); },
+    win() { curPan = 0; [67, 72, 76, 79, 84, 88].forEach((m, i) => tone({ f: MIDI(m), t: i * .12, dur: 1.2, type: 'triangle', vol: .1, rev: .7 })); bell(60, .75, .12, 2.2); },
+    lose() { curPan = 0; [69, 65, 62, 57].forEach((m, i) => tone({ f: MIDI(m), t: i * .3, dur: 1, vol: .12, vib: 3, vibRate: 4, rev: .8 })); tone({ f: MIDI(33), t: .9, dur: 2, vol: .15, a: .3, rev: .6 }); },
+  };
+})();
+
+/* ---------- 意象資料庫（30 種屬性） ---------- */
+const IMAGERY = [
+  { id:'storm',    name:'怒濤千疊', elem:'水', color:'#5ee7ff', color2:'#3a8dff', light:'#e2fbff', verb:'捲作怒濤千疊',
+    keys:'雨水浪江河海湖潮波濤溪泉瀑舟流涛', orient:true },
+  { id:'wind',     name:'狂風捲字', elem:'風', color:'#c8f7e8', color2:'#6fcfb9', light:'#f4fffb', verb:'捲成狂風字旋',
+    keys:'風颯飆嵐吹颳飄风', phrases:['狂風','春風','秋風','北風','西風','東風','清風','微風'] },
+  { id:'fire',     name:'烈焰字球', elem:'火', color:'#ffb347', color2:'#ff4d2e', light:'#fff1c9', verb:'凝成烈焰字球',
+    keys:'火日熱炎燒陽焰烽燭燈暑灼赤烈煙霞夕輝热烧阳灯烟辉', orient:true },
+  { id:'flower',   name:'落花劍陣', elem:'花', color:'#ff9ad5', color2:'#ff5fa2', light:'#ffe3f3', verb:'綻為落花劍陣',
+    keys:'花落桃梅蘭菊芳紅芽春蕊蓮荷杏梨牡丹英兰红' },
+  { id:'moon',     name:'孤月寒鋒', elem:'月', color:'#cfd8ff', color2:'#8fa2ff', light:'#ffffff', verb:'聚作孤月寒鋒',
+    keys:'月夜宵嬋娟蟾影婵', orient:true },
+  { id:'mountain', name:'山岳壓城', elem:'土', color:'#c5e478', color2:'#7fb04a', light:'#efffd0', verb:'壘成山岳壓城',
+    keys:'山峰嶺石岩岳城關塞地土原野丘沙岭关' },
+  { id:'sword',    name:'萬字劍陣', elem:'金', color:'#f5e6a8', color2:'#e9c46a', light:'#fffbe6', verb:'鑄成萬字劍陣',
+    keys:'劍刀戈兵金鐵將軍戰馬弓甲征剑铁将军战马', orient:true },
+  { id:'ice',      name:'六出冰晶', elem:'冰', color:'#a8f0ff', color2:'#6fb8e8', light:'#f2fdff', verb:'凝為六出冰晶',
+    keys:'雪冰霜寒凍凝冬凜冷冻凛' },
+  { id:'thunder',  name:'驚雷三疊', elem:'雷', color:'#fff36b', color2:'#b48cff', light:'#fffde0', verb:'劈作驚雷三疊',
+    keys:'雷電霆閃驚震霹靂电闪惊', orient:true },
+  { id:'wing',     name:'鴻鵠展翼', elem:'禽', color:'#9ff5d0', color2:'#3fcf9a', light:'#eafff6', verb:'振作鴻鵠展翼',
+    keys:'鳥雁鶯燕鵬鶴飛翅鴻鷹鷗鵲鴉禽翼鵝鴨雞鷺鸝鴿鸟飞鹰', orient:true },
+  { id:'sorrow',   name:'千愁淚滴', elem:'愁', color:'#8fb3ff', color2:'#5a6fd6', light:'#e6eeff', verb:'凝成千愁淚滴',
+    keys:'愁悲淚憂恨哀苦傷寂寞孤淒斷泣怨泪忧伤凄断', phrases:['斷腸','寂寞','淒涼'], orient:true },
+  { id:'love',     name:'相思心印', elem:'情', color:'#ff7aa8', color2:'#e0457a', light:'#ffe0ec', verb:'結成相思心印',
+    keys:'愛情心思念戀相憐君卿伊爱恋怜', phrases:['相思','思念'] },
+  { id:'home',     name:'歸心星環', elem:'鄉', color:'#ffcf8a', color2:'#d98a3a', light:'#fff3df', verb:'繞成歸心星環',
+    keys:'鄉家故歸客遊離別遠旅途乡归离别远', phrases:['故鄉','思鄉','歸來'] },
+  { id:'wine',     name:'醉月酒渦', elem:'醉', color:'#e6a0ff', color2:'#a05ad6', light:'#f8e8ff', verb:'旋作醉月酒渦',
+    keys:'酒醉杯觴飲樽盞壺醒酌饮' },
+  { id:'time',     name:'光陰沙漏', elem:'時', color:'#f0d9a8', color2:'#b89a5a', light:'#fffaf0', verb:'流成光陰沙漏',
+    keys:'年歲時古今朝暮老髮陰昔久秋岁时发阴', phrases:['白髮','光陰','歲月'] },
+  { id:'spirit',   name:'浩氣神箭', elem:'氣', color:'#ffe066', color2:'#ff9f1c', light:'#fffbe0', verb:'化作浩氣神箭',
+    keys:'志壯雄豪英氣凌天破乘勇壮气', phrases:['千里','萬里','凌雲','青雲','長風'], orient:true },
+  { id:'dream',    name:'莊周夢蝶', elem:'夢', color:'#c4b5ff', color2:'#7f6bff', light:'#f1edff', verb:'幻作莊周夢蝶',
+    keys:'夢梦仙幻眠迷虛浮魂', phrases:['浮生','夢裡','夢中','夢蝶'] },
+  { id:'write',    name:'翰墨書卷', elem:'文', color:'#f5d58a', color2:'#c99a3b', light:'#fff8e6', verb:'展為翰墨書卷',
+    keys:'書詩文字筆墨讀卷章句吟詞紙硯书诗笔读词' },
+  { id:'star',     name:'星河倒懸', elem:'星', color:'#9ecbff', color2:'#5b7cff', light:'#f0f6ff', verb:'綴成星河倒懸',
+    keys:'星辰銀斗宿宇宙', phrases:['銀河','星河','北斗','星漢'] },
+  { id:'zen',      name:'空山禪印', elem:'禪', color:'#e3cf9f', color2:'#9c8460', light:'#fff8ea', verb:'圓成空山禪印',
+    keys:'禪佛寺僧鐘磬靜悟塵菩禅钟静', phrases:['空山','山寺','菩提'] },
+  { id:'music',    name:'琴音千波', elem:'樂', color:'#7ef0e0', color2:'#2fb3a5', light:'#e8fffb', verb:'蕩成琴音千波',
+    keys:'琴瑟笛簫歌曲韻樂鼓絃弦唱琵琶箏乐箫', minN:140, fsK:.8 },
+  { id:'nation',   name:'九鼎山河', elem:'國', color:'#f0b44c', color2:'#b5651d', light:'#fff0d0', verb:'鑄為九鼎山河',
+    keys:'國社稷廷民王臣邦帝国', phrases:['天下','江山','家國','山河','國家'] },
+  { id:'dragon',   name:'龍騰九霄', elem:'龍', color:'#5fffb0', color2:'#1fae6a', light:'#e6fff2', verb:'化作龍騰九霄',
+    keys:'龍虎鳳麟蛟龙凤', orient:true, minN:150, fsK:.75 },
+  { id:'light',    name:'破曉晨光', elem:'光', color:'#fff2a8', color2:'#ffc94d', light:'#ffffff', verb:'迸為破曉晨光',
+    keys:'光明曙晴亮耀曦晨旦' },
+  { id:'friend',   name:'知交雙環', elem:'誼', color:'#ffb3c7', color2:'#f07aa0', light:'#fff0f4', verb:'扣成知交雙環',
+    keys:'友朋親兄弟母父伴', phrases:['故人','知己','知音','汪倫'] },
+  { id:'bamboo',   name:'松竹勁節', elem:'節', color:'#b8f28a', color2:'#5aa34a', light:'#f2ffe6', verb:'挺成松竹勁節',
+    keys:'竹節堅貞骨勁节坚', phrases:['青山','千磨萬擊','松柏'] },
+  { id:'tree',     name:'古木參天', elem:'木', color:'#7fd88a', color2:'#3f9a52', light:'#eaffec', verb:'長成古木參天',
+    keys:'木樹林松柏梧桐楓槐柳枝葉森杉榆樟綠树叶枫', minN:140 },
+  { id:'grass',    name:'芳草連天', elem:'草', color:'#c6f36b', color2:'#7fb83a', light:'#f6ffe2', verb:'蔓成芳草連天',
+    keys:'草蓬蒿苔莎萋茵蘆葦萍藻蒲芊', phrases:['芳草','青草','春草','野草'], minN:120 },
+  { id:'bug',      name:'蜻蜓點水', elem:'蟲', color:'#9be7ff', color2:'#4fa8c9', light:'#effcff', verb:'化作蜻蜓點水',
+    keys:'蟲蟬蝶蜂蟻螢蛙蟋蟀蜻蜓蚊蠶蛩蛾虫蝉蚁萤', orient:true, minN:120 },
+  { id:'food',     name:'人間煙火', elem:'食', color:'#ffcf7a', color2:'#e08a3c', light:'#fff6e4', verb:'烹成人間煙火',
+    keys:'食飯粥羹餅肉魚茶米糧粟禾稻麥瓜果菜蔬鹽糖餐飽饑餓湯飧吃饭鱼粮', minN:130 },
+];
+const DEFAULT_IM = IMAGERY.find(i => i.id === 'sword');
+const BACKFIRE_IM = { id:'backfire', name:'文字自爆', elem:'濁', color:'#ff4d5e', color2:'#6b5560', light:'#ffd0d0' };
+const NEUTRAL = { color:'#e9c46a', color2:'#bfa36a', light:'#fff4d6' };
+
+// 給 Claude 判讀用的屬性說明
+const HINTS = {
+  storm:'江河湖海、波浪、雨、流水', wind:'風、吹拂、狂風、飄搖', fire:'火焰、烈日、炎熱、燃燒、晚霞', flower:'花朵、花開花落、春花',
+  tree:'樹木、森林、枝葉、落葉', grass:'青草、草原、野草、苔蘚', bug:'昆蟲、蟬、蝴蝶、螢火蟲、蜜蜂', food:'食物、飲食、米飯、農作、美食',
+  moon:'月亮、月光、夜晚', mountain:'山岳、大地、城池關塞、沙漠', sword:'兵器、戰爭、將士、征戰', ice:'冰雪、寒冷、霜凍、冬天',
+  thunder:'雷電、驚天動地、震撼', wing:'飛禽、鳥類、飛翔', sorrow:'憂愁、悲傷、孤獨、離恨、淚水', love:'愛情、相思、思念心上人',
+  home:'思鄉、故鄉、旅途、離別、歸來', wine:'飲酒、醉、宴飲', time:'時間流逝、歲月、日子、年華、光陰', spirit:'豪情壯志、志向、奮發、勇氣',
+  dream:'夢境、虛幻、仙境、人生如夢', write:'讀書、寫作、文字、學問、詩書', star:'星辰、銀河、宇宙', zen:'寧靜、平和、空靈、禪意、悠閒',
+  music:'音樂、琴笛、歌聲、旋律', nation:'國家、天下、家國興亡、社稷', dragon:'龍、虎、鳳、神獸、騰躍', light:'光明、希望、破曉、快樂、明亮',
+  friend:'友情、親情、知己、家人', bamboo:'堅毅、氣節、松竹、不屈、堅持',
+};
+IMAGERY.forEach(im => im.hint = HINTS[im.id]);
+
+// 詞語層級的判讀（離線時的備援）：先比對整個詞，詞義優先於單字
+const LEXICON = {
+  time:'日子 今日 明日 昨日 每日 日日 日常 終日 整日 往日 平日 生日 節日 假日 時日 日期 時間 歲月 光陰 青春 年華 白髮 時光 過去 未來 從前 如今 一生 人生',
+  zen:'寧靜 安靜 平靜 寂靜 靜謐 安寧 悠閒 悠然 清淨 恬淡 平和 安詳 放空 自在',
+  wind:'狂風 春風 秋風 北風 西風 東風 清風 微風 颱風 涼風 風吹 大風 長風 風起 寒風',
+  storm:'風雨 暴雨 大雨 細雨 下雨 雨天 江水 流水 浪花 海浪 波濤 大海 河流 洪水 潮水',
+  fire:'烈日 驕陽 火焰 烈火 夕陽 晚霞 炎熱 燃燒 火光 熱血 野火 大火 火燒',
+  light:'旭日 日出 朝陽 陽光 曙光 光明 希望 明天 開心 快樂 幸福 微笑 晨光 光芒',
+  moon:'月亮 明月 月光 月色 夜晚 深夜',
+  star:'星星 銀河 星空 宇宙 星河 繁星 流星',
+  friend:'朋友 友情 友誼 知己 故人 家人 媽媽 母親 父親 爸爸 兄弟 姊妹 同學 夥伴',
+  love:'愛情 相思 思念 喜歡 愛你 戀愛 心動 情人',
+  home:'故鄉 家鄉 思鄉 回家 離別 遠方 旅行 歸來 異鄉 遊子',
+  sorrow:'悲傷 難過 憂愁 孤獨 寂寞 眼淚 哭泣 傷心 惆悵 失落 孤單 斷腸',
+  spirit:'夢想 理想 志向 努力 奮鬥 勇氣 加油 凌雲 壯志 千里 萬里 追夢 飛越',
+  bamboo:'堅強 堅持 不屈 毅力 堅定 不放棄 氣節',
+  dream:'夢境 夢中 夢裡 人生如夢 浮生 幻想 仙境 作夢 曉夢 莊生 莊周',
+  write:'讀書 書本 寫字 文章 學習 知識 詩人 寫詩 筆墨',
+  music:'音樂 歌聲 唱歌 琴聲 旋律 樂曲 笛聲',
+  nation:'國家 天下 江山 山河 家國 民族 社稷',
+  ice:'雪花 冰雪 寒冬 寒冷 冰冷 霜雪 下雪',
+  thunder:'雷電 閃電 雷聲 打雷 雷霆 霹靂',
+  wing:'飛翔 翅膀 小鳥 飛鳥 鳥兒 展翅 高飛 燕子 老鷹 白鷺 鴿子 黃鸝',
+  tree:'樹木 森林 大樹 古木 樹葉 綠葉 枝頭 楓葉 柳樹 松樹 落葉 落木',
+  grass:'小草 青草 草原 草地 芳草 野草 綠草 離離 原上草 草色',
+  bug:'蝴蝶 蜜蜂 螞蟻 蟬鳴 螢火蟲 蜻蜓 蟋蟀 昆蟲 蚊子 毛毛蟲',
+  food:'吃飯 美食 好吃 食物 早餐 午餐 晚餐 便當 奶茶 炒飯 拉麵 麵包 蛋糕 水果 火鍋 米飯 餃子 粽子 月餅 肚子餓 盤中飧 熱騰騰 一碗',
+  wine:'喝酒 美酒 醉了 乾杯 酒杯 酒香',
+  mountain:'高山 大地 山峰 沙漠 群山 山川 岩石',
+  sword:'戰爭 戰士 將軍 寶劍 戰場 刀劍 沙場',
+  flower:'花朵 春天 花開 落花 花園 花瓣 桃花 梅花',
+  dragon:'飛龍 神龍 老虎 鳳凰 蛟龍',
+  _:'火車 風景 風格 風俗 風度 作風 薪水 口水 花錢 花費 花樣 天氣 日本 心情 電腦 電話 電視 雷射 月份 星期 明白 明星 金錢 東西 冰箱 風箏 地方 日記',
+};
+const LEX = {};
+for (const [id, words] of Object.entries(LEXICON)) for (const w of words.split(' ')) LEX[w] = id === '_' ? null : id;
+const LEX_MAX = Math.max(...Object.keys(LEX).map(w => w.length));
+function lexiconJudge(chars) {          // 回傳 {im, score}
+  const score = {};
+  const add = (id, v) => { if (id) score[id] = (score[id] || 0) + v; };
+  let i = 0, lastWord = null;
+  while (i < chars.length) {
+    let hit = 0;
+    for (let L = Math.min(LEX_MAX, chars.length - i); L >= 2; L--) {
+      const w = chars.slice(i, i + L).join('');
+      if (w in LEX) { add(LEX[w], 3); lastWord = LEX[w]; hit = L; break; }
+    }
+    if (hit) { i += hit; continue; }
+    const c = chars[i];
+    for (const im of IMAGERY) if (im.keys.includes(c)) add(im.id, 1);
+    i++;
+  }
+  const joined = chars.join('');
+  for (const im of IMAGERY) for (const ph of im.phrases || []) if (joined.includes(ph) && !LEX[ph]) add(im.id, 1);
+  if (lastWord) add(lastWord, .5);        // 中文常以句尾的詞為主體
+  let best = null, bs = 0;
+  for (const im of IMAGERY) if ((score[im.id] || 0) > bs) { best = im; bs = score[im.id]; }
+  return { im: best || DEFAULT_IM, score: bs };
+}
+
+const SAMPLES = [
+  '夜來風雨聲，花落知多少', '野火燒不盡，春風吹又生', '舉頭望明月，低頭思故鄉',
+  '北風捲地白草折，胡天八月即飛雪', '莊生曉夢迷蝴蝶', '君不見高堂明鏡悲白髮',
+  '花間一壺酒，獨酌無相親', '長風破浪會有時', '問君能有幾多愁',
+];
+const ENEMY_LINES = [   // 墨魘的詩句：屬性依整句意境人工判定
+  ['國破山河在，城春草木深', 'nation'], ['黑雲壓城城欲摧', 'thunder'], ['月落烏啼霜滿天', 'moon'],
+  ['大漠孤煙直，長河落日圓', 'mountain'], ['千山鳥飛絕，萬徑人蹤滅', 'ice'], ['烽火連三月，家書抵萬金', 'fire'],
+  ['無邊落木蕭蕭下', 'tree'], ['寒雨連江夜入吳', 'storm'], ['雷霆乍驚，宮車過也', 'thunder'],
+  ['抽刀斷水水更流，舉杯消愁愁更愁', 'sorrow'], ['大風起兮雲飛揚', 'wind'],
+];
+
+/* ---------- 詩文出處資料庫：吟出有出處的詩句時，標註作者與篇名 ---------- */
+const SOURCES = [
+  ['《詩經・周南・關雎》', '關關雎鳩，在河之洲。窈窕淑女，君子好逑。'],
+  ['《詩經・周南・桃夭》', '桃之夭夭，灼灼其華。'],
+  ['《詩經・秦風・蒹葭》', '蒹葭蒼蒼，白露為霜。所謂伊人，在水一方。'],
+  ['《詩經・小雅・采薇》', '昔我往矣，楊柳依依。今我來思，雨雪霏霏。'],
+  ['《詩經・鄭風・子衿》', '青青子衿，悠悠我心。'],
+  ['戰國・屈原〈離騷〉', '路漫漫其修遠兮，吾將上下而求索。'],
+  ['《周易・乾卦・象傳》', '天行健，君子以自強不息。'],
+  ['《論語・學而》', '學而時習之，不亦說乎？有朋自遠方來，不亦樂乎？'],
+  ['《論語・為政》', '學而不思則罔，思而不學則殆。知之為知之，不知為不知，是知也。溫故而知新，可以為師矣。'],
+  ['《論語・述而》', '三人行，必有我師焉。'],
+  ['《論語・子罕》', '逝者如斯夫，不舍晝夜。歲寒，然後知松柏之後彫也。'],
+  ['《論語・顏淵》', '己所不欲，勿施於人。'],
+  ['《老子・第八章》', '上善若水。'],
+  ['《老子・第六十四章》', '千里之行，始於足下。'],
+  ['《孟子・告子下》', '生於憂患，死於安樂。天將降大任於是人也，必先苦其心志，勞其筋骨。'],
+  ['《孟子・滕文公下》', '富貴不能淫，貧賤不能移，威武不能屈。'],
+  ['《荀子・勸學》', '青，取之於藍，而青於藍。不積跬步，無以至千里；不積小流，無以成江海。'],
+  ['漢樂府〈長歌行〉', '百川東到海，何時復西歸？少壯不努力，老大徒傷悲。'],
+  ['東漢・曹操〈短歌行〉', '對酒當歌，人生幾何？譬如朝露，去日苦多。何以解憂？唯有杜康。'],
+  ['東漢・曹操〈龜雖壽〉', '老驥伏櫪，志在千里。烈士暮年，壯心不已。'],
+  ['東漢・曹操〈觀滄海〉', '秋風蕭瑟，洪波湧起。日月之行，若出其中；星漢燦爛，若出其裡。'],
+  ['漢・劉邦〈大風歌〉', '大風起兮雲飛揚，威加海內兮歸故鄉。安得猛士兮守四方！'],
+  ['三國・曹植〈七步詩〉', '本是同根生，相煎何太急？'],
+  ['東晉・陶淵明〈飲酒〉', '採菊東籬下，悠然見南山。'],
+  ['東晉・陶淵明〈雜詩〉', '盛年不重來，一日難再晨。及時當勉勵，歲月不待人。'],
+  ['唐・駱賓王〈詠鵝〉', '鵝鵝鵝，曲項向天歌。白毛浮綠水，紅掌撥清波。'],
+  ['唐・王勃〈送杜少府之任蜀州〉', '海內存知己，天涯若比鄰。'],
+  ['唐・王勃〈滕王閣序〉', '落霞與孤鶩齊飛，秋水共長天一色。'],
+  ['唐・陳子昂〈登幽州臺歌〉', '前不見古人，後不見來者。念天地之悠悠，獨愴然而涕下。'],
+  ['唐・賀知章〈回鄉偶書〉', '少小離家老大回，鄉音無改鬢毛衰。兒童相見不相識，笑問客從何處來。'],
+  ['唐・賀知章〈詠柳〉', '碧玉妝成一樹高，萬條垂下綠絲絛。不知細葉誰裁出，二月春風似剪刀。'],
+  ['唐・張若虛〈春江花月夜〉', '春江潮水連海平，海上明月共潮生。江畔何人初見月？江月何年初照人？'],
+  ['唐・張九齡〈望月懷遠〉', '海上生明月，天涯共此時。'],
+  ['唐・王之渙〈登鸛雀樓〉', '白日依山盡，黃河入海流。欲窮千里目，更上一層樓。'],
+  ['唐・孟浩然〈春曉〉', '春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。'],
+  ['唐・王翰〈涼州詞〉', '葡萄美酒夜光杯，欲飲琵琶馬上催。醉臥沙場君莫笑，古來征戰幾人回。'],
+  ['唐・王昌齡〈出塞〉', '秦時明月漢時關，萬里長征人未還。但使龍城飛將在，不教胡馬度陰山。'],
+  ['唐・王昌齡〈從軍行〉', '青海長雲暗雪山，孤城遙望玉門關。黃沙百戰穿金甲，不破樓蘭終不還。'],
+  ['唐・王昌齡〈芙蓉樓送辛漸〉', '寒雨連江夜入吳，平明送客楚山孤。洛陽親友如相問，一片冰心在玉壺。'],
+  ['唐・王維〈相思〉', '紅豆生南國，春來發幾枝。願君多采擷，此物最相思。'],
+  ['唐・王維〈九月九日憶山東兄弟〉', '獨在異鄉為異客，每逢佳節倍思親。遙知兄弟登高處，遍插茱萸少一人。'],
+  ['唐・王維〈送元二使安西〉', '渭城朝雨浥輕塵，客舍青青柳色新。勸君更盡一杯酒，西出陽關無故人。'],
+  ['唐・王維〈鹿柴〉', '空山不見人，但聞人語響。返景入深林，復照青苔上。'],
+  ['唐・王維〈山居秋暝〉', '空山新雨後，天氣晚來秋。明月松間照，清泉石上流。'],
+  ['唐・王維〈使至塞上〉', '大漠孤煙直，長河落日圓。'],
+  ['唐・李白〈靜夜思〉', '床前明月光，疑是地上霜。舉頭望明月，低頭思故鄉。'],
+  ['唐・李白〈將進酒〉', '君不見黃河之水天上來，奔流到海不復回。君不見高堂明鏡悲白髮，朝如青絲暮成雪。人生得意須盡歡，莫使金樽空對月。天生我材必有用，千金散盡還復來。'],
+  ['唐・李白〈月下獨酌〉', '花間一壺酒，獨酌無相親。舉杯邀明月，對影成三人。'],
+  ['唐・李白〈行路難〉', '長風破浪會有時，直掛雲帆濟滄海。'],
+  ['唐・李白〈黃鶴樓送孟浩然之廣陵〉', '故人西辭黃鶴樓，煙花三月下揚州。孤帆遠影碧空盡，唯見長江天際流。'],
+  ['唐・李白〈早發白帝城〉', '朝辭白帝彩雲間，千里江陵一日還。兩岸猿聲啼不住，輕舟已過萬重山。'],
+  ['唐・李白〈望廬山瀑布〉', '日照香爐生紫煙，遙看瀑布掛前川。飛流直下三千尺，疑是銀河落九天。'],
+  ['唐・李白〈贈汪倫〉', '李白乘舟將欲行，忽聞岸上踏歌聲。桃花潭水深千尺，不及汪倫送我情。'],
+  ['唐・李白〈宣州謝朓樓餞別校書叔雲〉', '抽刀斷水水更流，舉杯消愁愁更愁。'],
+  ['唐・李白〈蜀道難〉', '蜀道之難，難於上青天。'],
+  ['唐・杜甫〈春望〉', '國破山河在，城春草木深。感時花濺淚，恨別鳥驚心。烽火連三月，家書抵萬金。白頭搔更短，渾欲不勝簪。'],
+  ['唐・杜甫〈春夜喜雨〉', '好雨知時節，當春乃發生。隨風潛入夜，潤物細無聲。'],
+  ['唐・杜甫〈登高〉', '無邊落木蕭蕭下，不盡長江滾滾來。萬里悲秋常作客，百年多病獨登臺。'],
+  ['唐・杜甫〈望嶽〉', '會當凌絕頂，一覽眾山小。'],
+  ['唐・杜甫〈絕句〉', '兩個黃鸝鳴翠柳，一行白鷺上青天。窗含西嶺千秋雪，門泊東吳萬里船。'],
+  ['唐・杜甫〈月夜憶舍弟〉', '露從今夜白，月是故鄉明。'],
+  ['唐・杜甫〈奉贈韋左丞丈二十二韻〉', '讀書破萬卷，下筆如有神。'],
+  ['唐・岑參〈白雪歌送武判官歸京〉', '北風捲地白草折，胡天八月即飛雪。忽如一夜春風來，千樹萬樹梨花開。'],
+  ['唐・崔顥〈黃鶴樓〉', '昔人已乘黃鶴去，此地空餘黃鶴樓。黃鶴一去不復返，白雲千載空悠悠。日暮鄉關何處是？煙波江上使人愁。'],
+  ['唐・張繼〈楓橋夜泊〉', '月落烏啼霜滿天，江楓漁火對愁眠。姑蘇城外寒山寺，夜半鐘聲到客船。'],
+  ['唐・孟郊〈遊子吟〉', '慈母手中線，遊子身上衣。臨行密密縫，意恐遲遲歸。誰言寸草心，報得三春暉。'],
+  ['唐・孟郊〈登科後〉', '春風得意馬蹄疾，一日看盡長安花。'],
+  ['唐・李紳〈憫農〉', '鋤禾日當午，汗滴禾下土。誰知盤中飧，粒粒皆辛苦。'],
+  ['唐・柳宗元〈江雪〉', '千山鳥飛絕，萬徑人蹤滅。孤舟蓑笠翁，獨釣寒江雪。'],
+  ['唐・劉禹錫〈陋室銘〉', '山不在高，有仙則名。水不在深，有龍則靈。斯是陋室，惟吾德馨。'],
+  ['唐・劉禹錫〈烏衣巷〉', '舊時王謝堂前燕，飛入尋常百姓家。'],
+  ['唐・劉禹錫〈酬樂天揚州初逢席上見贈〉', '沉舟側畔千帆過，病樹前頭萬木春。'],
+  ['唐・白居易〈賦得古原草送別〉', '離離原上草，一歲一枯榮。野火燒不盡，春風吹又生。'],
+  ['唐・白居易〈長恨歌〉', '在天願作比翼鳥，在地願為連理枝。天長地久有時盡，此恨綿綿無絕期。'],
+  ['唐・白居易〈琵琶行〉', '大弦嘈嘈如急雨，小弦切切如私語。嘈嘈切切錯雜彈，大珠小珠落玉盤。同是天涯淪落人，相逢何必曾相識。'],
+  ['唐・白居易〈憶江南〉', '日出江花紅勝火，春來江水綠如藍。能不憶江南？'],
+  ['唐・白居易〈大林寺桃花〉', '人間四月芳菲盡，山寺桃花始盛開。'],
+  ['唐・白居易〈問劉十九〉', '綠蟻新醅酒，紅泥小火爐。晚來天欲雪，能飲一杯無？'],
+  ['唐・元稹〈離思〉', '曾經滄海難為水，除卻巫山不是雲。'],
+  ['唐・李賀〈雁門太守行〉', '黑雲壓城城欲摧，甲光向日金鱗開。'],
+  ['唐・崔護〈題都城南莊〉', '去年今日此門中，人面桃花相映紅。人面不知何處去，桃花依舊笑春風。'],
+  ['唐・杜牧〈山行〉', '遠上寒山石徑斜，白雲生處有人家。停車坐愛楓林晚，霜葉紅於二月花。'],
+  ['唐・杜牧〈清明〉', '清明時節雨紛紛，路上行人欲斷魂。借問酒家何處有，牧童遙指杏花村。'],
+  ['唐・杜牧〈泊秦淮〉', '煙籠寒水月籠沙，夜泊秦淮近酒家。商女不知亡國恨，隔江猶唱後庭花。'],
+  ['唐・杜牧〈江南春〉', '千里鶯啼綠映紅，水村山郭酒旗風。南朝四百八十寺，多少樓臺煙雨中。'],
+  ['唐・杜牧〈阿房宮賦〉', '雷霆乍驚，宮車過也。'],
+  ['唐・李商隱〈錦瑟〉', '錦瑟無端五十弦，一弦一柱思華年。莊生曉夢迷蝴蝶，望帝春心託杜鵑。'],
+  ['唐・李商隱〈無題〉', '相見時難別亦難，東風無力百花殘。春蠶到死絲方盡，蠟炬成灰淚始乾。'],
+  ['唐・李商隱〈無題〉', '身無彩鳳雙飛翼，心有靈犀一點通。'],
+  ['唐・李商隱〈登樂遊原〉', '夕陽無限好，只是近黃昏。'],
+  ['唐・李商隱〈夜雨寄北〉', '何當共剪西窗燭，卻話巴山夜雨時。'],
+  ['南唐・李煜〈虞美人〉', '春花秋月何時了，往事知多少。問君能有幾多愁？恰似一江春水向東流。'],
+  ['南唐・李煜〈相見歡〉', '無言獨上西樓，月如鉤。寂寞梧桐深院鎖清秋。剪不斷，理還亂，是離愁。'],
+  ['宋・范仲淹〈岳陽樓記〉', '先天下之憂而憂，後天下之樂而樂。'],
+  ['宋・周敦頤〈愛蓮說〉', '出淤泥而不染，濯清漣而不妖。'],
+  ['宋・歐陽脩〈醉翁亭記〉', '醉翁之意不在酒，在乎山水之間也。'],
+  ['宋・晏殊〈浣溪沙〉', '無可奈何花落去，似曾相識燕歸來。'],
+  ['宋・晏殊〈蝶戀花〉', '昨夜西風凋碧樹，獨上高樓，望盡天涯路。'],
+  ['宋・柳永〈雨霖鈴〉', '寒蟬淒切，對長亭晚，驟雨初歇。今宵酒醒何處？楊柳岸、曉風殘月。'],
+  ['宋・柳永〈蝶戀花〉', '衣帶漸寬終不悔，為伊消得人憔悴。'],
+  ['宋・王安石〈登飛來峰〉', '不畏浮雲遮望眼，自緣身在最高層。'],
+  ['宋・王安石〈泊船瓜洲〉', '春風又綠江南岸，明月何時照我還。'],
+  ['宋・王安石〈梅花〉', '牆角數枝梅，凌寒獨自開。遙知不是雪，為有暗香來。'],
+  ['宋・蘇軾〈水調歌頭〉', '明月幾時有？把酒問青天。不知天上宮闕，今夕是何年。我欲乘風歸去，又恐瓊樓玉宇，高處不勝寒。人有悲歡離合，月有陰晴圓缺，此事古難全。但願人長久，千里共嬋娟。'],
+  ['宋・蘇軾〈念奴嬌・赤壁懷古〉', '大江東去，浪淘盡，千古風流人物。人生如夢，一尊還酹江月。'],
+  ['宋・蘇軾〈定風波〉', '竹杖芒鞋輕勝馬，誰怕？一蓑煙雨任平生。也無風雨也無晴。'],
+  ['宋・蘇軾〈江城子〉', '十年生死兩茫茫，不思量，自難忘。'],
+  ['宋・蘇軾〈題西林壁〉', '橫看成嶺側成峰，遠近高低各不同。不識廬山真面目，只緣身在此山中。'],
+  ['宋・蘇軾〈飲湖上初晴後雨〉', '水光瀲灩晴方好，山色空濛雨亦奇。欲把西湖比西子，淡妝濃抹總相宜。'],
+  ['宋・蘇軾〈惠崇春江晚景〉', '竹外桃花三兩枝，春江水暖鴨先知。'],
+  ['宋・秦觀〈鵲橋仙〉', '金風玉露一相逢，便勝卻人間無數。兩情若是久長時，又豈在朝朝暮暮。'],
+  ['宋・李清照〈聲聲慢〉', '尋尋覓覓，冷冷清清，淒淒慘慘戚戚。'],
+  ['宋・李清照〈如夢令〉', '知否？知否？應是綠肥紅瘦。'],
+  ['宋・李清照〈夏日絕句〉', '生當作人傑，死亦為鬼雄。'],
+  ['宋・李清照〈一剪梅〉', '花自飄零水自流。一種相思，兩處閒愁。此情無計可消除，才下眉頭，卻上心頭。'],
+  ['宋・岳飛〈滿江紅〉', '怒髮衝冠，憑欄處、瀟瀟雨歇。三十功名塵與土，八千里路雲和月。莫等閒，白了少年頭，空悲切。'],
+  ['宋・陸游〈遊山西村〉', '山重水複疑無路，柳暗花明又一村。'],
+  ['宋・陸游〈十一月四日風雨大作〉', '夜闌臥聽風吹雨，鐵馬冰河入夢來。'],
+  ['宋・陸游〈示兒〉', '王師北定中原日，家祭無忘告乃翁。'],
+  ['宋・辛棄疾〈破陣子〉', '醉裡挑燈看劍，夢回吹角連營。'],
+  ['宋・辛棄疾〈青玉案・元夕〉', '東風夜放花千樹。眾裡尋他千百度，驀然回首，那人卻在，燈火闌珊處。'],
+  ['宋・辛棄疾〈醜奴兒〉', '少年不識愁滋味，愛上層樓。'],
+  ['宋・朱熹〈觀書有感〉', '半畝方塘一鑑開，天光雲影共徘徊。問渠那得清如許，為有源頭活水來。'],
+  ['宋・楊萬里〈曉出淨慈寺送林子方〉', '接天蓮葉無窮碧，映日荷花別樣紅。'],
+  ['宋・楊萬里〈小池〉', '小荷才露尖尖角，早有蜻蜓立上頭。'],
+  ['宋・葉紹翁〈遊園不值〉', '春色滿園關不住，一枝紅杏出牆來。'],
+  ['宋・文天祥〈過零丁洋〉', '人生自古誰無死，留取丹心照汗青。'],
+  ['宋・趙恆〈勵學篇〉（相傳）', '書中自有千鍾粟，書中自有黃金屋，書中自有顏如玉。'],
+  ['元・馬致遠〈天淨沙・秋思〉', '枯藤老樹昏鴉，小橋流水人家，古道西風瘦馬。夕陽西下，斷腸人在天涯。'],
+  ['明・于謙〈石灰吟〉', '千錘萬鑿出深山，烈火焚燒若等閒。粉骨碎身渾不怕，要留清白在人間。'],
+  ['明・楊慎〈臨江仙〉', '滾滾長江東逝水，浪花淘盡英雄。是非成敗轉頭空，青山依舊在，幾度夕陽紅。'],
+  ['清・鄭燮〈竹石〉', '咬定青山不放鬆，立根原在破岩中。千磨萬擊還堅勁，任爾東西南北風。'],
+  ['清・龔自珍〈己亥雜詩〉', '落紅不是無情物，化作春泥更護花。'],
+  ['清・納蘭性德〈木蘭花令〉', '人生若只如初見，何事秋風悲畫扇。'],
+  ['徐志摩〈再別康橋〉', '輕輕的我走了，正如我輕輕的來。'],
+  ['余光中〈鄉愁〉', '小時候，鄉愁是一枚小小的郵票。'],
+  ['鄭愁予〈錯誤〉', '我打江南走過，那等在季節裡的容顏如蓮花的開落。我達達的馬蹄是美麗的錯誤，我不是歸人，是個過客。'],
+  ['顧城〈一代人〉', '黑夜給了我黑色的眼睛，我卻用它尋找光明。'],
+];
+const normText = s => [...s].filter(isWordChar).join('');
+const SRC_INDEX = SOURCES.flatMap(([src, text]) =>
+  text.split(/[，。？！、；：,.?!;:\s]+/).map(normText).filter(c => c.length >= 3).map(c => ({ c, src })));
+function findSource(text) {
+  const n = normText(text);
+  if (n.length < 3) return null;
+  const parts = text.split(/[，。？！、；：,.?!;:\s「」『』…]+/).map(normText).filter(c => c.length >= 3);
+  let best = null, bestLen = 0;
+  for (const { c, src } of SRC_INDEX) {
+    let len = 0;
+    if (n.includes(c) && (c.length >= 4 || n === c)) len = c.length;                // 輸入包含整句
+    else for (const p of parts) if (p.length >= 4 && c.includes(p)) len = Math.max(len, p.length);   // 輸入是某句的一部分
+    if (len > bestLen) { best = src; bestLen = len; }
+  }
+  return best;
+}
+
+/* ---------- 不雅用語偵測 ---------- */
+const BAD_WORDS = [
+  '幹','靠北','靠杯','靠腰','靠夭','靠么','三小','啥小','北七','北爛','機掰','雞掰','鸡掰','機歪','雞歪','雞巴','鸡巴',
+  '操你','操妳','操他','操蛋','我操','肏','屌','屄','婊',
+  '他媽','他妈','你媽','你妈','妳媽','媽的','妈的','尼瑪','尼玛','你娘',
+  '白癡','白痴','智障','弱智','腦殘','脑残','低能','人渣','畜生','畜牲','王八','混蛋','混帳','混账',
+  '賤人','贱人','賤貨','狗屎','狗娘','去死','死全家','傻逼','傻b','煞筆',
+  'fuck','fck','fxck','shit','bitch','asshole','wtf','stfu','nmsl','cnm','tmd',
+];
+// 第二級：嘲諷、人身攻擊（離線時的備援；連結版主要由 Claude 判斷）
+const MOCK_WORDS = [
+  '笨蛋','豬頭','蠢貨','蠢豬','蠢蛋','廢物','废物','你是垃圾','垃圾人','好笨','很笨','真笨','超笨','好蠢','很蠢',
+  '好醜','很醜','真醜','超醜','醜八怪','好胖','很胖','死胖子','肥豬','矮冬瓜','滾開','滚开','滾蛋','滚蛋','魯蛇','loser','好爛','很爛',
+];
+function detectMock(raw) {
+  const s = raw.map(c => c.toLowerCase()).join('');
+  return MOCK_WORDS.filter(w => s.includes(w));
+}
+// 含「幹」但不是髒話的正常詞
+const SAFE_WORDS = ['樹幹','枝幹','才幹','能幹','幹部','幹練','幹勁','主幹','骨幹','幹線','軀幹','幹事','苦幹','實幹','精幹','幹活','幹道','幹嘛','幹麼','幹什麼','什麼','树干'];
+function detectBad(raw) {
+  let s = raw.map(c => c.toLowerCase()).join('');
+  for (const w of SAFE_WORDS) s = s.split(w).join('□'.repeat(w.length));
+  const idx = new Set();
+  for (const w of BAD_WORDS) {
+    let p = s.indexOf(w);
+    while (p >= 0) { for (let k = 0; k < w.length; k++) idx.add(p + k); p = s.indexOf(w, p + 1); }
+  }
+  return idx;
+}
+
+/* ---------- Claude 語意判讀：依整句意境決定屬性 ---------- */
+let samplerP = null, aiOff = false;
+function getSampler() {
+  if (!samplerP) samplerP = (window.claude && typeof window.claude.use === 'function')
+    ? Promise.resolve(window.claude.use('sample')).catch(() => null) : Promise.resolve(null);
+  return samplerP;
+}
+// 判讀時讓 Claude 稍作思考，結果較穩定；若覺得等太久，可改成 { modelTier: 'quick' }
+const JUDGE_OPTS = { modelTier: 'default', effort: 'low' };
+async function aiJudge(text) {
+  if (aiOff) return null;
+  const sample = await getSampler();
+  if (!sample || typeof sample.json !== 'function') return null;
+  const list = IMAGERY.map(i => `${i.id}（${i.elem}）：${i.hint}`).join('\n');
+  const prompt = `你是詩詞意象判官，替一款國中生玩的文學對戰遊戲判讀學生輸入的句子。
+
+一、意象屬性：依整句的原意、語境與整體意境判斷，不要只看單一字。例如「寧靜日子」的「日」是時日不是太陽，「狂風」是風不是水，「火車」不是火。從下列屬性 id 中選一個最貼切的：
+${list}
+
+二、用語檢查，逐項回答，每一項只看字面與明顯語意，不要過度解讀：
+(a) profanity：是否含髒話、粗口、性暗示、歧視性稱呼、詛咒他人（如「去死」）。
+(b) mocksPerson：是否在嘲諷、貶低、挖苦、取笑某個人。對象包括具名的真實人物（政治人物、名人、網紅、同學、老師）以及「你」「他」這類泛指。用諧音、綽號、雙關、比喻成動物或卡通人物來取笑都算。
+    不論對象的國籍、政黨、立場或身分，一律用同一個標準；不要因為是公眾人物或政治人物就放寬或從嚴。
+    中性或讚美地提到人物不算：「岳飛精忠報國」「李白斗酒詩百篇」「國父推翻滿清」都是 false。
+    以下都是 true：「王小明耍賴」（拿名字諧音取笑）、「某某某的英文很菜」（貶低能力）、「把某位領導人叫成卡通熊」（取不雅綽號）、「你好笨」（人身攻擊）、「他胖得像豬」（外貌羞辱）。
+    自嘲（「我好笨」）不算。
+
+只回覆一個 JSON 物件：
+{"element":"屬性id","strength":1到3的整數（意象鮮明度：1平淡、2清楚、3強烈）,"reason":"8字內描述此句意象","profanity":true或false,"profanityWords":["(a)的詞語原文，沒有就空陣列"],"mocksPerson":true或false,"source":"只有在你確定這句出自既有詩文或名言時，寫「朝代・作者〈篇名〉」或「《書名・篇名》」，否則 null"}
+
+要判讀的句子：「${text}」`;
+  try {
+    const r = await sample.json(prompt, JUDGE_OPTS);
+    if (!r || typeof r !== 'object') return null;
+    const im = IMAGERY.find(i => i.id === r.element);
+    if (!im) return null;
+    return {
+      element: im.id,
+      strength: clamp(Math.round(Number(r.strength) || 1), 1, 3),
+      reason: typeof r.reason === 'string' ? r.reason.slice(0, 16) : '',
+      profanity: r.profanity === true,
+      badWords: Array.isArray(r.profanityWords) ? r.profanityWords.filter(w => typeof w === 'string' && w).slice(0, 10) : [],
+      mocks: r.mocksPerson === true,
+      source: typeof r.source === 'string' && /[〈《]/.test(r.source) && r.source.length < 40 ? r.source : null,
+    };
+  } catch (e) {
+    if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(e && e.code)) aiOff = true;
+    return null;
+  }
+}
+
+/* ---------- 意象判定 ---------- */
+const usedLines = new Set();
+function analyze(text, isAI, verdict) {
+  const raw = [...text].filter(isWordChar).slice(0, 40);
+
+  if (!isAI) {
+    const bad = detectBad(raw);
+    if (verdict && verdict.profanity) {                    // 第一級：粗口，遮住 Claude 指出的詞
+      const s = raw.join('');
+      for (const w of verdict.badWords) { let p = s.indexOf(w); while (p >= 0) { for (let k = 0; k < w.length; k++) bad.add(p + k); p = s.indexOf(w, p + 1); } }
+    }
+    if (bad.size || (verdict && verdict.profanity)) {
+      const chars = raw.map((c, i) => bad.has(i) ? '＊' : c);
+      const clause = chars.length > 14 ? chars.slice(0, 14).join('') + '…' : chars.join('');
+      return { text, chars, im: BACKFIRE_IM, backfire: true, dmg: Math.round(55 + bad.size * 6 + rand(0, 20)), crit: false, clause };
+    }
+  }
+
+  const chars = raw, joined = chars.join('');
+  const src = findSource(text) || (verdict && verdict.source) || null;
+  let best, bestScore;
+  if (verdict) { best = IMAGERY.find(i => i.id === verdict.element); bestScore = verdict.strength; }   // 依整句意境判定
+  else { const j = lexiconJudge(chars); best = j.im; bestScore = Math.min(3, Math.round(j.score / 2)); }
+  const uniq = [...new Set(chars.filter(c => best.keys.includes(c)))];
+
+  // 第二級：嘲諷他人 →「文氣不正」，攻擊照常但威力只剩三成、不觸發任何效果
+  const unjust = !isAI && ((verdict && verdict.mocks) || (!verdict && detectMock(raw).length > 0));
+  let crit = !unjust && (bestScore >= 3 || (bestScore === 2 && Math.random() < .35));
+  let dmg, repeat = false;
+  if (isAI) dmg = rand(95, 150) * (crit ? 1.3 : 1);
+  else {
+    dmg = 35 + Math.min(chars.length, 28) * 4 + bestScore * 28 + rand(0, 25);
+    if (crit) dmg *= 1.5;
+    if (usedLines.has(joined)) { repeat = true; dmg *= .5; }
+    if (src && !unjust) dmg *= 1.15;                      // 典故加成
+    if (unjust) dmg *= .3;
+    usedLines.add(joined);
+  }
+  dmg = Math.round(dmg);
+
+  const clauses = text.split(/[，。、；：！？,.;:!?\s「」『』…]+/).filter(Boolean);
+  let clause = clauses.find(c => uniq.some(h => c.includes(h))) || clauses[0] || text;
+  if ([...clause].length > 14) clause = [...clause].slice(0, 14).join('') + '…';
+  return { text, chars, im: best, dmg, crit, repeat, clause, src, unjust, reason: verdict ? verdict.reason : '' };
+}
+
+/* =========================================================
+   屬性相剋與合擊
+   氣場：每位玩家上一招的屬性。
+   相剋：本招剋制對方氣場 ×1.5；本招被對方氣場剋制 ×0.75。
+   疊加：連續使用同一屬性，每疊一層威力提升。
+   合擊：上一招與本招構成特定組合，觸發典故效果。
+   ========================================================= */
+const COUNTER = {   // 攻方屬性 → { 被剋屬性: 說法 }
+  storm:   { fire:'水能滅火' },
+  fire:    { tree:'星火燎原', grass:'野火燒不盡', flower:'烈焰焚花', ice:'烈火融冰', sword:'真金也怕火煉', bug:'飛蛾撲火' },
+  ice:     { storm:'滴水成冰', grass:'嚴霜殺草', bug:'夏蟲不可語冰' },
+  mountain:{ storm:'水來土掩' },
+  tree:    { mountain:'盤根破石' },
+  sword:   { tree:'斧斤伐木', bamboo:'利刃斷竹' },
+  wind:    { flower:'風吹花落' },
+  grass:   { wind:'疾風知勁草' },
+  bamboo:  { wind:'任爾東西南北風' },
+  wing:    { bug:'飛鳥啄蟲' },
+  bug:     { tree:'蟲蛀朽木', food:'蟲蛀米糧', flower:'蜂蝶採花' },
+  thunder: { wing:'驚雷散鳥' },
+  dragon:  { storm:'龍王御水', thunder:'龍吟雷動' },
+  light:   { moon:'旭日驅月', star:'日出星隱', dream:'天光夢醒' },
+  moon:    { star:'月明星稀' },
+  time:    { flower:'花開花落終有時', love:'歲月催人老' },
+  spirit:  { time:'壯志不老', sorrow:'豪氣消愁' },
+  wine:    { sorrow:'借酒澆愁' },
+  food:    { sorrow:'飽食忘憂' },
+  friend:  { sorrow:'海內存知己' },
+  music:   { sorrow:'一曲解千愁' },
+  zen:     { wine:'清心醒酒', dream:'一念醒覺' },
+  write:   { sword:'筆勝於劍' },
+  nation:  { sword:'止戈為武' },
+  sorrow:  { love:'情深不壽' },
+  love:    { ice:'深情融冰' },
+};
+const COMBOS = [    // [兩招屬性, 合擊名稱, 效果, 威力倍率]
+  [['wind', 'fire'], '風助火勢', { burn: 3 }, 1.2],
+  [['storm', 'thunder'], '雷雨交加', { stun: 1 }, 1.2],
+  [['ice', 'wind'], '暴風雪', { freeze: true }, 1.25],
+  [['moon', 'wine'], '舉杯邀明月', { heal: 120 }, 1],
+  [['sorrow', 'wine'], '舉杯消愁', { heal: 100 }, 1],
+  [['flower', 'moon'], '花前月下', { heal: 80 }, 1.2],
+  [['tree', 'grass'], '草木逢春', { regen: 3 }, 1.1],
+  [['grass', 'flower'], '奼紫嫣紅', { regen: 3 }, 1.1],
+  [['dragon', 'storm'], '龍騰雲雨', {}, 1.5],
+  [['dragon', 'wind'], '雲龍風虎', {}, 1.5],
+  [['sword', 'spirit'], '仗劍天涯', {}, 1.4],
+  [['write', 'music'], '詩樂相和', {}, 1.4],
+  [['friend', 'wine'], '勸君更盡一杯酒', { heal: 100 }, 1.1],
+  [['star', 'moon'], '星月交輝', {}, 1.4],
+  [['home', 'moon'], '月是故鄉明', { heal: 80 }, 1.2],
+  [['bamboo', 'mountain'], '咬定青山', { shield: .5 }, 1.1],
+  [['wing', 'tree'], '良禽擇木', {}, 1.35],
+  [['bug', 'flower'], '蜂蝶戀花', { regen: 3 }, 1.1],
+  [['food', 'wine'], '酒足飯飽', { heal: 140 }, 1],
+  [['fire', 'food'], '人間煙火', { heal: 100 }, 1.2],
+  [['zen', 'mountain'], '空山禪寂', { shield: .4 }, 1.1],
+  [['light', 'spirit'], '光芒萬丈', {}, 1.4],
+  [['love', 'sorrow'], '此恨綿綿', {}, 1.4],
+  [['nation', 'sword'], '金戈鐵馬', {}, 1.4],
+  [['wing', 'wind'], '扶搖直上', {}, 1.4],
+  [['bug', 'grass'], '草長鶯飛', { regen: 3 }, 1.1],
+];
+const INNATE = {    // 各屬性本身的附加效果
+  fire: { burn: 2 }, bug: { poison: 3 }, ice: { freeze: true }, thunder: { stun: .5 },
+  food: { healPct: .3 }, tree: { healPct: .15 }, flower: { healPct: .12 }, grass: { regen: 2 },
+  bamboo: { shield: .3 }, friend: { shield: .2 }, wine: { wild: true }, zen: { cleanse: true }, light: { cleanse: true },
+};
+function interact(res, atk, def) {
+  if (res.unjust) {                     // 文氣不正：不吃相剋、疊加、合擊與屬性效果，也不留下氣場
+    res.fx = { noAura: true }; res.streak = 0;
+    res.notes = [{ t: '文氣不正・威力只剩三成', k: 'down' }];
+    return;
+  }
+  const notes = [], id = res.im.id, fx = Object.assign({}, INNATE[id] || {});
+  let mult = 1;
+  const c = def.aura && COUNTER[id] && COUNTER[id][def.aura];
+  const rc = !c && def.aura && COUNTER[def.aura] && COUNTER[def.aura][id];
+  if (c) { mult *= 1.5; notes.push({ t: `相剋・${c}`, k: 'up' }); }
+  else if (rc) { mult *= .75; notes.push({ t: `受制・${rc}`, k: 'down' }); }
+  const streak = atk.aura === id ? atk.streak + 1 : 1;
+  res.streak = streak;
+  if (streak >= 2) { mult *= [1, 1, 1.2, 1.4, 1.6][Math.min(streak, 4)]; notes.push({ t: `意象疊加 ×${streak}`, k: 'up' }); }
+  if (atk.aura && atk.aura !== id) {
+    const cb = COMBOS.find(([pair]) => pair.includes(atk.aura) && pair.includes(id));
+    if (cb) { mult *= cb[3]; Object.assign(fx, cb[2]); notes.push({ t: `合擊・${cb[1]}`, k: 'combo' }); res.combo = cb[1]; }
+  }
+  if (fx.wild) { const w = rand(.6, 1.8); mult *= w; notes.push({ t: w > 1 ? '醉拳・酒酣力猛' : '醉拳・腳步踉蹌', k: w > 1 ? 'up' : 'down' }); }
+  if (fx.stun && Math.random() > fx.stun) delete fx.stun;
+  if (atk.st.weak) { mult *= atk.st.weak; notes.push({ t: '受牽制・威力下降', k: 'down' }); atk.st.weak = 0; }
+  res.dmg = Math.round(res.dmg * mult);
+  res.fx = fx; res.notes = notes;
+}
+// 命中後套用效果；回傳要顯示的額外說明
+function applyEffects(res, atk, def) {
+  const fx = res.fx || {}, extra = [];
+  if (fx.burn) { def.st.burn = { turns: fx.burn, dmg: 30 }; extra.push({ t: `灼燒 ${fx.burn} 回合`, k: 'up' }); }
+  if (fx.poison) { def.st.poison = { turns: fx.poison, dmg: 20 }; extra.push({ t: `蟲蝕 ${fx.poison} 回合`, k: 'up' }); }
+  if (fx.freeze) { def.st.weak = .65; extra.push({ t: '冰封・對手下一招減弱', k: 'up' }); }
+  else if (fx.stun) { def.st.weak = .65; extra.push({ t: '麻痺・對手下一招減弱', k: 'up' }); }
+  let heal = 0;
+  if (fx.heal) heal += fx.heal;
+  if (fx.healPct) heal += Math.round(res.dmg * fx.healPct);
+  if (heal) { atk.hp = Math.min(atk.max, atk.hp + heal); floaters.push({ text: `+${heal}`, x: atk.x, y: atk.y - atk.r * 1.6, life: 1.6, color: '#7dffa8', small: true }); SFX.heal(); extra.push({ t: `回復 ${heal}`, k: 'heal' }); }
+  if (fx.regen) { atk.st.regen = { turns: fx.regen, amt: 40 }; extra.push({ t: `回春 ${fx.regen} 回合`, k: 'heal' }); }
+  if (fx.shield) { atk.st.shield = Math.max(atk.st.shield || 0, fx.shield); extra.push({ t: `護盾 ${Math.round(fx.shield * 100)}%`, k: 'heal' }); }
+  if (fx.cleanse && (atk.st.burn || atk.st.poison || atk.st.weak)) { atk.st.burn = atk.st.poison = null; atk.st.weak = 0; extra.push({ t: '滌淨負面狀態', k: 'heal' }); }
+  if (!fx.noAura) { atk.aura = res.im.id; atk.streak = res.streak || 1; }
+  return extra;
+}
+// 回合開始時結算持續效果；回傳是否倒下
+function tickStatus(f) {
+  const st = f.st, show = (text, color) => floaters.push({ text, x: f.x, y: f.y - f.r * 1.6, life: 1.5, color, small: true });
+  if (st.burn) { f.hp = Math.max(0, f.hp - st.burn.dmg); show(`灼燒 -${st.burn.dmg}`, '#ff7b3d'); f.hit = .6; if (--st.burn.turns <= 0) st.burn = null; }
+  if (st.poison) { f.hp = Math.max(0, f.hp - st.poison.dmg); show(`蟲蝕 -${st.poison.dmg}`, '#b6e34a'); f.hit = .5; if (--st.poison.turns <= 0) st.poison = null; }
+  if (st.regen && f.hp > 0) { f.hp = Math.min(f.max, f.hp + st.regen.amt); show(`回春 +${st.regen.amt}`, '#7dffa8'); if (--st.regen.turns <= 0) st.regen = null; }
+  return f.hp <= 0;
+}
+const NOTE_COLOR = { up: '#ffd166', down: '#9aa0b4', combo: '#ff8fd8', heal: '#7dffa8' };
+
+/* ---------- 形狀演算法（單位座標，面向右方；回傳 [x, y, 深度]） ---------- */
+const polyCache = {};
+function samplePolys(key, polys, n) {
+  const ck = key + n;
+  if (polyCache[ck]) return polyCache[ck];
+  const segs = []; let total = 0;
+  polys.forEach((pl, g) => {
+    for (let k = 0; k < pl.pts.length - 1; k++) {
+      const a = pl.pts[k], b = pl.pts[k + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      segs.push({ a, b, len, g: pl.g ?? g, start: total }); total += len;
+    }
+  });
+  const out = []; let si = 0;
+  for (let i = 0; i < n; i++) {
+    const s = (i + .5) / n * total;
+    while (si < segs.length - 1 && segs[si].start + segs[si].len < s) si++;
+    const sg = segs[si], t = sg.len ? (s - sg.start) / sg.len : 0;
+    out.push([lerp(sg.a[0], sg.b[0], t), lerp(sg.a[1], sg.b[1], t), sg.g]);
+  }
+  return (polyCache[ck] = out);
+}
+const rot2 = (x, y, a) => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
+const mirrorY = pts => pts.map(([x, y]) => [x, -y]);
+
+const MOUNT = [
+  { pts: [[-1.2,.6],[-.68,-.22],[-.38,.12],[0,-.85],[.36,.12],[.66,-.22],[1.2,.6],[-1.2,.6]] },
+  { pts: [[-.25,-.35],[0,-.6],[.25,-.35]] },
+];
+const SWORDS = (() => {
+  const base = [{ pts: [[-.35,-.07],[.85,-.07],[1.08,0],[.85,.07],[-.35,.07]] }, { pts: [[-.35,-.2],[-.35,.2]] }, { pts: [[-.35,0],[-.72,0]] }];
+  const out = [];
+  [[-.62,-.15],[0,.18],[.62,-.15]].forEach(([oy, ox], g) => base.forEach(b => out.push({ g, pts: b.pts.map(([x, y]) => [x * .85 + ox, y * .85 + oy]) })));
+  return out;
+})();
+const ICE = (() => {
+  const out = [];
+  for (let k = 0; k < 6; k++) {
+    const a = k * Math.PI / 3, c = Math.cos(a), s = Math.sin(a);
+    out.push({ pts: [[0, 0], [c, s]] });
+    for (const [r, l] of [[.45, .3], [.72, .22]]) {
+      const bx = c * r, by = s * r;
+      out.push({ pts: [[bx + Math.cos(a + 1) * l, by + Math.sin(a + 1) * l], [bx, by], [bx + Math.cos(a - 1) * l, by + Math.sin(a - 1) * l]] });
+    }
+  }
+  return out;
+})();
+const BOLTS = [-.55, 0, .55].map((oy, g) => ({ g, pts: [[-1,oy],[-.55,oy-.18],[-.35,oy+.08],[.05,oy-.2],[.25,oy+.1],[.65,oy-.12],[1.05,oy+.02]].map(([x, y]) => [x + (g === 1 ? .15 : 0), y]) }));
+const WINGPTS = [[.25,-.05],[0,-.55],[-.35,-1],[-.25,-.55],[-.42,-.45],[-.3,-.2],[-.45,-.08]];
+const BIRD = [
+  { pts: [[-.7,0],[.55,0]] }, { pts: [[.55,0],[.75,-.09],[.88,0],[.75,.09],[.55,0]] },
+  { pts: WINGPTS }, { pts: mirrorY(WINGPTS) },
+  { pts: [[-.7,0],[-1,-.22]] }, { pts: [[-.7,0],[-1.05,0]] }, { pts: [[-.7,0],[-1,.22]] },
+];
+const HOURGLASS = [
+  { pts: [[-.55,-.95],[.55,-.95],[.07,0],[.55,.95],[-.55,.95],[-.07,0],[-.55,-.95]] },
+  { pts: [[-.75,-1.05],[.75,-1.05]] }, { pts: [[-.75,1.05],[.75,1.05]] },
+  { pts: [[-.3,.75],[0,.5],[.3,.75]] },
+];
+const ARROW = [
+  { pts: [[-1.05,0],[1.05,0]] }, { pts: [[.6,-.32],[1.12,0],[.6,.32]] },
+  { pts: [[-1.05,-.28],[-.75,0],[-1.05,.28]] }, { pts: [[-.85,-.28],[-.55,0],[-.85,.28]] },
+  { pts: [[-.6,-.5],[.45,-.5]] }, { pts: [[-.6,.5],[.45,.5]] },
+];
+const BOOK = [
+  { pts: [[0,-.55],[-.5,-.72],[-1,-.6],[-1,.6],[-.5,.48],[0,.62]] },
+  { pts: [[0,-.55],[.5,-.72],[1,-.6],[1,.6],[.5,.48],[0,.62]] },
+  { pts: [[0,-.55],[0,.62]] },
+  { pts: [[-.85,-.3],[-.2,-.35]] }, { pts: [[-.85,0],[-.2,-.05]] }, { pts: [[-.85,.3],[-.2,.25]] },
+  { pts: [[.2,-.35],[.85,-.3]] }, { pts: [[.2,-.05],[.85,0]] }, { pts: [[.2,.25],[.85,.3]] },
+];
+const STARP = [{ pts: Array.from({ length: 11 }, (_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? .42 : 1; return [Math.cos(a) * r, Math.sin(a) * r]; }) }];
+const DING = [
+  { pts: [[-.75,-.35],[.75,-.35]] }, { pts: [[-.75,-.35],[-.7,.15],[-.45,.45],[.45,.45],[.7,.15],[.75,-.35]] },
+  { pts: [[-.55,-.35],[-.55,-.75],[-.3,-.75],[-.3,-.35]] }, { pts: [[.3,-.35],[.3,-.75],[.55,-.75],[.55,-.35]] },
+  { pts: [[-.4,.45],[-.55,1]] }, { pts: [[0,.45],[0,1]] }, { pts: [[.4,.45],[.55,1]] }, { pts: [[-.5,0],[.5,0]] },
+];
+const RAYS = (() => {
+  const out = [];
+  for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6, r2 = k % 2 ? .7 : 1.05; out.push({ pts: [[Math.cos(a) * .32, Math.sin(a) * .32], [Math.cos(a) * r2, Math.sin(a) * r2]] }); }
+  out.push({ pts: Array.from({ length: 17 }, (_, k) => [Math.cos(k / 16 * Math.PI * 2) * .22, Math.sin(k / 16 * Math.PI * 2) * .22]) });
+  return out;
+})();
+const BAMBOO = (() => {
+  const out = [];
+  [[-.6, -.75], [0, -1], [.6, -.8]].forEach(([x, top]) => {
+    out.push({ pts: [[x, 1], [x, top]] });
+    for (let y = .6; y > top + .1; y -= .4) out.push({ pts: [[x - .1, y], [x + .1, y]] });
+    out.push({ pts: [[x, top + .2], [x + .36, top]] }, { pts: [[x, top + .38], [x - .32, top + .2]] });
+  });
+  return out;
+})();
+const ellPts = (cx, cy, rx, ry, rot = 0, m = 16) => Array.from({ length: m + 1 }, (_, k) => { const a = k / m * Math.PI * 2; const [x, y] = rot2(Math.cos(a) * rx, Math.sin(a) * ry, rot); return [cx + x, cy + y]; });
+const arcPts = (cx, cy, rx, ry, a0, a1, m = 14) => Array.from({ length: m + 1 }, (_, k) => { const a = a0 + (a1 - a0) * k / m; return [cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]; });
+// 龍：鬣脊龍身、龍首（張口、雙角、龍鬚、龍眼）、雙爪、尾焰
+const DRAGON2 = (() => {
+  const out = [], w = x => x < -.55 ? .04 + .18 * (x + 1.15) / .6 : .22, top = [], bot = [];
+  for (let k = 0, x = -1.15; x <= .4501; k++, x += .07) { top.push([x, -w(x) - (k % 2 ? .15 * Math.min(1, w(x) / .22) : 0)]); bot.push([x, w(x)]); }
+  out.push({ g: 0, pts: top }, { g: 0, pts: bot });
+  out.push({ g: 0, pts: [[-1.15,0],[-1.34,-.18]] }, { g: 0, pts: [[-1.15,0],[-1.38,.03]] }, { g: 0, pts: [[-1.15,0],[-1.3,.2]] });
+  const H = pts => pts.map(([x, y]) => [.45 + x * 1.5, y * 1.5]);       // 龍首放大 1.5 倍
+  out.push({ g: 1, pts: H([[0,-.16],[.14,-.25],[.27,-.2],[.46,-.13],[.55,-.06],[.41,-.02]]) });
+  out.push({ g: 1, pts: H([[.41,.05],[.5,.15],[.27,.13],[.14,.19],[0,.16]]) });
+  out.push({ g: 1, pts: H([[.14,-.25],[.06,-.43],[-.04,-.52]]) }, { g: 1, pts: H([[.21,-.23],[.2,-.42],[.13,-.56]]) });
+  out.push({ g: 1, pts: H([[.52,-.05],[.4,.2],[.2,.34],[-.02,.38]]) }, { g: 1, pts: H([[.5,-.1],[.4,-.3],[.24,-.38],[.08,-.36]]) });
+  out.push({ g: 1, pts: H(ellPts(.26, -.12, .04, .04, 0, 7)) });
+  for (const lx of [.12, -.55]) out.push({ g: 2, pts: [[lx,.22],[lx-.08,.42],[lx+.06,.55]] }, { g: 2, pts: [[lx+.06,.55],[lx+.21,.5]] }, { g: 2, pts: [[lx+.06,.55],[lx+.19,.63]] }, { g: 2, pts: [[lx+.06,.55],[lx+.03,.68]] });
+  return out;
+})();
+// 樂：五線譜 + 連桁八分音符 ♫ + 兩個單八分音符 ♪
+const MUSIC = (() => {
+  const out = [];
+  for (let k = 0; k < 3; k++) out.push({ g: 0, pts: [[-1.1, .05 + k * .2], [1.1, .05 + k * .2]] });
+  const head = (cx, cy, g) => [{ g, pts: ellPts(cx, cy, .15, .1, -.35, 10) }, { g, pts: ellPts(cx, cy, .07, .045, -.35, 7) }];
+  out.push(...head(-.35, .38, 1), ...head(.35, .25, 1));
+  out.push({ g: 1, pts: [[-.21,.35],[-.21,-.6]] }, { g: 1, pts: [[.49,.22],[.49,-.72]] }, { g: 1, pts: [[-.21,-.6],[.49,-.72]] }, { g: 1, pts: [[-.21,-.5],[.49,-.62]] });
+  out.push(...head(-.95, .1, 2), { g: 2, pts: [[-.81,.07],[-.81,-.75],[-.62,-.55],[-.6,-.35]] });
+  out.push(...head(.95, .45, 3), { g: 3, pts: [[1.09,.42],[1.09,-.45],[1.27,-.27],[1.28,-.08]] });
+  return out;
+})();
+const TREE = [
+  { g: 0, pts: [[-.12,1],[-.08,.2]] }, { g: 0, pts: [[.12,1],[.08,.2]] }, { g: 0, pts: [[-.38,1],[-.12,.94]] }, { g: 0, pts: [[.38,1],[.12,.94]] },
+  { g: 0, pts: [[-.06,.38],[-.5,-.05]] }, { g: 0, pts: [[.06,.32],[.52,-.08]] }, { g: 0, pts: [[0,.2],[0,-.3]] },
+  { g: 1, pts: ellPts(-.5, -.3, .38, .38, 0, 18) }, { g: 1, pts: ellPts(.5, -.32, .38, .38, 0, 18) }, { g: 1, pts: ellPts(0, -.62, .45, .42, 0, 18) },
+];
+const DRAGONFLY = [
+  { g: 0, pts: [[-1.1,0],[.5,0]] }, { g: 0, pts: ellPts(.62, 0, .12, .1, 0, 10) },
+  { g: 0, pts: [[-.8,-.05],[-.8,.05]] }, { g: 0, pts: [[-.5,-.05],[-.5,.05]] }, { g: 0, pts: [[-.2,-.05],[-.2,.05]] },
+  { g: 1, pts: ellPts(.28, -.45, .15, .45, .25) }, { g: 1, pts: ellPts(.28, .45, .15, .45, -.25) },
+  { g: 2, pts: ellPts(-.05, -.42, .13, .4, -.2) }, { g: 2, pts: ellPts(-.05, .42, .13, .4, .2) },
+];
+const FOOD = [
+  { g: 0, pts: arcPts(0, -.05, .85, .62, 0, Math.PI) }, { g: 0, pts: [[-.85,-.05],[.85,-.05]] }, { g: 0, pts: [[-.28,.57],[-.32,.72],[.32,.72],[.28,.57]] },
+  { g: 0, pts: arcPts(0, -.05, .72, .3, Math.PI, Math.PI * 2) },
+  { g: 0, pts: [[.25,-.85],[.75,-.12]] }, { g: 0, pts: [[.42,-.9],[.88,-.18]] },
+  { g: 1, pts: [[-.45,-.42],[-.45,-1.05]] }, { g: 1, pts: [[-.12,-.45],[-.12,-1.15]] },
+];
+function twoLayer(i, n, frac) {      // 外框 + 內圈
+  const outer = Math.floor(n * frac);
+  return i < outer ? [i / outer, 1, 1] : [(i - outer) / Math.max(1, n - outer), .55, .6];
+}
+
+const SHAPES = {
+  storm(i, n, t) {             // 水：層層浪濤 + 捲起的浪頭
+    const curl = Math.floor(n * .28);
+    if (i < curl) { const u = i / curl, a = u * Math.PI * 2.6 + t * 1.5, r = .5 * (1 - u * .75); return [.45 + Math.cos(a) * r, -.3 - Math.sin(a) * r * .9, 1]; }
+    const j = i - curl, row = j % 3, u = Math.floor(j / 3) / Math.ceil((n - curl) / 3), x = -1.15 + u * 1.9, ph = x * 3.2 - t * 4 + row * 1.3;
+    return [x, .15 + row * .28 + Math.sin(ph) * .16 * (1 - row * .2), .5 + .5 * (1 - row / 3)];
+  },
+  wind(i, n, t) {              // 風：龍捲字旋
+    const u = i / n, a = u * Math.PI * 2 * 5.5 + t * 5, r = .12 + u * .88;
+    return [Math.cos(a) * r * .8, .95 - u * 1.9, (Math.sin(a) + 1) / 2];
+  },
+  fire(i, n, t) {
+    const core = Math.floor(n * .7);
+    if (i < core) {
+      const u = (i + .5) / core, r = .6 * Math.sqrt(u) * (1 + .08 * Math.sin(t * 9 + i)), a = i * 2.39996 + t * 1.5;
+      return [Math.cos(a) * r, Math.sin(a) * r, 1 - u * .4];
+    }
+    const k = (i - core) / Math.max(1, n - core - 1), spread = (1 - k) * .5 + .08;
+    return [-(.5 + k) - Math.sin(t * 12 + i) * .05, (hash(i) - .5) * 2 * spread + Math.sin(t * 10 + i * 1.3) * .06 * (1 + k), .55];
+  },
+  flower(i, n, t) {
+    const th = (i / n) * Math.PI, r = Math.cos(5 * th) * .95, a = th + t * 1.2;
+    return [r * Math.cos(a), r * Math.sin(a), .4 + .6 * Math.abs(r)];
+  },
+  moon(i, n, t) {
+    const a1 = Math.floor(n * .45), a2 = Math.floor(n * .72);
+    let u, k, z;
+    if (i < a1) { u = i / Math.max(1, a1 - 1); k = 1; z = 1; }
+    else if (i < a2) { u = (i - a1) / Math.max(1, a2 - a1 - 1); k = .72; z = .7; }
+    else { u = (i - a2) / Math.max(1, n - a2 - 1); k = .42; z = .9; }
+    const a = -Math.PI / 2 + u * Math.PI;
+    const [x, y] = rot2(Math.cos(a) * k, Math.sin(a) * .98, Math.sin(t * 1.5) * .18);
+    return [x, y, z];
+  },
+  mountain(i, n, t) { const p = samplePolys('m', MOUNT, n)[i]; return [p[0], p[1] + Math.sin(t * 3 + p[0] * 3) * .02, 1]; },
+  sword(i, n, t) { const p = samplePolys('s', SWORDS, n)[i]; return [p[0] + Math.sin(t * 2.5 + p[2] * 2) * .04, p[1] + Math.sin(t * 3 + p[2] * 1.7) * .05, 1]; },
+  ice(i, n, t) { const p = samplePolys('i', ICE, n)[i]; const [x, y] = rot2(p[0] * .95, p[1] * .95, t * .7); return [x, y, .7 + .3 * Math.hypot(p[0], p[1])]; },
+  thunder(i, n, t) {
+    const p = samplePolys('t', BOLTS, n)[i], f = Math.floor(t * 14);
+    return [p[0], p[1] + (hash(i * 1.3 + f) - .5) * .1, .5 + .5 * hash(i + f * 7)];
+  },
+  wing(i, n, t) { const p = samplePolys('w', BIRD, n)[i]; return [p[0], p[1] * (.65 + .35 * Math.sin(t * 7)), 1]; },
+  sorrow(i, n, t) {
+    const [u, sc, z] = twoLayer(i, n, .62), a = u * Math.PI * 2, w = sc * (1 + .05 * Math.sin(t * 4));
+    return [Math.cos(a) * .9 * w, Math.sin(a) * Math.pow(Math.abs(Math.sin(a / 2)), 1.6) * 1.1 * w, z];
+  },
+  love(i, n, t) {
+    const [u, sc, z] = twoLayer(i, n, .65), a = u * Math.PI * 2;
+    const beat = sc * (1 + .1 * Math.pow(Math.abs(Math.sin(t * 2.2)), 8));
+    const x = 16 * Math.pow(Math.sin(a), 3) / 17, y = -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a)) / 17;
+    return [x * beat, (y + .1) * beat, z];
+  },
+  home(i, n, t) {
+    const core = Math.floor(n * .12);
+    if (i < core) { const a = i / core * Math.PI * 2 + t; return [Math.cos(a) * .15, Math.sin(a) * .15, 1]; }
+    const j = i - core, ring = j % 3, u = Math.floor(j / 3) / Math.ceil((n - core) / 3);
+    const a = u * Math.PI * 2 + t * (1.5 + ring * .4);
+    const [x, y] = rot2(Math.cos(a), Math.sin(a) * .32, ring * Math.PI / 3);
+    return [x, y, .4 + .6 * (Math.sin(a) + 1) / 2];
+  },
+  wine(i, n, t) {
+    const arm = i % 2, u = Math.floor(i / 2) / Math.ceil(n / 2), r = .1 + u * .95, a = u * Math.PI * 3.2 + arm * Math.PI + t * 2.2;
+    return [Math.cos(a) * r + Math.sin(t * 3 + u * 9) * .05, Math.sin(a) * r * .85 + Math.cos(t * 2.3 + u * 7) * .05, .5 + .5 * (1 - u)];
+  },
+  time(i, n, t) { const p = samplePolys('h', HOURGLASS, n)[i]; const [x, y] = rot2(p[0], p[1] * .95, t * .6); return [x, y, 1]; },
+  spirit(i, n, t) {
+    const p = samplePolys('a', ARROW, n)[i];
+    return [p[0] + (Math.abs(p[1]) > .4 ? Math.sin(t * 8 + i) * .08 : 0), p[1], Math.abs(p[1]) > .4 ? .55 : 1];
+  },
+  dream(i, n, t) {
+    const s = (i / n) * Math.PI * 12;
+    const r = Math.exp(Math.cos(s)) - 2 * Math.cos(4 * s) - Math.pow(Math.sin(s / 12), 5);
+    const flap = .55 + .45 * Math.abs(Math.sin(t * 4));
+    return [Math.sin(s) * r / 4.6 * flap, -Math.cos(s) * r / 4.6 + .15, .6 + .4 * flap];
+  },
+  write(i, n, t) { const p = samplePolys('b', BOOK, n)[i]; return [p[0], p[1] + Math.sin(t * 4 + p[0] * 3) * .05 * Math.abs(p[0]), 1]; },
+  star(i, n, t) {             // 星：旋轉五芒星
+    const p = samplePolys('st', STARP, n)[i], sc = 1 + .06 * Math.sin(t * 6), [x, y] = rot2(p[0] * sc, p[1] * sc, t * .8);
+    return [x, y, .6 + .4 * Math.abs(Math.sin(t * 5 + i))];
+  },
+  zen(i, n, t) {              // 禪：一筆圓相
+    const [u, sc, z] = twoLayer(i, n, .6), a = -Math.PI * .4 + u * Math.PI * 1.85 + t * .4, r = (sc === 1 ? 1 : .84) * (1 + .04 * Math.sin(u * 20));
+    return [Math.cos(a) * r, Math.sin(a) * r, z];
+  },
+  music(i, n, t) {            // 樂：五線譜上跳動的音符
+    const p = samplePolys('mu', MUSIC, n)[i];
+    if (p[2] === 0) return [p[0], p[1] + Math.sin(p[0] * 4 - t * 5) * .04, .5];
+    return [p[0], p[1] + Math.sin(t * 5 + p[2] * 1.9) * .08, 1];
+  },
+  nation(i, n, t) { const p = samplePolys('d', DING, n)[i]; return [p[0], p[1] + Math.sin(t * 2) * .03, 1]; },   // 國：鼎
+  dragon(i, n, t) {           // 龍：鬣脊龍身如波游動，龍首固定隨身
+    const p = samplePolys('dg', DRAGON2, n)[i], xr = p[2] === 1 ? .45 : Math.min(p[0], .45);
+    const disp = Math.sin(xr * 2.8 - t * 4.5) * .2 * (.5 + .5 * (xr + 1.35) / 1.8);
+    return [p[0] + .04, p[1] + disp, p[2] === 1 ? 1 : p[2] === 2 ? .8 : .9];
+  },
+  light(i, n, t) {            // 光：放射光芒
+    const p = samplePolys('r', RAYS, n)[i], pulse = 1 + .08 * Math.sin(t * 8), [x, y] = rot2(p[0] * pulse, p[1] * pulse, t * .6);
+    return [x, y, 1];
+  },
+  friend(i, n, t) {           // 誼：雙環相扣
+    const ring = i % 2, u = Math.floor(i / 2) / Math.ceil(n / 2), a = u * Math.PI * 2 + (ring ? t : -t) * 1.2;
+    return [(ring ? .36 : -.36) + Math.cos(a) * .6, Math.sin(a) * .6, .7 + .3 * Math.sin(a + ring * Math.PI)];
+  },
+  tree(i, n, t) {             // 木：樹幹、枝椏與樹冠
+    const p = samplePolys('tr', TREE, n)[i];
+    return [p[0] + Math.sin(t * 1.6) * .06 * (1 - p[1]) / 2, p[1], p[2] === 1 ? .85 : 1];
+  },
+  grass(i, n, t) {            // 草：九株草葉隨風彎擺
+    const B = 9, b = i % B, s = Math.floor(i / B) / Math.max(1, Math.ceil(n / B) - 1);
+    const x0 = -1 + b * .25 + (hash(b) - .5) * .1, h = .9 + hash(b * 7) * .7, bend = (hash(b * 3) - .5) * .5 + Math.sin(t * 3 + b * .8) * .18;
+    return [x0 + bend * s * s, .9 - h * s, .6 + .4 * s];
+  },
+  bug(i, n, t) {              // 蟲：蜻蜓，四翅高速振動
+    const p = samplePolys('bg', DRAGONFLY, n)[i];
+    if (p[2] === 0) return [p[0], p[1], 1];
+    return [p[0], p[1] * (.55 + .45 * Math.abs(Math.sin(t * (p[2] === 1 ? 22 : 19)))), .7];
+  },
+  food(i, n, t) {             // 食：一碗飯、一雙筷子、裊裊熱氣
+    const p = samplePolys('fd', FOOD, n)[i];
+    if (p[2] === 1) return [p[0] + Math.sin(p[1] * 9 + t * 5) * .07, p[1], .55];
+    return [p[0], p[1] + Math.sin(t * 2) * .02, 1];
+  },
+  bamboo(i, n, t) {           // 節：三竿勁竹隨風搖曳
+    const p = samplePolys('bb', BAMBOO, n)[i];
+    return [p[0] + Math.sin(t * 2 + p[0] * 2) * .08 * (1 - p[1]) / 2, p[1], 1];
+  },
+};
+
+/* ---------- 角色 ---------- */
+const PAL_A   = { main:'#6ee7c8', c2:'#2bb39a', rgb:'110,231,200', dark:'#1d4c48' };
+const PAL_B   = { main:'#ffa58a', c2:'#e0603e', rgb:'255,165,138', dark:'#4c261d' };
+const PAL_INK = { main:'#c49bff', c2:'#7a3dd6', rgb:'176,124,255' };
+function makeScholar(name, pal, glyph) {
+  return { name, glyph: glyph || [...name][0] || '筆', kind:'scholar', pal, ai:false, hp:1000, max:1000, x:0, y:0, r:40, hit:0, st:{}, aura:null, streak:0 };
+}
+function makeInk() { return { name:'墨魘', glyph:'魘', kind:'ink', pal:PAL_INK, ai:true, hp:1200, max:1200, x:0, y:0, r:40, hit:0, st:{}, aura:null, streak:0 }; }
+
+let mode = 'solo', F = [makeScholar('書生', PAL_A, '筆'), makeInk()], cur = 0;
+let busy = false, over = true, bestHit = null, lastEnemyLine = '', matchId = 0;
+
+function resize() {
+  const r = cvs.parentElement.getBoundingClientRect();
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = r.width; H = r.height;
+  cvs.width = Math.round(W * DPR); cvs.height = Math.round(H * DPR);
+  cvs.style.width = W + 'px'; cvs.style.height = H + 'px';
+  PORTRAIT = H > W * 1.05;
+  S = PORTRAIT ? Math.max(40, Math.min(W * .3, H * .15)) : Math.max(40, Math.min(W * .16, H * .32));
+  placeFighters();
+}
+let PORTRAIT = false;
+function placeFighters() {
+  const rr = Math.max(20, Math.min(S * .42, 64));
+  if (PORTRAIT) {          // 直式：我方在下、對手在上
+    F[0].x = W * .5; F[0].y = H * .84;
+    F[1].x = W * .5; F[1].y = H * .17;
+  } else {                 // 橫式：我方在左、對手在右
+    F[0].x = W * .12; F[0].y = H * .58;
+    F[1].x = W * .86; F[1].y = F[1].kind === 'ink' ? H * .5 : H * .58;
+  }
+  F[0].r = F[1].r = rr;
+}
+// 手機鍵盤彈出、轉向時，把整個畫面縮到可見範圍內，確保按鈕按得到
+function fitViewport() {
+  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const cs = getComputedStyle(document.documentElement);
+  const pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);   // 扣掉手機安全區
+  $('#app').style.height = Math.round(h - pad) + 'px';
+  window.scrollTo(0, 0);
+}
+window.addEventListener('resize', fitViewport);
+if (window.visualViewport) window.visualViewport.addEventListener('resize', fitViewport);
+new ResizeObserver(() => resize()).observe(cvs.parentElement);
+
+/* ---------- 攻擊：文字粒子系統 ---------- */
+class Attack {
+  constructor(res, from, to, onImpact, onDone) {
+    this.res = res; this.from = from; this.onImpact = onImpact; this.onDone = onDone;
+    this.backfire = !!res.backfire;
+    this.ang = Math.atan2(to.y - from.y, to.x - from.x);     // 攻擊方向
+    this.downward = PORTRAIT && to.y > from.y;
+    this.to = this.backfire ? from : to;
+    this.im = res.im;
+    if (PORTRAIT) { this.cx = this.cx0 = W * .5; this.cy = this.cy0 = lerp(from.y, to.y, .42); }
+    else { this.cx = this.cx0 = lerp(from.x, to.x, .32); this.cy = this.cy0 = H * .47; }
+    this.colorK = 0;
+
+    const chars = res.chars, nO = chars.length;
+    const N = Math.max(clamp(nO * 4, 72, 150), res.im.minN || 0);
+    this.N = N;
+    const fs = clamp(S * .24, 15, 34);
+    const perRow = Math.max(4, Math.floor(W * .82 / (fs * 1.12)));
+    const rows = Math.ceil(nO / perRow);
+    const reps = Math.max(1, Math.floor(N / nO));
+    this.lineBottom = this.cy + ((rows - 1) / 2) * fs * 1.45 + fs * .5;
+    const taken = new Set();
+    this.ps = [];
+    for (let k = 0; k < nO; k++) {
+      const row = Math.floor(k / perRow), col = k % perRow, inRow = Math.min(perRow, nO - row * perRow);
+      const x = this.cx + (col - (inRow - 1) / 2) * fs * 1.12;
+      const y = this.cy + (row - (rows - 1) / 2) * fs * 1.45;
+      let slot = k + nO * (k % reps); if (slot >= N) slot = k;
+      taken.add(slot);
+      this.ps.push({ ch: chars[k], o: true, x, y, hx: x, hy: y, vx: 0, vy: 0, a: 0, rot: 0, vr: 0, z: 1, k, slot, fs });
+    }
+    for (let s = 0; s < N; s++) {
+      if (taken.has(s)) continue;
+      const src = this.ps[s % nO];
+      this.ps.push({ ch: src.ch, o: false, x: src.x, y: src.y, hx: src.hx, hy: src.hy, vx: 0, vy: 0, a: 0, rot: 0, vr: 0, z: 1, k: s, slot: s,
+                     fs: fs * .62 * (.75 + hash(s) * .5) * (res.im.fsK || 1) });
+    }
+    this.ps.forEach((p, idx) => { p.delay = hash(idx + nO * 7) * .35; p.curve = (hash(idx * 3.1) - .5) * S * 1.2; });
+    this.phase = 'reveal'; this.pt = 0; this.st = 0; this.spin = 1;
+    this.revealDur = Math.min(.055 * nO + .35, 1.3);
+  }
+  go(ph) { this.phase = ph; this.pt = 0; }
+  finish() { this.dead = true; this.onDone && this.onDone(); }
+  target(p) {
+    const l = SHAPES[this.im.id](p.slot, this.N, this.st);
+    if (this.im.orient) { const r = rot2(l[0], l[1], this.ang); l[0] = r[0]; l[1] = r[1]; }   // 有方向性的形狀轉向目標
+    p.z = l[2];
+    return [this.cx + l[0] * S, this.cy + l[1] * S];
+  }
+  followAll(dt, f) {
+    const k = follow(f, dt);
+    for (const p of this.ps) { const [tx, ty] = this.target(p); p.x = lerp(p.x, tx, k); p.y = lerp(p.y, ty, k); }
+  }
+  update(dt) {
+    this.pt += dt;
+    const ps = this.ps;
+    switch (this.phase) {
+      case 'reveal': {                         // 1. 詩句逐字浮現（中性金色，不透露屬性）
+        this.colorK = 0;
+        const step = (this.revealDur - .3) / Math.max(1, this.res.chars.length);
+        for (const p of ps) if (p.o) { const v = clamp((this.pt - p.k * step) / .25, 0, 1); p.a = v; p.y = p.hy + (1 - v) * 12; }
+        // 每浮現一個字，敲一個五聲音階的音
+        const shown = Math.min(this.res.chars.length, Math.floor(this.pt / Math.max(step, .001)) + 1);
+        this.ticked = this.ticked || 0;
+        while (this.ticked < shown) { SFX.at(this.cx0); SFX.tick(this.ticked++); }
+        if (this.pt > this.revealDur + .35) {
+          this.go('scatter');
+          SFX.at(this.cx0); SFX.scatter();
+          for (const p of ps) {
+            const ang = Math.random() * Math.PI * 2, sp = rand(60, 260) * (S / 140);
+            p.vx = Math.cos(ang) * sp; p.vy = Math.sin(ang) * sp - 30; p.vr = rand(-4, 4);
+          }
+        }
+        break;
+      }
+      case 'scatter': {                        // 2. 散成粒子
+        const fr = Math.pow(.05, dt);
+        for (const p of ps) {
+          p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= fr; p.vy *= fr; p.rot += p.vr * dt;
+          if (!p.o) p.a = Math.min(.75, p.a + dt * 2.2);
+        }
+        if (this.pt > .5) {
+          if (this.backfire) { this.go('corrupt'); SFX.at(this.from.x); SFX.elem('backfire', 'sig'); }
+          else { this.go('form'); SFX.at(this.cx0); SFX.form(); for (const p of ps) { p.sx = p.x; p.sy = p.y; p.sr = p.rot; } }
+        }
+        break;
+      }
+      case 'form': {                           // 3. Lerp 重組成意象，顏色同步顯現
+        this.colorK = clamp(this.pt / .9, 0, 1);
+        this.st += dt * this.spin;
+        for (const p of ps) {
+          const [tx, ty] = this.target(p);
+          const e = easeInOut(clamp((this.pt - p.delay) / 1.0, 0, 1));
+          const dx = tx - p.sx, dy = ty - p.sy, d = Math.hypot(dx, dy) || 1, bow = Math.sin(Math.PI * e) * p.curve;
+          p.x = lerp(p.sx, tx, e) + (-dy / d) * bow; p.y = lerp(p.sy, ty, e) + (dx / d) * bow;
+          p.rot = lerp(p.sr, 0, e); if (!p.o) p.a = Math.max(p.a, .75);
+        }
+        if (this.pt > 1.4) {
+          this.go('hold');
+          this.isNew = discover(this.im.id);
+          SFX.at(this.cx0); SFX.elem(this.im.id, 'sig');      // 屬性揭曉：播放該屬性的專屬音效
+          if (this.isNew) SFX.discover();
+        }
+        break;
+      }
+      case 'hold': {                           // 4. 成形蓄力（屬性揭曉）
+        this.colorK = 1;
+        this.spin = lerp(1, 2.6, clamp(this.pt / 1.1, 0, 1)); this.st += dt * this.spin;
+        this.followAll(dt, .35);
+        if (this.pt > 1.1) { this.go('launch'); SFX.launch(this.cx0, this.to.x); }
+        break;
+      }
+      case 'launch': {                         // 5. 衝向目標
+        this.st += dt * 3;
+        const e = easeIn(clamp(this.pt / .55, 0, 1));
+        this.cx = lerp(this.cx0, this.to.x, e); this.cy = lerp(this.cy0, this.to.y, e);
+        this.followAll(dt, .45);
+        if (this.pt >= .55) { this.go('explode'); this.explode(); }
+        break;
+      }
+      case 'corrupt': {                        // 反噬：文字在自己身邊失控打轉
+        this.colorK = clamp(this.pt / .6, 0, 1);
+        this.st += dt * (2 + this.pt * 4);
+        const jit = this.pt * S * .12, shrink = 1 - .4 * clamp(this.pt / 1.6, 0, 1), k = follow(.12, dt);
+        for (const p of ps) {
+          const ang = p.slot / this.N * Math.PI * 2 + this.st, rr = S * (.55 + .35 * hash(p.slot)) * shrink;
+          const tx = this.from.x + Math.cos(ang) * rr + rand(-jit, jit), ty = this.from.y + Math.sin(ang) * rr + rand(-jit, jit);
+          p.x = lerp(p.x, tx, k); p.y = lerp(p.y, ty, k); p.rot += rand(-.25, .25); p.z = 1;
+        }
+        if (this.pt > 1.6) { this.cx = this.from.x; this.cy = this.from.y; this.go('explode'); this.explode(); }
+        break;
+      }
+      case 'explode': {                        // 6. 撞擊四散
+        const fr = Math.pow(.15, dt), g = 260 * (S / 140);
+        for (const p of ps) {
+          p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= fr; p.vy = p.vy * fr + g * dt; p.rot += p.vr * dt; p.a = Math.max(0, p.a - dt * .9);
+        }
+        if (this.backfire && this.pt > 1.2) this.finish();
+        else if (!this.backfire && this.pt > .75) {
+          this.go('return');
+          SFX.restore();
+          for (const p of ps) { p.sx = p.x; p.sy = p.y; p.sr = p.rot; p.sa = p.a; p.sz = p.z; }
+        }
+        break;
+      }
+      case 'return': {                         // 7. 文字飛回原位，恢復成原本的詩句
+        this.colorK = 1 - clamp(this.pt / .8, 0, 1);
+        for (const p of ps) {
+          const e = easeInOut(clamp((this.pt - p.delay * .6) / .9, 0, 1));
+          p.x = lerp(p.sx, p.hx, e); p.y = lerp(p.sy, p.hy, e);
+          p.rot = lerp(p.sr, 0, e); p.z = lerp(p.sz ?? 1, 1, e);
+          p.a = p.o ? lerp(p.sa, 1, e) : p.sa * (1 - e);
+        }
+        if (this.pt > 1.25) this.go('rest');
+        break;
+      }
+      case 'rest': if (this.pt > (this.res.src ? 1.4 : .6)) this.go('fade'); break;
+      case 'fade':
+        for (const p of ps) if (p.o) p.a = Math.max(0, 1 - this.pt / .5);
+        if (this.pt > .5) this.finish();
+        break;
+    }
+  }
+  explode() {
+    for (const p of this.ps) {
+      const dx = p.x - this.to.x, dy = p.y - this.to.y, d = Math.hypot(dx, dy) || 1, sp = rand(180, 560) * (S / 140);
+      const push = this.backfire ? 0 : rand(40, 200);
+      p.vx = dx / d * sp + Math.cos(this.ang) * push;
+      p.vy = dy / d * sp + Math.sin(this.ang) * push - rand(0, 150); p.vr = rand(-8, 8);
+      p.a = Math.max(p.a, p.o ? 1 : .8);
+    }
+    this.onImpact && this.onImpact(this);
+  }
+  draw(ctx) {
+    const im = this.im, k = this.colorK;
+    const cGlow = mix(NEUTRAL.color, im.color, k), cEcho = mix(NEUTRAL.color2, im.color2, k), cLight = mix(NEUTRAL.light, im.light, k);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+    if (k > .02 && ['form', 'hold', 'launch'].includes(this.phase)) {
+      const g = ctx.createRadialGradient(this.cx, this.cy, 0, this.cx, this.cy, S * 1.4);
+      g.addColorStop(0, rgba(cGlow, .16 * k)); g.addColorStop(1, rgba(cGlow, 0));
+      ctx.fillStyle = g; ctx.fillRect(this.cx - S * 1.5, this.cy - S * 1.5, S * 3, S * 3);
+    }
+    if (this.phase === 'hold') this.drawReveal();
+    if (this.res.src && ['return', 'rest', 'fade'].includes(this.phase)) {     // 詩句歸位時標註出處
+      const a = this.phase === 'return' ? clamp((this.pt - .6) / .5, 0, 1) : this.phase === 'fade' ? 1 - this.pt / .5 : 1;
+      ctx.globalAlpha = Math.max(0, a) * .95;
+      ctx.font = `500 ${Math.round(clamp(S * .14, 12, 18))}px ${SERIF}`;
+      ctx.fillStyle = '#f7e2a4';
+      ctx.fillText(`—— ${this.res.src}`, this.cx0, this.lineBottom + clamp(S * .2, 14, 26));
+      ctx.globalAlpha = 1;
+    }
+    if (this.phase === 'corrupt') {
+      ctx.globalAlpha = clamp(this.pt / .3, 0, 1) * (.7 + .3 * Math.sin(this.pt * 30));
+      ctx.font = `900 ${Math.round(clamp(S * .17, 13, 22))}px ${SERIF}`;
+      ctx.fillStyle = '#ff6b78'; ctx.shadowColor = '#ff2b40'; ctx.shadowBlur = 14;
+      ctx.fillText('文氣污濁 · 反噬！', this.from.x + rand(-2, 2), this.from.y + (PORTRAIT && this.from.y < H / 2 ? 1 : -1) * S * 1.15 + rand(-2, 2));
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    }
+
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = rgba(cEcho, 1);
+    for (const p of this.ps) if (!p.o && p.a > .01) drawGlyph(p, 700);
+    ctx.shadowColor = rgba(cGlow, 1); ctx.shadowBlur = this.phase === 'rest' ? 22 : 14;
+    ctx.fillStyle = rgba(cLight, 1);
+    for (const p of this.ps) if (p.o && p.a > .01) drawGlyph(p, 900);
+    ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  }
+  drawReveal() {                               // 屬性揭曉的大字
+    const im = this.im, a = clamp(this.pt / .3, 0, 1), pop = 1 + (1 - a) * .4;
+    const big = Math.round(clamp(S * .22, 17, 32) * pop), y = this.downward ? this.cy0 + S * 1.3 + big * .4 : this.cy0 - S * 1.3 - (1 - a) * 10;
+    ctx.globalAlpha = a;
+    if (this.isNew) {
+      ctx.font = `700 ${Math.round(big * .45)}px ${SERIF}`; ctx.fillStyle = '#ffe9a8';
+      ctx.fillText('✦ 新意象發掘 ✦', this.cx0, y - big * 1.05);
+    }
+    ctx.font = `900 ${big}px ${SERIF}`; ctx.fillStyle = im.light; ctx.shadowColor = im.color; ctx.shadowBlur = 20;
+    ctx.fillText(im.name, this.cx0, y);
+    ctx.shadowBlur = 0;
+    ctx.font = `500 ${Math.round(big * .5)}px ${SERIF}`; ctx.fillStyle = im.color;
+    ctx.fillText(`— ${im.elem} 屬 性 —`, this.cx0, y + big * .85);
+    if (this.res.reason) { ctx.font = `400 ${Math.round(big * .42)}px ${SERIF}`; ctx.fillStyle = im.light; ctx.fillText(`「${this.res.reason}」`, this.cx0, y + big * 1.45); }
+    ctx.globalAlpha = 1;
+  }
+}
+function drawGlyph(p, weight) {
+  const z = p.z ?? 1, fs = Math.max(6, Math.round(p.fs * (.7 + .3 * z)));
+  ctx.globalAlpha = p.a * (.45 + .55 * z);
+  ctx.font = `${weight} ${fs}px ${SERIF}`;
+  if (Math.abs(p.rot) > .01) { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillText(p.ch, 0, 0); ctx.restore(); }
+  else ctx.fillText(p.ch, p.x, p.y);
+}
+
+/* ---------- 圖鑑 ---------- */
+const dex = new Set();
+try { JSON.parse(localStorage.getItem('szhjw-dex') || '[]').forEach(id => dex.add(id)); } catch (e) {}
+function discover(id) {
+  if (dex.has(id) || id === 'backfire') return false;
+  dex.add(id);
+  try { localStorage.setItem('szhjw-dex', JSON.stringify([...dex])); } catch (e) {}
+  return true;
+}
+function renderDex() {
+  $('#dex').innerHTML = IMAGERY.map(im => dex.has(im.id)
+    ? `<span class="on" style="--c:${im.color}">${im.elem}・${im.name}</span>`
+    : `<span>？・？？？？</span>`).join('');
+  $('#dexNote').textContent = `已發掘 ${IMAGERY.filter(i => dex.has(i.id)).length} / ${IMAGERY.length}`;
+}
+
+/* ---------- 特效 ---------- */
+let attacks = [], rings = [], sparks = [], floaters = [];
+let shake = 0, flash = 0, flashColor = '#ffffff';
+const ambient = [];
+const AMB = '書中自有黃金屋書中自有顏如玉之乎者也詩酒趁年華';
+for (let i = 0; i < 38; i++) ambient.push({ ch: AMB[i % AMB.length], x: Math.random(), y: Math.random(), v: rand(.006, .02), a: rand(.04, .11), s: rand(12, 26), ph: Math.random() * 6 });
+
+function impactFX(x, y, im, res) {
+  rings.push({ x, y, r: 0, max: S * 1.7, life: 1, color: im.color, w: 3 });
+  rings.push({ x, y, r: 0, max: S * 1.1, life: 1, color: '#ffffff', w: 1.5 });
+  for (let i = 0; i < 46; i++) {
+    const a = Math.random() * Math.PI * 2, sp = rand(80, 520);
+    sparks.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: rand(.5, 1), color: Math.random() < .5 ? im.color : im.light, s: rand(1, 2.6) });
+  }
+  floaters.push({ text: `-${res.dmg}`, sub: res.backfire ? '反噬！' : res.crit ? '暴擊！' : '', x, y: y - S * .4, life: 1.6, color: im.color, big: res.crit || res.backfire });
+  shake = res.crit || res.backfire ? 16 : 9;
+  flash = 1; flashColor = im.color;
+}
+
+/* ---------- 角色繪製 ---------- */
+function drawScholar(e, t) {
+  const sh = e.hit * 8, pal = e.pal, r = e.r;
+  const x = e.x + rand(-sh, sh), y = e.y + Math.sin(t * 1.6 + (e === F[1] ? 2 : 0)) * 4 + rand(-sh, sh);
+  ground(e.x, e.y + r * 1.25, r, pal.rgb);
+  let g = ctx.createRadialGradient(x, y, 0, x, y, r * 2.3);
+  g.addColorStop(0, `rgba(${pal.rgb},.28)`); g.addColorStop(1, `rgba(${pal.rgb},0)`);
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 2.3, 0, Math.PI * 2); ctx.fill();
+  ctx.lineWidth = 1.2; ctx.strokeStyle = `rgba(${pal.rgb},.55)`;
+  ctx.setLineDash([4, 7]); ctx.lineDashOffset = -t * 22;
+  ctx.beginPath(); ctx.arc(x, y, r * 1.4, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([2, 12]); ctx.lineDashOffset = t * 30; ctx.strokeStyle = 'rgba(233,196,106,.5)';
+  ctx.beginPath(); ctx.arc(x, y, r * 1.62, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([]);
+  g = ctx.createRadialGradient(x - r * .3, y - r * .3, r * .1, x, y, r);
+  g.addColorStop(0, pal.dark); g.addColorStop(1, '#0b0f14');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = pal.main; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.shadowColor = pal.main; ctx.shadowBlur = 16; ctx.fillStyle = '#fffaf0';
+  ctx.font = `900 ${Math.round(r * .95)}px ${SERIF}`; ctx.fillText(e.glyph, x, y + r * .04);
+  ctx.shadowBlur = 0;
+  if (e.hit > 0) { ctx.fillStyle = `rgba(255,255,255,${e.hit * .5})`; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+  label(e.name, x, e.y + r * 1.75, pal.main);
+}
+function drawInk(e, t) {
+  const sh = e.hit * 10, r = e.r * 1.15;
+  const x = e.x + rand(-sh, sh), y = e.y + Math.sin(t * 1.2) * 7 + rand(-sh, sh);
+  ground(e.x, e.y + r * 1.2, r, '176,124,255');
+  for (let k = 0; k < 7; k++) {
+    const ang = k / 7 * Math.PI * 2 + t * .6;
+    const ox = x + Math.cos(ang) * r * .38 * (1 + .3 * Math.sin(t * 2 + k)), oy = y + Math.sin(ang) * r * .38 * (1 + .3 * Math.cos(t * 1.7 + k));
+    const rr = r * (.8 + .22 * Math.sin(t * 1.7 + k * 2));
+    const g = ctx.createRadialGradient(ox, oy, 0, ox, oy, rr);
+    g.addColorStop(0, 'rgba(70,25,110,.55)'); g.addColorStop(1, 'rgba(15,6,25,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ox, oy, rr, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(8,5,14,.95)'; ctx.beginPath(); ctx.arc(x, y, r * .78, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(176,124,255,.55)'; ctx.lineWidth = 1.5; ctx.stroke();
+  const blink = Math.sin(t * .9) > .97 ? .15 : 1;
+  ctx.shadowColor = '#ff3b5c'; ctx.shadowBlur = 18; ctx.fillStyle = '#ff6b81';
+  [-1, 1].forEach(s => { ctx.beginPath(); ctx.ellipse(x + s * r * .26, y - r * .14, r * .1, r * .1 * blink, s * .3, 0, Math.PI * 2); ctx.fill(); });
+  ctx.shadowBlur = 0; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(196,155,255,.55)'; ctx.font = `900 ${Math.round(r * .5)}px ${SERIF}`; ctx.fillText(e.glyph, x, y + r * .3);
+  if (e.hit > 0) { ctx.fillStyle = `rgba(255,255,255,${e.hit * .55})`; ctx.beginPath(); ctx.arc(x, y, r * .8, 0, Math.PI * 2); ctx.fill(); }
+  label(e.name, x, e.y + r * 1.55, '#c49bff');
+}
+function ground(x, y, r, rgb) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r * 1.8);
+  g.addColorStop(0, `rgba(${rgb},.18)`); g.addColorStop(1, `rgba(${rgb},0)`);
+  ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r * 1.8, r * .35, 0, 0, Math.PI * 2); ctx.fill();
+}
+function label(text, x, y, color) {
+  ctx.font = `700 13px ${SERIF}`; ctx.fillStyle = color; ctx.globalAlpha = .85;
+  ctx.fillText([...text].join(' '), x, y); ctx.globalAlpha = 1;
+}
+
+/* ---------- 主迴圈 ---------- */
+let last = performance.now(), T = 0;
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now; T += dt;
+  update(dt); render(dt);
+  requestAnimationFrame(frame);
+}
+function update(dt) {
+  attacks.forEach(a => a.update(dt));
+  attacks = attacks.filter(a => !a.dead);
+  F.forEach(f => f.hit = Math.max(0, f.hit - dt * 2.5));
+  shake = Math.max(0, shake - dt * 40); flash = Math.max(0, flash - dt * 3);
+  for (const r of rings) { r.r = lerp(r.r, r.max, follow(.12, dt)); r.life -= dt * 1.5; }
+  rings = rings.filter(r => r.life > 0);
+  for (const s of sparks) { s.x += s.vx * dt; s.y += s.vy * dt; s.vx *= Math.pow(.08, dt); s.vy = s.vy * Math.pow(.08, dt) + 120 * dt; s.life -= dt; }
+  sparks = sparks.filter(s => s.life > 0);
+  for (const f of floaters) { f.y -= 38 * dt; f.life -= dt; }
+  floaters = floaters.filter(f => f.life > 0);
+  for (const a of ambient) { a.y -= a.v * dt; if (a.y < -.05) { a.y = 1.05; a.x = Math.random(); } }
+}
+function render(dt) {
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = `rgba(0,0,0,${1 - Math.pow(.58, dt * 60)})`; ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.translate(rand(-shake, shake), rand(-shake, shake));
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const a of ambient) {
+    ctx.globalAlpha = a.a * (.6 + .4 * Math.sin(T + a.ph)); ctx.fillStyle = '#e9c46a';
+    ctx.font = `400 ${a.s}px ${SERIF}`; ctx.fillText(a.ch, a.x * W, a.y * H);
+  }
+  ctx.globalAlpha = 1;
+  F.forEach(f => f.kind === 'ink' ? drawInk(f, T) : drawScholar(f, T));
+  if (thinking) {                      // 等待 Claude 判讀時，施法者周圍的推敲光圈
+    const f = thinking, rr = f.r * 1.9 + Math.sin(T * 6) * 4;
+    ctx.strokeStyle = hexA(f.pal.main, .75); ctx.lineWidth = 2; ctx.setLineDash([6, 10]); ctx.lineDashOffset = -T * 60;
+    ctx.beginPath(); ctx.arc(f.x, f.y, rr, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.globalAlpha = .6 + .4 * Math.sin(T * 4); ctx.fillStyle = f.pal.main; ctx.font = `700 13px ${SERIF}`;
+    ctx.fillText('推 敲 意 象 …', f.x, f.y + (PORTRAIT ? -1 : -1) * (rr + 14)); ctx.globalAlpha = 1;
+  }
+  attacks.forEach(a => a.draw(ctx));
+  ctx.globalCompositeOperation = 'lighter';
+  for (const r of rings) { ctx.strokeStyle = hexA(r.color, Math.max(0, r.life) * .8); ctx.lineWidth = r.w * r.life + .5; ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2); ctx.stroke(); }
+  for (const s of sparks) { ctx.fillStyle = hexA(s.color, Math.min(1, s.life * 1.5)); ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2); ctx.fill(); }
+  if (flash > 0) { ctx.fillStyle = hexA(flashColor, flash * .13); ctx.fillRect(-20, -20, W + 40, H + 40); }
+  ctx.globalCompositeOperation = 'source-over';
+  for (const f of floaters) {
+    if (f.small) {
+      ctx.globalAlpha = Math.min(1, f.life * 1.5); ctx.font = `900 ${Math.round(clamp(S * .13, 13, 19))}px ${SERIF}`;
+      ctx.shadowColor = f.color; ctx.shadowBlur = 12; ctx.fillStyle = f.color; ctx.fillText(f.text, f.x, f.y); ctx.shadowBlur = 0;
+      continue;
+    }
+    const age = 1.6 - f.life, pop = age < .15 ? 1 + (1 - age / .15) * .8 : 1;
+    const size = (f.big ? 46 : 34) * pop * clamp(S / 150, .7, 1.2);
+    ctx.globalAlpha = Math.min(1, f.life * 1.5); ctx.font = `900 ${Math.round(size)}px ${SERIF}`;
+    ctx.shadowColor = f.color; ctx.shadowBlur = 20; ctx.fillStyle = '#fff'; ctx.fillText(f.text, f.x, f.y);
+    if (f.sub) { ctx.font = `900 ${Math.round(size * .45)}px ${SERIF}`; ctx.fillStyle = f.color; ctx.fillText(f.sub, f.x, f.y - size * .75); }
+    ctx.shadowBlur = 0;
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* ---------- 介面與流程 ---------- */
+const input = $('#poem'), btn = $('#cast'), detectEl = $('#detect'), turnEl = $('#turn');
+
+function updateHud() {
+  F.forEach((f, i) => {
+    const hp = $(`#hp${i}`);
+    hp.style.setProperty('--c1', f.pal.main); hp.style.setProperty('--c2', f.pal.c2);
+    hp.classList.toggle('active', i === cur && !over);
+    $(`#nm${i}`).textContent = f.name;
+    const pct = (f.hp / f.max * 100) + '%';
+    $(`#fill${i}`).style.width = pct; $(`#ghost${i}`).style.width = pct;
+    $(`#num${i}`).textContent = `${f.hp} / ${f.max}`;
+    const chips = [];
+    if (f.aura) { const im = IMAGERY.find(x => x.id === f.aura); chips.push([`氣場・${im.elem}${f.streak > 1 ? ' ×' + f.streak : ''}`, im.color]); }
+    if (f.st.burn) chips.push([`灼燒 ${f.st.burn.turns}`, '#ff7b3d']);
+    if (f.st.poison) chips.push([`蟲蝕 ${f.st.poison.turns}`, '#b6e34a']);
+    if (f.st.weak) chips.push(['受制', '#9aa0b4']);
+    if (f.st.regen) chips.push([`回春 ${f.st.regen.turns}`, '#7dffa8']);
+    if (f.st.shield) chips.push([`護盾 ${Math.round(f.st.shield * 100)}%`, '#8fd3ff']);
+    $(`#fx${i}`).innerHTML = chips.map(([t, c]) => `<span style="--c:${c}">${t}</span>`).join('');
+  });
+}
+function setTurnLabel(text, color) { turnEl.textContent = text; turnEl.style.setProperty('--tc', color || '#e9c46a'); }
+let bannerTimer;
+function banner(html, color) {
+  const el = $('#banner');
+  el.innerHTML = html; el.style.setProperty('--c', color);
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  clearTimeout(bannerTimer); bannerTimer = setTimeout(() => el.classList.remove('show'), 3600);
+}
+function log(who, color, text) {
+  const li = document.createElement('li');
+  const w = document.createElement('span'); w.className = 'who'; w.style.color = color; w.textContent = who;
+  li.appendChild(w); li.appendChild(document.createTextNode(text));
+  const ul = $('#log'); ul.prepend(li);
+  while (ul.children.length > 30) ul.lastChild.remove();
+}
+function preview() {   // 輸入時只顯示字數，不透露屬性
+  const n = [...input.value].filter(isWordChar).length;
+  detectEl.innerHTML = n
+    ? `已凝聚 <span class="q">${Math.min(n, 40)}</span> 字文氣`
+    : '寫下一句詩或名言，按「具象化攻擊」。';
+}
+
+function hit(res, atk, def) {
+  const target = res.backfire ? atk : def;
+  let shieldNote = null;
+  if (!res.backfire && def.st.shield) {          // 護盾抵消部分傷害
+    const absorbed = Math.round(res.dmg * def.st.shield);
+    res.dmg -= absorbed; def.st.shield = 0; shieldNote = { t: `${def.name}護盾抵消 ${absorbed}`, k: 'down' };
+  }
+  target.hp = Math.max(0, target.hp - res.dmg);
+  target.hit = 1;
+  impactFX(target.x, target.y, res.im, res);
+  SFX.at(target.x); SFX.elem(res.im.id, 'hit');            // 命中：該屬性的專屬撞擊音
+  if (res.crit) SFX.crit();
+  updateHud();
+  const im = res.im;
+  if (res.backfire) {
+    atk.streak = 0;
+    updateHud();
+    banner(`『${esc(res.clause)}』文氣污濁，引發<b>文字自爆</b>！<br>${esc(atk.name)}反噬自身 <b>${res.dmg}</b> 點傷害<br><small>詩句裡出現了粗口或不當的字眼。文字有力量，請好好使用它。</small>`, '#ff4d5e');
+    log(atk.name, atk.pal.main, `口出惡言，文字自爆，自扣 ${res.dmg} 點`);
+    return;
+  }
+  const notes = (res.notes || []).concat(shieldNote ? [shieldNote] : [], applyEffects(res, atk, def));
+  if (res.unjust) {
+    floaters.push({ text: '文氣不正', x: atk.x, y: atk.y - atk.r * 1.7, life: 2, color: '#9aa0b4', small: true });
+    banner(`『${esc(res.clause)}』<b style="color:#c9cbd6;text-shadow:none">文氣不正</b>，只對${esc(def.name)}造成 ${res.dmg} 點傷害。` +
+      `<br><small>詩句是拿來表達的，不是拿來取笑別人的。換一句吧！</small>`, '#8f93a8');
+    log(atk.name, atk.pal.main, `『${res.clause}』文氣不正（嘲諷他人），威力只剩三成，${res.dmg} 點`);
+    updateHud();
+    return;
+  }
+  if (notes.some(n => n.k === 'combo')) SFX.combo(); else if (notes.some(n => n.t.startsWith('相剋'))) SFX.counter();
+  notes.filter(n => n.k === 'combo' || n.t.startsWith('相剋')).forEach((n, k) =>
+    floaters.push({ text: n.t, x: def.x, y: def.y + def.r * 1.2 + k * 22, life: 1.8, color: NOTE_COLOR[n.k], small: true }));
+  updateHud();
+  const kind = `${im.elem}屬性${res.crit ? '暴擊' : '傷害'}`;
+  const who = atk.ai ? `${esc(atk.name)}吟出` : (mode === 'multi' ? `${esc(atk.name)}：` : '');
+  banner(`${who}『${esc(res.clause)}』${im.verb}，對${esc(def.name)}造成 <b>${res.dmg}</b> 點${kind}！` +
+    (res.crit ? '<span class="crit">CRIT</span>' : '') +
+    (res.reason ? `<br><small>意象：${esc(res.reason)}</small>` : '') +
+    (res.repeat ? '<br><small>（此句已被吟過，威力減半——試試新的句子吧）</small>' : '') +
+    (notes.length ? `<div class="notes">${notes.map(n => `<span style="color:${NOTE_COLOR[n.k]}">${esc(n.t)}</span>`).join('')}</div>` : '') +
+    (res.src ? `<div class="src">📜 出自 ${esc(res.src)}${atk.ai ? '' : '　·　典故加成'}</div>` : ''), im.color);
+  log(atk.name, atk.pal.main, `『${res.clause}』${im.verb}，${res.dmg} 點${kind}${notes.length ? '｜' + notes.map(n => n.t).join('、') : ''}${res.src ? `（${res.src}）` : ''}`);
+  if (!atk.ai && (!bestHit || res.dmg > bestHit.dmg)) bestHit = { ...res, who: atk.name };
+}
+
+function launchAttack(res) {
+  const atk = F[cur], def = F[1 - cur], id = matchId;
+  if (!res.backfire) interact(res, atk, def);
+  attacks.push(new Attack(res, atk, def,
+    () => { if (id === matchId) hit(res, atk, def); },
+    () => { if (id === matchId) afterAttack(); }));
+}
+function afterAttack() {
+  input.value = ''; preview();                    // 攻擊結束後輸入框恢復原狀
+  if (F.some(f => f.hp <= 0)) { endGame(); return; }
+  cur = 1 - cur;
+  beginTurn();
+}
+function beginTurn() {
+  if (over) return;
+  const f = F[cur];
+  if (tickStatus(f)) { updateHud(); endGame(); return; }
+  updateHud();
+  document.documentElement.style.setProperty('--accent', f.pal.main);
+  if (f.ai) {
+    btn.disabled = true; busy = true;
+    setTurnLabel(`${f.name}吟詠中…`, f.pal.main);
+    const id = matchId;
+    setTimeout(() => { if (id === matchId && !over) aiTurn(); }, 700);
+  } else {
+    busy = false; btn.disabled = false;
+    SFX.turn();
+    setTurnLabel(mode === 'multi' ? `${f.name} 的回合` : '你的回合', f.pal.main);
+    input.placeholder = mode === 'multi' ? `${f.name}，請寫下你的詩句……` : '寫下一句詩，例如：夜來風雨聲，花落知多少';
+    if (matchMedia('(pointer:fine)').matches) input.focus();
+  }
+}
+async function cast() {
+  if (busy || over || F[cur].ai) return;
+  const text = input.value.trim();
+  const raw = [...text].filter(isWordChar).slice(0, 40);
+  if (raw.length < 2) {
+    input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
+    detectEl.innerHTML = '<span style="color:#ff8a95">至少輸入兩個字，才能凝聚文氣。</span>';
+    return;
+  }
+  SFX.init();
+  busy = true; btn.disabled = true;
+  const id = matchId, who = F[cur];
+  setTurnLabel('推敲意象中…', who.pal.main);
+  thinking = who;
+  const verdict = detectBad(raw).size ? null : await aiJudge(text);   // 交給 Claude 讀整句意境
+  thinking = null;
+  if (id !== matchId || over) return;
+  setTurnLabel('文氣凝聚中…', who.pal.main);
+  launchAttack(analyze(text, false, verdict));
+}
+let thinking = null;
+function aiTurn() {
+  let line;
+  const foe = F[0], smart = ENEMY_LINES.filter(l => foe.aura && COUNTER[l[1]] && COUNTER[l[1]][foe.aura] && l !== lastEnemyLine);
+  if (smart.length && Math.random() < .5) line = smart[Math.floor(Math.random() * smart.length)];
+  else do { line = ENEMY_LINES[Math.floor(Math.random() * ENEMY_LINES.length)]; } while (line === lastEnemyLine);
+  lastEnemyLine = line;
+  launchAttack(analyze(line[0], true, { element: line[1], strength: 2, reason: '', profanity: false, badWords: [], mocks: false, source: null }));
+}
+
+function startGame(m) {
+  SFX.init(); SFX.click();          // 瀏覽器規定音訊須由使用者點擊啟動
+  mode = m;
+  if (m === 'solo') F = [makeScholar('書生', PAL_A, '筆'), makeInk()];
+  else {
+    const n1 = $('#name1').value.trim() || '甲方', n2 = $('#name2').value.trim() || '乙方';
+    F = [makeScholar(n1, PAL_A), makeScholar(n2 === n1 ? n2 + '２' : n2, PAL_B)];
+  }
+  matchId++;
+  placeFighters();
+  usedLines.clear(); attacks = []; rings = []; sparks = []; floaters = [];
+  bestHit = null; over = false; cur = 0; input.value = '';
+  $('#log').innerHTML = '';
+  $('#chips').style.display = m === 'solo' ? '' : 'none';
+  $('#menu').classList.remove('show'); $('#over').classList.remove('show');
+  log('系統', '#e9c46a', m === 'solo' ? '墨魘自書頁中甦醒。以詩為兵，擊退它吧！' : `詩壇論劍開始：${F[0].name} 對 ${F[1].name}！`);
+  preview(); beginTurn();
+}
+function showMenu() {
+  matchId++; over = true; busy = false; attacks = [];
+  renderDex();
+  $('#over').classList.remove('show'); $('#menu').classList.add('show');
+}
+function endGame() {
+  over = true; btn.disabled = true; updateHud();
+  const winner = F.find(f => f.hp > 0) || F[0];
+  const card = $('#card');
+  setTimeout(() => (mode === 'solo' && winner !== F[0]) ? SFX.lose() : SFX.win(), 500);
+  if (mode === 'solo') {
+    const win = winner === F[0];
+    card.classList.toggle('lose', !win);
+    $('#ovBig').textContent = win ? '勝' : '敗';
+    $('#ovTitle').textContent = win ? '墨魘消散' : '墨跡吞沒了書頁';
+    $('#ovSub').textContent = win ? '書中自有黃金屋——你以詩為兵，化字為鋒。' : '別氣餒，換幾句意象更鮮明的詩，再戰一次！';
+    setTurnLabel(win ? '勝利' : '落敗', win ? '#e9c46a' : '#c49bff');
+  } else {
+    card.classList.remove('lose');
+    $('#ovBig').textContent = '勝';
+    $('#ovTitle').textContent = `${winner.name} 奪得黃金屋`;
+    $('#ovSub').textContent = '詩壇論劍，以文會友。勝負之外，願每一句詩都被好好記住。';
+    setTurnLabel(`${winner.name} 勝`, winner.pal.main);
+  }
+  $('#ovBest').textContent = bestHit ? `本局最強一擊：${mode === 'multi' ? bestHit.who + '・' : ''}『${bestHit.clause}』${bestHit.dmg} 點` : '';
+  setTimeout(() => $('#over').classList.add('show'), 700);
+}
+
+btn.addEventListener('click', cast);
+input.addEventListener('input', preview);
+input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) cast(); });
+$('#startSolo').addEventListener('click', () => startGame('solo'));
+$('#startMulti').addEventListener('click', () => startGame('multi'));
+$('#againBtn').addEventListener('click', () => startGame(mode));
+$('#menuBtn').addEventListener('click', () => { SFX.click(); showMenu(); });
+$('#homeBtn').addEventListener('click', () => { SFX.click(); showMenu(); });
+const muteBtn = $('#muteBtn');
+const renderMute = () => { muteBtn.textContent = SFX.muted ? '🔇 音效關' : '🔊 音效開'; muteBtn.classList.toggle('off', SFX.muted); };
+muteBtn.addEventListener('click', () => { SFX.init(); SFX.toggle(); renderMute(); SFX.click(); });
+renderMute();
+const chipsEl = $('#chips');
+SAMPLES.forEach(s => {
+  const c = document.createElement('button'); c.className = 'chip'; c.textContent = s;
+  c.onclick = () => { SFX.init(); SFX.click(); input.value = s; preview(); };
+  chipsEl.appendChild(c);
+});
+
+fitViewport(); resize(); updateHud(); preview(); renderDex(); getSampler();
+btn.disabled = true; setTurnLabel('請選擇模式');
+requestAnimationFrame(frame);
+</script>
+
+
+
+</body></html>

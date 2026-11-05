@@ -135,3 +135,10 @@ main>.card{margin-bottom:18px}
 .btnlink.primary{background:var(--text);color:var(--bg)}
 @media (max-width:760px){.flow,.up-grid{grid-template-columns:1fr}}
 .keystatus{color:var(--ok);margin:10px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+.mpreview{border:1px dashed var(--border);border-radius:4px;padding:10px 12px;background:var(--bg);line-height:1.9;min-height:40px}
+.mpreview .mp-stem{font-weight:700;margin-bottom:4px;white-space:pre-wrap}
+
+.paste{margin-top:12px}
+.paste summary{cursor:pointer;color:var(--accent)}
+.paste textarea{min-height:150px;font-family:inherit}

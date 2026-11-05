@@ -18,6 +18,7 @@ const OTHER_CATS = {
   職業教育: '職業探索、職前技能',
   社會技巧: '人際互動、拒絕誘惑、自我保護',
   學科練習: '內建固定範圍的學科小遊戲',
+  邏輯推理: '觀察證據、找出矛盾、推理判斷',
 };
 const BANK_STEPS = [['subject', '學科'], ['games', '遊戲'], ['version', '版本'], ['volume', '年級冊'], ['chapter', '章節'], ['ready', '開始']];
 
@@ -104,7 +105,7 @@ async function initHome() {
     return zone(s.代碼, s.名稱, SUBJECT_CHAR[s.代碼] || s.名稱[0], SUBJECT_NOTE[s.代碼] || '', `${s.題數} 題・${n} 個遊戲`);
   });
   const others = gamesFor('O');
-  if (others.length) zones.push(zone('O', '其他', '他', '生活管理・職業教育・社會技巧', `${others.length} 個遊戲`));
+  if (others.length) zones.push(zone('O', '其他', '他', '生活管理・職業教育・社會技巧・邏輯推理', `${others.length} 個遊戲`));
   $('#subject-cards').dataset.ok = '1';
   $('#subject-cards').replaceChildren(...zones);
 }
@@ -381,6 +382,10 @@ function showResult(r) {
 $('#again').addEventListener('click', startGame);
 $('#other-mode').addEventListener('click', () => pickSubject(S.subject, S.subjectName));
 $('#restart').addEventListener('click', buildVersions);
+
+// 題目裡的 $...$ 數學式用 KaTeX 顯示（遊戲畫面、結果檢討）
+window.MathRender?.watch($('#game-root'));
+window.MathRender?.watch($('#review'));
 
 initHome().then(() => show('subject')).catch((e) => {
   $('#subject-cards').dataset.ok = 'err';

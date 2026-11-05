@@ -11,14 +11,16 @@
     <span id="summary" class="muted"></span>
     <label class="filter"><input type="checkbox" id="showRejected" checked> 顯示已退回</label>
     <button id="reload" type="button">重新整理</button>
+    <button id="new-q" type="button" class="primary">＋ 手動新增一題</button>
   </header>
   <main>
-    <p class="hint">這裡是「匯入考卷」整理出來的題目草稿。標示「需審核」的題目排在最前面；黃色框是需要確認的欄位。按「通過」後題目才會放進 <code>題目/</code> 並立即出現在練習中。</p>
+    <p class="hint">這裡是「匯入考卷」整理出來的題目草稿，也可以按「手動新增一題」自己出題。數學式用 <code>$</code> 包住會以 KaTeX 顯示，例如 <code>$\frac{1}{2}$</code>。標示「需審核」的題目排在最前面；黃色框是需要確認的欄位。按「通過」後題目才會放進 <code>題目/</code> 並立即出現在練習中。</p>
     <div id="broken"></div>
     <div id="list" class="list">載入中…</div>
   </main>
   <datalist id="dl-版本"></datalist><datalist id="dl-年級"></datalist><datalist id="dl-冊"></datalist><datalist id="dl-章"></datalist>
   <div id="toast" class="toast" role="status"></div>
+  <script src="/vendor/katex/render-math.js"></script>
   <script src="nav.js"></script>
   <script src="admin.js"></script>
 </body>

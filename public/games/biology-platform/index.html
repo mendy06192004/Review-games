@@ -1,0 +1,1274 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>生物大平台</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Huninn&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: a lab-bench lobby of four specimen cards; each game runs in one full-height stage under a sticky HUD. Single bright theme by choice. */
+:root{
+  --bg:#E9F7EF; --bg2:#D4F0E2; --paper:#FFFFFF; --ink:#0F3A40; --ink2:#4B6B6E;
+  --leaf:#22A86A; --leaf-d:#15804F; --sun:#FFC93C; --sun-d:#E0A400;
+  --mem:#E8456F; --nuc:#3D6FE0; --vio:#8A5CF6; --line:#BFE3CF;
+  --ok:#1FAF5E; --bad:#F06548;
+  --f-disp:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-num:"Baloo 2","Noto Sans TC",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+body{background-image:radial-gradient(circle at 12% 18%,#fff8 0 60px,transparent 61px),radial-gradient(circle at 88% 70%,#fff6 0 90px,transparent 91px),radial-gradient(var(--line) 1.2px,transparent 1.3px);background-size:auto,auto,22px 22px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--nuc);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-disp);font-weight:400;text-wrap:balance;margin:0}
+.screen{min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1040px;margin:0 auto}
+
+/* Lobby */
+#lobby{padding-block:22px 40px}
+.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand svg{width:64px;height:64px;flex:none}
+.brand h1{font-size:clamp(34px,7vw,56px);line-height:1.05;color:var(--ink);letter-spacing:.02em}
+.brand h1 span{color:var(--leaf)}
+.brand p{margin:4px 0 0;color:var(--ink2);font-size:15px}
+.modebar{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--paper);padding:8px;border-radius:22px;border:2px solid var(--line);max-width:620px}
+.modebtn{border-radius:16px;padding:10px 12px;text-align:left;display:flex;gap:10px;align-items:center;transition:background .2s,transform .15s}
+.modebtn svg{width:40px;height:40px;flex:none}
+.modebtn b{display:block;font-family:var(--f-disp);font-size:19px;font-weight:400}
+.modebtn small{display:block;color:var(--ink2);font-size:12.5px;line-height:1.35}
+.modebtn[aria-pressed="true"]{background:var(--ink);color:#fff}
+.modebtn[aria-pressed="true"] small{color:#CFE9DC}
+.modebtn:active{transform:scale(.97)}
+.grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:16px}
+.gcard{position:relative;text-align:left;background:var(--paper);border-radius:26px;padding:16px 16px 18px;border:2px solid var(--line);display:flex;flex-direction:column;gap:8px;transition:transform .18s,box-shadow .18s;overflow:hidden;min-width:0}
+.gcard:hover{transform:translateY(-4px);box-shadow:0 12px 0 -4px var(--c)}
+.gcard:active{transform:scale(.98)}
+.gcard .art{height:130px;border-radius:18px;background:var(--cbg);display:grid;place-items:center}
+.gcard .art svg{height:116px;width:auto;max-width:100%}
+.gcard .tag{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--c)}
+.gcard h3{font-size:24px;line-height:1.2}
+.gcard p{margin:0;color:var(--ink2);font-size:14px}
+.gcard .best{margin-top:auto;font-family:var(--f-num);font-size:14px;color:var(--ink2)}
+.gcard .best b{color:var(--ink);font-size:18px}
+.foot{margin-top:26px;color:var(--ink2);font-size:13px}
+
+/* HUD + stage */
+#game{display:flex;flex-direction:column;height:100%;min-height:100%}
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:10px;padding-block:10px;flex-wrap:wrap}
+.back{display:flex;align-items:center;gap:4px;background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:6px 14px 6px 10px;font-weight:700;font-size:14px}
+.back svg{width:18px;height:18px}
+.hud h2{font-size:20px;flex:1;min-width:120px}
+.chip{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-family:var(--f-num);font-weight:800;font-size:17px;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.chip svg{width:18px;height:18px}
+.chip.mode{font-family:var(--f-disp);font-weight:400;font-size:14px;background:var(--ink);color:#fff;border-color:var(--ink)}
+.prog{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-bottom:8px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--leaf),var(--sun));transition:width .3s}
+#stage{flex:1;position:relative;max-width:1040px;width:100%;margin:0 auto 16px;min-height:0}
+
+/* Shared game bits */
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:24px;padding:16px}
+.q{font-family:var(--f-disp);font-size:clamp(19px,4.4vw,26px);line-height:1.35;text-align:center;margin:4px 0 12px}
+.q em{font-style:normal;color:var(--mem)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px}
+.opt{background:var(--paper);border:2.5px solid var(--line);border-radius:18px;padding:14px 12px;font-size:18px;font-weight:700;transition:transform .12s,border-color .12s,background .2s}
+.opt:hover{border-color:var(--leaf)}
+.opt:active{transform:scale(.97)}
+.opt.right{background:#D9F7E5;border-color:var(--ok)}
+.opt.wrong{background:#FFE3DC;border-color:var(--bad);animation:shake .35s}
+.btn{background:var(--leaf);color:#fff;border-radius:999px;padding:12px 26px;font-weight:900;font-size:18px;box-shadow:0 5px 0 var(--leaf-d);transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--leaf-d)}
+.btn.alt{background:var(--paper);color:var(--ink);border:2px solid var(--line);box-shadow:0 5px 0 var(--line)}
+.btn.sun{background:var(--sun);color:var(--ink);box-shadow:0 5px 0 var(--sun-d)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+
+/* Game 1: cell defense */
+.g1{display:flex;flex-direction:column;gap:10px;height:100%}
+.field{position:relative;flex:1;min-height:340px;border-radius:28px;overflow:hidden;background:#FFF6D6;border:3px solid #F3D277}
+.field>svg.bgcell{position:absolute;inset:0;width:100%;height:100%}
+.danger{position:absolute;left:0;right:0;bottom:0;height:46px;background:repeating-linear-gradient(-45deg,#F0654833 0 12px,transparent 12px 24px);border-top:2px dashed var(--bad)}
+.bubble{position:absolute;left:50%;width:min(86%,420px);transform:translateX(-50%);background:var(--paper);border:3px solid var(--mem);border-radius:22px;padding:10px 14px 10px 64px;font-weight:700;font-size:clamp(15px,3.6vw,19px);line-height:1.4;box-shadow:0 6px 0 #E8456F44}
+.bubble svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:44px;height:44px}
+.bubble.hit{animation:pop .3s reverse forwards}
+.towers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.tower{background:var(--paper);border:2.5px solid var(--line);border-radius:18px;padding:6px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;font-size:14px;transition:transform .1s}
+.tower svg{width:100%;max-width:70px;height:52px}
+.tower:active{transform:scale(.94)}
+.tower.flash{background:#D9F7E5;border-color:var(--ok)}
+.tower.no{background:#FFE3DC;border-color:var(--bad)}
+.lives{display:flex;gap:4px}
+.lives svg{width:20px;height:20px}
+
+/* Game 2: customs */
+.g2{display:flex;flex-direction:column;gap:12px;height:100%}
+.desk{display:flex;justify-content:center;align-items:center;min-height:250px;position:relative}
+.card{touch-action:none;user-select:none;-webkit-user-select:none;background:var(--paper);border:3px solid var(--ink);border-radius:24px;width:min(300px,82vw);padding:12px 14px 14px;text-align:center;box-shadow:0 8px 0 var(--ink);cursor:grab;animation:pop .35s}
+.card.drag{cursor:grabbing;box-shadow:0 18px 30px #0F3A4033;position:fixed;z-index:30;animation:none}
+.card .stamp{font-size:12px;letter-spacing:.12em;font-weight:900;color:var(--ink2)}
+.card svg{width:150px;height:120px;display:block;margin:4px auto}
+.card b{font-family:var(--f-disp);font-weight:400;font-size:26px;display:block}
+.card small{display:block;color:var(--ink2);font-size:14px;line-height:1.4;margin-top:2px}
+.gates{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gate{border-radius:20px;padding:10px 6px;border:3px dashed var(--gc);background:var(--gbg);font-family:var(--f-disp);font-size:clamp(15px,3.6vw,19px);display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s}
+.gate svg{width:34px;height:34px}
+.gate small{font-family:var(--f-body);font-size:11.5px;color:var(--ink2)}
+.gate.over{transform:scale(1.06);border-style:solid}
+.gate.flash{background:#D9F7E5;border-color:var(--ok);border-style:solid}
+.gate.no{background:#FFE3DC;border-color:var(--bad);animation:shake .35s}
+.hint{text-align:center;color:var(--ink2);font-size:13px}
+
+/* Game 3: ecosystem */
+.chain{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;margin:6px 0 12px}
+.node{display:flex;flex-direction:column;align-items:center;background:var(--paper);border:2.5px solid var(--line);border-radius:18px;padding:6px 6px 4px;width:clamp(74px,17vw,118px);font-weight:700;font-size:14px;transition:transform .12s}
+.node svg{width:100%;height:64px}
+.node.tap:hover{border-color:var(--leaf);transform:translateY(-3px)}
+.node.right{background:#D9F7E5;border-color:var(--ok)}
+.node.wrong{background:#FFE3DC;border-color:var(--bad);animation:shake .35s}
+.node.hl{border-color:var(--mem);box-shadow:0 0 0 4px #E8456F33}
+.arrow{width:24px;height:20px;flex:none}
+.pyr{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;margin:4px 0 12px}
+.pyr div{border-radius:10px;padding:6px 8px;color:#fff;font-weight:700;font-size:14px;text-align:center;font-variant-numeric:tabular-nums}
+.decomp{display:flex;justify-content:center;margin-top:-4px}
+
+/* Game 4: genetics */
+.punnett{display:grid;grid-template-columns:56px repeat(2,minmax(70px,110px));grid-template-rows:48px repeat(2,minmax(62px,90px));gap:6px;justify-content:center;margin:8px auto 14px}
+.punnett .h{display:grid;place-items:center;font-family:var(--f-num);font-weight:800;font-size:24px;border-radius:14px;background:var(--bg2)}
+.punnett .h.m{background:#DCE6FF;color:var(--nuc)}
+.punnett .h.f{background:#FFE0EA;color:var(--mem)}
+.pcell{border:2.5px dashed var(--ink2);border-radius:16px;font-family:var(--f-num);font-weight:800;font-size:28px;background:var(--paper)}
+.pcell.set{border-style:solid;border-color:var(--nuc)}
+.pcell.right{background:#D9F7E5;border-color:var(--ok)}
+.pcell.wrong{background:#FFE3DC;border-color:var(--bad)}
+.dna{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin:10px 0}
+.pair{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pair .rung{width:4px;height:18px;background:var(--line);border-radius:2px}
+.base{width:clamp(30px,7.4vw,44px);height:clamp(36px,8.6vw,50px);border-radius:12px;display:grid;place-items:center;font-family:var(--f-num);font-weight:800;font-size:clamp(18px,4.6vw,24px);color:#fff}
+.base.empty{background:var(--paper);border:2.5px dashed var(--ink2);color:var(--ink)}
+.base.empty.cur{border-style:solid;border-color:var(--mem);box-shadow:0 0 0 4px #E8456F33}
+.base.wrong{outline:3px solid var(--bad)}
+.bA{background:#E8456F}.bT{background:#F59E0B}.bG{background:#22A86A}.bC{background:#3D6FE0}
+.pad{display:flex;justify-content:center;gap:10px;margin:8px 0 12px}
+.pad button{width:58px;height:58px;border-radius:18px;font-family:var(--f-num);font-weight:800;font-size:26px;color:#fff;box-shadow:0 4px 0 #0002}
+.pad button:active{transform:translateY(3px);box-shadow:none}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.chromo{display:block;margin:0 auto 8px;max-width:100%;height:auto}
+
+/* Result */
+#result{display:grid;place-items:center;padding-block:30px}
+.rcard{background:var(--paper);border:3px solid var(--ink);border-radius:32px;padding:24px 22px;max-width:460px;width:100%;text-align:center;box-shadow:0 10px 0 var(--ink);animation:pop .45s}
+.rstars{display:flex;justify-content:center;gap:6px;margin:6px 0}
+.rstars svg{width:66px;height:66px}
+.rstars svg:nth-child(2){width:84px;height:84px;margin-top:-12px}
+.rscore{font-family:var(--f-num);font-weight:800;font-size:64px;line-height:1;color:var(--leaf)}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.rgrid div{background:var(--bg);border-radius:16px;padding:8px 4px}
+.rgrid b{display:block;font-family:var(--f-num);font-size:22px;font-variant-numeric:tabular-nums}
+.rgrid small{color:var(--ink2);font-size:12.5px}
+.rmsg{color:var(--ink2);margin:0 0 16px}
+
+/* Tip sheet + toast */
+#tip{position:fixed;inset:0;z-index:40;display:grid;place-items:end center;background:#0F3A4055;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.tipbox{background:var(--paper);border-radius:28px;max-width:520px;width:100%;padding:18px 20px 20px;border:3px solid var(--sun);animation:pop .3s;display:flex;gap:14px;align-items:flex-start}
+.tipbox svg{width:64px;height:64px;flex:none}
+.tipbox h3{font-size:21px;color:var(--sun-d)}
+.tipbox p{margin:6px 0 4px}
+.tipbox .ans{font-weight:700;color:var(--leaf-d)}
+.tipbox .btn{margin-top:10px}
+#toast{position:fixed;left:50%;top:calc(80px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:45;background:var(--leaf);color:#fff;font-family:var(--f-disp);font-size:30px;padding:8px 28px;border-radius:999px;box-shadow:0 6px 0 var(--leaf-d);pointer-events:none;animation:pop .3s}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.sound{position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;width:46px;height:46px;border-radius:50%;background:var(--paper);border:2px solid var(--line);display:grid;place-items:center}
+.sound svg{width:24px;height:24px}
+
+@media (max-width:520px){
+  .towers{gap:5px}.tower{font-size:12px;border-radius:14px}.tower svg{height:42px}
+  .gates{gap:7px}
+  .modebtn svg{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="fx"></canvas>
+<button class="sound" id="soundBtn" aria-label="音效開關"></button>
+
+<section id="lobby" class="screen">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#22A86A"/><circle cx="32" cy="32" r="24" fill="#BFF0D3"/><circle cx="36" cy="28" r="10" fill="#3D6FE0"/><circle cx="38" cy="26" r="4" fill="#9DB8FF"/><ellipse cx="20" cy="40" rx="7" ry="4" fill="#E8456F" transform="rotate(-25 20 40)"/><circle cx="42" cy="45" r="3" fill="#FFC93C"/><circle cx="18" cy="24" r="2.5" fill="#8A5CF6"/></svg>
+      <div><h1>生物<span>大平台</span></h1><p>國中生物會考複習遊戲 · 七上七下 14 款小遊戲</p></div>
+    </div>
+    <div class="modebar" role="group" aria-label="難度">
+      <button class="modebtn" id="mBasic" aria-pressed="true">
+        <svg viewBox="0 0 40 40"><path d="M20 36V20" stroke="#15804F" stroke-width="3" stroke-linecap="round"/><path d="M20 22C10 22 7 14 8 8c8 0 12 5 12 14Z" fill="#22A86A"/><path d="M20 20c0-7 4-12 12-12 1 7-3 13-12 12Z" fill="#7FD9A6"/></svg>
+        <span><b>萌芽模式</b><small>圖示提示、選項較少、速度慢</small></span></button>
+      <button class="modebtn" id="mHard" aria-pressed="false">
+        <svg viewBox="0 0 40 40"><path d="M8 30c4-14 14-22 26-24-2 12-10 22-24 26Z" fill="#FFC93C"/><path d="M10 31 26 15" stroke="#E0A400" stroke-width="2.5"/><circle cx="12" cy="12" r="4" fill="#E8456F"/><circle cx="30" cy="30" r="3" fill="#3D6FE0"/></svg>
+        <span><b>演化模式</b><small>會考題型、速度快、提示隱藏</small></span></button>
+    </div>
+    <div class="semtabs" role="group" aria-label="冊別"><button data-s="all">全部</button><button data-s="上">七上</button><button data-s="下">七下</button></div>
+    <div class="grid" id="cards"></div>
+    <p class="foot">電腦用滑鼠點擊或拖曳，手機直接點或拖。連續答對有連擊加分，打錯了小幫手會出來提醒你。</p>
+  </div>
+</section>
+
+<section id="game" class="screen" hidden>
+  <div class="wrap" style="width:100%">
+    <div class="hud">
+      <button class="back" id="backBtn"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>大廳</button>
+      <h2 id="gTitle"></h2>
+      <span class="chip mode" id="gMode"></span>
+      <span class="chip" id="gExtra" hidden></span>
+      <span class="chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="#3D6FE0" stroke-width="2.6"/><path d="M12 9v4l3 2" stroke="#3D6FE0" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M9 3h6" stroke="#3D6FE0" stroke-width="2.6" stroke-linecap="round"/></svg><span id="gTime">0</span></span>
+      <span class="chip"><svg viewBox="0 0 24 24"><path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8Z" fill="#FFC93C" stroke="#E0A400" stroke-width="1.5"/></svg><span id="gScore">0</span></span>
+    </div>
+    <div class="prog"><i id="gProg"></i></div>
+  </div>
+  <div id="stage"></div>
+</section>
+
+<section id="result" class="screen" hidden>
+  <div class="rcard">
+    <h2 id="rTitle" style="font-size:28px"></h2>
+    <div class="rstars" id="rStars"></div>
+    <div class="rscore" id="rScore">0</div>
+    <div class="rgrid">
+      <div><b id="rAcc">0%</b><small>正確率</small></div>
+      <div><b id="rTime">0</b><small>用時（秒）</small></div>
+      <div><b id="rCombo">0</b><small>最高連擊</small></div>
+    </div>
+    <p class="rmsg" id="rMsg"></p>
+    <div class="row"><button class="btn" id="againBtn">再玩一次</button><button class="btn alt" id="homeBtn">回大廳</button></div>
+  </div>
+</section>
+
+<div id="tip" hidden><div class="tipbox"><span id="tipArt"></span>
+  <div><h3>溫馨小提示</h3><p class="ans" id="tipAns"></p><p id="tipText"></p><button class="btn sun" id="tipOk">知道了，繼續</button></div>
+</div></div>
+<div id="toast" hidden></div>
+<style>
+[hidden]{display:none!important}
+/* ===== 第二版：動作玩法樣式 ===== */
+.hearts{display:flex;gap:3px}.hearts svg{width:22px;height:22px}
+#hint{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:44;display:flex;align-items:center;gap:10px;background:#FFFBEA;border:3px solid var(--sun);border-radius:22px;padding:8px 16px 8px 8px;max-width:min(92vw,520px);box-shadow:0 8px 0 #E0A40033;font-weight:700;font-size:16px;line-height:1.4;animation:pop .3s;pointer-events:none}
+#hint svg{width:48px;height:48px;flex:none}
+.pop{position:fixed;z-index:46;pointer-events:none;font-family:var(--f-num);font-weight:800;font-size:28px;color:var(--leaf);text-shadow:0 2px 0 #fff,0 -2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff;animation:rise .9s forwards}
+.pop.bad{color:var(--bad);font-family:var(--f-disp);font-size:22px}
+@keyframes rise{0%{transform:translate(-50%,0) scale(.6);opacity:0}20%{transform:translate(-50%,-10px) scale(1.15);opacity:1}100%{transform:translate(-50%,-70px) scale(1);opacity:0}}
+@keyframes bob{0%,100%{transform:translate(-50%,-50%) translateY(0)}50%{transform:translate(-50%,-50%) translateY(-8px)}}
+@keyframes boom{to{transform:translate(-50%,-50%) scale(1.8);opacity:0}}
+@keyframes wob{0%,100%{transform:translate(-50%,-50%) rotate(-4deg)}50%{transform:translate(-50%,-50%) rotate(4deg)}}
+
+/* 細胞防衛戰 */
+.arena{position:relative;height:min(46vh,440px);min-height:260px;border-radius:50% / 40%;overflow:hidden;background:radial-gradient(circle at 50% 50%,#FFFDF2 0 30%,#FFF4C9 70%);border:6px solid #8CD45C;box-shadow:inset 0 0 0 6px #C9F0A8}
+.nuc{position:absolute;left:50%;top:50%;width:96px;height:96px;transform:translate(-50%,-50%);transition:transform .2s}
+.nuc.hurt{animation:shake .4s}
+.enemy{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;width:96px;cursor:pointer;touch-action:manipulation}
+.enemy .mon{width:62px;height:62px;animation:wob 1.2s ease-in-out infinite}
+.enemy .need{background:#fff;border:2.5px solid var(--ec);border-radius:12px;padding:1px 7px;font-weight:900;font-size:13px;line-height:1.35;text-align:center;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.enemy .need svg{width:18px;height:18px;flex:none}
+.enemy.tgt::before{content:"";position:absolute;left:50%;top:31px;width:78px;height:78px;transform:translate(-50%,-50%);border:3px dashed var(--mem);border-radius:50%;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.enemy.dead{animation:boom .35s forwards;pointer-events:none}
+.enemy.dead .mon{animation:none}
+.shot{position:absolute;width:26px;height:26px;transform:translate(-50%,-50%);transition:left .22s linear,top .22s linear;z-index:3}
+.shot svg{width:100%;height:100%}
+.towers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.tower{position:relative;background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:6px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:1px;font-weight:900;font-size:15px;box-shadow:0 5px 0 var(--line);transition:transform .08s}
+.tower>svg{width:100%;max-width:84px;height:58px}
+.tower:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.tower .badge{position:absolute;top:-10px;right:-6px;width:32px;height:32px;background:#fff;border-radius:50%;padding:4px;border:2px solid var(--line)}
+.tower .badge svg{width:100%;height:100%}
+
+/* 生物海關：輸送帶 */
+.belt{position:relative;height:230px;border-radius:26px;background:linear-gradient(#EAF6FF,#D3ECFF);overflow:hidden;border:3px solid #9CCBEB}
+.belt .track{position:absolute;left:0;right:0;bottom:16px;height:30px;background:repeating-linear-gradient(90deg,#33424D 0 26px,#45576A 26px 52px);border-block:4px solid #22303A;animation:roll 1s linear infinite}
+.belt.fast .track{animation-duration:.55s}
+@keyframes roll{to{background-position:52px 0}}
+.belt .endzone{position:absolute;right:0;top:0;bottom:0;width:56px;background:repeating-linear-gradient(-45deg,#F0654833 0 10px,transparent 10px 20px);border-left:3px dashed var(--bad)}
+.item{position:absolute;bottom:42px;width:150px;background:#fff;border:3px solid var(--ink);border-radius:22px;padding:4px 8px 8px;text-align:center;box-shadow:0 6px 0 var(--ink);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.item svg{width:118px;height:94px;display:block;margin:0 auto}
+.item b{font-family:var(--f-disp);font-weight:400;font-size:21px;display:block;line-height:1.2}
+.item small{display:block;font-size:12px;color:var(--ink2);line-height:1.3}
+.item.drag{position:fixed;bottom:auto;z-index:30;cursor:grabbing;box-shadow:0 16px 28px #0F3A4040}
+@keyframes vanish{to{transform:scale(1.4);opacity:0}}.item.gone{animation:vanish .3s forwards;pointer-events:none}
+.gates{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.gates.three{grid-template-columns:repeat(3,1fr)}
+.gate{border-radius:22px;padding:8px 6px 10px;border:3px solid var(--gc);background:var(--gbg);font-family:var(--f-disp);font-size:clamp(16px,3.8vw,20px);display:flex;flex-direction:column;align-items:center;gap:0;box-shadow:0 5px 0 var(--gc);transition:transform .1s;animation:pop .3s}
+.gate>svg{width:58px;height:46px}
+.gate small{font-family:var(--f-body);font-size:12px;color:var(--ink2)}
+.gate:active,.gate.over{transform:translateY(3px) scale(1.04)}
+.gate.flash{background:#D9F7E5;border-color:var(--ok)}
+.gate.no{background:#FFE3DC;animation:shake .35s}
+
+/* 食物鏈 */
+.slots{display:flex;justify-content:center;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.slot{width:clamp(62px,15vw,96px);aspect-ratio:1;border-radius:22px;border:3px dashed #9CB8AE;background:#ffffffaa;display:grid;place-items:center;position:relative;font-size:12px;color:var(--ink2);font-weight:700;text-align:center;line-height:1.2;padding:4px}
+.slot.on{border:3px solid var(--leaf);background:#fff;animation:pop .3s}
+.slot svg{width:100%;height:100%}
+.slot .lb{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:12px;color:var(--leaf-d)}
+.pond{position:relative;height:min(46vh,360px);min-height:250px;border-radius:30px;background:radial-gradient(circle at 30% 20%,#fff 0 12%,transparent 40%),linear-gradient(#E9F8E4,#CDEFD8);border:3px solid #9BD9B0;overflow:hidden;margin-top:26px}
+.bub{position:absolute;transform:translate(-50%,-50%);width:clamp(84px,21vw,124px);aspect-ratio:1;border-radius:50%;background:#ffffffd9;border:3px solid #fff;box-shadow:0 6px 14px #15804F22,inset 0 -6px 0 #CDEFD8;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:14px;animation:bob 2.4s ease-in-out infinite;touch-action:manipulation}
+.bub svg{width:72%;height:58%}
+.bub.no{border-color:var(--bad);background:#FFE3DC}
+.bub.used{animation:boom .3s forwards;pointer-events:none}
+.bub .tag{position:absolute;top:-8px;right:-4px;width:30px;height:30px;background:#fff;border-radius:50%;padding:3px;border:2px solid var(--sun)}
+.rule{display:inline-flex;align-items:center;gap:6px;background:#FFFBEA;border:2px solid var(--sun);border-radius:999px;padding:4px 14px;font-weight:700;font-size:14px}
+.rule svg{width:20px;height:20px}
+.cans{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+.can{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;border:3px solid var(--line);border-radius:22px;padding:8px 10px;min-width:96px;font-family:var(--f-num);font-weight:800;font-size:22px;box-shadow:0 5px 0 var(--line);transition:transform .08s}
+.can svg{width:46px;height:66px}
+.can:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.can.right{border-color:var(--ok);background:#D9F7E5}.can.wrong{border-color:var(--bad);background:#FFE3DC;animation:shake .35s}
+.drip{position:absolute;width:22px;height:30px;animation:fall 1.4s ease-in infinite}
+@keyframes fall{0%{transform:translateY(-30px);opacity:0}20%{opacity:1}100%{transform:translateY(80px);opacity:0}}
+.lineup{display:flex;justify-content:center;align-items:flex-end;gap:6px;flex-wrap:wrap;margin:6px 0}
+.lineup .node{width:clamp(70px,17vw,110px)}
+
+/* 解碼室 */
+.zip{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.zip .pair{transition:transform .2s}
+.zip .pair.now{transform:translateY(-6px)}
+.zip .pair.now .base:first-child{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--mem)}
+.timebar{height:12px;border-radius:99px;background:var(--bg2);overflow:hidden;margin:6px 0 10px}
+.timebar i{display:block;height:100%;background:linear-gradient(90deg,var(--mem),var(--sun));transition:width .2s linear}
+.legend{display:flex;justify-content:center;gap:10px;margin-bottom:8px;font-family:var(--f-num);font-weight:800}
+.legend span{display:flex;align-items:center;gap:4px;background:#fff;border:2px solid var(--line);border-radius:999px;padding:2px 10px}
+.legend i{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;color:#fff;font-style:normal;font-size:14px}
+.pad button{width:68px;height:68px;font-size:30px}
+.lock{display:flex;justify-content:center;margin-bottom:4px}
+.lock svg{width:64px;height:64px;transition:transform .4s}
+.lock.open svg{transform:rotate(-12deg) scale(1.1)}
+.pcell.glow,.punnett .h.glow{box-shadow:0 0 0 4px var(--sun)}
+.numpad{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.numpad .opt{width:64px;font-family:var(--f-num);font-size:26px}
+@media (max-width:520px){.tower .badge{width:26px;height:26px;top:-8px}.tower>svg{height:46px}.item{width:132px}.item svg{width:100px;height:80px}.gates{gap:7px}.gate>svg{width:46px;height:38px}.pad button{width:58px;height:58px}}
+
+.towers.six{grid-template-columns:repeat(6,1fr)}
+@media (max-width:620px){.towers.six{grid-template-columns:repeat(3,1fr)}}
+.towers{grid-template-columns:repeat(var(--n,5),1fr)}
+.geno{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0 12px}
+.gq{display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .2s}
+.gq b{min-width:58px;padding:8px 6px;border-radius:14px;background:#EAF0FF;color:#3552B8;font-family:var(--f-num);font-size:22px;text-align:center;line-height:1}
+.gq span{min-width:58px;padding:4px 6px;border-radius:12px;border:2.5px dashed var(--ink2);text-align:center;font-weight:900;font-size:15px}
+.gq.now{transform:translateY(-6px)}.gq.now b{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--mem)}
+.gq.ok span{border:2.5px solid var(--ok);background:#D9F7E5;color:var(--leaf-d)}
+.ptype{flex-wrap:wrap}.ptype button{width:auto;min-width:76px;padding:0 16px;font-family:var(--f-disp);font-size:22px;border-radius:18px;color:#fff}
+.tb0{background:#4C6FE0}.tb1{background:#F0506E}.tb2{background:#9B5DE5}.tb3{background:#F5A524}
+.pcell{font-size:24px}.pcell sup,.punnett .h sup{font-size:.6em}
+.legend span b{font-family:var(--f-num);font-size:18px}
+</style>
+<div id="hint" hidden></div>
+<style>
+/* ===== 第三版：共用玩法樣式 ===== */
+.lane{position:relative;height:min(40vh,300px);min-height:220px;border-radius:24px;background:linear-gradient(#F4FBF7,#E2F3E9);border:3px solid var(--line);overflow:hidden}
+.lane .floor{position:absolute;left:0;right:0;bottom:0;height:16px;background:repeating-linear-gradient(-45deg,#F0654833 0 8px,transparent 8px 16px);border-top:2px dashed var(--bad)}
+.faller{position:absolute;left:50%;transform:translateX(-50%);background:#fff;border:3px solid var(--ink);border-radius:20px;padding:6px 14px 8px;display:flex;flex-direction:column;align-items:center;max-width:82%;box-shadow:0 5px 0 var(--ink)}
+.faller svg{width:84px;height:66px}
+.faller b{font-family:var(--f-disp);font-weight:400;font-size:clamp(17px,4.4vw,22px);text-align:center;line-height:1.25}
+.faller.good{animation:vanish .35s forwards;border-color:var(--ok)}
+.faller.bad{animation:shake .35s;border-color:var(--bad);background:#FFE3DC}
+.bins{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:10px;margin-top:12px}
+.bin{border-radius:20px;padding:14px 8px;background:var(--bc);color:#fff;font-family:var(--f-disp);font-size:clamp(17px,4.4vw,22px);box-shadow:0 5px 0 #0003;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2}
+.bin svg{width:34px;height:34px}
+.bin:active{transform:translateY(4px);box-shadow:0 1px 0 #0003}
+.bin.no{animation:shake .35s}
+.kb{margin-top:8px}
+@media (hover:none){.kb{display:none}}
+.oslots{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;margin:6px 0 14px}
+.os{min-width:62px;min-height:48px;padding:4px 8px;border-radius:14px;border:2.5px dashed #9CB8AE;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:15px;background:#fff;text-align:center;line-height:1.2}
+.os .n{color:#9CB8AE;font-family:var(--f-num);font-size:20px}
+.os.on{border:2.5px solid var(--leaf);background:#E7F7EE;color:var(--leaf-d);animation:pop .3s}
+.os .ci svg,.chip .ci svg{width:42px;height:32px;display:block}
+.sep{font-style:normal;color:#9CB8AE;font-weight:900;font-size:20px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.chip{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;border:2.5px solid var(--line);border-radius:16px;padding:10px 14px;font-weight:900;font-size:17px;box-shadow:0 4px 0 var(--line)}
+.chip:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.chip.used{opacity:.25;box-shadow:none}
+.shake{animation:shake .35s}
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc{display:flex;flex-direction:column;gap:8px;min-width:0}
+.ph{text-align:center;color:var(--ink2);font-size:13px}
+.pb{background:#fff;border:2.5px solid var(--line);border-radius:16px;padding:10px 8px;font-weight:700;font-size:15px;line-height:1.35;min-height:52px;box-shadow:0 4px 0 var(--line)}
+.pb.sel{border-color:var(--nuc);background:#EAF0FF;transform:translateY(-2px)}
+.pb.lock{background:var(--pc);border-color:var(--pc);color:#fff;box-shadow:none;opacity:.92}
+.mem{display:grid;grid-template-columns:repeat(var(--c),1fr);gap:8px;max-width:560px;margin:0 auto}
+@media (max-width:520px){.mem{grid-template-columns:repeat(3,1fr)}}
+.mc{position:relative;aspect-ratio:1/0.82;max-width:100%;border-radius:16px;perspective:600px;padding:0;background:none}
+.mc span{position:absolute;inset:0;border-radius:16px;display:grid;place-items:center;padding:6px;backface-visibility:hidden;transition:transform .35s;font-weight:900;font-size:clamp(13px,3.4vw,16px);line-height:1.3;text-align:center}
+.mc .back{background:repeating-linear-gradient(45deg,#4CC38A 0 10px,#3FB27A 10px 20px);border:3px solid #2E9E68}
+.mc .front{background:#fff;border:3px solid var(--line);transform:rotateY(180deg)}
+.mc.s1 .front{background:#FFF8E6}
+.mc.open .back{transform:rotateY(180deg)}.mc.open .front{transform:rotateY(0)}
+.mc.done .front{border-color:var(--ok);background:#D9F7E5}
+.ask{text-align:center;font-weight:900;font-size:18px;margin:0 0 8px}
+.ask em{font-style:normal;color:#fff;background:var(--mem);border-radius:999px;padding:2px 14px}
+.hs{display:flex;justify-content:center}
+.hs svg{width:min(100%,420px);height:auto}
+.hs [data-h]{cursor:pointer;transition:opacity .15s}
+.hs [data-h]:hover{opacity:.8}
+.hs [data-h].hit{opacity:.55}
+.found{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+.found span{background:#D9F7E5;color:var(--leaf-d);border-radius:999px;padding:2px 12px;font-weight:700;font-size:14px}
+.picopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr));gap:10px}
+.pico{background:#fff;border:2.5px solid var(--line);border-radius:18px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:900;font-size:15px;box-shadow:0 4px 0 var(--line)}
+.pico svg{width:100%;max-width:150px;height:96px}
+.pico.right{background:#D9F7E5;border-color:var(--ok)}.pico.wrong{background:#FFE3DC;border-color:var(--bad);animation:shake .35s}
+.pic{display:flex;justify-content:center;margin:0 0 10px}.pic svg{width:min(100%,320px);height:auto}
+/* 顯微鏡視野 */
+.view{position:relative;width:200px;height:200px;margin:0 auto 12px;border-radius:50%;background:radial-gradient(circle,#FFFDF2 0 60%,#F1EBD0 100%);border:8px solid #33424D;overflow:hidden}
+.view .cross{position:absolute;inset:0;background:linear-gradient(#0000 49.5%,#33424D22 49.5% 50.5%,#0000 50.5%),linear-gradient(90deg,#0000 49.5%,#33424D22 49.5% 50.5%,#0000 50.5%)}
+.view b{position:absolute;left:50%;top:50%;font-family:"Baloo 2",serif;font-size:56px;line-height:1;color:#3552B8;transition:transform .45s}
+.dpad{display:grid;grid-template-columns:repeat(3,58px);gap:6px;justify-content:center}
+.dpad button{height:52px;border-radius:14px;background:#fff;border:2.5px solid var(--line);box-shadow:0 4px 0 var(--line);font-size:22px;font-weight:900;color:var(--ink)}
+.dpad button:active{transform:translateY(3px);box-shadow:none}
+.dpad .mid{visibility:hidden}
+.glyph{font-family:"Baloo 2",serif;font-size:54px;line-height:1;color:#3552B8;display:inline-block}
+/* 反應燈 */
+.lamp{width:min(70vw,240px);aspect-ratio:1;border-radius:50%;margin:6px auto 12px;background:#F0506E;display:grid;place-items:center;color:#fff;font-family:var(--f-disp);font-size:24px;box-shadow:0 8px 0 #B83A55;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.lamp.go{background:#2DBE7E;box-shadow:0 8px 0 #1E8F57}
+.lamp.wait{background:#F5A524;box-shadow:0 8px 0 #C47F0A}
+/* 恆定儀表 */
+.gauges{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:10px;margin-bottom:12px}
+.gauge{background:#fff;border:2.5px solid var(--line);border-radius:18px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.gauge b{font-size:14px}
+.gbar{position:relative;width:26px;height:140px;border-radius:13px;background:linear-gradient(#F0506E 0 15%,#FFE3DC 15% 35%,#D9F7E5 35% 65%,#DCE8FF 65% 85%,#4C6FE0 85%);overflow:visible}
+.gbar i{position:absolute;left:-7px;right:-7px;height:6px;border-radius:3px;background:var(--ink);transform:translateY(50%);transition:bottom .25s linear}
+.gauge.alert{border-color:var(--bad);animation:shake .4s}
+.gauge small{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.event{background:#FFFBEA;border:3px solid var(--sun);border-radius:18px;padding:8px 12px;text-align:center;font-weight:900;font-size:18px;min-height:48px;margin-bottom:10px}
+.acts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.act{background:#fff;border:2.5px solid var(--line);border-radius:16px;padding:10px 8px;font-weight:900;font-size:15px;line-height:1.3;box-shadow:0 4px 0 var(--line)}
+.act small{display:block;font-weight:700;color:var(--ink2);font-size:12px}
+.act:active{transform:translateY(3px);box-shadow:none}
+/* 脈搏 */
+.beat{width:120px;height:120px;margin:0 auto 10px}
+.beat.on{animation:thump .25s}
+@keyframes thump{50%{transform:scale(1.18)}}
+/* 大廳分頁 */
+.semtabs{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.semtabs button{border-radius:999px;padding:6px 16px;font-weight:900;background:#fff;border:2px solid var(--line)}
+.semtabs button[aria-pressed="true"]{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.semhead{grid-column:1/-1;font-family:var(--f-disp);font-size:22px;margin:8px 0 -4px;color:var(--ink)}
+.gcard .ch{position:absolute;top:12px;right:12px;background:#fff;border-radius:999px;padding:1px 10px;font-size:12px;font-weight:900;color:var(--c);border:2px solid var(--c)}
+</style>
+<script>
+/* ===== 圖庫 A：簡潔扁平風格（色塊為主、無陰影、無描邊） ===== */
+const sv=(vb,inner)=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round">${inner}</svg>`;
+const DK='#23343C';
+const eyes=(x,y,g=12,r=4.5)=>`<circle cx="${x-g/2}" cy="${y}" r="${r}" fill="${DK}"/><circle cx="${x+g/2}" cy="${y}" r="${r}" fill="${DK}"/>`;
+
+const ICON={
+ bolt:()=>sv('0 0 24 24',`<path d="M13.5 2 4.5 13.5h6.5L9.5 22l10-12.5H13Z" fill="#F5A524"/>`),
+ sun:()=>sv('0 0 24 24',`<g stroke="#F5A524" stroke-width="2.4">${[0,45,90,135,180,225,270,315].map(a=>`<path d="M12 2.2v2.8" transform="rotate(${a} 12 12)"/>`).join('')}</g><circle cx="12" cy="12" r="5.6" fill="#F5A524"/>`),
+ shield:()=>sv('0 0 24 24',`<path d="M12 2.5 20 5.5v6c0 5.5-3.6 8.6-8 10.5-4.4-1.9-8-5-8-10.5v-6Z" fill="#6DBE45"/><path d="m8.5 12 2.5 2.5 4.5-5" stroke="#fff" stroke-width="2.4" fill="none"/>`),
+ dna:()=>sv('0 0 24 24',`<path d="M7 2c0 6 10 8 10 20M17 2C17 8 7 10 7 22" stroke="#4C6FE0" stroke-width="2.4" fill="none"/><path d="M8.6 6h6.8M8.6 18h6.8M10 12h4" stroke="#4C6FE0" stroke-width="2"/>`),
+ door:()=>sv('0 0 24 24',`<rect x="4" y="3" width="11" height="18" rx="2" fill="#F2A33A"/><circle cx="12" cy="12.5" r="1.3" fill="#fff"/><path d="M15 12h6M18.5 9.5 21 12l-2.5 2.5" stroke="#F2A33A" stroke-width="2.2" fill="none"/>`),
+ drop:()=>sv('0 0 24 24',`<path d="M12 2.5C8.5 8 5.5 11.5 5.5 15a6.5 6.5 0 0 0 13 0c0-3.5-3-7-6.5-12.5Z" fill="#3FA9E8"/>`)
+};
+
+const ART={
+ /* ---- 細胞構造（課本：細胞核、細胞膜、粒線體、葉綠體、液胞、細胞壁） ---- */
+ nucleus:()=>sv('0 0 120 90',`<circle cx="60" cy="45" r="36" fill="#9DB4F7"/><circle cx="60" cy="45" r="28" fill="#B9CAFA"/><path d="M42 40c6-8 12 6 18-2s12 6 18-2M44 54c6-6 12 6 18 0s10 4 14 0" stroke="#7F9BEF" stroke-width="3.5" fill="none"/><circle cx="68" cy="38" r="9" fill="#4C6FE0"/>`),
+ membrane:()=>sv('0 0 120 90',`<circle cx="60" cy="45" r="34" fill="#FFF1DC"/><circle cx="60" cy="45" r="34" fill="none" stroke="#F2A33A" stroke-width="7"/>${[0,60,120,180,240,300].map(a=>`<rect x="56" y="5" width="8" height="12" rx="4" fill="#C9761A" transform="rotate(${a} 60 45)"/>`).join('')}<path d="M8 45h22M24 39l6 6-6 6M112 45H90M96 39l-6 6 6 6" stroke="#C9761A" stroke-width="3.5" fill="none"/>`),
+ mito:()=>sv('0 0 120 90',`<ellipse cx="60" cy="45" rx="50" ry="30" fill="#FF8F5E"/><path d="M22 45 32 27l10 36 10-36 10 36 10-36 10 36 10-36 8 18" stroke="#FFD3BF" stroke-width="6" fill="none"/>`),
+ chloro:()=>sv('0 0 120 90',`<ellipse cx="60" cy="45" rx="50" ry="30" fill="#45C07F"/>${[[34,45],[60,40],[86,45]].map(([x,y])=>[0,1,2,3].map(k=>`<rect x="${x-10}" y="${y-13+k*7}" width="20" height="5" rx="2.5" fill="#1E8F57"/>`).join('')).join('')}`),
+ vacuole:()=>sv('0 0 120 90',`<path d="M24 46c-2-20 18-32 38-30s38 8 36 28-14 32-38 32-34-10-36-30Z" fill="#8FD0F2"/><path d="M60 26c-7 11-12 17-12 23a12 12 0 0 0 24 0c0-6-5-12-12-23Z" fill="#E5F5FD"/>`),
+ wall:()=>sv('0 0 120 90',`<rect x="10" y="8" width="100" height="74" rx="10" fill="#7DC254"/><rect x="21" y="19" width="78" height="52" rx="6" fill="#E9F6DE"/><path d="M10 31h11M10 59h11M99 31h11M99 59h11M45 8v11M75 8v11M45 71v11M75 71v11" stroke="#5FA338" stroke-width="3"/>`),
+ /* ---- 入侵怪物 ---- */
+ monster:(c,d)=>sv('0 0 100 100',`<path d="M50 8l8 12 13-6 1 14 14 2-6 12 12 8-11 8 6 12-14 1-1 14-13-5-9 11-9-11-13 5-1-14-14-1 6-12-11-8 12-8-6-12 14-2 1-14 13 6Z" fill="${c}"/><circle cx="50" cy="54" r="24" fill="${d}" opacity=".25"/><circle cx="40" cy="50" r="8" fill="#fff"/><circle cx="60" cy="50" r="8" fill="#fff"/><circle cx="42" cy="51" r="4" fill="${DK}"/><circle cx="58" cy="51" r="4" fill="${DK}"/><path d="M31 39l14 6M69 39l-14 6" stroke="${DK}" stroke-width="4"/><path d="M42 66h16" stroke="${DK}" stroke-width="4"/>`),
+ /* ---- 介面 ---- */
+ star:(f='#F5B82E')=>sv('0 0 24 24',`<path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8Z" fill="${f}"/>`),
+ heart:(on=true)=>sv('0 0 24 24',`<path d="M12 21C5 15 2 12 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 4-3 7-10 13Z" fill="${on?'#F0506E':'#DCE5E0'}"/>`),
+ arrow:()=>`<svg class="arrow" viewBox="0 0 24 20"><path d="M2 10h16M13 4l7 6-7 6" fill="none" stroke="#7A9295" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ soundOn:()=>sv('0 0 24 24',`<path d="M4 9h4l5-4v14l-5-4H4Z" fill="#0F3A40"/><path d="M16 8c2 2 2 6 0 8M19 5c4 4 4 10 0 14" stroke="#0F3A40" stroke-width="2.2" fill="none"/>`),
+ soundOff:()=>sv('0 0 24 24',`<path d="M4 9h4l5-4v14l-5-4H4Z" fill="#7A9295"/><path d="M16 9l6 6M22 9l-6 6" stroke="#F0506E" stroke-width="2.4"/>`),
+ mascot:()=>sv('0 0 64 64',`<circle cx="32" cy="34" r="24" fill="#4CC38A"/><circle cx="42" cy="24" r="7" fill="#2E9E68"/>${eyes(30,36,14,3.6)}<path d="M25 44q7 5 14 0" stroke="${DK}" stroke-width="3" fill="none"/><path d="M32 10V4" stroke="#2E9E68" stroke-width="3"/><circle cx="32" cy="4" r="3" fill="#F5B82E"/>`),
+ battery:()=>sv('0 0 60 90',`<rect x="22" y="4" width="16" height="8" rx="3" fill="#D99A12"/><rect x="8" y="10" width="44" height="74" rx="10" fill="#F5C443"/><path d="M33 22 21 44h9l-3 16 13-22h-9Z" fill="#fff"/>`),
+ drop:()=>sv('0 0 30 40',`<path d="M15 3C9 14 4 20 4 27a11 11 0 0 0 22 0c0-7-5-13-11-24Z" fill="#9B5DE5"/>`),
+ bodyHeart:()=>sv('0 0 100 100',`<circle cx="50" cy="50" r="44" fill="#FFE1E7"/><path d="M50 78C30 62 22 52 22 41a14 14 0 0 1 28-4 14 14 0 0 1 28 4c0 11-8 21-28 37Z" fill="#F0506E"/>`),
+ bodyHurt:()=>sv('0 0 100 100',`<circle cx="50" cy="50" r="44" fill="#FFD0D8"/><path d="M50 78C30 62 22 52 22 41a14 14 0 0 1 28-4 14 14 0 0 1 28 4c0 11-8 21-28 37Z" fill="#B9C6C2"/><path d="M50 37 44 50l10 4-6 14" stroke="#fff" stroke-width="4" fill="none"/>`)
+};
+const bare=s=>s.replace(/^<svg[^>]*>|<\/svg>$/g,'');
+</script>
+<script>
+/* ===== 圖庫 B：生物（扁平簡潔） ===== */
+const ground=(c='#C9B79A')=>`<rect x="8" y="106" width="134" height="6" rx="3" fill="${c}"/>`;
+const water=()=>`<rect x="8" y="106" width="134" height="6" rx="3" fill="#9CCFEA"/>`;
+Object.assign(ART,{
+ /* 原核生物界 */
+ lacto:()=>sv('0 0 150 120',[[18,70,-18],[48,56,-8],[80,52,6],[110,60,18]].map(([x,y,r])=>`<rect x="${x}" y="${y-9}" width="28" height="18" rx="9" fill="#F59E6B" transform="rotate(${r} ${x+14} ${y})"/>`).join('')),
+ strep:()=>sv('0 0 150 120',Array.from({length:9},(_,i)=>{const x=18+i*14.5,y=60+Math.sin(i*.75)*18;return `<circle cx="${x}" cy="${y}" r="8.5" fill="${i%2?'#E9799A':'#F29AB4'}"/>`}).join('')),
+ nostoc:()=>sv('0 0 150 120',Array.from({length:8},(_,i)=>{const x=16+i*17,y=62+Math.sin(i*.9)*16,big=i===4;return `<circle cx="${x}" cy="${y}" r="${big?11:9}" fill="${big?'#9EDFD2':'#35B39F'}"/>`}).join('')),
+ /* 原生生物界 */
+ amoeba:()=>sv('0 0 150 120',`<path d="M36 62c-22-4-26-26-6-28 6-16 30-12 36 0 14-16 42-10 42 8 24 2 32 28 12 36 2 20-26 28-38 14-16 14-42 4-38-12-14-2-18-12-8-18Z" fill="#87D6CF"/><circle cx="74" cy="60" r="12" fill="#2E8C86"/><circle cx="102" cy="74" r="7" fill="#C9EEEA"/>`),
+ parame:()=>sv('0 0 150 120',`${Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2,x=76+Math.cos(a)*57,y=60+Math.sin(a)*30;return `<path d="M${x} ${y}l${(Math.cos(a)*6).toFixed(1)} ${(Math.sin(a)*6).toFixed(1)}" stroke="#6EB2E6" stroke-width="2.4"/>`}).join('')}<path d="M20 60c0-26 40-34 74-30s38 18 34 30-26 28-60 28-48-8-48-28Z" fill="#A9D6F6"/><path d="M92 46c10 8 10 22-2 28" stroke="#5B9FD6" stroke-width="4" fill="none"/><ellipse cx="60" cy="58" rx="12" ry="8" fill="#5B9FD6"/>`),
+ trypano:()=>sv('0 0 150 120',`<circle cx="30" cy="40" r="13" fill="#F6C1C1"/><circle cx="118" cy="84" r="13" fill="#F6C1C1"/><circle cx="32" cy="88" r="10" fill="#F6C1C1"/><path d="M28 64c14-16 28 10 44-4s28 10 42-6" stroke="#B88BEA" stroke-width="13" fill="none"/><path d="M114 54c8-6 14-14 24-14" stroke="#B88BEA" stroke-width="3" fill="none"/><circle cx="64" cy="62" r="4.5" fill="#7A4DC9"/>`),
+ euglena:()=>sv('0 0 150 120',`<path d="M120 54c10-8 16-22 26-26" stroke="#2E9E68" stroke-width="3.5" fill="none"/><path d="M20 66c8-28 72-36 100-12 6 12-8 24-32 28-32 6-72 6-68-16Z" fill="#7DD6A2"/>${[[42,70],[58,62],[74,72],[92,64]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="7" ry="4" fill="#2E9E68"/>`).join('')}<circle cx="110" cy="56" r="5" fill="#F0506E"/>`),
+ slime:()=>sv('0 0 150 120',`<rect x="10" y="78" width="130" height="28" rx="14" fill="#B08A63"/><path d="M24 80c6-20 22-20 26-36s26-14 30 0 22 16 26 36" stroke="#F2C230" stroke-width="10" fill="none"/><path d="M50 44c-6-10-2-20 8-22M80 44c6-12 18-12 22-6M106 80c4-14 16-18 22-14" stroke="#F2C230" stroke-width="7" fill="none"/><circle cx="64" cy="40" r="9" fill="#F2C230"/>`),
+ kelp:()=>sv('0 0 150 120',`${water()}<path d="M75 108c-3-26 4-60-3-86" stroke="#7A6230" stroke-width="5" fill="none"/><path d="M72 24C44 18 38 60 46 102c10 6 20-30 26-78Z" fill="#B39A45"/><path d="M76 24c30-10 38 30 28 76-10 8-22-38-28-76Z" fill="#C9B256"/>`),
+ /* 真菌界 */
+ yeast:()=>sv('0 0 150 120',`<ellipse cx="64" cy="66" rx="38" ry="32" fill="#F2CF78"/><ellipse cx="108" cy="38" rx="19" ry="16" fill="#F7E0A6"/><circle cx="62" cy="64" r="10" fill="#D9A93A"/>`),
+ mold:()=>sv('0 0 150 120',`<path d="M14 94c0-14 12-16 20-16h82c8 0 20 2 20 16v12H14Z" fill="#E8C690"/>${[32,54,76,98,120].map((x,i)=>{const y=38+(i%2)*14;return `<path d="M${x} 80V${y+8}" stroke="#9AA8B2" stroke-width="3"/><circle cx="${x}" cy="${y}" r="10" fill="#3C4A54"/>`}).join('')}`),
+ shroom:()=>sv('0 0 150 120',`${ground()}<path d="M60 62h30l4 44H56Z" fill="#F1E3CF"/><path d="M14 66C14 34 42 14 75 14s61 20 61 52Z" fill="#B5764E"/><path d="M28 66h94" stroke="#8A5534" stroke-width="5"/>${[[48,36,8],[80,28,6],[104,44,7]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.6}" fill="#D3A07E"/>`).join('')}`),
+ /* 植物界 */
+ moss:()=>sv('0 0 150 120',`${ground()}<path d="M52 72V30M100 70V26" stroke="#C9A24A" stroke-width="2.5"/><ellipse cx="52" cy="27" rx="5" ry="8" fill="#B07A3A"/><ellipse cx="100" cy="23" rx="5" ry="8" fill="#B07A3A"/>${Array.from({length:11},(_,i)=>{const x=22+i*10.5,h=26+((i*37)%16);return `<path d="M${x} 106V${106-h}" stroke="#4FAE52" stroke-width="5"/>${[0,1,2].map(k=>`<path d="M${x} ${106-h+6+k*8}l-6-5M${x} ${106-h+10+k*8}l6-5" stroke="#7CCB6A" stroke-width="3"/>`).join('')}`}).join('')}`),
+ fern:()=>sv('0 0 150 120',`${ground()}${[-52,-34,-16,0,16,34,52].map((a,i)=>`<path d="M75 104 75 ${i%2?30:22}" stroke="${i%2?'#3DB57B':'#2E9E68'}" stroke-width="16" transform="rotate(${a} 75 104)"/><path d="M75 100 75 ${i%2?36:28}" stroke="#1F7F52" stroke-width="2" transform="rotate(${a} 75 104)"/>`).join('')}<circle cx="75" cy="104" r="8" fill="#8A6A45"/>`),
+ pine:()=>sv('0 0 150 120',`${ground()}<rect x="69" y="84" width="12" height="22" fill="#8A6240"/><path d="M75 10 104 46H46Z" fill="#2E8F5A"/><path d="M75 28 112 70H38Z" fill="#3A9E66"/><path d="M75 48 120 90H30Z" fill="#46AE72"/><ellipse cx="118" cy="98" rx="9" ry="12" fill="#B9814D"/><path d="M112 92h12M111 98h14M112 104h12" stroke="#8A5A2E" stroke-width="2"/>`),
+ ginkgo:()=>sv('0 0 150 120',`${[[50,66,-30],[96,56,24],[74,40,-4]].map(([x,y,r])=>`<g transform="rotate(${r} ${x} ${y})"><path d="M${x} ${y+30}V${y+4}" stroke="#9B8A3A" stroke-width="3"/><path d="M${x} ${y+6}C${x-30} ${y-6} ${x-26} ${y-34} ${x} ${y-30} ${x+26} ${y-34} ${x+30} ${y-6} ${x} ${y+6}Z" fill="#E7C83C"/><path d="M${x} ${y-28}v14" stroke="#F7E7A0" stroke-width="3"/></g>`).join('')}<circle cx="34" cy="104" r="7" fill="#F2B84B"/><circle cx="50" cy="106" r="7" fill="#F2B84B"/>`),
+ rice:()=>sv('0 0 150 120',`${ground()}${[50,76,102].map(x=>`<path d="M${x} 106C${x} 82 ${x+4} 52 ${x+12} 24" stroke="#4FAE52" stroke-width="4" fill="none"/><path d="M${x} 104c-14-18-22-30-24-42M${x} 104c14-16 22-28 26-40" stroke="#7CCB6A" stroke-width="3.5" fill="none"/>${[0,1,2,3].map(k=>`<ellipse cx="${x+12+k*5}" cy="${26+k*8}" rx="4.5" ry="7" fill="#EBC64E" transform="rotate(30 ${x+12+k*5} ${26+k*8})"/>`).join('')}`).join('')}`),
+ /* 動物界 */
+ frog:()=>sv('0 0 150 120',`<path d="M30 98c-8 6-16 8-22 6M120 98c8 6 16 8 22 6" stroke="#2E9E68" stroke-width="8"/><ellipse cx="75" cy="76" rx="48" ry="30" fill="#57C785"/><ellipse cx="75" cy="86" rx="28" ry="14" fill="#B8EBCB"/><circle cx="52" cy="46" r="16" fill="#57C785"/><circle cx="98" cy="46" r="16" fill="#57C785"/><circle cx="52" cy="45" r="8" fill="#fff"/><circle cx="98" cy="45" r="8" fill="#fff"/><circle cx="53" cy="46" r="4.5" fill="${DK}"/><circle cx="97" cy="46" r="4.5" fill="${DK}"/>`),
+ worm:()=>sv('0 0 150 120',`<path d="M16 78c14-30 34-30 46 0s30 26 46 0 18-18 26-10" stroke="#E9899B" stroke-width="20" fill="none"/><path d="M16 78c14-30 34-30 46 0s30 26 46 0 18-18 26-10" stroke="#D86D82" stroke-width="20" fill="none" stroke-dasharray="2 9" stroke-linecap="butt"/>`),
+ coral:()=>sv('0 0 150 120',`${water()}<path d="M75 104V70M75 80 50 50M75 76l26-34M50 50 40 26M50 50l14-24M101 42 92 18M101 42l18-16" stroke="#FF8A7A" stroke-width="12" fill="none"/>`),
+ seastar:()=>sv('0 0 150 120',`<path d="M75 10 89 46l38 2-30 24 11 38-33-21-33 21 11-38-30-24 38-2Z" fill="#F28C3B" stroke="#F28C3B" stroke-width="10"/>${[[75,32],[100,52],[90,84],[60,84],[50,52],[75,60]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.5" fill="#FFD0A8"/>`).join('')}`),
+ /* 病毒（不屬於任何一界） */
+ flu:()=>sv('0 0 150 120',`${Array.from({length:14},(_,i)=>{const a=i/14*Math.PI*2,x=75+Math.cos(a)*36,y=60+Math.sin(a)*36;return `<path d="M${x.toFixed(1)} ${y.toFixed(1)}l${(Math.cos(a)*12).toFixed(1)} ${(Math.sin(a)*12).toFixed(1)}" stroke="#C870A0" stroke-width="3.5"/><circle cx="${(x+Math.cos(a)*14).toFixed(1)}" cy="${(y+Math.sin(a)*14).toFixed(1)}" r="4" fill="${i%2?'#F5B82E':'#9B5DE5'}"/>`}).join('')}<circle cx="75" cy="60" r="36" fill="#E7A6CB"/><path d="M58 50c8 6 18-6 26 2M56 68c10 4 20-4 30 2" stroke="#C870A0" stroke-width="4" fill="none"/>`),
+ covid:()=>sv('0 0 150 120',`${Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2,x=75+Math.cos(a)*34,y=60+Math.sin(a)*34;return `<path d="M${x.toFixed(1)} ${y.toFixed(1)}l${(Math.cos(a)*14).toFixed(1)} ${(Math.sin(a)*14).toFixed(1)}" stroke="#D9534F" stroke-width="4"/><circle cx="${(x+Math.cos(a)*17).toFixed(1)}" cy="${(y+Math.sin(a)*17).toFixed(1)}" r="6" fill="#D9534F"/>`}).join('')}<circle cx="75" cy="60" r="34" fill="#F29B95"/>${[[64,50],[86,56],[70,72]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#E8716B"/>`).join('')}`),
+ /* 生態系 */
+ grass:()=>sv('0 0 150 120',`${ground()}${[22,40,58,92,110,128].map((x,i)=>`<path d="M${x} 104C${x-4} 80 ${x+(i%2?12:-12)} 56 ${x+(i%2?18:-16)} 36" stroke="${i%2?'#3DB57B':'#7CCB6A'}" stroke-width="8" fill="none"/>`).join('')}<path d="M75 104V54" stroke="#3DB57B" stroke-width="5"/>${[0,72,144,216,288].map(a=>`<ellipse cx="75" cy="37" rx="7" ry="11" fill="#FFF" transform="rotate(${a} 75 49)"/>`).join('')}<circle cx="75" cy="49" r="8" fill="#F5B82E"/>`),
+ hopper:()=>sv('0 0 150 120',`<path d="M58 80l-10 24M78 82l2 22" stroke="#5E9E2C" stroke-width="4"/><path d="M84 70 106 30l18 46Z" fill="#6DB33A"/><path d="M24 72c18-18 70-20 92-6 6 8-2 16-12 16H36c-12 0-18-4-12-10Z" fill="#8FCF55"/><circle cx="118" cy="64" r="16" fill="#8FCF55"/><circle cx="122" cy="60" r="4" fill="${DK}"/><path d="M124 48c6-16 12-24 20-28M118 47c0-16 4-28 8-36" stroke="#5E9E2C" stroke-width="2.8" fill="none"/>`),
+ snake:()=>sv('0 0 150 120',`<path d="M16 92c22 14 34-22 54-12s28 26 46 10" stroke="#6CC04A" stroke-width="18" fill="none"/><ellipse cx="116" cy="64" rx="22" ry="17" fill="#6CC04A"/><circle cx="120" cy="58" r="4" fill="${DK}"/><path d="M136 72l10 2-6 3m6-3-4 6" stroke="#F0506E" stroke-width="2.6" fill="none"/>`),
+ hawk:()=>sv('0 0 150 120',`<path d="M75 54C52 30 22 30 4 42c18 4 36 14 50 30ZM75 54c23-24 53-24 71-12-18 4-36 14-50 30Z" fill="#9B6A45"/><path d="M62 92l13 20 13-20Z" fill="#9B6A45"/><ellipse cx="75" cy="72" rx="20" ry="25" fill="#C9935F"/><circle cx="75" cy="40" r="15" fill="#F4E6D3"/><circle cx="70" cy="38" r="3" fill="${DK}"/><circle cx="80" cy="38" r="3" fill="${DK}"/><path d="M71 45l4 7 4-7Z" fill="#F5B82E"/>`),
+ algae:()=>sv('0 0 150 120',`<rect x="6" y="6" width="138" height="108" rx="20" fill="#E1F2FB"/>${[[44,42,16],[104,36,12],[106,84,13],[52,86,11],[78,62,20]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#4CC38A"/><circle cx="${x}" cy="${y}" r="${r*.42}" fill="#2E9E68"/>`).join('')}`),
+ zoo:()=>sv('0 0 150 120',`<rect x="6" y="6" width="138" height="108" rx="20" fill="#E1F2FB"/><path d="M60 42 24 20M90 42l36-22M58 74 32 98M92 74l28 24M75 92v18" stroke="#E07A5F" stroke-width="3.5"/><ellipse cx="75" cy="60" rx="24" ry="31" fill="#F4A28C"/><circle cx="75" cy="46" r="5" fill="#C4553B"/>`),
+ fish:()=>sv('0 0 150 120',`<path d="M108 60l32-24v48Z" fill="#4BA3E3"/><path d="M60 34l16-14 12 18Z" fill="#4BA3E3"/><ellipse cx="66" cy="60" rx="48" ry="30" fill="#78BEF0"/><circle cx="44" cy="54" r="5" fill="${DK}"/>`),
+ bigfish:()=>sv('0 0 150 120',`<path d="M120 60l26-30v60Z" fill="#5868D6"/><path d="M56 28l22-18 12 22Z" fill="#5868D6"/><ellipse cx="68" cy="60" rx="58" ry="38" fill="#7B89E8"/><ellipse cx="62" cy="74" rx="40" ry="16" fill="#AEB7F5"/><circle cx="36" cy="50" r="6" fill="${DK}"/><path d="M14 68l8-3 4 6 5-6 5 6 5-6" stroke="#fff" stroke-width="3" fill="none"/>`),
+ gull:()=>sv('0 0 150 120',`<path d="M75 60C56 34 28 30 6 40c20 4 40 16 52 32ZM75 60c19-26 47-30 69-20-20 4-40 16-52 32Z" fill="#DCE3E8"/><path d="M6 40c8 0 14 2 18 4M144 40c-8 0-14 2-18 4" stroke="#3C4A54" stroke-width="5"/><ellipse cx="75" cy="76" rx="17" ry="21" fill="#F4F7F9"/><circle cx="75" cy="52" r="14" fill="#F4F7F9"/><circle cx="79" cy="50" r="3" fill="${DK}"/><path d="M86 54l12 3-12 3Z" fill="#F5B82E"/>`),
+ bacteria:()=>sv('0 0 150 120',`<path d="M20 98C30 50 70 20 128 20c-6 52-40 84-108 78Z" fill="#B9A36A"/><path d="M24 96 116 30" stroke="#9A8550" stroke-width="3"/>${[[56,72,-30],[86,50,-30],[98,74,20],[60,44,10],[40,86,40]].map(([x,y,r])=>`<rect x="${x-13}" y="${y-6}" width="26" height="12" rx="6" fill="#F59E6B" transform="rotate(${r} ${x} ${y})"/>`).join('')}`),
+ human:()=>sv('0 0 150 120',`<circle cx="75" cy="28" r="16" fill="#E8B98F"/><path d="M47 112c0-34 12-60 28-60s28 26 28 60Z" fill="#5B8DEF"/>`),
+ /* ---- 大廳封面 ---- */
+ coverCell:()=>sv('0 0 200 140',`<rect x="8" y="10" width="184" height="120" rx="22" fill="#7DC254"/><rect x="16" y="18" width="168" height="104" rx="16" fill="#EEF8E4"/><g transform="translate(70 32) scale(.5)">${bare(ART.nucleus())}</g><g transform="translate(24 76) scale(.42)">${bare(ART.chloro())}</g><g transform="translate(124 78) scale(.42)">${bare(ART.mito())}</g><g transform="translate(126 26) scale(.36)">${bare(ART.vacuole())}</g>`),
+ coverCustoms:()=>sv('0 0 200 140',`<rect x="6" y="92" width="188" height="16" rx="8" fill="#3C4A54"/>${[22,50,78,106,134,162].map(x=>`<circle cx="${x}" cy="100" r="4" fill="#7A8C99"/>`).join('')}<g transform="translate(8 26) scale(.48)">${bare(ART.amoeba())}</g><g transform="translate(72 18) scale(.5)">${bare(ART.yeast())}</g><g transform="translate(128 22) scale(.46)">${bare(ART.flu())}</g>${['#F59E6B','#87D6CF','#B5764E','#46AE72','#57C785'].map((c,i)=>`<rect x="${12+i*37}" y="116" width="31" height="16" rx="5" fill="${c}"/>`).join('')}`),
+ coverEco:()=>sv('0 0 200 140',`<path d="M100 8 188 132H12Z" fill="#E4F4DA"/><path d="M100 8 188 132H12Z" fill="none" stroke="#B9DFA4" stroke-width="3"/><path d="M40 96h120M70 54h60" stroke="#B9DFA4" stroke-width="3"/><g transform="translate(40 96) scale(.24)">${bare(ART.grass())}</g><g transform="translate(84 96) scale(.24)">${bare(ART.grass())}</g><g transform="translate(126 96) scale(.24)">${bare(ART.grass())}</g><g transform="translate(66 60) scale(.22)">${bare(ART.hopper())}</g><g transform="translate(102 60) scale(.22)">${bare(ART.hopper())}</g><g transform="translate(82 22) scale(.24)">${bare(ART.hawk())}</g>`),
+ coverGene:()=>sv('0 0 200 140',`<rect x="14" y="26" width="88" height="88" rx="14" fill="#fff"/><path d="M58 26v88M14 70h88" stroke="#C9D3D0" stroke-width="3"/>${[[36,56,'TT','#4C6FE0'],[80,56,'Tt','#4C6FE0'],[36,100,'Tt','#4C6FE0'],[80,100,'tt','#F0506E']].map(([x,y,t,c])=>`<text x="${x}" y="${y}" font-family="Baloo 2,sans-serif" font-weight="800" font-size="20" text-anchor="middle" fill="${c}">${t}</text>`).join('')}${[[130,40,'#4C6FE0'],[150,40,'#F0506E'],[170,40,'#4C6FE0'],[130,86,'#F0506E'],[150,86,'#4C6FE0'],[170,86,'#F0506E']].map(([x,y,c])=>`<rect x="${x-5}" y="${y}" width="10" height="34" rx="5" fill="${c}"/>`).join('')}<path d="M126 57h48M126 103h48" stroke="#fff" stroke-width="3"/>`)
+});
+</script>
+<script>
+/* ===== 圖庫 C：新遊戲用圖（扁平簡潔） ===== */
+const GL='#CFE7F2',GD='#7FB3CC',LQ='#8FD0F2';
+Object.assign(ART,{
+ /* 實驗器材 */
+ beaker:()=>sv('0 0 120 100',`<path d="M32 14h56v70a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8Z" fill="${GL}"/><path d="M32 50h56v34a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8Z" fill="${LQ}"/><path d="M26 14h68" stroke="${GD}" stroke-width="5"/><path d="M76 30h10M76 42h10M76 54h10" stroke="${GD}" stroke-width="3"/>`),
+ cylinder:()=>sv('0 0 120 100',`<rect x="48" y="6" width="24" height="80" rx="4" fill="${GL}"/><rect x="48" y="40" width="24" height="46" fill="${LQ}"/><rect x="34" y="86" width="52" height="8" rx="4" fill="${GD}"/>${[16,26,36,46,56,66,76].map(y=>`<path d="M48 ${y}h${y%20===16?14:8}" stroke="${GD}" stroke-width="2.5"/>`).join('')}`),
+ tube:(c=LQ)=>sv('0 0 120 100',`<path d="M48 6h24v74a12 12 0 0 1-24 0Z" fill="${GL}"/><path d="M48 46h24v34a12 12 0 0 1-24 0Z" fill="${c}"/><path d="M44 6h32" stroke="${GD}" stroke-width="5"/>`),
+ lamp:()=>sv('0 0 120 100',`<path d="M60 8c-8 12-10 18-10 24a10 10 0 0 0 20 0c0-6-2-12-10-24Z" fill="#F5A524"/><path d="M60 22c-4 6-5 9-5 12a5 5 0 0 0 10 0c0-3-1-6-5-12Z" fill="#FFE27A"/><rect x="56" y="42" width="8" height="12" fill="#9AA8B2"/><path d="M30 92c0-24 12-38 30-38s30 14 30 38Z" fill="${GL}"/><path d="M34 92c2-14 10-22 26-22s24 8 26 22Z" fill="#F7E7A0"/>`),
+ dropper:()=>sv('0 0 120 100',`<rect x="52" y="6" width="16" height="24" rx="8" fill="#F0506E"/><path d="M54 30h12v44l-6 14-6-14Z" fill="${GL}"/><path d="M54 56h12v18l-6 14-6-14Z" fill="${LQ}"/><circle cx="60" cy="96" r="3" fill="${LQ}"/>`),
+ dish:()=>sv('0 0 120 100',`<ellipse cx="60" cy="62" rx="48" ry="16" fill="${GD}"/><path d="M12 50v12c0 9 22 16 48 16s48-7 48-16V50" fill="${GL}"/><ellipse cx="60" cy="50" rx="48" ry="16" fill="#E8F4FA"/>`),
+ flask:()=>sv('0 0 120 100',`<path d="M50 6h20v26l26 50a8 8 0 0 1-7 12H31a8 8 0 0 1-7-12l26-50Z" fill="${GL}"/><path d="M36 62h48l12 20a8 8 0 0 1-7 12H31a8 8 0 0 1-7-12Z" fill="${LQ}"/><path d="M46 6h28" stroke="${GD}" stroke-width="5"/>`),
+ scope:()=>sv('0 0 120 120',`<rect x="22" y="104" width="76" height="10" rx="5" fill="#33424D"/><path d="M70 104V60" stroke="#33424D" stroke-width="10"/><path d="M70 60c0-22-14-34-30-36" stroke="#33424D" stroke-width="10" fill="none"/><rect x="28" y="12" width="16" height="44" rx="4" fill="#5B8DEF" transform="rotate(-18 36 34)"/><rect x="24" y="4" width="22" height="10" rx="3" fill="#3552B8" transform="rotate(-18 36 34)"/><rect x="28" y="62" width="50" height="7" rx="3" fill="#7A8C99"/><rect x="40" y="54" width="10" height="10" fill="#9AA8B2"/><circle cx="46" cy="86" r="9" fill="#F5A524"/>`),
+ /* 細胞與溶液 */
+ rbc:(s=1,state='')=>sv('0 0 120 100',state==='burst'?`${[[30,30],[86,26],[24,70],[92,74],[60,84],[58,16]].map(([x,y])=>`<path d="M${x} ${y}l8-6 6 8-8 5Z" fill="#F0506E"/>`).join('')}<circle cx="60" cy="50" r="6" fill="#F7A3B5"/>`:`<g transform="translate(60 50) scale(${s})"><ellipse rx="34" ry="${state==='shrink'?22:30}" fill="#F0506E"/><ellipse rx="16" ry="${state==='shrink'?9:13}" fill="#C93659"/>${state==='shrink'?'<path d="M-30 -6q6 6 0 12M30 -6q-6 6 0 12" stroke="#fff" stroke-width="3" fill="none"/>':''}</g>`),
+ plantCell:(state='')=>sv('0 0 120 100',`<rect x="14" y="8" width="92" height="84" rx="8" fill="#7DC254"/><rect x="20" y="14" width="80" height="72" rx="5" fill="#EEF8E4"/>${state==='shrink'?'<rect x="36" y="28" width="48" height="44" rx="14" fill="#B7E39A"/><circle cx="60" cy="50" r="7" fill="#4C6FE0"/>':state==='swell'?'<rect x="21" y="15" width="78" height="70" rx="5" fill="#B7E39A"/><circle cx="74" cy="34" r="7" fill="#4C6FE0"/>':'<rect x="24" y="18" width="72" height="64" rx="5" fill="#B7E39A"/><circle cx="72" cy="36" r="7" fill="#4C6FE0"/>'}`),
+ dots:(lt,rt)=>sv('0 0 200 100',`<rect x="4" y="4" width="192" height="92" rx="14" fill="#E8F4FA"/><path d="M100 8v84" stroke="#F5A524" stroke-width="5" stroke-dasharray="8 6"/>${Array.from({length:lt},(_,k)=>`<circle cx="${18+(k*37)%74}" cy="${18+((k*53)%66)}" r="5" fill="#4C6FE0"/>`).join('')}${Array.from({length:rt},(_,k)=>`<circle cx="${118+(k*41)%70}" cy="${22+((k*29)%60)}" r="5" fill="#4C6FE0"/>`).join('')}`),
+ /* 葉片：碘液檢測（hotspot） */
+ leafHS:(stained)=>sv('0 0 240 160',`<path d="M120 150C40 140 10 80 30 20c60 0 160 10 180 70-20 50-60 62-90 60Z" fill="${stained?'#3E3A6E':'#9ED36A'}" data-h="lit"/><path d="M84 46h76v54H84Z" fill="${stained?'#D9B65A':'#7CB24E'}" data-h="cov"/>${stained?'':'<rect x="84" y="46" width="76" height="54" fill="#C9D3D9" data-h="cov"/><path d="M84 46l76 54M160 46 84 100" stroke="#AEB9C0" stroke-width="2" data-h="cov"/>'}<path d="M30 20 170 110" stroke="${stained?'#2A2650':'#6FA640'}" stroke-width="4" fill="none" style="pointer-events:none"/>`),
+ /* 花的構造（hotspot） */
+ flowerHS:()=>sv('0 0 300 260',`<path d="M150 250V178" stroke="#4FAE52" stroke-width="10"/><ellipse cx="150" cy="176" rx="30" ry="12" fill="#2E9E68" data-h="torus"/><path d="M118 172c-30 0-50-14-56-30 26-4 46 6 62 22ZM182 172c30 0 50-14 56-30-26-4-46 6-62 22Z" fill="#46AE72" data-h="sepal"/><path d="M96 156C40 130 40 60 92 50c18 20 30 60 30 104ZM204 156c56-26 56-96 4-106-18 20-30 60-30 104Z" fill="#F7A3B5" data-h="petal"/><g data-h="pistil"><path d="M142 120h16l6 40c0 10-28 10-28 0Z" fill="#B5E08F"/><path d="M146 60h8v62h-8Z" fill="#B5E08F"/><ellipse cx="150" cy="58" rx="12" ry="7" fill="#7FCB5B"/></g><g data-h="ovary"><ellipse cx="150" cy="146" rx="20" ry="18" fill="#7FCB5B"/></g><g data-h="ovule">${[[143,140],[157,140],[150,152]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#FFF3B0"/>`).join('')}</g>${[[112,0],[188,0]].map(([x])=>`<g data-h="stamen"><path d="M${x} 150 ${x+(x<150?-8:8)} 80" stroke="#E8C24A" stroke-width="4"/><ellipse cx="${x+(x<150?-8:8)}" cy="74" rx="11" ry="8" fill="#F5A524"/></g>`).join('')}`),
+ /* 向性 */
+ potPlant:(dir)=>{const d=dir==='L'?'M60 70C60 44 40 30 26 22':dir==='R'?'M60 70C60 44 80 30 94 22':'M60 70V14';const e=dir==='L'?[26,22]:dir==='R'?[94,22]:[60,14];return sv('0 0 120 110',`<path d="M38 70h44l-6 34H44Z" fill="#C9835A"/><path d="${d}" stroke="#4FAE52" stroke-width="6" fill="none"/><ellipse cx="${e[0]}" cy="${e[1]}" rx="12" ry="7" fill="#46AE72"/>`)},
+ hangPot:(stem,root)=>sv('0 0 120 130',`<path d="M60 2v14" stroke="#9AA8B2" stroke-width="3"/><path d="M38 16h44l-6 34H44Z" fill="#C9835A" transform="rotate(180 60 33)"/><path d="M60 50${stem==='up'?'c0 20 30 20 30 60':'v60'}" stroke="#4FAE52" stroke-width="6" fill="none"/><path d="M60 16${root==='down'?'c-10 0-20 4-26 30':'c0-6 0-10 0-14'}" stroke="#B07A3A" stroke-width="4" fill="none"/>`),
+ sunL:()=>sv('0 0 40 40',`<circle cx="20" cy="20" r="9" fill="#F5A524"/>${[0,45,90,135,180,225,270,315].map(a=>`<path d="M20 4v5" stroke="#F5A524" stroke-width="3" transform="rotate(${a} 20 20)"/>`).join('')}`),
+ /* 馬的腳 */
+ foot4:()=>sv('0 0 100 100',`<rect x="38" y="6" width="24" height="54" rx="10" fill="#B07A52"/>${[26,42,58,74].map(x=>`<rect x="${x-6}" y="58" width="12" height="30" rx="6" fill="#8A5A3C"/>`).join('')}`),
+ foot3:()=>sv('0 0 100 100',`<rect x="38" y="6" width="24" height="56" rx="10" fill="#B07A52"/><rect x="44" y="58" width="12" height="34" rx="6" fill="#8A5A3C"/><rect x="28" y="60" width="10" height="20" rx="5" fill="#8A5A3C"/><rect x="62" y="60" width="10" height="20" rx="5" fill="#8A5A3C"/>`),
+ foot1:()=>sv('0 0 100 100',`<rect x="40" y="6" width="20" height="62" rx="9" fill="#B07A52"/><path d="M34 70h32l6 22H28Z" fill="#5D3922"/>`),
+ /* 化石 */
+ ammonite:()=>sv('0 0 120 120',`<circle cx="60" cy="60" r="48" fill="#D9C39A"/><path d="M60 60m-6 0a6 6 0 1 1 12 0 14 14 0 1 1-26 4 24 24 0 1 1 44-8 34 34 0 1 1-60 14 44 44 0 1 1 76-20" stroke="#A8895A" stroke-width="5" fill="none"/>`),
+ footprint:()=>sv('0 0 120 120',`<rect x="6" y="6" width="108" height="108" rx="18" fill="#E2D2B4"/><path d="M60 90c-14 0-20-10-16-22l8-14h16l8 14c4 12-2 22-16 22Z" fill="#B59A6E"/><path d="M48 52 34 22M60 50V16M72 52 86 22" stroke="#B59A6E" stroke-width="12"/>`),
+ /* 恆定、神經 */
+ thermo:()=>sv('0 0 60 120',`<rect x="22" y="6" width="16" height="80" rx="8" fill="#E8EEF2"/><rect x="26" y="40" width="8" height="54" fill="#F0506E"/><circle cx="30" cy="96" r="16" fill="#F0506E"/>`),
+ brain:()=>sv('0 0 120 100',`<path d="M60 14c-10-10-34-8-38 10-16 4-18 24-8 32-6 14 6 28 22 26 8 10 24 8 24-2Z" fill="#F7A3B5"/><path d="M60 14c10-10 34-8 38 10 16 4 18 24 8 32 6 14-6 28-22 26-8 10-24 8-24-2Z" fill="#F29AB4"/><path d="M60 14v66M36 36c8 2 12 8 10 16M84 36c-8 2-12 8-10 16M34 62c8-2 14 2 16 8M86 62c-8-2-14 2-16 8" stroke="#D86D8E" stroke-width="3.5" fill="none"/>`),
+ kidney:()=>sv('0 0 120 100',`<path d="M40 10c-26 0-30 40-22 60 8 20 34 24 34 4 0-12-12-14-12-26s14-14 14-24c0-8-6-14-14-14Z" fill="#C9555E"/><path d="M80 10c26 0 30 40 22 60-8 20-34 24-34 4 0-12 12-14 12-26S66 34 66 24c0-8 6-14 14-14Z" fill="#C9555E"/><path d="M48 50c8 0 12 10 12 30M72 50c-8 0-12 10-12 30" stroke="#F5C443" stroke-width="4" fill="none"/>`),
+ stomach:()=>sv('0 0 120 100',`<path d="M56 6v16c0 10-30 14-30 40 0 22 24 32 46 24 20-8 30-34 18-52-6-10-20-6-22 6" stroke="#F29AB4" stroke-width="16" fill="none"/><path d="M90 24c4 10-2 18-10 18" stroke="#F7C1D1" stroke-width="4" fill="none"/>`),
+ /* 保育 */
+ earth:()=>sv('0 0 120 120',`<circle cx="60" cy="60" r="48" fill="#6CB7EA"/><path d="M30 40c10-12 24-10 30-2s4 18-6 22-6 18-18 18-18-10-14-20-2-10 8-18ZM74 30c10-4 24 4 26 16s-8 14-14 10-18-20-12-26ZM70 82c8-6 20-4 22 4s-10 14-18 10-10-8-4-14Z" fill="#57C785"/>`),
+ leopardcat:()=>sv('0 0 150 120',`<path d="M38 50 30 22l24 18ZM112 50l8-28-24 18Z" fill="#C99A5B"/><ellipse cx="75" cy="68" rx="44" ry="38" fill="#D9AE6E"/><path d="M58 30c-2 10 0 16 4 22M92 30c2 10 0 16-4 22M75 28v18" stroke="#fff" stroke-width="5"/>${[[50,82],[100,82],[60,96],[90,96],[44,64],[106,64]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.5" fill="#7A5230"/>`).join('')}<circle cx="60" cy="62" r="6" fill="${DK}"/><circle cx="90" cy="62" r="6" fill="${DK}"/><path d="M70 76h10l-5 6Z" fill="#E8899B"/>`),
+ bullfrog:()=>sv('0 0 150 120',`<ellipse cx="75" cy="76" rx="52" ry="32" fill="#7A9A3A"/><circle cx="50" cy="46" r="16" fill="#7A9A3A"/><circle cx="100" cy="46" r="16" fill="#7A9A3A"/><circle cx="50" cy="45" r="8" fill="#F5C443"/><circle cx="100" cy="45" r="8" fill="#F5C443"/><circle cx="50" cy="45" r="4" fill="${DK}"/><circle cx="100" cy="45" r="4" fill="${DK}"/><circle cx="74" cy="70" r="12" fill="#A9C26A"/>`),
+ /* 封面 */
+ coverScope:()=>sv('0 0 200 140',`<circle cx="134" cy="70" r="52" fill="#FFF8E1"/><circle cx="134" cy="70" r="52" fill="none" stroke="#33424D" stroke-width="7"/><text x="134" y="92" text-anchor="middle" font-family="Baloo 2,serif" font-size="58" font-weight="800" fill="#3552B8" transform="rotate(180 134 70)">F</text><g transform="translate(6 14) scale(.95)">${bare(ART.scope())}</g>`),
+ coverLab:()=>sv('0 0 200 140',`<g transform="translate(-6 18) scale(1.05)">${bare(ART.beaker())}</g><g transform="translate(36 54) scale(.4)">${bare(ART.rbc(1))}</g><g transform="translate(104 20) scale(.8)">${bare(ART.plantCell())}</g>`),
+ coverDigest:()=>sv('0 0 200 140',`<circle cx="62" cy="70" r="54" fill="#FFE1E7"/><g transform="translate(10 16) scale(.9)">${bare(ART.stomach())}</g><g transform="translate(110 30) scale(.7)">${bare(ART.tube('#3E3A6E'))}</g><g transform="translate(140 30) scale(.7)">${bare(ART.tube('#F08A3C'))}</g>`),
+ coverCirc:()=>sv('0 0 200 140',`${[[14,24,'#4CC38A'],[64,24,'#fff'],[114,24,'#4CC38A'],[39,80,'#fff'],[89,80,'#4CC38A'],[139,80,'#fff']].map(([x,y,c])=>`<rect x="${x}" y="${y}" width="44" height="44" rx="9" fill="${c}" stroke="#C9E8D6" stroke-width="3"/>`).join('')}<g transform="translate(64 24) scale(.44)">${bare(ART.bodyHeart())}</g><g transform="translate(39 84) scale(.36)">${bare(ART.rbc(1))}</g><g transform="translate(139 80) scale(.44)">${bare(ART.bodyHeart())}</g>`),
+ coverNerve:()=>sv('0 0 200 140',`<g transform="translate(30 10) scale(1.1)">${bare(ART.brain())}</g><path d="M100 96v30M100 112h-50M100 112h50" stroke="#F5A524" stroke-width="6"/><path d="M150 20 136 52h12l-6 26 22-36h-12l8-22Z" fill="#F5A524"/>`),
+ coverHomeo:()=>sv('0 0 200 140',`${[[30,'#F0506E'],[80,'#F5A524'],[130,'#4C6FE0']].map(([x,c],k)=>`<rect x="${x}" y="16" width="34" height="110" rx="17" fill="#fff"/><rect x="${x}" y="52" width="34" height="38" fill="#D9F7E5"/><rect x="${x-6}" y="${[60,74,66][k]}" width="46" height="8" rx="4" fill="${c}"/>`).join('')}`),
+ coverFlower:()=>sv('0 0 200 140',`<g transform="translate(46 4) scale(.5)">${bare(ART.flowerHS())}</g><g transform="translate(0 70) scale(.45)">${bare(ART.amoeba())}</g><g transform="translate(130 74) scale(.42)">${bare(ART.yeast())}</g>`),
+ coverFossil:()=>sv('0 0 200 140',`<rect x="6" y="96" width="188" height="36" rx="8" fill="#E2D2B4"/><rect x="6" y="60" width="188" height="36" fill="#EDE2CC"/><g transform="translate(14 36) scale(.7)">${bare(ART.ammonite())}</g><g transform="translate(104 40) scale(.4)">${bare(ART.foot4())}</g><g transform="translate(136 40) scale(.4)">${bare(ART.foot3())}</g><g transform="translate(166 40) scale(.4)">${bare(ART.foot1())}</g>`),
+ coverGuard:()=>sv('0 0 200 140',`<g transform="translate(10 10)">${bare(ART.earth())}</g><g transform="translate(110 30) scale(.6)">${bare(ART.leopardcat())}</g>`)
+});
+</script>
+<script>
+/* ===== 核心引擎 ===== */
+const $=s=>document.querySelector(s);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.random()*a.length|0];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const S={mode:store.get('bio_mode','basic'),key:null,score:0,ok:0,total:0,combo:0,maxCombo:0,t0:0,tick:null,paused:false,sound:store.get('bio_sound',true),cleanup:null};
+const MODE_NAME={basic:'萌芽模式',hard:'演化模式'};
+
+/* 音效 */
+let AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,t,d,type='triangle',v=.18){const a=ac();if(!a||!S.sound)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,a.currentTime+t);g.gain.linearRampToValueAtTime(v,a.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+t+d);o.connect(g).connect(a.destination);o.start(a.currentTime+t);o.stop(a.currentTime+t+d+.05)}
+function noise(t,d,v=.12){const a=ac();if(!a||!S.sound)return;const n=a.sampleRate*d,b=a.createBuffer(1,n,a.sampleRate),c=b.getChannelData(0);for(let i=0;i<n;i++)c[i]=(Math.random()*2-1)*(1-i/n)*(0.6+0.4*Math.sin(i/300));const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=1400;f.Q.value=.7;const g=a.createGain();g.gain.value=v;s.connect(f).connect(g).connect(a.destination);s.start(a.currentTime+t)}
+const SFX={
+ cheer(){[523,659,784,1047].forEach((f,i)=>tone(f,i*.07,.25));tone(1319,.3,.4,'sine',.12);noise(.05,.7,.1)},
+ wrong(){tone(392,0,.18,'sine',.14);tone(311,.16,.3,'sine',.14)},
+ tap(){tone(880,0,.06,'square',.05)},
+ win(){[523,659,784,659,784,1047,1319].forEach((f,i)=>tone(f,i*.11,.3));noise(.2,1.2,.12)}
+};
+
+/* 滿屏星星特效 */
+const fx=$('#fx'),cx=fx.getContext('2d');let parts=[],fxRun=false;
+function sizeFx(){fx.width=innerWidth*devicePixelRatio;fx.height=innerHeight*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+addEventListener('resize',sizeFx);sizeFx();
+function starPath(x,y,r){cx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;cx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr)}cx.closePath()}
+function burst(n=70){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const W=innerWidth,H=innerHeight,cols=['#FFC93C','#E8456F','#22A86A','#3D6FE0','#8A5CF6','#FF8A5B'];
+ for(let i=0;i<n;i++){const fromTop=i%2;parts.push({x:Math.random()*W,y:fromTop?-20:H*.5+Math.random()*H*.3,vx:(Math.random()-.5)*6,vy:fromTop?2+Math.random()*4:-(8+Math.random()*8),r:5+Math.random()*9,c:pick(cols),a:Math.random()*6,va:(Math.random()-.5)*.3,life:1})}
+ if(!fxRun){fxRun=true;requestAnimationFrame(fxLoop)}}
+function fxLoop(){cx.clearRect(0,0,innerWidth,innerHeight);parts=parts.filter(p=>p.life>0&&p.y<innerHeight+40);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.a+=p.va;p.life-=.009;cx.save();cx.globalAlpha=Math.max(0,Math.min(1,p.life*1.6));cx.translate(p.x,p.y);cx.rotate(p.a);starPath(0,0,p.r);cx.fillStyle=p.c;cx.fill();cx.restore()}
+ if(parts.length)requestAnimationFrame(fxLoop);else{fxRun=false;cx.clearRect(0,0,innerWidth,innerHeight)}}
+
+/* 畫面切換 */
+function show(id){['lobby','game','result'].forEach(s=>$('#'+s).hidden=s!==id);scrollTo(0,0)}
+let toastT;
+function toast(msg,color){const t=$('#toast');t.textContent=msg;t.style.background=color||'';t.hidden=false;t.style.animation='none';t.offsetWidth;t.style.animation='';clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,900)}
+const PRAISE=['答對了！','太強了！','完美！','生物學霸！','漂亮！'];
+
+/* 計分 */
+function right(el){S.ok++;S.total++;S.combo++;S.maxCombo=Math.max(S.maxCombo,S.combo);const base=S.mode==='hard'?15:10;const bonus=Math.min(S.combo-1,5)*2;S.score+=base+bonus;if(el)popAt(el,'+'+(base+bonus));$('#gScore').textContent=S.score;SFX.cheer();burst();toast(S.combo>=3?`${S.combo} 連擊！`:pick(PRAISE))}
+function wrong(ans,text,cb){S.total++;S.combo=0;SFX.wrong();S.paused=true;$('#tipAns').textContent=ans?'正確答案：'+ans:'';$('#tipText').textContent=text;$('#tip').hidden=false;$('#tipOk').focus();tipCb=()=>{S.paused=false;cb&&cb()}}
+let tipCb=null;
+function popAt(el,txt,bad){const r=el.getBoundingClientRect?el.getBoundingClientRect():el;const d=document.createElement('div');d.className='pop'+(bad?' bad':'');d.textContent=txt;d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+r.height*.3)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),950)}
+let hintT;
+function hint(msg,ms=2800){const h=$('#hint');h.innerHTML=ART.mascot()+'<span>'+msg+'</span>';h.hidden=false;h.style.animation='none';h.offsetWidth;h.style.animation='';clearTimeout(hintT);hintT=setTimeout(()=>h.hidden=true,ms)}
+function miss(msg,el){S.total++;S.combo=0;SFX.wrong();if(el)popAt(el,'再想想',true);if(msg)hint(msg,Math.max(2800,msg.length*110))}
+function hearts(n,max=3){setExtra('<span class="hearts">'+Array.from({length:max},(_,k)=>ART.heart(k<n)).join('')+'</span>')}
+
+function later(fn,ms){const t=S.tok;setTimeout(()=>{if(t===S.tok)fn()},ms)}
+$('#tipOk').onclick=()=>{$('#tip').hidden=true;const c=tipCb;tipCb=null;c&&c()};
+function setProg(i,n){$('#gProg').style.width=(i/n*100)+'%'}
+function setExtra(html){const e=$('#gExtra');if(html==null){e.hidden=true;return}e.hidden=false;e.innerHTML=html}
+
+/* 計時：countdown 為 null 表示正向計時 */
+function startClock(countdown,onEnd){clearInterval(S.tick);S.t0=Date.now();let left=countdown,last=Date.now();
+ const draw=()=>{$('#gTime').textContent=countdown?Math.ceil(left):Math.floor((Date.now()-S.t0)/1000)};draw();
+ S.tick=setInterval(()=>{const now=Date.now();if(countdown&&!S.paused){left-=(now-last)/1000;if(left<=0){left=0;draw();clearInterval(S.tick);onEnd&&onEnd();return}}last=now;draw()},200)}
+
+/* 遊戲註冊 */
+const GAMES={};
+function startGame(key){S.tok=(S.tok||0)+1;S.key=key;S.score=0;S.ok=0;S.total=0;S.combo=0;S.maxCombo=0;S.paused=false;
+ const g=GAMES[key];$('#gTitle').textContent=g.name;$('#gMode').textContent=MODE_NAME[S.mode];$('#gScore').textContent='0';setExtra(null);setProg(0,1);
+ const st=$('#stage');st.innerHTML='';show('game');S.started=Date.now();S.cleanup=g.start(st,S.mode)||null}
+function stopGame(){S.tok=(S.tok||0)+1;$('#hint').hidden=true;clearInterval(S.tick);if(S.cleanup){S.cleanup();S.cleanup=null}$('#tip').hidden=true;tipCb=null}
+function finish(title){stopGame();const secs=Math.round((Date.now()-S.started)/1000);const acc=S.total?Math.round(S.ok/S.total*100):0;
+ const stars=acc>=90?3:acc>=70?2:acc>=40?1:0;
+ $('#rTitle').textContent=title||'任務完成！';$('#rStars').innerHTML=[0,1,2].map(i=>ART.star(i<stars?'#FFC93C':'#E3ECE8')).join('');
+ $('#rScore').textContent=S.score;$('#rAcc').textContent=acc+'%';$('#rTime').textContent=secs;$('#rCombo').textContent=S.maxCombo;
+ const k='bio_best_'+S.key+'_'+S.mode;const best=store.get(k,0);let msg;
+ if(S.score>best){store.set(k,S.score);msg=best?`刷新紀錄！上次最佳 ${best} 分。`:'第一筆紀錄誕生！'}else msg=`本模式最佳紀錄 ${best} 分。`;
+ msg+=stars===3?' 觀念超扎實，可以挑戰演化模式了。':stars===2?' 很不錯，再玩一次把錯的觀念補起來。':' 先看清楚提示，多練幾次就會熟。';
+ $('#rMsg').textContent=msg;show('result');if(stars)SFX.win(),burst(140)}
+$('#backBtn').onclick=()=>{stopGame();renderLobby();show('lobby')};
+$('#againBtn').onclick=()=>startGame(S.key);
+$('#homeBtn').onclick=()=>{renderLobby();show('lobby')};
+
+/* 大廳 */
+const CARDS=[
+ {key:'scope',sem:'上',ch:'第1章',tag:'生命世界與科學方法',name:'顯微鏡探險隊',desc:'分辨生物與非生物、移動玻片把字移到正中央、算放大倍率、認識實驗器材。',c:'#3552B8',cbg:'#E8EEFF',art:'coverScope'},
+ {key:'cell',sem:'上',ch:'第2章',tag:'生物體的組成 · 細胞構造',name:'細胞防衛戰',desc:'怪物入侵細胞！派出細胞核、粒線體、葉綠體等構造，在牠們衝到細胞中央前打倒牠們。',c:'#5E8F1C',cbg:'#F1FADD',art:'coverCell'},
+ {key:'lab',sem:'上',ch:'第2章',tag:'擴散、滲透與組成層次',name:'細胞實驗站',desc:'把紅血球泡進不同溶液看它脹破或萎縮，排出組成層次和長度單位。',c:'#1F8F8A',cbg:'#E3F5F3',art:'coverLab'},
+ {key:'digest',sem:'上',ch:'第3章',tag:'生物體的營養',name:'消化道大冒險',desc:'跟著食物走完消化道、配對消化液與酵素、用碘液找出光合作用的葉片。',c:'#D9476A',cbg:'#FDE8ED',art:'coverDigest'},
+ {key:'circ',sem:'上',ch:'第4章',tag:'生物體的運輸作用',name:'循環翻翻樂',desc:'翻牌配對血球、血管、維管束的功能，數脈搏、排出血液循環路線。',c:'#C9364F',cbg:'#FFE8EC',art:'coverCirc'},
+ {key:'nerve',sem:'上',ch:'第5章',tag:'生物體的協調作用',name:'神經反應站',desc:'測你的反應時間、排出神經傳導路徑、配對內分泌腺，看豆苗往哪邊彎。',c:'#C9761A',cbg:'#FFF2E0',art:'coverNerve'},
+ {key:'homeo',sem:'上',ch:'第6章',tag:'生物體的恆定 · 即時管理',name:'恆定控制中心',desc:'身體狀況一直在變！即時選對反應，讓體溫、血糖、水分維持在綠色區。',c:'#4C6FE0',cbg:'#E8EEFF',art:'coverHomeo'},
+ {key:'homeo2',sem:'上',ch:'第6章',tag:'呼吸與排泄',name:'呼吸與排泄任務',desc:'排出泌尿系統、判斷吸氣時橫膈怎麼動、分辨內溫和外溫動物。',c:'#8A5CF6',cbg:'#EFE8FF',art:'coverHomeo'},
+ {key:'repro',sem:'下',ch:'第1章',tag:'生殖',name:'花花生殖園',desc:'點出花的構造、分辨有性與無性生殖、幫種子找到傳播方式。',c:'#D9476A',cbg:'#FDE8ED',art:'coverFlower'},
+ {key:'gene',sem:'下',ch:'第1、2章',tag:'細胞分裂與遺傳',name:'遺傳學解碼室',desc:'限時判斷表現型、用棋盤方格法轉開密碼鎖，算出血型、性別與染色體數目。',c:'#E8456F',cbg:'#FFE8EE',art:'coverGene'},
+ {key:'fossil',sem:'下',ch:'第3章',tag:'化石、演化與命名',name:'化石時光機',desc:'分辨遺骸和遺跡化石、排出馬的演化、記住界門綱目科屬種與二名法。',c:'#8B5A3C',cbg:'#F6ECE4',art:'coverFossil'},
+ {key:'kingdom',sem:'下',ch:'第3章',tag:'五界分類',name:'生物海關審查員',desc:'生物坐著輸送帶過來了，趁牠掉下去之前丟進正確的界別閘門，病毒可不屬於五界！',c:'#3D6FE0',cbg:'#E6EEFF',art:'coverCustoms'},
+ {key:'eco',sem:'下',ch:'第4章',tag:'生物與環境 · 生態系',name:'生態系食物網',desc:'點泡泡接出食物鏈、挑對 1/10 能量電池、找出汙染物質累積最多的生物。',c:'#15804F',cbg:'#E4F7EC',art:'coverEco'},
+ {key:'guard',sem:'下',ch:'第4、5章',tag:'族群、碳循環與保育',name:'保育守護隊',desc:'分辨原生種與外來入侵種、估算族群數量、判斷碳循環，守護生物多樣性。',c:'#2E9E68',cbg:'#E3F5EA',art:'coverGuard'}
+];
+let SEM=store.get('bio_sem','all');
+function cardHTML(c){return `<button class="gcard" data-k="${c.key}" style="--c:${c.c};--cbg:${c.cbg}"><span class="ch">七${c.sem} ${c.ch}</span><div class="art">${ART[c.art]()}</div><span class="tag">${c.tag}</span><h3>${c.name}</h3><p>${c.desc}</p><span class="best">${MODE_NAME[S.mode]}最佳 <b>${store.get('bio_best_'+c.key+'_'+S.mode,0)}</b> 分</span></button>`}
+function renderLobby(){$('#mBasic').setAttribute('aria-pressed',S.mode==='basic');$('#mHard').setAttribute('aria-pressed',S.mode==='hard');
+ document.querySelectorAll('.semtabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===SEM));
+ const secs=SEM==='all'?['上','下']:[SEM];
+ $('#cards').innerHTML=secs.map(s=>`<h2 class="semhead">七年級${s}學期</h2>`+CARDS.filter(c=>c.sem===s).map(cardHTML).join('')).join('');
+ document.querySelectorAll('.gcard').forEach(b=>b.onclick=()=>{ac();SFX.tap();startGame(b.dataset.k)})}
+document.querySelectorAll('.semtabs button').forEach(b=>b.onclick=()=>{SEM=b.dataset.s;store.set('bio_sem',SEM);SFX.tap();renderLobby()});
+$('#mBasic').onclick=()=>{S.mode='basic';store.set('bio_mode','basic');SFX.tap();renderLobby()};
+$('#mHard').onclick=()=>{ac();S.mode='hard';store.set('bio_mode','hard');SFX.tap();renderLobby()};
+function drawSound(){$('#soundBtn').innerHTML=S.sound?ART.soundOn():ART.soundOff()}
+$('#soundBtn').onclick=()=>{S.sound=!S.sound;store.set('bio_sound',S.sound);drawSound();ac();SFX.tap()};
+</script>
+<script>
+/* ===== 共用玩法引擎 ===== */
+/* 關卡流程：seq 為關卡代號陣列，R 為 {代號:(box,next)=>{}} */
+function runRounds(st,seq,R,doneTitle){st.innerHTML='<div class="panel" id="rbox"></div>';const box=st.querySelector('#rbox');let i=0;const N=seq.length;
+ const next=()=>{i++;go()};function go(){if(i>=N){finish(doneTitle);return}setProg(i,N);R[seq[i]](box,next)}
+ startClock(null);go()}
+/* 掉落分類：物品從上往下掉，點下方分類桶 */
+function fallSort({box,title,bins,items,speed=9,next,sub=''}){const tok=S.tok;
+ box.innerHTML=`<p class="q">${title}</p>${sub}<div class="lane"><div class="floor"></div></div><div class="bins" style="--n:${bins.length}">${bins.map(b=>`<button class="bin" data-b="${b.id}" style="--bc:${b.c}">${b.icon?b.icon:''}<span>${b.label}</span></button>`).join('')}</div>${bins.length===2?'<p class="hint kb">電腦可以用鍵盤 ← → 分類</p>':''}`;
+ const lane=box.querySelector('.lane'),binEls=[...box.querySelectorAll('.bin')];let i=0,y=0,cur=null,el=null,alive=true,last=performance.now(),raf;
+ const bl=id=>bins.find(b=>b.id===id).label;
+ function spawn(){if(!alive||S.tok!==tok)return;if(i>=items.length){alive=false;later(next,500);return}
+  cur=items[i];el=document.createElement('div');el.className='faller';el.innerHTML=(cur.a?ART[cur.a]():'')+`<b>${cur.t}</b>`;lane.appendChild(el);y=-10;el.style.top=y+'px'}
+ function resolve(ok){const e=el;cur=null;e.classList.add(ok?'good':'bad');later(()=>e.remove(),380);i++;later(spawn,ok?420:900)}
+ function loop(t){if(!alive||S.tok!==tok)return;const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(!S.paused&&cur){y+=(lane.clientHeight)/speed*dt;el.style.top=y+'px';
+   if(y>lane.clientHeight-el.offsetHeight-6){const c=cur;miss(`來不及了！「${c.t}」屬於「${bl(c.bin)}」。${c.why||''}`);resolve(false)}}
+  raf=requestAnimationFrame(loop)}
+ function pickBin(b){if(!cur||S.paused)return;const c=cur;if(b.dataset.b===c.bin){right(b);resolve(true)}else{b.classList.add('no');later(()=>b.classList.remove('no'),350);miss(`「${c.t}」屬於「${bl(c.bin)}」。${c.why||''}`,b);resolve(false)}}
+ binEls.forEach(b=>b.onclick=()=>pickBin(b));
+ const key=e=>{if(S.tok!==tok){removeEventListener('keydown',key);return}if(bins.length!==2)return;if(e.key==='ArrowLeft')pickBin(binEls[0]);if(e.key==='ArrowRight')pickBin(binEls[1])};
+ addEventListener('keydown',key);spawn();raf=requestAnimationFrame(loop)}
+/* 依序點選：items 為正確順序，decoys 為干擾項 {t,why} */
+function orderTap({box,title,items,decoys=[],next,pre=0,sub='',hintFn,arts}){
+ const chips=shuffle(items.slice(pre).map(t=>({t})).concat(decoys.map(d=>({t:d.t,why:d.why,dec:1}))));
+ const lab=t=>(arts&&arts[t]?`<span class="ci">${ART[arts[t]]()}</span>`:'')+`<span>${t}</span>`;
+ box.innerHTML=`<p class="q">${title}</p>${sub}<div class="oslots">${items.map((t,k)=>`${k?'<i class="sep">›</i>':''}<div class="os${k<pre?' on':''}" data-s="${k}">${k<pre?lab(t):`<span class="n">${k+1}</span>`}</div>`).join('')}</div><div class="chips">${chips.map((c,j)=>`<button class="chip" data-j="${j}">${lab(c.t)}</button>`).join('')}</div>`;
+ let pos=pre,done=false;
+ box.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{if(done||S.paused)return;const c=chips[+b.dataset.j];
+  if(!c.dec&&c.t===items[pos]){const s=box.querySelector(`.os[data-s="${pos}"]`);s.innerHTML=lab(c.t);s.classList.add('on');b.disabled=true;b.classList.add('used');tone(523+pos*90,0,.14);pos++;
+   if(pos===items.length){done=true;right(box.querySelector('.oslots'));later(next,900)}}
+  else{b.classList.add('shake');later(()=>b.classList.remove('shake'),400);miss(c.dec?c.why:(hintFn?hintFn(pos,c.t):`「${c.t}」不是下一個，想想「${items[pos-1]||'開頭'}」之後是誰？`),b)}})}
+/* 配對連線：pairs [[左,右]] */
+function pairUp({box,title,pairs,next,sub='',lt='',rt=''}){const L=shuffle(pairs.map((p,k)=>({t:p[0],k}))),Rr=shuffle(pairs.map((p,k)=>({t:p[1],k})));const cols=['#4C6FE0','#F0506E','#2E9E68','#F5A524','#9B5DE5','#1FA3A3','#C9761A','#5B8DEF'];
+ box.innerHTML=`<p class="q">${title}</p>${sub}<div class="pairs"><div class="pc">${lt?`<b class="ph">${lt}</b>`:''}${L.map(x=>`<button class="pb" data-s="L" data-k="${x.k}">${x.t}</button>`).join('')}</div><div class="pc">${rt?`<b class="ph">${rt}</b>`:''}${Rr.map(x=>`<button class="pb" data-s="R" data-k="${x.k}">${x.t}</button>`).join('')}</div></div>`;
+ let sel=null,left=pairs.length;
+ box.querySelectorAll('.pb').forEach(b=>b.onclick=()=>{if(S.paused||b.classList.contains('lock'))return;
+  if(!sel||sel.dataset.s===b.dataset.s){sel&&sel.classList.remove('sel');sel=b;b.classList.add('sel');SFX.tap();return}
+  const a=sel;sel=null;a.classList.remove('sel');
+  if(a.dataset.k===b.dataset.k){const c=cols[(pairs.length-left)%cols.length];[a,b].forEach(x=>{x.classList.add('lock');x.style.setProperty('--pc',c)});right(b);left--;if(!left)later(next,800)}
+  else{const lA=a.dataset.s==='L'?a:b;const p=pairs[+lA.dataset.k];[a,b].forEach(x=>{x.classList.add('shake');later(()=>x.classList.remove('shake'),400)});miss(`「${p[0]}」要配「${p[1]}」。`,b)}})}
+/* 翻牌記憶：pairs [[a,b]] */
+function memory({box,title,pairs,next,peek=3000,hard=false}){const cards=shuffle(pairs.flatMap(([a,b],k)=>[{t:a,k,side:0},{t:b,k,side:1}]));const seen=new Set();
+ box.innerHTML=`<p class="q">${title}</p><div class="mem" style="--c:${cards.length>12?4:3}">${cards.map((c,j)=>`<button class="mc open s${c.side}" data-j="${j}"><span class="back"></span><span class="front">${c.t}</span></button>`).join('')}</div><p class="hint" id="peekT">先記住位置！</p>`;
+ const els=[...box.querySelectorAll('.mc')];let first=null,lock=true,left=pairs.length;
+ later(()=>{els.forEach(e=>e.classList.remove('open'));lock=false;const p=box.querySelector('#peekT');if(p)p.textContent='翻兩張，配成一對！'},peek);
+ els.forEach(e=>e.onclick=()=>{if(lock||S.paused||e.classList.contains('open'))return;e.classList.add('open');SFX.tap();const j=+e.dataset.j;
+  if(first===null){first=j;return}
+  const a=cards[first],b=cards[j],ea=els[first];first=null;
+  if(a.k===b.k){[ea,e].forEach(x=>x.classList.add('done'));right(e);left--;if(!left)later(next,900)}
+  else{lock=true;const known=seen.has(j)||seen.has(cards.indexOf(a));seen.add(j);seen.add(cards.indexOf(a));
+   if(known){S.total++;S.combo=0;SFX.wrong();if(!hard)hint(`「${a.t}」的另一半是「${pairs[a.k][1-a.side]}」。`,2600)}
+   later(()=>{ea.classList.remove('open');e.classList.remove('open');lock=false},900)}})}
+/* 點圖找部位：svg 內元素以 data-h 標示 */
+function hotspot({box,title,svg,asks,names,next,sub=''}){let k=0;
+ box.innerHTML=`<p class="q">${title}</p>${sub}<p class="ask">點出：<em id="askL">${names[asks[0]]}</em></p><div class="hs">${svg}</div><div class="found" id="found"></div>`;
+ const hs=box.querySelector('.hs');let done=false;
+ hs.addEventListener('click',e=>{if(done||S.paused)return;const g=e.target.closest('[data-h]');if(!g)return;const id=g.dataset.h;
+  if(id===asks[k]){hs.querySelectorAll(`[data-h="${id}"]`).forEach(x=>x.classList.add('hit'));right(g);box.querySelector('#found').insertAdjacentHTML('beforeend',`<span>${names[id]}</span>`);k++;
+   if(k>=asks.length){done=true;later(next,900)}else box.querySelector('#askL').textContent=names[asks[k]]}
+  else miss(`那是「${names[id]||'其他部位'}」，再找找「${names[asks[k]]}」。`,g)})}
+/* 點圖選擇（選項是圖） */
+function picChoice({box,title,opts,ans,tip,next,sub='',noLabel=false}){box.innerHTML=`<p class="q">${title}</p>${sub}<div class="picopts">${opts.map((o,j)=>`<button class="pico" data-j="${j}">${o.svg}<span>${noLabel?'':o.t}</span></button>`).join('')}</div>`;let done=false;
+ box.querySelectorAll('.pico').forEach(b=>b.onclick=()=>{if(done||S.paused)return;done=true;const o=opts[+b.dataset.j];
+  if(o.t===ans){b.classList.add('right');right(b);later(next,800)}else{b.classList.add('wrong');box.querySelectorAll('.pico').forEach(x=>{if(opts[+x.dataset.j].t===ans)x.classList.add('right')});miss(tip,b);later(next,2400)}})}
+</script>
+<script>
+/* ===== 遊戲一：細胞防衛戰（課本：細胞的構造） ===== */
+const ORG={nucleus:'細胞核',membrane:'細胞膜',mito:'粒線體',chloro:'葉綠體',vacuole:'液胞',wall:'細胞壁'};
+const ORG_IC={nucleus:'dna',membrane:'door',mito:'bolt',chloro:'sun',vacuole:'drop',wall:'shield'};
+const IC_NAME={dna:'螺旋',door:'門',bolt:'閃電',sun:'太陽',drop:'水滴',shield:'盾牌'};
+const ORG_SHORT={
+ nucleus:'細胞核裡有遺傳物質，控制細胞的活動',
+ membrane:'細胞膜控制物質進出細胞，氧氣、二氧化碳靠擴散作用通過',
+ mito:'粒線體進行呼吸作用，利用氧氣分解葡萄糖、產生能量',
+ chloro:'葉綠體進行光合作用，把二氧化碳和水變成葡萄糖、釋出氧氣',
+ vacuole:'液胞儲存水分和養分，植物細胞的液胞通常很大',
+ wall:'細胞壁在細胞膜外面，保護和支持植物細胞'};
+const FOES={
+ nucleus:{n:'亂碼怪',c:'#7F9BEF',d:'#3552B8',basic:['遺傳物質在哪裡','要下指令控制細胞'],hard:['染色後最明顯的深色圓形構造','黑色素在保護它不被紫外線破壞','控制細胞生長與活動的中心']},
+ membrane:{n:'闖關怪',c:'#F2A33A',d:'#A8620F',basic:['氧氣要進細胞','有東西要進出'],hard:['葡萄糖要靠膜上蛋白質進來','氧氣靠擴散作用通過','控制物質進出細胞']},
+ mito:{n:'沒電怪',c:'#8E9AAF',d:'#56627A',basic:['細胞沒電了','需要能量'],hard:['要用氧氣分解葡萄糖','呼吸作用在哪裡進行','產生能量、水和二氧化碳']},
+ chloro:{n:'飢餓怪',c:'#F5B82E',d:'#B07A00',basic:['要用陽光做養分','要做光合作用'],hard:['保衛細胞有，表皮細胞沒有','把二氧化碳和水變成葡萄糖','照光後要釋出氧氣']},
+ vacuole:{n:'口渴怪',c:'#3FA9E8',d:'#1A6FA6',basic:['要儲存水分','水分不夠了'],hard:['要儲存水分和養分','植物細胞裡大大的儲存袋']},
+ wall:{n:'撞擊怪',c:'#F26B5B',d:'#B83A2C',basic:['外面在撞細胞','需要保護和支持'],hard:['植物細胞泡純水也不會破','洋蔥表皮細胞外的深色輪廓','口腔皮膜細胞沒有的最外層']}};
+GAMES.cell={name:'細胞防衛戰',start(st,mode){
+ const hard=mode==='hard',TOTAL=hard?16:10,MAXON=hard?3:1,TRAVEL=hard?9:15,GAP=hard?2.2:1.4;
+ const keys=hard?Object.keys(ORG):['nucleus','mito','chloro','wall'];
+ let lives=3,spawned=0,foes=[],raf=0,last=performance.now(),spawnT=.8,target=null,alive=true,cool=0,lastType=null;
+ st.innerHTML=`<div class="arena" id="arena"><div class="nuc" id="nuc">${ART.bodyHeart()}</div></div>
+  <div class="towers${keys.length===6?' six':''}" style="--n:${keys.length}">${keys.map(k=>`<button class="tower" data-o="${k}" aria-label="${ORG[k]}">${hard?'':`<span class="badge">${ICON[ORG_IC[k]]()}</span>`}${ART[k]()}<span>${ORG[k]}</span></button>`).join('')}</div>
+  <p class="hint" style="margin-top:10px">${hard?'六種構造全上場，怪物只說需求、不給圖示！點怪物可以換目標。':'看怪物說的需求和圖示，點有<b>一樣圖示</b>的構造發射！'}</p>`;
+ const arena=st.querySelector('#arena'),nuc=st.querySelector('#nuc');hearts(lives);
+ function spawn(){let t;do{t=pick(keys)}while(t===lastType&&keys.length>1);lastType=t;spawned++;const F=FOES[t],a=Math.random()*Math.PI*2;
+  const el=document.createElement('div');el.className='enemy';el.style.setProperty('--ec',F.d);
+  const need=pick(F[mode]);el.innerHTML=`<span class="mon">${ART.monster(F.c,F.d)}</span><span class="need">${hard?'':ICON[ORG_IC[t]]()}${need}</span>`;
+  const f={t,el,p:0,a,fast:1,need};el.onclick=()=>{target=f;mark()};arena.appendChild(el);foes.push(f);place(f)}
+ function place(f){const r=1-f.p;f.el.style.left=(50+Math.cos(f.a)*38*r)+'%';f.el.style.top=(50+Math.sin(f.a)*34*r)+'%'}
+ function mark(){if(!foes.includes(target))target=foes.reduce((m,f)=>!m||f.p>m.p?f:m,null);foes.forEach(f=>f.el.classList.toggle('tgt',f===target))}
+ function loop(t){if(!alive)return;const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(!S.paused){cool-=dt;spawnT-=dt;
+   if(spawnT<=0&&foes.length<MAXON&&spawned<TOTAL){spawn();spawnT=GAP}
+   for(const f of foes.slice()){f.p+=dt/TRAVEL*f.fast;place(f);
+    if(f.p>=1){foes.splice(foes.indexOf(f),1);f.el.remove();lives--;hearts(lives);nuc.innerHTML=ART.bodyHurt();nuc.classList.remove('hurt');nuc.offsetWidth;nuc.classList.add('hurt');later(()=>nuc.innerHTML=ART.bodyHeart(),700);
+     miss(`${FOES[f.t].n}衝進來了！${ORG_SHORT[f.t]}。`);
+     if(lives<=0){alive=false;finish('細胞被攻破了！');return}}}
+   mark();
+   if(spawned>=TOTAL&&!foes.length){alive=false;later(()=>finish('細胞守住了！'),500);return}}
+  setProg(spawned-foes.length,TOTAL);raf=requestAnimationFrame(loop)}
+ st.querySelectorAll('.tower').forEach(b=>b.onclick=()=>{if(!alive||S.paused||cool>0)return;mark();const f=target;if(!f)return;cool=.25;SFX.tap();
+  const o=b.dataset.o,ar=arena.getBoundingClientRect(),br=b.getBoundingClientRect();
+  const sh=document.createElement('div');sh.className='shot';sh.innerHTML=ICON[ORG_IC[o]]();sh.style.left=(br.left+br.width/2-ar.left)+'px';sh.style.top=(br.top-ar.top)+'px';arena.appendChild(sh);
+  requestAnimationFrame(()=>{const er=f.el.getBoundingClientRect();sh.style.left=(er.left+er.width/2-ar.left)+'px';sh.style.top=(er.top+30-ar.top)+'px'});
+  later(()=>{sh.remove();if(!foes.includes(f))return;
+   if(o===f.t){foes.splice(foes.indexOf(f),1);f.el.classList.add('dead');right(f.el);later(()=>f.el.remove(),400);mark()}
+   else{f.fast=hard?1.6:1;miss(hard?`${ORG[o]}打不動！想想誰負責「${f.need}」。`:`打不動！要用有${IC_NAME[ORG_IC[f.t]]}圖示的「${ORG[f.t]}」。`,f.el)}},230)});
+ startClock(null);raf=requestAnimationFrame(loop);
+ return()=>{alive=false;cancelAnimationFrame(raf)}
+}};
+
+/* ===== 遊戲二：生物海關審查員（課本：五界＋病毒） ===== */
+const KD=[
+ {id:'pro',name:'原核生物界',sub:'沒有細胞核',c:'#E07A3F',bg:'#FFF0E6',ic:'lacto'},
+ {id:'protist',name:'原生生物界',sub:'構造簡單，多為單細胞',c:'#1F8F8A',bg:'#E3F5F3',ic:'amoeba'},
+ {id:'fungi',name:'真菌界',sub:'有細胞壁、沒有葉綠體',c:'#8B5A3C',bg:'#F6ECE4',ic:'shroom'},
+ {id:'plant',name:'植物界',sub:'多細胞、能行光合作用',c:'#2E9E68',bg:'#E3F5EA',ic:'fern'},
+ {id:'animal',name:'動物界',sub:'多細胞、靠攝食獲得養分',c:'#D9476A',bg:'#FDE8ED',ic:'frog'},
+ {id:'virus',name:'病毒',sub:'沒有細胞，不屬於五界',c:'#8A5CF6',bg:'#EFE8FF',ic:'flu'}];
+const ORGS=[
+ {n:'乳酸桿菌',a:'lacto',k:'pro',lv:0,c:'做優酪乳的好菌',t:'細菌的遺傳物質沒有核膜包住，沒有細胞核，屬原核生物界。'},
+ {n:'肺炎鏈球菌',a:'strep',k:'pro',lv:0,c:'會引起肺炎的細菌',t:'細菌沒有細胞核，屬原核生物界。'},
+ {n:'念球藻',a:'nostoc',k:'pro',lv:1,c:'藍菌，能行光合作用',t:'念球藻是藍菌，雖然能行光合作用，但沒有細胞核，屬原核生物界，不是植物。'},
+ {n:'變形蟲',a:'amoeba',k:'protist',lv:0,c:'用偽足移動',t:'變形蟲是原生動物，有細胞核、單細胞，屬原生生物界。'},
+ {n:'草履蟲',a:'parame',k:'protist',lv:0,c:'用纖毛運動',t:'草履蟲是原生動物，有細胞核、單細胞，屬原生生物界。'},
+ {n:'錐蟲',a:'trypano',k:'protist',lv:1,c:'寄生在血液中，引起昏睡病',t:'錐蟲是用鞭毛運動的原生動物，屬原生生物界。'},
+ {n:'眼蟲',a:'euglena',k:'protist',lv:1,c:'有葉綠體又會游動',t:'眼蟲介於原生動物和藻類之間，屬原生生物界，不是植物也不是動物。'},
+ {n:'黏菌',a:'slime',k:'protist',lv:1,c:'長在枯葉或樹皮上',t:'黏菌是原生菌類，屬原生生物界，不是真菌界。'},
+ {n:'海帶',a:'kelp',k:'protist',lv:1,c:'大型藻類，沒有真正的根莖葉',t:'海帶是藻類，屬原生生物界。'},
+ {n:'酵母菌',a:'yeast',k:'fungi',lv:0,c:'做麵包的單細胞菌',t:'酵母菌有細胞壁、沒有葉綠體，屬真菌界。'},
+ {n:'香菇',a:'shroom',k:'fungi',lv:0,c:'蕈類，用孢子繁殖',t:'蕈類不能行光合作用，要從外界獲得養分，屬真菌界。'},
+ {n:'黴菌',a:'mold',k:'fungi',lv:1,c:'長在麵包上的黑點',t:'黴菌由菌絲構成、以孢子繁殖，屬真菌界。'},
+ {n:'土馬騌',a:'moss',k:'plant',lv:0,c:'蘚苔植物，沒有維管束',t:'蘚苔植物沒有維管束，但有葉綠體，屬植物界。'},
+ {n:'鳥巢蕨',a:'fern',k:'plant',lv:0,c:'蕨類，又叫山蘇',t:'蕨類有維管束、用孢子繁殖，屬植物界。'},
+ {n:'臺灣二葉松',a:'pine',k:'plant',lv:1,c:'裸子植物，有毬果',t:'松樹是裸子植物，屬植物界。'},
+ {n:'銀杏',a:'ginkgo',k:'plant',lv:1,c:'裸子植物，種子可以吃',t:'銀杏是裸子植物（活化石），屬植物界。'},
+ {n:'水稻',a:'rice',k:'plant',lv:0,c:'會開花的被子植物',t:'水稻是被子植物，屬植物界。'},
+ {n:'青蛙',a:'frog',k:'animal',lv:0,c:'脊索動物',t:'青蛙多細胞、沒有細胞壁、要攝食，屬動物界。'},
+ {n:'蚯蚓',a:'worm',k:'animal',lv:0,c:'環節動物，身體分節',t:'蚯蚓是環節動物，屬動物界。'},
+ {n:'珊瑚',a:'coral',k:'animal',lv:1,c:'固著在海底，像樹枝',t:'珊瑚看起來像植物，其實是刺絲胞動物，屬動物界。'},
+ {n:'海星',a:'seastar',k:'animal',lv:1,c:'棘皮動物',t:'海星是棘皮動物，屬動物界。'},
+ {n:'流行性感冒病毒',a:'flu',k:'virus',lv:0,c:'讓人得流感',t:'病毒只有蛋白質外殼和遺傳物質，沒有細胞構造，不屬於五界。'},
+ {n:'新型冠狀病毒',a:'covid',k:'virus',lv:1,c:'引起 COVID-19',t:'病毒必須在活細胞中才能增殖，不屬於五界。'}];
+GAMES.kingdom={name:'生物海關審查員',start(st,mode){
+ const hard=mode==='hard',N=hard?14:10,CROSS=hard?6.5:11;
+ const pool=hard?ORGS:ORGS.filter(o=>o.lv===0);let list=shuffle(pool);while(list.length<N)list=list.concat(shuffle(pool));list=list.slice(0,N);
+ let i=0,lives=3,x=0,cur=null,el=null,drag=false,busy=true,alive=true,raf=0,last=performance.now();
+ st.innerHTML=`<div class="belt${hard?' fast':''}" id="belt"><div class="track"></div><div class="endzone"></div></div><div class="gates" id="gates"></div>
+  <p class="hint" style="margin-top:10px">${hard?'六個閘門全開、輸送帶加速，放錯也會扣愛心！':'把生物拖進閘門，或直接點閘門。掉進紅色區就來不及了！'}</p>`;
+ const belt=st.querySelector('#belt'),gw=st.querySelector('#gates');hearts(lives);
+ const gateHTML=k=>`<button class="gate" data-k="${k.id}" style="--gc:${k.c};--gbg:${k.bg}">${ART[k.ic]()}<span>${k.name}</span>${hard?'':`<small>${k.sub}</small>`}</button>`;
+ function bindGates(){gw.querySelectorAll('.gate').forEach(g=>g.onclick=()=>judge(g.dataset.k,g))}
+ if(hard){gw.innerHTML=KD.map(gateHTML).join('');bindGates()}
+ function next(){if(!alive)return;if(i>=N){alive=false;finish('海關審查完成！');return}setProg(i,N);cur=list[i];busy=false;x=-170;
+  if(!hard){const others=shuffle(KD.filter(k=>k.id!==cur.k)).slice(0,2);gw.innerHTML=shuffle([KD.find(k=>k.id===cur.k),...others]).map(gateHTML).join('');bindGates()}
+  el=document.createElement('div');el.className='item';el.innerHTML=`${ART[cur.a]()}<b>${cur.n}</b><small>${cur.c}</small>`;el.style.left=x+'px';belt.appendChild(el);bindDrag(el)}
+ function done(){busy=true;const e=el;e.classList.add('gone');later(()=>e.remove(),300);i++;later(next,450)}
+ function judge(k,g){if(busy||S.paused||!alive)return;
+  if(k===cur.k){g.classList.add('flash');right(g);done()}
+  else{g.classList.add('no');later(()=>g.classList.remove('no'),400);miss(cur.t,g);
+   if(hard){lives--;hearts(lives);if(lives<=0){alive=false;finish('海關被突破了！');return}}
+   done()}}
+ function loop(t){if(!alive)return;const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(!S.paused&&!busy&&!drag){x+=(belt.clientWidth+170)/CROSS*dt;el.style.left=x+'px';
+   if(x>belt.clientWidth-56-40){busy=true;lives--;hearts(lives);el.classList.add('gone');const e=el;later(()=>e.remove(),300);
+    const kd=KD.find(k=>k.id===cur.k);miss(`${cur.n}掉下去了！牠屬於「${kd.name}」。`);
+    if(lives<=0){alive=false;finish('海關被突破了！');return}i++;later(next,500)}}
+  raf=requestAnimationFrame(loop)}
+ function gateAt(px,py){return [...gw.querySelectorAll('.gate')].find(g=>{const r=g.getBoundingClientRect();return px>=r.left&&px<=r.right&&py>=r.top&&py<=r.bottom})}
+ function bindDrag(c){let sx,sy,ox,oy,id=null,over=null;
+  c.addEventListener('pointerdown',e=>{if(busy)return;id=e.pointerId;sx=e.clientX;sy=e.clientY;const r=c.getBoundingClientRect();ox=sx-r.left;oy=sy-r.top;c.setPointerCapture(id)});
+  c.addEventListener('pointermove',e=>{if(id!==e.pointerId)return;
+   if(!drag&&Math.hypot(e.clientX-sx,e.clientY-sy)>6){drag=true;c.classList.add('drag')}
+   if(drag){c.style.left=(e.clientX-ox)+'px';c.style.top=(e.clientY-oy)+'px';const g=gateAt(e.clientX,e.clientY);if(g!==over){over&&over.classList.remove('over');over=g;g&&g.classList.add('over')}}});
+  const end=e=>{if(id!==e.pointerId)return;id=null;if(!drag)return;drag=false;over&&over.classList.remove('over');c.classList.remove('drag');c.style.top='';c.style.left=x+'px';
+   if(over){const g=over;over=null;judge(g.dataset.k,g)}};
+  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end)}
+ startClock(null);next();raf=requestAnimationFrame(loop);
+ return()=>{alive=false;cancelAnimationFrame(raf)}
+}};
+</script>
+<script>
+/* ===== 共用：快速選擇（答錯不中斷，小幫手提醒） ===== */
+function mcq(box,html,opts,ans,tip,next,cls='opts'){
+ box.innerHTML=html+`<div class="${cls}">${opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div>`;let done=false;
+ box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(done||S.paused)return;done=true;const v=opts[b.dataset.k];
+  if(String(v)===String(ans)){b.classList.add('right');right(b);later(next,700)}
+  else{b.classList.add('wrong');box.querySelectorAll('.opt').forEach(x=>{if(String(opts[x.dataset.k])===String(ans))x.classList.add('right')});miss(tip,b);later(next,2200)}})}
+const fmt=n=>n>=1?Math.round(n).toLocaleString('en-US'):String(+n.toPrecision(3));
+const uniq=a=>[...new Set(a)];
+
+/* ===== 遊戲三：生態系食物網 ===== */
+const CHAINS=[
+ {nodes:[['grass','草'],['hopper','蚱蜢'],['frog','青蛙'],['snake','蛇'],['hawk','老鷹']],dec:['shroom','蕈類']},
+ {nodes:[['algae','浮游藻'],['zoo','浮游動物'],['fish','小魚'],['bigfish','大魚'],['gull','海鷗']],dec:['bacteria','細菌']}];
+const ROLE=['生產者','初級消費者','次級消費者','三級消費者','四級消費者'];
+const SPOTS={3:[[22,34],[52,68],[80,36]],5:[[18,30],[50,24],[82,30],[30,72],[70,72]],6:[[17,30],[50,24],[83,30],[22,74],[52,72],[82,74]]};
+GAMES.eco={name:'生態系食物網',start(st,mode){
+ const hard=mode==='hard',len=hard?5:3;
+ const seq=hard?['chain',...shuffle(['chain','chain','energy','energy2','ddt','ddtWhy','dec','pop','rel'])]:['chain',...shuffle(['chain','chain','chain','energy','energy','ddt','ddt','dec','dec'])];
+ const N=seq.length;let i=0;st.innerHTML=`<div class="panel" id="eco"></div>`;const box=st.querySelector('#eco');
+ const next=()=>{i++;round()};
+ const nodeHTML=(a,n,lab,tap,k)=>`<${tap?'button':'div'} class="node${tap?' tap':''}" data-i="${k}">${ART[a]()}<span>${n}</span>${lab!=null?`<small style="font-family:var(--f-num);font-weight:800;color:var(--mem);font-size:15px">${lab}</small>`:''}</${tap?'button':'div'}>`;
+ const lineup=(ns,labs=[],arrows=true,tap=false)=>`<div class="lineup">${ns.map((x,k)=>(k&&arrows?ART.arrow():'')+nodeHTML(x[0],x[1],labs[k],tap,x[2]??k)).join('')}</div>`;
+ function pond(items,onTap){const p=box.querySelector('.pond');const spots=shuffle(SPOTS[items.length]);
+  p.innerHTML=items.map((it,k)=>`<button class="bub" data-i="${it.i}" style="left:${spots[k][0]}%;top:${spots[k][1]}%;animation-delay:${(-Math.random()*2).toFixed(2)}s">${it.tag?`<span class="tag">${ICON.sun()}</span>`:''}${ART[it.a]()}<span>${it.n}</span></button>`).join('');
+  p.querySelectorAll('.bub').forEach(b=>b.onclick=()=>{if(!S.paused)onTap(b.dataset.i,b)})}
+ function cans(html,opts,ans,tip){box.innerHTML=html+`<div class="cans">${opts.map(v=>`<button class="can" data-v="${v}">${ART.battery()}<span>${fmt(v)}</span></button>`).join('')}</div>`;let done=false;
+  box.querySelectorAll('.can').forEach(b=>b.onclick=()=>{if(done||S.paused)return;done=true;
+   if(+b.dataset.v===ans){b.classList.add('right');right(b);later(next,800)}
+   else{b.classList.add('wrong');box.querySelector(`.can[data-v="${ans}"]`).classList.add('right');miss(tip,b);later(next,2600)}})}
+ function round(){if(i>=N){finish('生態調查完成！');return}setProg(i,N);const ch=pick(CHAINS),ns=ch.nodes.slice(0,len),t=seq[i];
+  if(t==='chain'){let pos=0,done=false;
+   box.innerHTML=`<p class="q">${hard?'照<em>能量流動</em>的順序點泡泡，組出食物鏈！':'從<em>生產者</em>開始，誰被誰吃？依序點泡泡！'}</p>
+    <div class="slots">${ns.map((n,k)=>`${k?ART.arrow():''}<div class="slot" data-s="${k}">${k===0&&!hard?ICON.sun():''}<span class="lb">${hard?'':ROLE[k]}</span></div>`).join('')}</div><div class="pond"></div>`;
+   const items=ns.map(([a,n],k)=>({a,n,i:k,tag:!hard&&k===0}));if(hard)items.push({a:ch.dec[0],n:ch.dec[1],i:'d'});
+   pond(items,(id,b)=>{if(done)return;
+    if(id===String(pos)){const s=box.querySelector(`.slot[data-s="${pos}"]`);s.innerHTML=ART[ns[pos][0]]()+`<span class="lb">${hard?ns[pos][1]:ROLE[pos]}</span>`;s.classList.add('on');b.classList.add('used');tone(523+pos*130,0,.15);pos++;
+     if(pos===len){done=true;right(box.querySelector('.slots'));later(next,900)}}
+    else{b.classList.add('no');later(()=>b.classList.remove('no'),400);
+     miss(id==='d'?'蕈類、細菌是分解者，不在捕食的食物鏈裡喔！':pos===0?(hard?'食物鏈要從生產者開始！':'先找有太陽標記、會行光合作用的生產者！'):`誰會吃掉「${ns[pos-1][1]}」？`,b)}})}
+  else if(t==='energy'){const E=hard?pick([10000,20000,50000]):1000,k=1+(Math.random()*(len-1)|0),ans=E/Math.pow(10,k);
+   const opts=hard?shuffle(uniq([ans,ans*10,ans/10,E-ans])):shuffle([ans,ans*10,ans/10]);
+   cans(`<p class="q">${ns[0][1]}有 ${fmt(E)} 份能量，<em>${ns[k][1]}</em>能拿到多少？</p>${hard?'':`<p style="text-align:center;margin:0 0 6px"><span class="rule">${ICON.bolt()}每往上一級，能量只剩 1/10</span></p>`}`+lineup(ns,ns.map((_,j)=>j===0?fmt(E):j===k?'?':null)),opts,ans,`每往上一級只剩 1/10：${fmt(E)}${' ÷ 10'.repeat(k)} = ${fmt(ans)}。`)}
+  else if(t==='energy2'){const top=pick([5,10,20]),n=len-1,ans=top*Math.pow(10,n);
+   cans(`<p class="q"><em>${ns[n][1]}</em>想得到 ${top} 份能量，${ns[0][1]}最少要有多少？</p>`+lineup(ns,ns.map((_,j)=>j===n?top:j===0?'?':null)),shuffle(uniq([ans,ans/10,ans*10,top*n*10])),ans,`往下推，每一級都要乘以 10，共 ${n} 次：${top} × ${fmt(Math.pow(10,n))} = ${fmt(ans)}。`)}
+  else if(t==='ddt'){const show=hard?shuffle(ns.map((x,k)=>[x[0],x[1],k])):ns;
+   box.innerHTML=`<p class="q">有毒的<em>汙染物質</em>（例如汞）流進環境了！誰體內累積<em>最多</em>？點牠！</p><div style="position:relative">${lineup(show,[],!hard,true)}${[0,1,2].map(k=>`<span class="drip" style="left:${10+k*30}%;top:-10px;animation-delay:${k*.45}s">${ART.drop()}</span>`).join('')}</div><p class="hint">${hard?'順序被打亂了，想想誰在最頂端':'箭頭指向「吃牠的生物」'}</p>`;let done=false;
+   box.querySelectorAll('.node').forEach(b=>b.onclick=()=>{if(done||S.paused)return;done=true;
+    if(b.dataset.i===String(len-1)){b.classList.add('right');right(b);later(next,800)}
+    else{b.classList.add('wrong');box.querySelector(`.node[data-i="${len-1}"]`).classList.add('right');miss(`汙染物質不易被生物排除，會隨食物鏈累積，愈高級的消費者濃度愈高，最頂端的${ns[len-1][1]}最多（生物放大作用）。`,b);later(next,2600)}})}
+  else if(t==='dec'){box.innerHTML=`<p class="q">誰會把<em>落葉和屍體</em>分解掉，讓養分回到土裡？</p><div class="pond"></div>`;let done=false;
+   const items=shuffle(ns).slice(0,hard?4:2).map(([a,n])=>({a,n,i:'x'})).concat([{a:ch.dec[0],n:ch.dec[1],i:'d'}]);
+   pond(items,(id,b)=>{if(done)return;done=true;if(id==='d'){b.classList.add('used');right(b);later(next,800)}else{b.classList.add('no');miss(`${ch.dec[1]}是分解者！分解者會分泌酵素到體外，把遺體和排泄物分解，讓物質回到環境。`,b);later(next,2400)}})}
+  else if(t==='ddtWhy'){const E=1;mcq(box,`<p class="q">${ns[0][1]}體內的汙染物質是 <em>1 ppm</em>，愈往上會怎樣？</p>`+lineup(ns,ns.map((_,j)=>j===0?'1 ppm':j===len-1?'?':null)),shuffle(['愈來愈高，最高級消費者最多','愈來愈低，最高級消費者最少','每一級都一樣','只會留在生產者體內']),'愈來愈高，最高級消費者最多','汙染物質不易被生物體排除，會隨食物鏈傳遞而累積：愈高級的消費者，體內濃度愈高（生物放大作用）。',next)}
+  else if(t==='rel'){const R=pick([['硫化菌住在管蟲體內，管蟲給牠住所，牠給管蟲養分','互利共生'],['錐蟲住在人的血液裡，讓人得昏睡病','寄生'],['老鷹抓蛇來吃','掠食'],['兩種草長在一起，搶同一片陽光和水','競爭']]);mcq(box,`<p class="q">這是哪一種<em>互動關係</em>？</p><p class="q" style="font-size:18px;color:var(--ink2)">${R[0]}</p>`,['競爭','掠食','寄生','互利共生'],R[1],`${R[0]}：屬於${R[1]}。`,next)}
+  else if(t==='pop'){const prey=ns[1][1],pred=ns[2][1];mcq(box,`<p class="q">如果<em>${pred}</em>被大量捕捉，短時間內<em>${prey}</em>會？</p>`+lineup(ns),['變多','變少','不變'],'變多',`吃${prey}的${pred}變少了，${prey}被吃掉的少，短期內會變多。`,next)}
+ }
+ startClock(null);round();
+}};
+</script>
+<script>
+/* ===== 遊戲四：遺傳學解碼室（課本：生殖、遺傳） ===== */
+const TRAITS=[{L:'T',who:'豌豆莖的高度',d:'高莖',r:'矮莖'},{L:'R',who:'豌豆種子的形狀',d:'圓形',r:'皺皮'},{L:'Y',who:'豌豆子葉的顏色',d:'黃色',r:'綠色'}];
+const ALBINO={L:'A',who:'膚色（白化症）',d:'正常',r:'白化症'};
+const G=s=>s.replace(/I([AB])/g,'I<sup>$1</sup>');                       /* IA → I^A */
+const allele=s=>s.match(/I[AB]|i|[A-Za-z]/g);
+const rank=a=>a==='IA'?0:a==='IB'?1:a==='i'?2:a==='X'?0:a==='Y'?1:(a===a.toUpperCase()?0:1);
+const gt=(a,b)=>rank(a)<=rank(b)?a+b:b+a;
+const ABO=g=>({IAIA:'A',IAi:'A',IBIB:'B',IBi:'B',IAIB:'AB',ii:'O'})[g];
+const FR=n=>['0','1/4','1/2','3/4','1'][n];
+const lockSVG=open=>sv('0 0 64 64',`<path d="M20 30V20a12 12 0 0 1 24 0v10" stroke="#8A9AA6" stroke-width="6" fill="none" transform="${open?'translate(10 -8) rotate(18 44 30)':''}"/><rect x="12" y="28" width="40" height="30" rx="9" fill="${open?'#4CC38A':'#F5B82E'}"/><circle cx="32" cy="41" r="4.5" fill="${DK}"/><path d="M32 44v6" stroke="${DK}" stroke-width="4"/>`);
+function chromoSVG(kind,top,cnt=4){const T=(x,y,s,txt,c='#0F3A40',w=700)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="${s}" font-weight="${w}" fill="${c}" font-family="Noto Sans TC,Baloo 2,sans-serif">${txt}</text>`;
+ const cell=(x,y,r,c)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#FFF1CF"/>${Array.from({length:c},(_,k)=>{const a=k/c*Math.PI*2+.4,px=x+Math.cos(a)*r*.42,py=y+Math.sin(a)*r*.42;return `<rect x="${(px-3.5).toFixed(1)}" y="${(py-10).toFixed(1)}" width="7" height="20" rx="3.5" fill="${['#4C6FE0','#F0506E'][k%2]}" transform="rotate(${k*41} ${px.toFixed(1)} ${py.toFixed(1)})"/>`}).join('')}`;
+ const q=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#E5B544" stroke-width="3" stroke-dasharray="5 4"/>`+T(x,y+8,22,'?','#F0506E',800);
+ const arr=(x,lab)=>`<path d="M${x} 70h36M${x+26} 60l12 10-12 10" stroke="#7A9295" stroke-width="3.5" fill="none"/>`+T(x+18,50,13,lab,'#4B6B6E');
+ let b;
+ if(kind==='meio')b=cell(56,66,42,cnt)+T(56,130,14,top)+arr(112,'減數分裂')+[[194,38],[250,38],[194,102],[250,102]].map(([x,y])=>q(x,y,24)).join('');
+ else if(kind==='mito')b=cell(56,66,42,cnt)+T(56,130,14,top)+arr(112,'細胞分裂')+[[204,70],[286,70]].map(([x,y])=>q(x,y,34)).join('');
+ else b=cell(36,38,26,2)+cell(36,104,26,2)+T(100,43,13,'精子 '+top)+T(100,109,13,'卵 '+top)+arr(140,'受精')+q(250,70,40);
+ return `<svg class="chromo" width="340" height="146" viewBox="0 0 340 146">${b}</svg>`}
+let zipTick=null;
+GAMES.gene={name:'遺傳學解碼室',start(st,mode){
+ const hard=mode==='hard';
+ const seq=hard?shuffle(['pun','pun','abo','abo','sex','rev','type','type','chr','chr']):['type','pun','chr','sex','type','chr','pun','chr'];
+ const N=seq.length;let i=0;st.innerHTML=`<div class="panel" id="gene"></div>`;const box=st.querySelector('#gene');
+ const next=()=>{clearInterval(zipTick);i++;round()};
+ function round(){if(i>=N){finish('遺傳密碼破解！');return}setProg(i,N);({pun,abo,sex,rev,type,chr})[seq[i]]()}
+
+ /* 表現型判斷機：限時連按 */
+ function type(){let L,LIM,cards,btns,ans,legend,title;
+  if(!hard){const T=pick(TRAITS),D=T.L,r=D.toLowerCase();L=6;LIM=40;cards=Array.from({length:L},()=>pick([D+D,D+r,D+r,r+r]));btns=[T.d,T.r];ans=g=>g===r+r?T.r:T.d;
+   title=`${T.who}：看<em>基因型</em>，按出<em>表現型</em>！`;legend=`<div class="legend"><span>有大寫 <b>${D}</b> → ${T.d}</span><span>兩個小寫 <b>${r}${r}</b> → ${T.r}</span></div>`}
+  else{L=10;LIM=30;cards=Array.from({length:L},()=>pick(['IAIA','IAi','IBIB','IBi','IAIB','ii']));btns=['A','B','AB','O'];ans=g=>ABO(g);
+   title=`ABO 血型：看<em>基因型</em>，按出<em>血型</em>！`;legend=''}
+  let k=0,left=LIM,done=false;
+  box.innerHTML=`<p class="q">${title}</p>${legend}<div class="timebar"><i style="width:100%"></i></div><div class="geno"></div><div class="pad ptype">${btns.map((b,j)=>`<button class="tb${j}" data-b="${b}">${b}</button>`).join('')}</div>`;
+  const row=box.querySelector('.geno'),bar=box.querySelector('.timebar i');
+  const draw=()=>{row.innerHTML=cards.map((g,j)=>`<div class="gq${j===k?' now':''}${j<k?' ok':''}"><b>${G(g)}</b><span>${j<k?ans(g):'?'}</span></div>`).join('')};draw();
+  clearInterval(zipTick);zipTick=setInterval(()=>{if(S.paused||done)return;left-=.1;bar.style.width=Math.max(0,left/LIM*100)+'%';if(left<=0){done=true;clearInterval(zipTick);miss(hard?'時間到！I<sup>A</sup>、I<sup>B</sup> 是顯性，i 是隱性，ii 才是 O 型。':'時間到！有大寫就是顯性的表現型。');later(next,2000)}},100);
+  box.querySelectorAll('.pad button').forEach(p=>p.onclick=()=>{if(done||S.paused)return;
+   if(p.dataset.b===ans(cards[k])){tone(440*Math.pow(2,k/12),0,.12,'square',.06);k++;draw();
+    if(k===L){done=true;clearInterval(zipTick);right(row);if(left>LIM/2){S.score+=5;$('#gScore').textContent=S.score;later(()=>popAt(bar,'快手 +5'),300)}later(next,900)}}
+   else miss(hard?`${G(cards[k])} 是 ${ans(cards[k])} 型喔！`:`${cards[k]} 有沒有大寫？答案是${ans(cards[k])}。`,p)})}
+
+ /* 棋盤方格法密碼鎖（通用） */
+ function grid({head,m,f,opts,after,tip}){const ansG=[gt(m[0],f[0]),gt(m[0],f[1]),gt(m[1],f[0]),gt(m[1],f[1])],ch=['?',...opts],cur=[0,0,0,0];
+  box.innerHTML=`<div class="lock" id="lk">${lockSVG(false)}</div><p class="q">${head}<br>點格子，轉出子代的基因型！</p>
+   <div class="punnett"><div></div><div class="h f" data-h="c0">${G(f[0])}</div><div class="h f" data-h="c1">${G(f[1])}</div><div class="h m" data-h="r0">${G(m[0])}</div><button class="pcell" data-c="0">?</button><button class="pcell" data-c="1">?</button><div class="h m" data-h="r1">${G(m[1])}</div><button class="pcell" data-c="2">?</button><button class="pcell" data-c="3">?</button></div>
+   <div class="row"><button class="btn" id="chk">轉開密碼鎖</button></div>${hard?'':'<p class="hint">每一格 = 上面的一個 + 左邊的一個</p>'}`;
+  const cells=[...box.querySelectorAll('.pcell')];
+  cells.forEach(c=>c.onclick=()=>{const k=+c.dataset.c;cur[k]=cur[k]%(ch.length-1)+1;c.innerHTML=G(ch[cur[k]]);c.classList.add('set');tone(660,0,.05,'square',.05);
+   if(!hard){box.querySelectorAll('.glow').forEach(x=>x.classList.remove('glow'));[`r${k>>1}`,`c${k&1}`].forEach(h=>box.querySelector(`[data-h="${h}"]`).classList.add('glow'))}});
+  let checked=false;box.querySelector('#chk').onclick=function(){if(checked)return;if(cur.includes(0)){hint('還有格子是問號喔！',1500);return}checked=true;this.disabled=true;let ok=true;
+   cells.forEach((c,k)=>{c.onclick=null;const g=ch[cur[k]]===ansG[k];c.classList.add(g?'right':'wrong');if(!g){ok=false;c.innerHTML=G(ansG[k])}});
+   box.querySelectorAll('.glow').forEach(x=>x.classList.remove('glow'));
+   const go=()=>after(ansG,box.querySelector('.punnett').outerHTML);
+   if(ok){const lk=box.querySelector('#lk');lk.innerHTML=lockSVG(true);lk.classList.add('open');right(lk);later(go,900)}
+   else{miss(tip,this);later(go,2600)}}}
+ function pun(){const T=hard&&Math.random()<.35?ALBINO:pick(TRAITS),D=T.L,r=D.toLowerCase();
+  const P=hard?[[D+r,D+r],[D+r,r+r],[D+D,D+r],[D+r,D+r]]:[[D+r,D+r],[D+D,r+r],[D+r,r+r]];const [m,f]=pick(P).map(s=>s.split(''));
+  grid({head:`${T.who}：<em>${D}</em> 是${T.d}（顯性），${r} 是${T.r}（隱性）<br>親代 ${m.join('')} × ${f.join('')}`,m,f,opts:[D+D,D+r,r+r],tip:'每一格 = 上面的字母 + 左邊的字母，大寫寫在前面。',
+   after:(ansG,gridHTML)=>{const domN=ansG.filter(g=>g!==r+r).length,recN=4-domN,hetN=ansG.filter(g=>g===D+r).length;
+    if(!hard)return mcq(box,`<p class="q">4 格裡面，有幾格是<em>${T.d}</em>？</p>${gridHTML}<p class="hint">有大寫 ${D} 的格子就是${T.d}</p>`,[0,1,2,3,4],domN,`有大寫 ${D} 的格子就是${T.d}，共 ${domN} 格。`,next,'numpad');
+    if(T===ALBINO)return mcq(box,`<p class="q">白化症是<em>隱性</em>遺傳疾病，孩子是白化症的機率？</p>${gridHTML}`,['0','1/4','1/2','3/4','1'],FR(recN),`要從爸媽各得到一個隱性的 a（aa）才會白化，共 ${recN} 格，機率 ${FR(recN)}。`,next);
+    if(domN===3&&Math.random()<.5)return mcq(box,`<p class="q">子代中表現<em>${T.d}</em>的個體裡，${D}${r} 占多少？</p>${gridHTML}`,['1/3','1/2','2/3','3/4'],'2/3',`${T.d}有 ${D}${D}、${D}${r}、${D}${r} 三格，其中 ${D}${r} 兩格，所以是 2/3。`,next);
+    if(Math.random()<.5)return mcq(box,`<p class="q">子代基因型是 <em>${D}${r}</em> 的機率？</p>${gridHTML}`,['0','1/4','1/2','3/4','1'],FR(hetN),`${D}${r} 有 ${hetN} 格，機率 ${hetN}/4。`,next);
+    mcq(box,`<p class="q">子代表現型是<em>${T.d}</em>的機率？</p>${gridHTML}`,['0','1/4','1/2','3/4','1'],FR(domN),`含 ${D} 的有 ${domN} 格，機率 ${FR(domN)}。`,next)}})}
+ function abo(){const [m,f]=pick([['IAi','IBi'],['IAIB','ii'],['IAi','IAi'],['IAIB','IAi'],['IBi','ii']]).map(allele);
+  const opts=uniq(['IAIA','IAi','IBIB','IBi','IAIB','ii'].filter(g=>[gt(m[0],f[0]),gt(m[0],f[1]),gt(m[1],f[0]),gt(m[1],f[1])].includes(g)).concat(['IAIB','ii'])).slice(0,4);
+  grid({head:`ABO 血型：I<sup>A</sup>、I<sup>B</sup> 為顯性，i 為隱性<br>父 ${G(m.join(''))} × 母 ${G(f.join(''))}`,m,f,opts,tip:'每一格各取父母一個等位基因，I<sup>A</sup> 寫前面、i 寫後面。',
+   after:(ansG,gridHTML)=>{const ty=pick(uniq(ansG.map(ABO)).concat(['O','AB']));const n=ansG.filter(g=>ABO(g)===ty).length;
+    mcq(box,`<p class="q">孩子是 <em>${ty} 型</em>的機率？</p>${gridHTML}`,['0','1/4','1/2','3/4','1'],FR(n),`${ty} 型的基因型在 4 格中有 ${n} 格，機率 ${FR(n)}。（ii 才是 O 型，I<sup>A</sup>I<sup>B</sup> 是 AB 型）`,next)}})}
+ function sex(){grid({head:`性別遺傳：爸爸是 <em>XY</em>，媽媽是 <em>XX</em>`,m:['X','Y'],f:['X','X'],opts:['XX','XY'],tip:'爸爸給 X 或 Y，媽媽一定給 X。',
+   after:(ansG,gridHTML)=>{const girl=!hard||Math.random()<.5;mcq(box,`<p class="q">生${girl?'<em>女孩（XX）</em>':'<em>男孩（XY）</em>'}的機率？</p>${gridHTML}`,['0','1/4','1/2','3/4','1'],'1/2',`XX 和 XY 各 2 格，生男生女的機會各是 1/2。決定性別的是爸爸給的精子帶 X 還是 Y。`,next)}})}
+ function rev(){const T=pick(TRAITS),D=T.L,r=D.toLowerCase();const c=pick([{x:`${T.d} : ${T.r} = 1 : 1`,a:D+r,t:`子代出現 ${r}${r}，代表${T.d}親代帶有 ${r}，所以是 ${D}${r}。`},{x:`全部都是${T.d}`,a:D+D,t:`子代全為${T.d}，代表${T.d}親代只給得出 ${D}，所以是 ${D}${D}。`}]);
+  mcq(box,`<div class="lock">${lockSVG(false)}</div><p class="q">${T.d}的豌豆 × ${T.r}（${r}${r}），子代<em>${c.x}</em>。<br>${T.d}親代的基因型是？</p>`,[D+D,D+r,r+r],c.a,c.t,next)}
+ function chr(){const B=[
+   {k:'meio',top:'14 條',cnt:6,q:'豌豆體細胞有 14 條染色體，<em>減數分裂</em>後的生殖細胞有幾條？',a:'7',o:['7','14','28'],t:'減數分裂讓染色體數目減半：14 → 7。'},
+   {k:'mito',top:'14 條',cnt:6,q:'豌豆體細胞有 14 條染色體，<em>細胞分裂</em>後新細胞有幾條？',a:'14',o:['7','14','28'],t:'細胞分裂產生兩個相同的細胞，染色體數目不變：14 條。'},
+   {k:'meio',top:'46 條',cnt:6,q:'人類體細胞有 46 條，<em>精子</em>有幾條？',a:'23',o:['23','46','92'],t:'精子由減數分裂產生，染色體減半：23 條。'},
+   {k:'mito',top:'46 條',cnt:6,q:'人的皮膚細胞有 46 條，<em>細胞分裂</em>後新細胞有幾條？',a:'46',o:['23','46','92'],t:'細胞分裂後數目不變：46 條。'},
+   {k:'fert',top:'23 條',q:'精子 23 條 + 卵 23 條，<em>受精卵</em>有幾條？',a:'46',o:['23','46','92'],t:'受精後染色體恢復成對：23 + 23 = 46。'}];
+  const H=[
+   {k:'meio',top:'8 條',cnt:8,q:'果蠅體細胞 8 條，<em>卵</em>有幾條？',a:'4',o:['2','4','8','16'],t:'卵由減數分裂產生，減半：4 條。'},
+   {k:'meio',top:'78 條',cnt:8,q:'雞的體細胞有 78 條，<em>精子</em>有幾條？',a:'39',o:['39','78','156','26'],t:'精子是單套（n），78 ÷ 2 = 39 條。'},
+   {k:'mito',top:'2n = ?',cnt:6,q:'大猩猩的精子有 24 條，其<em>皮膚細胞分裂</em>後新細胞有幾條？',a:'48',o:['12','24','48','96'],t:'精子 n = 24，體細胞 2n = 48，細胞分裂後不變。'},
+   {k:'meio',top:'2n',cnt:4,q:'減數分裂產生的精子和卵是幾套染色體？',a:'單套（n）',o:['單套（n）','雙套（2n）','四套（4n）'],t:'減數分裂讓染色體減半，精子和卵是單套（n），受精卵恢復雙套（2n）。'},
+   {k:'meio',top:'44+XX',cnt:4,q:'女性的<em>卵</em>含有哪些染色體？',a:'22+X',o:['22+X','22+Y','44+XX','23+X'],t:'減數分裂時各對染色體分離，卵含 22 條體染色體加 1 條 X。'},
+   {k:'meio',top:'44+XY',cnt:4,q:'男性的<em>精子</em>可能含有哪些染色體？',a:'22+X 或 22+Y',o:['22+X 或 22+Y','只有 22+Y','44+XY','22+XY'],t:'精子含 22 條體染色體，加上 X 或 Y 其中一條。'},
+   {k:'none',top:'',q:'唐氏症患者通常多了一條第 21 號染色體，每個體細胞有幾條？',a:'47',o:['45','46','47','48'],t:'唐氏症屬於染色體數目異常，46 + 1 = 47 條。'}];
+  const c=pick(hard?H:B);mcq(box,`<p class="q">${c.q}</p>`+(c.k==='none'?'':chromoSVG(c.k,c.top,c.cnt)),shuffle(c.o),c.a,c.t,next)}
+ startClock(null);round();
+ return()=>clearInterval(zipTick)
+}};
+
+/* 啟動 */
+$('#tipArt').innerHTML=ART.mascot();drawSound();renderLobby();show('lobby');
+</script>
+<script>
+/* ===== 七上 第1章：顯微鏡探險隊 ===== */
+const B_LIFE={id:'life',label:'生物',c:'#2E9E68'},B_NON={id:'non',label:'非生物',c:'#7A8C99'};
+GAMES.scope={name:'顯微鏡探險隊',start(st,mode){const hard=mode==='hard';
+ const R={
+  life:(box,next)=>{const P=[['松鼠','life'],['豆苗','life'],['細菌','life'],['香菇','life'],['草履蟲','life'],['石頭','non'],['水','non'],['機器人','non'],['汽車','non'],['雲','non']];
+   const H=[['萌芽中的種子','life','種子會代謝、萌芽，具有生命現象。'],['火','non','火會變大，但不會代謝、生殖，不是生物。'],['會走路的機器狗','non','機器不會代謝和生殖。'],['珊瑚','life','珊瑚是刺絲胞動物。'],['鐘乳石','non','鐘乳石會變長，但不是生長發育。'],['黴菌','life','黴菌是真菌。']];
+   const items=shuffle(hard?shuffle(P).slice(0,4).concat(H):P).slice(0,hard?9:7).map(([t,bin,why])=>({t,bin,why:why||''}));
+   fallSort({box,title:'能表現<em>生命現象</em>的才是生物！',sub:hard?'':'<p class="hint">生命現象：代謝、生長發育、感應運動、生殖</p>',bins:[B_LIFE,B_NON],items,speed:hard?6:10,next})},
+  phen:(box,next)=>pairUp({box,title:'配對：這是哪一種<em>生命現象</em>？',pairs:[['豆苗一天天長高','生長與發育'],['含羞草被碰到葉子閉合','感應與運動'],['分解食物中的養分','代謝'],['母雞孵出小雞','生殖']],next}),
+  move:(box,next)=>{const comp=!hard||Math.random()<.6;const dirs=[[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]];const [dx,dy]=pick(dirs);const name=['左上','上','右上','左','右','左下','下','右下'][dirs.findIndex(d=>d[0]===dx&&d[1]===dy)];
+   box.innerHTML=`<p class="q">${comp?'<em>複式顯微鏡</em>':'<em>解剖顯微鏡</em>'}：字在視野的<em>${name}方</em>，玻片要往哪邊移，字才會到正中央？</p>${hard?'':`<p class="hint">${comp?'複式顯微鏡的像上下顛倒、左右相反：字在哪邊，玻片就往哪邊移':'解剖顯微鏡的像方向相同'}</p>`}<div class="view"><div class="cross"></div><b id="glyph" style="transform:translate(calc(-50% + ${dx*52}px),calc(-50% + ${dy*52}px))">F</b></div><div class="dpad">${['↖','↑','↗','←','·','→','↙','↓','↘'].map((a,k)=>`<button data-k="${k}" class="${k===4?'mid':''}">${a}</button>`).join('')}</div>`;
+   let done=false;box.querySelectorAll('.dpad button').forEach(b=>b.onclick=()=>{if(done||S.paused)return;done=true;const k=+b.dataset.k;const mx=k%3-1,my=Math.floor(k/3)-1;
+    const img=comp?[-mx,-my]:[mx,my];const nx=dx+img[0],ny=dy+img[1];box.querySelector('#glyph').style.transform=`translate(calc(-50% + ${nx*52}px),calc(-50% + ${ny*52}px))`;
+    if(nx===0&&ny===0){right(b);later(next,900)}else{miss(comp?`複式顯微鏡要往「${name}」移：字在哪邊，玻片就往哪邊移。`:`解剖顯微鏡的像和實物同方向，字在${name}方，玻片要往反方向移。`,b);later(next,2600)}})},
+  see:(box,next)=>{const comp=!hard||Math.random()<.6;const T=[['不變','none'],['上下顛倒、左右相反','rotate(180deg)'],['只有左右相反','scaleX(-1)'],['只有上下顛倒','scaleY(-1)']];const ans=comp?'上下顛倒、左右相反':'不變';
+   mcq(box,`<p class="q">玻片上寫著 <span class="glyph">F</span>，用<em>${comp?'複式':'解剖'}顯微鏡</em>看起來會是哪一個？</p>`,T.map(([t,tf])=>`<span class="glyph" style="transform:${tf}">F</span><br><small>${t}</small>`),`<span class="glyph" style="transform:${comp?'rotate(180deg)':'none'}">F</span><br><small>${ans}</small>`,comp?'複式顯微鏡的物像上下顛倒、左右相反（轉 180 度）。':'解剖顯微鏡的物像和標本方向相同。',next)},
+  mag:(box,next)=>{const e=pick([5,10,15]),o=pick([4,10,40]);const a=e*o;mcq(box,`<p class="q">目鏡 <em>${e}×</em>、物鏡 <em>${o}×</em>，放大倍率是多少？</p><div class="pic">${ART.scope()}</div>`,shuffle(uniq([a,e+o,a*10,o]).map(String)).map(v=>v+' 倍'),a+' 倍',`放大倍率 = 目鏡倍率 × 物鏡倍率 = ${e} × ${o} = ${a} 倍。`,next)},
+  high:(box,next)=>{const Q=pick([['換成高倍率物鏡後，<em>視野亮度</em>會？','變暗',['變亮','變暗','不變']],['換成高倍率物鏡後，看到的<em>細胞數目</em>會？','變少',['變多','變少','不變']],['換成高倍率物鏡後，看到的<em>細胞大小</em>會？','變大',['變大','變小','不變']],['要觀察<em>立體、不透光</em>的花朵表面，用哪種顯微鏡？','解剖顯微鏡',['複式顯微鏡','解剖顯微鏡']]]);
+   mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],'高倍率：視野小、較暗、細胞數少、細胞看起來較大。解剖顯微鏡適合觀察立體、不透光的物體。',next)},
+  tool:(box,next)=>{const T=[['beaker','燒杯','溶解固體、混合液體'],['cylinder','量筒','測量液體體積'],['tube','試管','少量物質反應或加熱'],['lamp','酒精燈','加熱'],['dropper','滴管','吸取少量液體'],['dish','培養皿','培養與觀察'],['flask','錐形瓶','搖晃混合液體']];
+   const set=shuffle(T).slice(0,hard?4:3);const ask=pick(set);
+   picChoice({box,title:`要<em>${ask[2]}</em>，該拿哪個器材？`,opts:set.map(([a,t])=>({svg:ART[a](),t})),ans:ask[1],tip:`${ask[2]}要用${ask[1]}。`,next,noLabel:hard})},
+  safe:(box,next)=>{const Q=pick([['酒精燈翻倒著火了，要怎麼辦？','用溼抹布覆蓋',['用溼抹布覆蓋','用嘴吹熄','用手拍打']],['酒精燈用完，要怎麼熄滅？','用燈罩蓋熄',['用燈罩蓋熄','用嘴吹熄','倒水澆熄']],['燒燙傷的處理原則是？','沖、脫、泡、蓋、送',['沖、脫、泡、蓋、送','先擦藥膏','用冰塊直接壓']],['量筒可以拿來加熱嗎？','不可以',['可以','不可以']]]);
+   mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],`${Q[0].replace(/？/,'')}：${Q[1]}。`,next)},
+  vars:(box,next)=>{const V=pick([['溫度','操作變因','研究「吐司發霉和溫度」，刻意改變的是溫度。'],['吐司的種類和大小','控制變因','除了溫度外，其他條件都要相同。'],['吐司發霉的程度','應變變因','隨著溫度改變而改變的結果。']]);
+   mcq(box,`<p class="q">實驗主題：<em>吐司發霉與溫度的關係</em><br>「${V[0]}」是哪一種變因？</p>`,['操作變因','控制變因','應變變因'],V[1],V[2],next)},
+  method:(box,next)=>orderTap({box,title:'把<em>科學方法</em>的步驟排好！',items:['觀察','提出問題','形成假說','設計實驗','分析結果','提出結論'],next,pre:hard?0:1})
+ };
+ runRounds(st,hard?shuffle(['life','move','move','see','mag','high','tool','vars','method','safe']):['life','phen','move','see','mag','tool','move','safe'],R,'實驗室探險完成！')}};
+
+/* ===== 七上 第2章：細胞實驗站（擴散、滲透、組成層次、尺度） ===== */
+GAMES.lab={name:'細胞實驗站',start(st,mode){const hard=mode==='hard';
+ const SOL=[['濃食鹽水','#F5C443'],['純水','#8FD0F2'],['生理食鹽水','#B7E39A']];
+ const R={
+  osmo:(box,next)=>{const plant=hard&&Math.random()<.5;const goals=plant?[['萎縮，細胞膜和細胞壁分離','濃食鹽水','shrink'],['略為膨脹但不會破','純水','swell'],['形狀維持不變','生理食鹽水','']]:[['萎縮變皺','濃食鹽水','shrink'],['膨脹到破裂','純水','burst'],['形狀維持不變','生理食鹽水','']];
+   const g=pick(goals);const draw=st=>plant?ART.plantCell(st):ART.rbc(st==='swell'?1.25:1,st);
+   box.innerHTML=`<p class="q">把${plant?'<em>植物細胞</em>':'<em>紅血球</em>'}泡進哪一杯，會讓它<em>${g[0]}</em>？</p><div class="pic" id="cellv">${draw('')}</div><div class="cans">${shuffle(SOL).map(([t,c])=>`<button class="can" data-t="${t}" style="font-size:16px">${sv('0 0 60 80',`<path d="M10 8h40v62a6 6 0 0 1-6 6H16a6 6 0 0 1-6-6Z" fill="#E8F4FA"/><path d="M10 34h40v36a6 6 0 0 1-6 6H16a6 6 0 0 1-6-6Z" fill="${c}"/>`)}<span>${t}</span></button>`).join('')}</div>${hard?'':'<p class="hint">水會從水多（濃度低）的地方，滲透到水少（濃度高）的地方</p>'}`;
+   let done=false;box.querySelectorAll('.can').forEach(b=>b.onclick=()=>{if(done||S.paused)return;done=true;const t=b.dataset.t;const res=goals.find(x=>x[1]===t);box.querySelector('#cellv').innerHTML=draw(res[2]);
+    if(t===g[1]){b.classList.add('right');right(b);later(next,1000)}else{b.classList.add('wrong');miss(`放進${t}會${res[0]}。要${g[0]}，應該用${g[1]}。${plant?'植物細胞有細胞壁保護，泡純水也不會破。':''}`,b);later(next,2800)}})},
+  diff:(box,next)=>{const L=Math.random()<.5;mcq(box,`<p class="q">擴散作用：這些分子會往哪邊移動？</p><div class="pic">${ART.dots(L?14:3,L?3:14)}</div>`,['往左邊','往右邊','不會移動'],L?'往右邊':'往左邊','擴散作用：物質由高濃度往低濃度移動，最後均勻分布。',next)},
+  pass:(box,next)=>{const items=shuffle([['氧','direct'],['二氧化碳','direct'],['葡萄糖','help'],['胺基酸','help'],['礦物質','help']]).map(([t,bin])=>({t,bin}));
+   fallSort({box,title:'這個物質怎麼通過<em>細胞膜</em>？',bins:[{id:'direct',label:'直接通過',c:'#4C6FE0'},{id:'help',label:'靠膜上蛋白質',c:'#F2A33A'}],items,speed:8,next,sub:'<p class="hint">水兩種方式都可以，所以這裡不考它</p>'})},
+  uni:(box,next)=>{const items=shuffle([['草履蟲','one','parame'],['變形蟲','one','amoeba'],['新月藻','one'],['酵母菌','one','yeast'],['人','multi','human'],['青蛙','multi','frog'],['辣椒植株','multi'],['香菇','multi','shroom']]).slice(0,hard?8:6).map(([t,bin,a])=>({t,bin,a}));
+   fallSort({box,title:'這是<em>單細胞</em>還是<em>多細胞</em>生物？',bins:[{id:'one',label:'單細胞',c:'#1FA3A3'},{id:'multi',label:'多細胞',c:'#9B5DE5'}],items,speed:hard?6:9,next})},
+  level:(box,next)=>{const plant=hard&&Math.random()<.5;
+   if(plant)return orderTap({box,title:'<em>植物體</em>的組成層次，由小到大排好！',items:['細胞','組織','器官','個體'],decoys:[{t:'系統',why:'植物體沒有「系統」這個層次。'}],next});
+   orderTap({box,title:'<em>人體</em>的組成層次，由小到大排好！',items:['細胞','組織','器官','系統','個體'],next,pre:hard?0:1})},
+  unit:(box,next)=>orderTap({box,title:'長度單位，<em>由小排到大</em>！',items:hard?['奈米','微米','毫米','公分','公尺','公里']:['微米','毫米','公分','公尺'],next}),
+  scale:(box,next)=>{const Q=pick([['細胞的大小，常用哪個單位？','微米'],['恆星之間的距離，用哪個單位？','光年'],['一顆綠豆的長度，適合用哪個單位？','毫米']]);mcq(box,`<p class="q">${Q[0]}</p>`,['微米','毫米','公里','光年'],Q[1],'細胞用微米，綠豆用毫米或公分，恆星距離用光年。',next)},
+  cellparts:(box,next)=>pairUp({box,title:'配對：誰<em>有</em>這個構造？',lt:'構造',rt:'誰有',pairs:hard?[['細胞壁','只有植物細胞'],['葉綠體','只有部分植物細胞'],['細胞膜','動、植物細胞都有'],['細胞核','動、植物細胞都有（紅血球成熟後沒有）']]:[['細胞壁','植物細胞'],['細胞膜','動物和植物細胞都有'],['葉綠體','能行光合作用的植物細胞']],next})
+ };
+ runRounds(st,hard?shuffle(['osmo','osmo','diff','pass','uni','level','level','unit','scale','cellparts']):['osmo','diff','uni','level','osmo','unit','cellparts','scale'],R,'實驗站任務完成！')}};
+
+/* ===== 七上 第3章：消化道大冒險（養分、酵素、光合作用、消化） ===== */
+GAMES.digest={name:'消化道大冒險',start(st,mode){const hard=mode==='hard';
+ const R={
+  tract:(box,next)=>orderTap({box,title:'跟著食物走！依序點出<em>消化道</em>',sub:`<div class="pic">${ART.stomach()}</div>`,items:hard?['口腔','咽','食道','胃','小腸','大腸','肛門']:['口腔','食道','胃','小腸','大腸','肛門'],decoys:hard?[{t:'肝臟',why:'肝臟是消化腺，食物不會經過它。'},{t:'胰臟',why:'胰臟是消化腺，分泌胰液到小腸。'}]:[],next,pre:hard?0:1}),
+  nutr:(box,next)=>{const items=shuffle([['醣類','yes'],['蛋白質','yes'],['脂質','yes'],['水','no'],['礦物質','no'],['維生素','no']]).map(([t,bin])=>({t,bin}));
+   fallSort({box,title:'六大營養素：能不能<em>產生能量</em>？',bins:[{id:'yes',label:'能產生能量',c:'#F5A524',icon:ICON.bolt()},{id:'no',label:'不能產生能量',c:'#4C6FE0'}],items,speed:hard?6:9,next})},
+  small:(box,next)=>pairUp({box,title:'消化作用：大分子會分解成什麼？',lt:'大分子',rt:'小分子',pairs:[['澱粉','葡萄糖'],['蛋白質','胺基酸'],['脂質','脂肪酸和甘油']],next}),
+  gland:(box,next)=>pairUp({box,title:'配對：消化腺和它的消化液',pairs:hard?[['唾腺','唾液：初步分解澱粉'],['胃腺','胃液：含鹽酸，分解蛋白質'],['肝臟','膽汁：乳化脂質，不含酵素'],['胰臟','胰液：分解醣類、蛋白質、脂質'],['腸腺','腸液：分解醣類和蛋白質']]:[['唾腺','唾液'],['胃腺','胃液'],['肝臟','膽汁'],['胰臟','胰液']],next}),
+  test:(box,next)=>{const st2=pick([['碘液','#3E3A6E','藍黑色','澱粉'],['本氏液（隔水加熱）','#F08A3C','橙紅色','葡萄糖']]);
+   mcq(box,`<p class="q">滴入<em>${st2[0]}</em>後變成${st2[2]}，代表含有什麼？</p><div class="pic">${ART.tube(st2[1])}</div>`,['澱粉','葡萄糖','蛋白質'],st2[3],'碘液遇澱粉變藍黑色（或紫紅色）；本氏液加熱後遇葡萄糖變綠、黃、橙或紅色。',next)},
+  vit:(box,next)=>{const Q=pick([['缺乏維生素 A，可能會？','夜盲症'],['缺乏維生素 C，可能會？','牙齦或皮下出血'],['構成骨頭和牙齒的重要礦物質是？','鈣和磷'],['人體造血需要的礦物質是？','鐵']]);mcq(box,`<p class="q">${Q[0]}</p>`,shuffle(['夜盲症','牙齦或皮下出血','鈣和磷','鐵']),Q[1],`${Q[0].replace('？','')}：${Q[1]}。`,next)},
+  enzyme:(box,next)=>{const Q=pick([['人體的酵素大約在幾度活性最好？','37℃',['0℃','37℃','90℃']],['唾液中的酵素煮沸後會？','失去活性',['活性更好','失去活性','不受影響']],['胃中的酵素適合什麼環境？','酸性',['酸性','中性','鹼性']],['小腸中的酵素適合什麼環境？','鹼性',['酸性','中性','鹼性']],['澱粉酶可以分解蛋白質嗎？','不行，酵素具有專一性',['可以','不行，酵素具有專一性']],['大部分酵素的主要成分是？','蛋白質',['醣類','蛋白質','脂質']]]);
+   mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],'酵素主要成分是蛋白質，具專一性，受溫度和酸鹼性影響：唾液中性、胃酸性、小腸鹼性，人體約 37℃ 最佳。',next)},
+  leaf:(box,next)=>{box.innerHTML=`<p class="q">葉片一部分包上鋁箔，照光一週後去色、滴碘液。<br>哪個部位會變<em>藍黑色</em>？點它！</p><div class="hs">${ART.leafHS(false)}</div>`;let done=false;
+   box.querySelector('.hs').addEventListener('click',e=>{const g=e.target.closest('[data-h]');if(!g||done||S.paused)return;done=true;box.querySelector('.hs').innerHTML=ART.leafHS(true);
+    if(g.dataset.h==='lit'){right(box.querySelector('.hs'));later(next,1100)}else{miss('包住鋁箔的部分照不到光，不能行光合作用，沒有澱粉，所以不會變藍黑色。');later(next,2800)}})},
+  photo:(box,next)=>{const Q=pick([['光合作用在葉片的哪裡進行？','葉肉細胞的葉綠體',['葉肉細胞的葉綠體','葉脈','表皮細胞']],['氣體進出葉片的通道是？','氣孔',['氣孔','葉脈','角質層']],['光合作用需要的原料是？','二氧化碳和水',['二氧化碳和水','氧和葡萄糖','澱粉和氧']],['光合作用會釋放出什麼氣體？','氧',['氧','二氧化碳','氮']]]);mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],`${Q[0].replace('？','')}：${Q[1]}。`,next)}
+ };
+ runRounds(st,hard?shuffle(['tract','nutr','small','gland','test','vit','enzyme','enzyme','leaf','photo']):['tract','nutr','small','test','gland','leaf','photo','tract'],R,'消化之旅完成！')}};
+</script>
+<script>
+/* ===== 七上 第4章：循環翻翻樂（運輸作用） ===== */
+GAMES.circ={name:'循環翻翻樂',start(st,mode){const hard=mode==='hard';
+ const PB=[['紅血球','運送氧氣'],['白血球','吞噬病原體'],['血小板','幫助血液凝固'],['動脈','血液離開心臟'],['靜脈','血液流回心臟'],['微血管','物質交換的場所'],['木質部','運送水分和礦物質'],['韌皮部','運送光合作用的養分']];
+ const PH=[['動脈','血壓最大、管壁最厚'],['微血管','管壁只有一層細胞'],['靜脈','有瓣膜防止逆流'],['第一道防線','皮膚與黏膜'],['第二道防線','白血球吞噬、發炎反應'],['第三道防線','淋巴球、抗體'],['蒸散作用','水分由氣孔散失'],['淋巴結','過濾病原體'],['肺循環','心臟與肺之間'],['體循環','心臟與全身之間'],['根毛','增加吸收的表面積'],['疫苗','讓淋巴球產生記憶']];
+ const R={
+  mem:(box,next)=>memory({box,title:'翻牌配對：找出<em>構造</em>和它的<em>功能</em>！',pairs:shuffle(hard?PH:PB).slice(0,hard?8:6),next,peek:hard?1800:4000,hard}),
+  pulse:(box,next)=>{const bpm=pick([60,72,84,96]);const secs=5;const beats=Math.round(bpm*secs/60);
+   box.innerHTML=`<p class="q">用手指按住手腕的動脈測<em>脈搏</em>！專心數 ${secs} 秒內跳了幾下</p><div class="beat" id="bt">${ART.bodyHeart()}</div><div class="row"><button class="btn" id="go">開始數</button></div>`;
+   box.querySelector('#go').onclick=function(){this.remove();const bt=box.querySelector('#bt');let n=0;const iv=setInterval(()=>{n++;bt.classList.remove('on');bt.offsetWidth;bt.classList.add('on');tone(110,0,.12,'sine',.25);if(n>=beats){clearInterval(iv);later(ask,700)}},60000/bpm);};
+   function ask(){if(!hard)return mcq(box,`<p class="q">剛剛跳了幾下？</p>`,shuffle(uniq([beats,beats-2,beats+2,beats+4])).map(String),String(beats),`一共跳了 ${beats} 下。脈搏是動脈隨心搏擴張的情形，所以脈搏次數和心搏次數相同。`,next);
+    mcq(box,`<p class="q">${secs} 秒跳了 ${beats} 下，<em>一分鐘的心搏</em>大約幾次？</p>`,shuffle(uniq([bpm,beats*10,bpm+12,beats*6])).map(String),String(bpm),`一分鐘 = 60 秒，${beats} × (60 ÷ ${secs}) = ${bpm} 次。脈搏次數 = 心搏次數。`,next)}},
+  vessel:(box,next)=>{const items=shuffle([['血壓最大','a'],['管壁最厚、彈性最好','a'],['把血液帶離心臟','a'],['有瓣膜','v'],['血液流回心房','v'],['管壁只有一層細胞','c'],['血液流速最慢','c'],['和組織細胞交換物質','c']]).slice(0,hard?8:6).map(([t,bin])=>({t,bin}));
+   fallSort({box,title:'這是哪一種<em>血管</em>的特徵？',bins:[{id:'a',label:'動脈',c:'#F0506E'},{id:'v',label:'靜脈',c:'#4C6FE0'},{id:'c',label:'微血管',c:'#9B5DE5'}],items,speed:hard?7:10,next})},
+  route:(box,next)=>{const lung=Math.random()<.5;
+   if(lung)return orderTap({box,title:'排出<em>肺循環</em>的路線',items:['右心室','肺動脈','肺部微血管','肺靜脈','左心房'],next});
+   orderTap({box,title:'排出<em>體循環</em>的路線',items:['左心室','主動脈','全身微血管','大靜脈','右心房'],next})},
+  plant:(box,next)=>pairUp({box,title:'植物的運輸：配對構造和功能',pairs:[['木質部','由下往上運送水分和礦物質'],['韌皮部','運送葉片製造的養分'],['氣孔','水蒸氣散失、氣體進出'],['根毛','增加吸收水分的面積']],next}),
+  blood:(box,next)=>{const Q=pick([['血液中數量最多的血球是？','紅血球'],['體積最大、有細胞核的血球是？','白血球'],['受傷時幫助血液凝固的是？','血小板'],['手腕上摸到的脈搏，來自哪種血管？','動脈'],['血液和組織細胞交換氣體、養分在哪裡？','微血管']]);mcq(box,`<p class="q">${Q[0]}</p>`,Q[1].includes('脈')||['動脈','微血管'].includes(Q[1])?['動脈','靜脈','微血管']:['紅血球','白血球','血小板'],Q[1],`${Q[0].replace('？','')}：${Q[1]}。`,next)},
+  ring:(box,next)=>{const Q=pick([['年輪中顏色<em>淺</em>、細胞大的部分，是在什麼季節形成？','春夏',['春夏','秋冬']],['樹皮被環狀剝除，為什麼整棵樹會死？','韌皮部斷了，養分送不到根',['韌皮部斷了，養分送不到根','木質部斷了，水送不上去']],['植物體內水分往上運送，最主要的動力是？','蒸散作用的拉力',['蒸散作用的拉力','韌皮部的推力','根部的心臟']]]);mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],`答案：${Q[1]}。`,next)}
+ };
+ runRounds(st,hard?['mem',...shuffle(['vessel','route','pulse','ring','blood']),'mem']:['mem','plant','pulse','blood','vessel','mem'],R,'循環系統全通了！')}};
+
+/* ===== 七上 第5章：神經反應站（協調作用） ===== */
+GAMES.nerve={name:'神經反應站',start(st,mode){const hard=mode==='hard';
+ const R={
+  react:(box,next)=>{box.innerHTML=`<p class="q">反應測試！燈變<em>綠色</em>的瞬間馬上點它</p><div class="lamp wait" id="lamp">準備…</div><p class="hint">訊息路徑：眼睛（受器）→ 感覺神經元 → 大腦 → 脊髓 → 運動神經元 → 手指肌肉（動器）</p>`;
+   const lamp=box.querySelector('#lamp');let state='wait',t0=0,done=false;const tok=S.tok;
+   const tm=setTimeout(()=>{if(S.tok!==tok||done)return;state='go';lamp.className='lamp go';lamp.textContent='點！';t0=performance.now()},1500+Math.random()*2200);
+   lamp.onclick=()=>{if(done)return;if(state==='wait'){done=true;clearTimeout(tm);lamp.className='lamp';lamp.textContent='太早了';miss('還沒變綠就點了！反應要等受器接收到刺激才開始。');later(next,1800);return}
+    done=true;const ms=Math.round(performance.now()-t0);lamp.className='lamp go';lamp.textContent=ms+' 毫秒';right(lamp);if(ms<350){S.score+=5;$('#gScore').textContent=S.score;later(()=>popAt(lamp,'神速 +5'),300)}later(next,1500)}},
+  path:(box,next)=>orderTap({box,title:'看到小狗後<em>伸手握手</em>，訊息怎麼傳？',items:['眼睛（受器）','感覺神經元','大腦','運動神經元','手部肌肉（動器）'],next,pre:hard?0:1}),
+  reflexPath:(box,next)=>orderTap({box,title:'手碰到熱茶壺<em>立刻縮回</em>（反射作用），訊息怎麼傳？',items:['皮膚（受器）','感覺神經元','脊髓','運動神經元','手部肌肉（動器）'],decoys:[{t:'大腦',why:'反射作用不經過大腦思考判斷，由脊髓控制，所以特別快。'}],next}),
+  reflex:(box,next)=>{const items=shuffle([['眨眼','r'],['打噴嚏','r'],['手碰熱壺縮回','r'],['看到小狗去握手','v'],['接住掉落的直尺','v'],['舉手回答問題','v'],['寫作業','v']]).slice(0,hard?7:6).map(([t,bin])=>({t,bin}));
+   fallSort({box,title:'這是<em>反射作用</em>，還是經過大腦思考的<em>意識動作</em>？',bins:[{id:'r',label:'反射作用',c:'#F5A524'},{id:'v',label:'意識動作',c:'#4C6FE0'}],items,speed:hard?6:9,next})},
+  ns:(box,next)=>pairUp({box,title:'配對：神經系統的分工',pairs:[['腦和脊髓','中樞神經系統：整合訊息、下命令'],['腦神經和脊神經','周圍神經系統：傳遞訊息'],['受器','接受刺激（眼、耳、鼻、舌、皮膚）'],['動器','產生反應（肌肉或腺體）']],next}),
+  gland:(box,next)=>pairUp({box,title:'配對：內分泌腺和激素',lt:'內分泌腺',rt:'激素',pairs:hard?[['腦垂腺','生長激素'],['甲狀腺','甲狀腺素：促進代謝'],['副甲狀腺','調節血液中鈣的濃度'],['胰島','胰島素和升糖素'],['腎上腺','腎上腺素：緊急時心跳加快'],['睪丸、卵巢','性激素：第二性徵']]:[['腦垂腺','生長激素'],['甲狀腺','甲狀腺素'],['胰島','胰島素'],['腎上腺','腎上腺素']],next}),
+  disease:(box,next)=>{const Q=pick([['成長期生長激素分泌太多','巨人症'],['成長期生長激素分泌太少','侏儒症'],['胰島素分泌不足，血糖過高','糖尿病']]);mcq(box,`<p class="q">${Q[0]}，會造成？</p>`,['巨人症','侏儒症','糖尿病'],Q[1],`${Q[0]}會造成${Q[1]}。`,next)},
+  trop:(box,next)=>{const fromL=Math.random()<.5;picChoice({box,title:`陽光從<em>${fromL?'左':'右'}邊</em>照過來，幾天後豆苗的莖會怎麼長？`,sub:`<div class="pic" style="justify-content:${fromL?'flex-start':'flex-end'}">${ART.sunL().replace('<svg','<svg width="48" height="48"')}</div>`,opts:[{svg:ART.potPlant('L'),t:'往左彎'},{svg:ART.potPlant(''),t:'直直長'},{svg:ART.potPlant('R'),t:'往右彎'}],ans:fromL?'往左彎':'往右彎',tip:'莖具有向光性，會朝光源彎曲生長。',next})},
+  hang:(box,next)=>picChoice({box,title:'把盆栽<em>倒吊</em>，幾天後莖和根會怎麼長？',opts:[{svg:ART.hangPot('up','down'),t:'莖往上彎、根往下長'},{svg:ART.hangPot('down','up'),t:'莖往下、根往上'}],ans:'莖往上彎、根往下長',tip:'莖有背地性（往上長），根有向地性（往下長）。',next}),
+  plantq:(box,next)=>{const Q=pick([['含羞草被碰到，小葉立刻閉合','觸發運動'],['酢漿草的葉片到晚上下垂合起','睡眠運動'],['爬藤植物碰到支柱會纏繞上去','向觸性'],['根往土壤深處生長','向地性']]);mcq(box,`<p class="q">${Q[0]}，這是？</p>`,['觸發運動','睡眠運動','向觸性','向地性'],Q[1],`${Q[0]}：${Q[1]}。`,next)},
+  fatigue:(box,next)=>{const Q=pick([['吃完糖果再吃水果，覺得水果不甜','感覺疲勞'],['聞到食物香味，流出口水，產生反應的唾腺是','動器'],['看電影、卡通時，畫面看起來是連續的','視覺暫留'],['用火光吸引魚群，利用魚的','趨光性']]);mcq(box,`<p class="q">${Q[0]}…這是？</p>`,shuffle(['感覺疲勞','動器','視覺暫留','趨光性']),Q[1],`${Q[0]}：${Q[1]}。`,next)}
+ };
+ runRounds(st,hard?['react',...shuffle(['reflexPath','reflex','ns','gland','disease','trop','hang','plantq']),'react']:['react','path','reflex','gland','trop','fatigue','react','plantq'],R,'神經系統暢通！')}};
+
+/* ===== 七上 第6章：恆定控制中心（即時管理） ===== */
+GAMES.homeo={name:'恆定控制中心',start(st,mode){const hard=mode==='hard';
+ const G={
+  temp:{n:'體溫',up:{b:'血管收縮、肌肉顫抖',s:'產生、保留熱'},dn:{b:'流汗、血管擴張',s:'散熱'}},
+  sugar:{n:'血糖',up:{b:'分泌升糖素',s:'肝糖變成葡萄糖'},dn:{b:'分泌胰島素',s:'葡萄糖存成肝糖'}},
+  water:{n:'水分',up:{b:'產生口渴、尿量減少',s:'保留水分'},dn:{b:'尿量增加',s:'排出多餘的水'}},
+  co2:{n:'二氧化碳',up:{b:'呼吸變慢',s:''},dn:{b:'呼吸運動加快',s:'排出二氧化碳'}}};
+ const EV=[['temp',1,'大太陽下打球'],['temp',1,'發燒了'],['temp',-1,'寒流來了'],['temp',-1,'冬天游泳後吹到風'],['sugar',1,'吃了一大碗白飯'],['sugar',1,'喝了一瓶含糖飲料'],['sugar',-1,'一整個早上沒吃東西'],['sugar',-1,'跑完 3000 公尺'],
+  ['water',-1,'流了很多汗'],['water',-1,'整天沒喝水'],['water',1,'一口氣喝了很多水'],['co2',1,'劇烈運動中'],['co2',1,'爬樓梯衝上五樓']];
+ const keys=hard?['temp','sugar','water','co2']:['temp','sugar'];const events=EV.filter(e=>keys.includes(e[0]));
+ const N=hard?16:10,DRIFT=hard?16:9;let v={},lives=3,k=0,cur=null,alive=true,raf,last=performance.now(),gap=0;keys.forEach(x=>v[x]=50);
+ st.innerHTML=`<div class="panel"><div class="gauges" style="--n:${keys.length}">${keys.map(x=>`<div class="gauge" id="g_${x}"><b>${G[x].n}</b><div class="gbar"><i id="m_${x}" style="bottom:50%"></i></div><small>正常範圍</small></div>`).join('')}</div>
+  <div class="event" id="ev">身體狀況穩定，準備迎接挑戰…</div><div class="acts">${keys.flatMap(x=>['dn','up'].map(d=>`<button class="act" data-g="${x}" data-d="${d}">${hard?'':(d==='dn'?'⬇ ':'⬆ ')}${G[x][d].b}${!hard&&G[x][d].s?`<small>${G[x][d].s}</small>`:''}</button>`)).join('')}</div>
+  <p class="hint" style="margin-top:10px">${hard?'四個指標同時管理！事件出現後，指標會一直偏移，選對身體的反應把它拉回綠色區。':'事件發生後指標會往紅色或藍色跑，點下讓它回到綠色區的身體反應！'}</p></div>`;
+ hearts(lives);
+ const draw=()=>keys.forEach(x=>{st.querySelector('#m_'+x).style.bottom=Math.max(0,Math.min(100,v[x]))+'%';st.querySelector('#g_'+x).classList.toggle('alert',v[x]>85||v[x]<15)});
+ function newEv(){if(k>=N){alive=false;draw();later(()=>finish('體內恆定守住了！'),500);return}setProg(k,N);k++;const e=pick(events);cur={g:e[0],dir:e[1],t:e[2]};st.querySelector('#ev').innerHTML=`<b>${e[2]}</b>：${G[e[0]].n}${e[1]>0?'上升中 ⬆':'下降中 ⬇'}`}
+ function loop(t){if(!alive||S.tok!==tok)return;const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(!S.paused){if(cur){v[cur.g]+=cur.dir*DRIFT*dt;if(v[cur.g]>=100||v[cur.g]<=0){const g=cur.g,hi=v[g]>50;cur=null;lives--;hearts(lives);v[g]=50;miss(`${G[g].n}失控了！${G[g].n}太${hi?'高':'低'}時要「${G[g][hi?'dn':'up'].b}」。`);if(lives<=0){alive=false;finish('身體失去恆定了！');return}gap=1.2}}
+   else{gap-=dt;if(gap<=0)newEv()}
+   keys.forEach(x=>{if(!cur||cur.g!==x)v[x]+=(50-v[x])*0.3*dt});draw()}
+  raf=requestAnimationFrame(loop)}
+ const tok=S.tok;
+ st.querySelectorAll('.act').forEach(b=>b.onclick=()=>{if(!cur||S.paused||!alive)return;const g=b.dataset.g,d=b.dataset.d;const need=cur.dir>0?'dn':'up';
+  if(g===cur.g&&d===need){v[g]=50;cur=null;gap=hard?.7:1.2;right(b);draw()}
+  else{if(g===cur.g){v[g]+=cur.dir*14}miss(`「${cur.t}」讓${G[cur.g].n}${cur.dir>0?'上升':'下降'}，要用「${G[cur.g][need].b}」把它拉回來。`,b)}});
+ startClock(null);gap=1;raf=requestAnimationFrame(loop);
+ return()=>{alive=false;cancelAnimationFrame(raf)}}};
+/* 七上 第6章：呼吸與排泄任務 */
+GAMES.homeo2={name:'呼吸與排泄任務',start(st,mode){const hard=mode==='hard';
+ const R={
+  urine:(box,next)=>orderTap({box,title:'尿液怎麼排出體外？依序點出<em>泌尿系統</em>',sub:`<div class="pic">${ART.kidney()}</div>`,items:['腎臟','輸尿管','膀胱','尿道'],next}),
+  breath:(box,next)=>{const Q=pick([['吸氣時，橫膈會？','下降',['上升','下降']],['吸氣時，肋骨會？','上舉',['上舉','下降']],['呼吸運動的控制中樞在？','腦幹',['大腦','小腦','腦幹']],['血液中二氧化碳變多時，呼吸會？','加快',['加快','變慢']],['魚類用什麼交換氣體？','鰓',['鰓','肺','皮膚']]]);mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],`${Q[0].replace('？','')}：${Q[1]}。吸氣時橫膈下降、肋骨上舉，胸腔變大。`,next)},
+  resp:(box,next)=>pairUp({box,title:'呼吸作用和光合作用，配對特徵',pairs:[['呼吸作用','在粒線體進行'],['光合作用','在葉綠體進行'],['呼吸作用的產物','能量、水、二氧化碳'],['光合作用的產物','葡萄糖、氧']],next}),
+  temp:(box,next)=>{const items=shuffle([['蜥蜴','out'],['青蛙','out'],['魚','out'],['人','in'],['海豹','in'],['麻雀','in']]).map(([t,bin])=>({t,bin}));fallSort({box,title:'這是<em>外溫動物</em>還是<em>內溫動物</em>？',bins:[{id:'out',label:'外溫動物',c:'#4C6FE0'},{id:'in',label:'內溫動物',c:'#F0506E'}],items,speed:hard?6:9,next})},
+  waste:(box,next)=>pairUp({box,title:'含氮廢物怎麼排？',pairs:[['氨','毒性大，多數魚類直接排到水中'],['尿素','人類由腎臟形成尿液'],['尿酸','鳥類、昆蟲']],next}),
+  test:(box,next)=>{const Q=pick([['二氧化碳通入澄清石灰水會？','變混濁',['變混濁','變藍色','沒變化']],['氯化亞鈷試紙碰到水氣會變成？','粉紅色',['粉紅色','藍色','黑色']]]);mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],`${Q[0].replace('？','')}：${Q[1]}。`,next)}
+ };
+ runRounds(st,hard?shuffle(['urine','breath','resp','temp','waste','test','breath']):['urine','breath','temp','resp','breath'],R,'呼吸與排泄任務完成！')}};
+</script>
+<script>
+/* ===== 七下 第1章：花花生殖園 ===== */
+GAMES.repro={name:'花花生殖園',start(st,mode){const hard=mode==='hard';
+ const NAMES={torus:'花托',sepal:'萼片',petal:'花瓣',stamen:'雄蕊',pistil:'雌蕊',ovary:'子房',ovule:'胚珠'};
+ const R={
+  flower:(box,next)=>hotspot({box,title:'花的構造：照指示點出部位！',svg:ART.flowerHS(),names:NAMES,asks:hard?shuffle(['sepal','petal','stamen','pistil','ovary','ovule']):shuffle(['petal','stamen','pistil','sepal']).slice(0,4),next,sub:hard?'':'<p class="hint">由外到內：萼片 → 花瓣 → 雄蕊 → 雌蕊</p>'}),
+  sexsort:(box,next)=>{const A=[['變形蟲一分為二','a','分裂生殖'],['水螅長出芽體','a','出芽生殖'],['酵母菌出芽','a','出芽生殖'],['黴菌散出孢子','a','孢子繁殖'],['蕨類孢子萌發','a','孢子繁殖'],['甘藷的根長出新芽','a','營養器官繁殖'],['扦插一段莖長成新株','a','營養器官繁殖'],['蘭花組織培養','a','人為的無性生殖'],['複製羊桃莉','a','沒有精卵結合']];
+   const Sx=[['小丑魚產卵、受精','s'],['豌豆授粉後結種子','s'],['人的精子和卵結合','s'],['受精的雞蛋孵出小雞','s'],['黃頭鷺求偶、交配','s']];
+   const items=shuffle(shuffle(A).slice(0,hard?6:4).concat(shuffle(Sx).slice(0,hard?4:3))).map(([t,bin,why])=>({t,bin,why:why?`（${why}）`:'需要精卵（配子）結合。'}));
+   fallSort({box,title:'這是<em>無性生殖</em>還是<em>有性生殖</em>？',bins:[{id:'a',label:'無性生殖',c:'#1FA3A3'},{id:'s',label:'有性生殖',c:'#F0506E'}],items,speed:hard?6:9,next,sub:hard?'':'<p class="hint">有精子和卵（配子）結合的才是有性生殖</p>'})},
+  asexType:(box,next)=>pairUp({box,title:'配對：無性生殖的方式',pairs:[['變形蟲、細菌','分裂生殖'],['水螅、酵母菌','出芽生殖'],['黴菌、蕨類','孢子繁殖'],['甘藷、落地生根','營養器官繁殖']],next}),
+  fruit:(box,next)=>pairUp({box,title:'受精後，花的哪個部分會變成什麼？',pairs:[['子房','果實'],['胚珠','種子'],['雄蕊的花藥','產生花粉']],next}),
+  seed:(box,next)=>pairUp({box,title:'果實怎麼幫種子<em>傳播</em>？',pairs:[['鬼針草（有倒鉤）','動物傳播'],['鳳仙花','彈力傳播'],['椰子（中空）','水力傳播'],['蒲公英（有冠毛）','風力傳播']],next}),
+  pollin:(box,next)=>{const items=shuffle([['花小、沒有花蜜','w'],['柱頭像羽毛','w'],['花藥伸出花外','w'],['花色鮮豔','i'],['有花蜜','i'],['有香味','i']]).map(([t,bin])=>({t,bin}));
+   fallSort({box,title:'這是<em>風媒花</em>還是<em>蟲媒花</em>的特徵？',bins:[{id:'w',label:'風媒花',c:'#7A8C99'},{id:'i',label:'蟲媒花',c:'#F5A524'}],items,speed:hard?6:9,next})},
+  human:(box,next)=>{const Q=pick([['人類的精子和卵在哪裡受精？','輸卵管',['輸卵管','子宮','卵巢']],['胚胎在哪裡著床？','子宮',['輸卵管','子宮','卵巢']],['胎兒透過什麼從母體得到養分和氧氣？','臍帶與胎盤',['臍帶與胎盤','羊水','卵黃']],['羊水的功能是？','減少胎兒受到震動',['減少胎兒受到震動','提供養分','製造血液']]]);mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],`${Q[0].replace('？','')}：${Q[1]}。`,next)},
+  pros:(box,next)=>{const Q=pick([['哪一種生殖方式，後代和親代的遺傳物質<em>完全相同</em>？','無性生殖'],['哪一種生殖方式，後代較能<em>適應環境變動</em>？','有性生殖'],['想要<em>保留</em>某品種水果的好味道，用哪一種？','無性生殖']]);mcq(box,`<p class="q">${Q[0]}</p>`,['無性生殖','有性生殖'],Q[1],'無性生殖完整保留親代特性；有性生殖的後代遺傳多樣性高，較能適應環境變動。',next)},
+  egg:(box,next)=>{const Q=pick([['雞蛋中真正的卵細胞是哪個部分？','卵黃和上面的小白點',['蛋白','卵黃和上面的小白點','繫帶']],['市場買的未受精雞蛋，染色體是？','單套（n）',['單套（n）','雙套（2n）']]]);mcq(box,`<p class="q">${Q[0]}</p>`,Q[2],Q[1],`答案：${Q[1]}。`,next)}
+ };
+ runRounds(st,hard?['flower',...shuffle(['sexsort','asexType','fruit','seed','pollin','human','pros','egg'])]:['flower','sexsort','fruit','seed','asexType','pros','flower'],R,'生殖園探索完成！')}};
+
+/* ===== 七下 第3章：化石時光機（演化、命名、分類階層） ===== */
+GAMES.fossil={name:'化石時光機',start(st,mode){const hard=mode==='hard';
+ const R={
+  fsort:(box,next)=>{const items=shuffle([['恐龍骨骼','body','ammonite'],['三葉蟲外殼','body'],['冰封的長毛象','body'],['琥珀裡的昆蟲','body'],['海膽化石','body'],['恐龍腳印','trace','footprint'],['糞便化石','trace'],['爬行的痕跡','trace']]).slice(0,hard?8:6).map(([t,bin,a])=>({t,bin,a}));
+   fallSort({box,title:'挖到化石了！是<em>遺骸化石</em>還是<em>遺跡化石</em>？',bins:[{id:'body',label:'遺骸化石',c:'#B07A52'},{id:'trace',label:'遺跡化石',c:'#7A8C99'}],items,speed:hard?6:9,next,sub:hard?'':'<p class="hint">遺骸＝生物身體留下的；遺跡＝生物活動留下的痕跡</p>'})},
+  horse:(box,next)=>orderTap({box,title:'馬的演化：從<em>最古老</em>排到<em>現代</em>',sub:'<p class="hint">從森林走向草原，體型由小變大</p>',items:['四趾','三趾','單趾'],arts:{'四趾':'foot4','三趾':'foot3','單趾':'foot1'},next}),
+  rank:(box,next)=>orderTap({box,title:'生物分類的<em>七個階層</em>，從大排到小！',items:['界','門','綱','目','科','屬','種'],next,pre:hard?0:1,sub:hard?'':'<p class="hint">口訣：界門綱目科屬種</p>'}),
+  rankq:(box,next)=>{const Q=pick([['包含生物種類<em>最多</em>的階層是？','界'],['分類的<em>基本單位</em>是？','種'],['親緣關係<em>最接近</em>的是同一個？','種']]);mcq(box,`<p class="q">${Q[0]}</p>`,['界','門','屬','種'],Q[1],'「界」範圍最大、種類最多但親緣最遠；「種」是基本單位，親緣最近。',next)},
+  name:(box,next)=>{if(!hard)return mcq(box,`<p class="q">臺灣獼猴的學名 <em><i>Macaca cyclopis</i></em>，第一個字 <i>Macaca</i> 是？</p>`,['屬名','種小名','俗名'],'屬名','二名法：第一個字是屬名（第一個字母大寫），第二個字是種小名（全小寫），都用斜體拉丁文。',next);
+   mcq(box,`<p class="q">哪兩種生物的親緣關係最近？</p><p class="hint" style="font-size:15px">中白鷺 <i>Ardea intermedia</i>｜山月桃 <i>Alpinia intermedia</i><br>蒼鷺 <i>Ardea cinerea</i>｜灰甲澤蟹 <i>Geothelphusa cinerea</i></p>`,shuffle(['中白鷺和蒼鷺','中白鷺和山月桃','蒼鷺和灰甲澤蟹']),'中白鷺和蒼鷺','學名第一個字是屬名，中白鷺和蒼鷺都是 Ardea 屬，親緣關係最近；種小名相同不代表親緣近。',next)},
+  species:(box,next)=>mcq(box,`<p class="q">斑馬和驢交配生下的<em>斑馬驢沒有生殖能力</em>，所以斑馬和驢是？</p>`,['同一種','不同種'],'不同種','能在自然狀況下產生「具生殖能力的後代」，才是同一種。',next),
+  trend:(box,next)=>{const Q=pick([['構造上：','單細胞 → 多細胞',['單細胞 → 多細胞','多細胞 → 單細胞']],['環境上：','水生 → 陸生',['水生 → 陸生','陸生 → 水生']],['在野柳的陸地上找到海膽化石，表示那裡古代是？','海洋',['海洋','沙漠','森林']]]);mcq(box,`<p class="q">${Q[0].endsWith('：')?'化石告訴我們生物演化的趨勢，'+Q[0]:Q[0]}</p>`,Q[2],Q[1],'演化趨勢：由簡單到複雜、由單細胞到多細胞、由水生到陸生。',next)},
+  living:(box,next)=>mcq(box,`<p class="q">外貌和遠古祖先很像，祖先的其他物種多已滅絕，被稱為<em>活化石</em>的是？</p>`,shuffle(['銀杏','鱟','腔棘魚','以上都是']),'以上都是','腔棘魚、銀杏和鱟都是活化石。',next),
+  key:(box,next)=>{const A=pick([['前肢槳狀','海牛'],['前肢鰭狀、有兩隻長犬齒','海象'],['前肢鰭狀、沒有長犬齒、有外耳','海獅'],['前肢鰭狀、沒有長犬齒、沒有外耳','海豹']]);mcq(box,`<p class="q">用檢索表找動物：<em>${A[0]}</em>，是哪一種？</p>`,['海牛','海象','海獅','海豹'],A[1],'檢索表：前肢槳狀→海牛；鰭狀且有長犬齒→海象；有外耳→海獅；沒有外耳→海豹。',next)},
+  evo:(box,next)=>{const Q=pick([['提出「物種會隨時間改變」，整理貝類化石的是？','拉馬克'],['搭小獵犬號、研究加拉巴哥群島鷽鳥，寫了《物種起源》的是？','達爾文'],['創立二名法的瑞典科學家是？','林奈']]);mcq(box,`<p class="q">${Q[0]}</p>`,['拉馬克','達爾文','林奈','孟德爾'],Q[1],`答案：${Q[1]}。`,next)}
+ };
+ runRounds(st,hard?shuffle(['fsort','horse','rank','rankq','name','species','trend','living','key','evo']):['fsort','horse','rank','name','trend','species','rank'],R,'時光旅行完成！')}};
+
+/* ===== 七下 第4、5章：保育守護隊（族群、碳循環、生物多樣性、保育） ===== */
+GAMES.guard={name:'保育守護隊',start(st,mode){const hard=mode==='hard';
+ const R={
+  eco:(box,next)=>{const items=shuffle([['自備環保餐具','g'],['搭大眾交通工具','g'],['垃圾分類、資源回收','g'],['參加淨灘','g'],['多種樹','g'],['棄養寵物','b'],['燃燒廢電纜','b'],['在石虎棲地開路','b'],['把外來魚放生到河裡','b'],['工廠排放含汞廢水','b']]).slice(0,hard?9:7).map(([t,bin])=>({t,bin}));
+   fallSort({box,title:'這個行為對環境<em>友善</em>還是<em>有害</em>？',bins:[{id:'g',label:'友善',c:'#2E9E68'},{id:'b',label:'有害',c:'#F0506E'}],items,speed:hard?5.5:9,next})},
+  alien:(box,next)=>{const items=shuffle([['石虎','n','leopardcat'],['臺灣黑熊','n'],['山羌','n'],['穿山甲','n'],['美洲牛蛙','x','bullfrog'],['小花蔓澤蘭','x'],['布袋蓮','x'],['秋行軍蟲','x']]).slice(0,hard?8:6).map(([t,bin,a])=>({t,bin,a}));
+   fallSort({box,title:'這是臺灣的<em>原生物種</em>，還是<em>外來入侵種</em>？',bins:[{id:'n',label:'原生物種',c:'#2E9E68'},{id:'x',label:'外來入侵種',c:'#C9761A'}],items,speed:hard?6:9,next})},
+  hippo:(box,next)=>pairUp({box,title:'生物多樣性的危機（HIPPO），配對例子',pairs:[['棲地破壞','開路讓石虎生存空間變少'],['外來種引入','美洲牛蛙捕食原生蛙類'],['人口問題','人口超過 80 億、塑膠大增'],['環境汙染','工廠排放重金屬廢水'],['資源過度使用','化石燃料快速減少']].slice(0,hard?5:4),next}),
+  levels:(box,next)=>{const Q=pick([['同一種稻米有很多不同品系','遺傳多樣性'],['一片森林裡有很多種生物','物種多樣性'],['臺灣有森林、濕地、海洋等各種環境','生態系多樣性']]);mcq(box,`<p class="q">「${Q[0]}」屬於哪一種多樣性？</p>`,['遺傳多樣性','物種多樣性','生態系多樣性'],Q[1],`${Q[0]}：${Q[1]}。`,next)},
+  pop:(box,next)=>{const Q=pick([['椰油部落海岸林裡，所有的蘭嶼角鴞','族群'],['椰油部落海岸林裡，所有的生物','群集'],['一隻蘭嶼角鴞','個體'],['海岸林的所有生物和環境','生態系']]);mcq(box,`<p class="q">「${Q[0]}」是生物圈的哪一個層次？</p>`,['個體','族群','群集','生態系'],Q[1],'個體 → 族群（同種）→ 群集（所有族群）→ 生態系（生物＋環境）→ 生物圈。',next)},
+  grow:(box,next)=>mcq(box,`<p class="q">出生數 + 遷入數 <em>大於</em> 死亡數 + 遷出數，族群會？</p>`,['變大','變小','不變'],'變大','出生和遷入的總和大於死亡和遷出的總和，個體數增加，族群變大。',next),
+  count:(box,next)=>{if(!hard){const a=pick([4,5,6]);return mcq(box,`<p class="q">樣區法：田地分成 <em>12 格</em>，抽一格數到 ${a} 隻蝸牛，全部大約有幾隻？</p>`,shuffle(uniq([a*12,a+12,a*10,a*6])).map(String),String(a*12),`估計值 = ${a} × 12 = ${a*12} 隻。`,next)}
+   const m=pick([20,30,40]),c=pick([30,40,60]),r=pick([5,10]);const ans=m*c/r;mcq(box,`<p class="q">捉放法：先捉 <em>${m}</em> 隻做記號放回；第二次捉 <em>${c}</em> 隻，其中 <em>${r}</em> 隻有記號。族群大約幾隻？</p>`,shuffle(uniq([ans,m+c,m*r,c*r/2])).map(String),String(ans),`族群數 = 第一次標記數 × 第二次捕捉數 ÷ 第二次有記號數 = ${m} × ${c} ÷ ${r} = ${ans}。`,next)},
+  carbon:(box,next)=>{const items=shuffle([['光合作用','in'],['呼吸作用','out'],['分解者的分解作用','out'],['燃燒木材','out'],['汽機車燃燒汽油','out'],['二氧化碳溶在海水中','in']]).map(([t,bin])=>({t,bin}));
+   fallSort({box,title:'碳循環：這個作用會<em>吸收</em>還是<em>釋放</em>二氧化碳？',bins:[{id:'in',label:'吸收 CO₂',c:'#2E9E68'},{id:'out',label:'釋放 CO₂',c:'#7A8C99'}],items,speed:hard?6:9,next})},
+  succ:(box,next)=>orderTap({box,title:'森林大火後的<em>演替</em>，依序排好',items:['草本植物出現','形成草原','木本植物增加','形成森林'],next}),
+  rel:(box,next)=>{const R2=pick([['獅子和斑馬','掠食'],['跳蚤和狗','寄生'],['兩種植物搶陽光','競爭'],['硫化菌和管蟲','互利共生'],['利用瓢蟲吃蚜蟲','生物防治']]);mcq(box,`<p class="q">「${R2[0]}」是哪一種關係？</p>`,R2[1]==='生物防治'?['生物防治','寄生','競爭']:['競爭','掠食','寄生','互利共生'],R2[1],`${R2[0]}：${R2[1]}。`,next)},
+  treaty:(box,next)=>pairUp({box,title:'配對：國際保育公約',pairs:[['拉姆薩公約','保護濕地'],['華盛頓公約','限制野生動植物不當交易'],['生物多樣性公約','維護全球生物多樣性'],['氣候變遷綱要公約','控制溫室氣體排放']],next}),
+  eutro:(box,next)=>mcq(box,`<p class="q">含磷的清潔劑流進湖泊，藻類大量繁殖、水中缺氧，叫做？</p>`,['優養化','生物放大作用','溫室效應'],'優養化','磷化物讓水中養分過多，藻類大量繁殖造成缺氧，稱為優養化。',next)
+ };
+ runRounds(st,hard?shuffle(['eco','alien','hippo','levels','pop','count','carbon','succ','treaty','eutro']):['eco','alien','levels','pop','grow','carbon','count','rel'],R,'地球守護成功！')}};
+</script>
+
+</body></html>

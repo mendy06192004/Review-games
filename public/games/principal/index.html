@@ -1395,12 +1395,23 @@ if(window.GameBridge&&GameBridge.requireBank("救救校長！校園大修繕")){
     qs.forEach(q=>{const k=MAP[q.id.split("-")[0]];if(k)QB[k].push({bank:true,id:q.id,q:q.題幹,opts:q.選項,img:q.圖片});});
     $$("#tabs button").forEach(b=>{b.hidden=!QB[b.dataset.s].length;});
     const only=Object.keys(QB).filter(k=>QB[k].length);if(only.length===1)S.subj=only[0];
+    window.__bankReady=true;
+    /* [題庫模式] 題目到達時若答題視窗已開著（例如還在顯示「選科目」），重新整理畫面 */
+    if($("#quizModal").classList.contains("show"))openQuiz();
   });
 }
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function openQuiz(){
   $("#quizModal").classList.add("show");
+  /* [題庫模式] 只能選「這次範圍裡有題目」的科目；存檔裡的舊科目若沒有題目就清掉，只有一科就直接開始 */
+  const avail=Object.keys(QB).filter(k=>QB[k].length);
+  if(S.subj&&!avail.includes(S.subj))S.subj=null;
+  if(!S.subj&&avail.length===1)S.subj=avail[0];
   if(S.subj){setSubj(S.subj);return;}
+  if(!avail.length){
+    $("#quizBody").innerHTML=`<div class="q-card"><div class="q-text">${window.GameBridge&&GameBridge.active&&!window.__bankReady?"題目載入中，請稍候…":"這個範圍沒有題目，請回平台換一個範圍。"}</div></div><div class="q-actions"><button class="btn btn-o" id="qHome">回去</button></div>`;
+    $("#qHome").onclick=closeQuiz;return;
+  }
   $$("#tabs button").forEach(b=>b.classList.remove("on"));
   $("#quizBody").innerHTML=`<div class="q-info"><span style="display:flex;align-items:center;gap:4px">${soulSvg(18)}<b>${S.money}</b> ${CUR}</span></div>
     <div class="q-card"><div class="q-text">選一個科目開始收集${CUR}吧！</div><div class="pick">${Object.entries(SUBJ).filter(([k])=>QB[k].length).map(([k,v])=>`<button data-s="${k}" style="background:${v.c}">${v.n}</button>`).join("")}</div></div>

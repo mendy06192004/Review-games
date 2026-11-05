@@ -1,0 +1,452 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>圓圓披薩店</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;700&display=swap">
+<link rel="stylesheet" href="/vendor/katex/katex.min.css">
+<script src="/vendor/katex/katex.min.js"></script>
+<script src="/vendor/katex/auto-render.min.js"></script>
+<script>
+/* [平台] 原本用 CDN 的 MathJax，改用本機 KaTeX（不需網路）；保留相同的呼叫方式 */
+window.__mj=true;
+window.MathJax={typesetClear:function(){},typesetPromise:function(els){(els||[document.body]).forEach(function(e){try{renderMathInElement(e,{delimiters:[{left:'$',right:'$',display:false}],throwOnError:false});}catch(x){}});return Promise.resolve();}};
+</script>
+<style>
+/* Layout: one centered column — shop counter (customer + growing pizza) above a single question card */
+:root{
+  --bg:#E8F1EB; --tile:#DAE9DF; --surface:#FFFFFF; --ink:#2A2019; --muted:#6C5F55; --line:#DCD2C6;
+  --crust:#D8933B; --cheese:#FFE08A; --gold:#F2B630; --sauce:#D6442A; --sauce-soft:#FBE4DE;
+  --basil:#2C8753; --basil-soft:#DBF0E3; --hint:#FFF5D6;
+  --f-display:"Chiron GoRound TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17130F; --tile:#1C1713; --surface:#26201A; --ink:#F6EDE3; --muted:#B9AA9B; --line:#3D332B;
+  --crust:#C98A3E; --cheese:#5B4621; --gold:#EDB841; --sauce:#F2705A; --sauce-soft:#46241E;
+  --basil:#5DC48C; --basil-soft:#1E3A2A; --hint:#3A3020; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17130F; --tile:#1C1713; --surface:#26201A; --ink:#F6EDE3; --muted:#B9AA9B; --line:#3D332B;
+  --crust:#C98A3E; --cheese:#5B4621; --gold:#EDB841; --sauce:#F2705A; --sauce-soft:#46241E;
+  --basil:#5DC48C; --basil-soft:#1E3A2A; --hint:#3A3020; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background-color:var(--bg);background-image:repeating-conic-gradient(var(--tile) 0 25%,transparent 0 50%);background-size:56px 56px;
+  color:var(--ink);font-family:var(--f-body);font-size:19px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3,.disp{font-family:var(--f-display);text-wrap:balance;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bar .brand{font-family:var(--f-display);font-weight:900;font-size:22px;flex:1;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:700;font-variant-numeric:tabular-nums}
+.chip svg{width:22px;height:22px}
+.iconbtn{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;min-height:44px}
+
+/* map */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:8px 0}
+.hero svg{width:120px;height:120px}
+.hero h1{font-size:clamp(32px,8vw,48px);font-weight:900;line-height:1.15}
+.hero p{margin:6px 0 0;color:var(--muted)}
+.orders{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+@media (max-width:420px){.orders{grid-template-columns:1fr}}
+.order{display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center;text-align:left;background:var(--surface);border:3px solid var(--line);border-radius:22px;padding:14px 16px;transition:transform .15s,border-color .15s}
+.order:hover{transform:translateY(-2px);border-color:var(--crust)}
+.order .num{width:56px;height:56px;border-radius:50%;background:var(--cheese);border:5px solid var(--crust);display:grid;place-items:center;font-family:var(--f-display);font-weight:900;font-size:24px}
+.order .tagline{font-size:14px;color:var(--muted);letter-spacing:.06em}
+.order h3{font-size:22px;font-weight:900;line-height:1.3}
+.order .desc{font-size:15px;color:var(--muted);line-height:1.45}
+.stars{display:flex;gap:2px;margin-top:4px}
+.stars svg{width:22px;height:22px}
+.note{font-size:14px;color:var(--muted);text-align:center}
+
+/* counter */
+.counter{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--surface);border:3px solid var(--line);border-radius:24px;padding:12px 14px}
+.counter .face{width:64px;height:64px}
+.bubble{min-width:0}
+.bubble .who{font-size:14px;color:var(--muted)}
+.bubble .say{font-family:var(--f-display);font-weight:700;font-size:18px;line-height:1.35}
+.counter .pzbox{width:96px;height:96px}
+.prog{display:flex;align-items:center;gap:10px;font-weight:700;font-variant-numeric:tabular-nums;font-size:16px}
+.track{flex:1;height:14px;border-radius:99px;background:var(--surface);border:2px solid var(--line);overflow:hidden}
+.track i{display:block;height:100%;background:var(--gold);transition:width .4s}
+
+/* card */
+.card{background:var(--surface);border:3px solid var(--line);border-radius:26px;padding:18px clamp(14px,4vw,28px) 22px;display:flex;flex-direction:column;gap:14px}
+.tag{align-self:flex-start;background:var(--basil-soft);color:var(--ink);border-radius:999px;padding:3px 14px;font-size:16px;font-weight:700}
+.fig{width:100%;max-width:280px;height:auto;display:block;margin:0 auto;overflow:visible}
+.qrow{display:flex;gap:10px;align-items:flex-start}
+.q{font-size:23px;font-weight:700;line-height:1.55;margin:0;flex:1;min-width:0}
+.speak{flex:none;width:52px;height:52px;border-radius:50%;background:var(--hint);border:2px solid var(--line);display:grid;place-items:center}
+.speak svg{width:26px;height:26px}
+.opts{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:600px){.opts.n3{grid-template-columns:repeat(3,1fr)}.opts.n2{grid-template-columns:repeat(2,1fr)}}
+.opts.pic{grid-template-columns:repeat(3,1fr)}
+.opt{min-height:68px;border-radius:18px;border:3px solid var(--line);background:var(--bg);font-size:24px;font-weight:700;padding:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s}
+.opt:hover:not(:disabled){border-color:var(--crust);transform:translateY(-2px)}
+.opt .fig{max-width:150px}
+.opt.right{background:var(--basil-soft);border-color:var(--basil)}
+.opt.wrong{background:var(--sauce-soft);border-color:var(--sauce);opacity:.7;animation:shake .4s}
+.opt:disabled{cursor:default}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+.hintbtn{align-self:flex-start;background:var(--hint);border:2px dashed var(--gold);border-radius:999px;padding:8px 18px;font-weight:700;min-height:48px}
+.box{border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.box.hint{background:var(--hint);border:2px dashed var(--gold)}
+.box.good{background:var(--basil-soft);border:3px solid var(--basil)}
+.box.try{background:var(--sauce-soft);border:3px solid var(--sauce)}
+.box b.h{font-family:var(--f-display);font-size:22px}
+.box .fig{max-width:220px}
+.next{align-self:stretch;min-height:64px;border-radius:18px;border:0;background:var(--basil);color:#fff;font-family:var(--f-display);font-weight:900;font-size:24px}
+.combo{display:inline-block;background:var(--gold);color:#2A2019;border-radius:999px;padding:2px 12px;font-weight:700;font-size:16px;animation:pop .5s}
+
+/* teach */
+.teach h2{font-size:28px;font-weight:900}
+.teach ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.teach li{background:var(--bg);border-radius:14px;padding:10px 14px;font-size:20px}
+.teach li strong{color:var(--sauce)}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap}
+.btnrow button{flex:1 1 200px}
+.ghost{min-height:64px;border-radius:18px;border:3px solid var(--line);background:var(--surface);font-family:var(--f-display);font-weight:700;font-size:20px}
+
+/* done */
+.done{align-items:center;text-align:center}
+.done h2{font-size:34px;font-weight:900}
+.bigstars{display:flex;gap:8px;justify-content:center}
+.bigstars svg{width:64px;height:64px;animation:pop .5s backwards}
+.bigstars svg:nth-child(2){animation-delay:.2s}.bigstars svg:nth-child(3){animation-delay:.4s}
+.done .fig{max-width:220px}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+/* svg parts */
+.pz{fill:var(--cheese);stroke:var(--crust);stroke-width:7}
+.dot{fill:var(--ink)}
+.lb{font:italic 700 19px "Times New Roman",Georgia,serif;fill:var(--ink)}
+.sm{font:700 15px var(--f-body);fill:var(--ink)}
+.ln{stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+.ray{stroke:var(--ink);stroke-width:3.5;stroke-linecap:round}
+.wedge{fill:var(--sauce)}
+.hl{fill:var(--sauce);fill-opacity:.45;stroke:none}
+.hline{stroke:var(--sauce);stroke-width:7;stroke-linecap:round}
+.knife{stroke:var(--basil);stroke-width:5;stroke-linecap:round}
+.pt{fill:var(--sauce);stroke:var(--surface);stroke-width:2.5}
+.xpt{fill:var(--ink)}
+.dash{stroke:var(--ink);stroke-width:2.5;stroke-dasharray:6 5;fill:none}
+.slice{stroke:var(--crust);stroke-width:2.5}
+.rmark{fill:none;stroke:var(--ink);stroke-width:2}
+.top-new{animation:pop .5s}
+mjx-container{font-size:108%!important}
+mjx-container[display="false"]{margin:0 2px}
+canvas#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+<canvas id="cf" hidden></canvas>
+
+<script>
+const R=String.raw;
+/* ---------- SVG helpers ---------- */
+const C={x:130,y:115,r:78};
+const f1=n=>+n.toFixed(1);
+function P(a,rr=C.r){const t=a*Math.PI/180;return [f1(C.x+rr*Math.cos(t)),f1(C.y-rr*Math.sin(t))];}
+const SV=(inner,vb='0 0 260 230')=>`<svg viewBox="${vb}" class="fig" aria-hidden="true">${inner}</svg>`;
+const pizza=()=>`<circle cx="${C.x}" cy="${C.y}" r="${C.r}" class="pz"/>`;
+const O=(lab=true,dx=10,dy=22)=>`<circle cx="${C.x}" cy="${C.y}" r="5" class="dot"/>`+(lab?T(C.x+dx,C.y+dy,'O'):'');
+const L=(p,q,c='ln')=>`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" class="${c}"/>`;
+const T=(x,y,s,c='lb')=>`<text x="${x}" y="${y}" class="${c}" text-anchor="middle">${s}</text>`;
+const lab=(a,s,off=20)=>{const p=P(a,C.r+off);return T(p[0],p[1]+6,s);};
+const CEN=[C.x,C.y];
+function sector(a1,a2,c='hl'){const lg=(a2-a1)>180?1:0;return `<path d="M${C.x},${C.y} L${P(a1)} A${C.r} ${C.r} 0 ${lg} 0 ${P(a2)} Z" class="${c}"/>`;}
+function segment(a1,a2,c='hl'){const lg=(a2-a1)>180?1:0;return `<path d="M${P(a1)} A${C.r} ${C.r} 0 ${lg} 0 ${P(a2)} Z" class="${c}"/>`;}
+function wedge(v,p1,p2,rr=15){const a=Math.atan2(p1[1]-v[1],p1[0]-v[0]),b=Math.atan2(p2[1]-v[1],p2[0]-v[0]);
+  const u=[f1(v[0]+rr*Math.cos(a)),f1(v[1]+rr*Math.sin(a))],w=[f1(v[0]+rr*Math.cos(b)),f1(v[1]+rr*Math.sin(b))];
+  const cr=Math.cos(a)*Math.sin(b)-Math.sin(a)*Math.cos(b);
+  return `<path d="M${v} L${u} A${rr} ${rr} 0 0 ${cr>0?1:0} ${w} Z" class="wedge"/>`;}
+function angleFig(v,a1,a2){const p=P(a1),q=P(a2);return SV(pizza()+O(true,12,-10)+L(v,p,'ray')+L(v,q,'ray')+wedge(v,p,q)+`<circle cx="${v[0]}" cy="${v[1]}" r="4" class="dot"/>`);}
+function rmark(a1,a2,s=13){const p=P(a1,s),q=P(a2,s),c=[f1(p[0]+q[0]-C.x),f1(p[1]+q[1]-C.y)];return `<path d="M${p} L${c} L${q}" class="rmark"/>`;}
+function fractionFig(n,k){let s=pizza();s+=sector(90,90+360*k/n);for(let i=0;i<n;i++)s+=L(CEN,P(90+i*360/n),'slice');return SV(s+O(false));}
+function sectorFig(a1,a2,txt,A='A',B='B'){const m=(a1+a2)/2,t=P(m,40);
+  return SV(pizza()+sector(a1,a2)+L(CEN,P(a1),'ray')+L(CEN,P(a2),'ray')+O(true,(m>90&&m<270)?12:-12,-10)+lab(a1,A)+lab(a2,B)+T(t[0],t[1]+5,txt,'sm'));}
+function segFig(a1,a2,A,B,extra=''){
+  return SV(pizza()+segment(a1,a2)+L(CEN,P(a1))+L(CEN,P(a2))+L(P(a1),P(a2),'ray')+O()+lab(a1,A)+lab(a2,B)+extra);}
+function radiusFig(txt){const p=P(30);return SV(pizza()+L(CEN,p,'ray')+O()+T(f1((C.x+p[0])/2),f1((C.y+p[1])/2)-10,txt,'sm'));}
+function pointFig(ratio,ang,name,showD){const rr=Math.min(ratio,1.45)*C.r,p=P(ang,rr),lp=P(ang,rr+20);
+  return SV(pizza()+O()+(showD?L(CEN,p,'dash'):'')+`<circle cx="${p[0]}" cy="${p[1]}" r="8" class="pt"/>`+T(lp[0],lp[1]+6,name),'-10 -10 280 250');}
+function knife(ratio,phi,name,marks=true){const rr=Math.min(ratio,1.45)*C.r,f=P(phi,rr),t=(phi+90)*Math.PI/180,d=[Math.cos(t),-Math.sin(t)];
+  const e1=[f1(f[0]+300*d[0]),f1(f[1]+300*d[1])],e2=[f1(f[0]-300*d[0]),f1(f[1]-300*d[1])];
+  let s=L(e1,e2,'knife');
+  if(marks){if(Math.abs(ratio-1)<.01)s+=`<circle cx="${f[0]}" cy="${f[1]}" r="6" class="xpt"/>`;
+    else if(ratio<1){const h=Math.sqrt(C.r*C.r-rr*rr);for(const sg of[1,-1])s+=`<circle cx="${f1(f[0]+sg*h*d[0])}" cy="${f1(f[1]+sg*h*d[1])}" r="6" class="xpt"/>`;}}
+  if(name){const lp=[f1(f[0]+(rr<C.r?95:60)*d[0]+16*Math.cos(phi*Math.PI/180)),f1(f[1]+(rr<C.r?95:60)*d[1]-16*Math.sin(phi*Math.PI/180))];s+=T(lp[0],lp[1]+6,name);}
+  return s;}
+const lineFig=(ratio,phi,name)=>SV(`<clipPath id="k${phi}${name}"><rect x="-10" y="-10" width="280" height="250"/></clipPath>`+pizza()+O()+`<g clip-path="url(#k${phi}${name})">${knife(ratio,phi,name)}</g>`,'-10 -10 280 250');
+function distFig(ratio,rTxt,dTxt){const rr=Math.min(ratio,1.45)*C.r,f=P(0,rr),rp=P(120);
+  return SV(`<clipPath id="dc"><rect x="-10" y="-10" width="300" height="250"/></clipPath>`+pizza()+`<g clip-path="url(#dc)">${knife(ratio,0,'')}</g>`+L(CEN,f,'dash')+L(CEN,rp,'dash')+O(true,-12,22)+
+    T(f1((C.x+f[0])/2),C.y-10,'d = '+dTxt,'sm')+T(f1((C.x+rp[0])/2)-22,f1((C.y+rp[1])/2),'r = '+rTxt,'sm'),'-10 -10 300 250');}
+
+/* ---------- small icons ---------- */
+const starSVG=on=>`<svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="${on?'var(--gold)':'none'}" stroke="var(--crust)" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const coinSVG=`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="var(--gold)" stroke="var(--crust)" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="var(--crust)" stroke-width="2"/></svg>`;
+const speakSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="var(--ink)"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>`;
+function faceSVG(col,mood){const m=mood==='happy'?'M22 40 Q32 50 42 40':'M24 42 Q32 45 40 42';
+  return `<svg viewBox="0 0 64 64" class="face" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="${col}" stroke="var(--ink)" stroke-width="2.5"/><circle cx="23" cy="27" r="3.5" fill="var(--ink)"/><circle cx="41" cy="27" r="3.5" fill="var(--ink)"/>${mood==='happy'?'<circle cx="16" cy="37" r="4" fill="var(--sauce)" opacity=".35"/><circle cx="48" cy="37" r="4" fill="var(--sauce)" opacity=".35"/>':''}<path d="${m}" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><path d="M14 14 Q32 -2 50 14 L46 18 Q32 8 18 18Z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/></svg>`;}
+function pizzaSVG(tops,cls='pzbox',fresh=-1){let s=`<svg viewBox="0 0 120 120" class="${cls}" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="var(--crust)"/><circle cx="60" cy="60" r="44" fill="var(--cheese)"/><circle cx="60" cy="60" r="44" fill="var(--sauce)" opacity=".18"/>`;
+  tops.forEach((t,i)=>{const g=`<g class="${i===fresh?'top-new':''}" style="transform-origin:${t.x}px ${t.y}px">`;
+    if(t.k===0)s+=g+`<circle cx="${t.x}" cy="${t.y}" r="7" fill="var(--sauce)"/><circle cx="${t.x-2}" cy="${t.y-2}" r="1.5" fill="#fff" opacity=".5"/></g>`;
+    else if(t.k===1)s+=g+`<ellipse cx="${t.x}" cy="${t.y}" rx="7" ry="4" fill="var(--basil)" transform="rotate(${t.a} ${t.x} ${t.y})"/></g>`;
+    else s+=g+`<circle cx="${t.x}" cy="${t.y}" r="4.5" fill="none" stroke="var(--ink)" stroke-width="2.5"/></g>`;});
+  return s+'</svg>';}
+
+/* ---------- content (對應講義 熟練1–7) ---------- */
+const PO=['在圓內','在圓上','在圓外'];
+const LO=['不相交','切線','割線'];
+const LEVELS=[
+{name:'認識圓',tagline:'熟練 1',desc:'圓心角、扇形、直徑、弦、弓形',col:'#9AD3B0',who:'小綠客人',want:'我想認識披薩的每個部分！',
+ teach:{fig:SV(pizza()+sector(20,110)+L(CEN,P(20),'ray')+L(CEN,P(110),'ray')+segment(205,335,'hl')+L(P(205),P(335),'ray')+wedge(CEN,P(20),P(110))+O(true,14,4)),
+  items:[R`披薩正中間的點叫做 <strong>圓心</strong> $O$。`,
+   R`角的尖尖（頂點）在圓心 $O$ 的角，叫做 <strong>圓心角</strong>。`,
+   R`兩條半徑 ＋ 一段弧，圍成 <strong>扇形</strong>（像一片披薩）。`,
+   R`連接圓上兩點的線段叫 <strong>弦</strong>；通過圓心的弦叫 <strong>直徑</strong>。`,
+   R`一條弦 ＋ 一段弧，圍成 <strong>弓形</strong>。`]},
+ qs:[
+  {q:R`哪一個是圓心角？`,pic:1,o:[angleFig(CEN,55,140),angleFig(P(270),60,125),angleFig([130,10],200,340)],hint:R`圓心角的尖尖（頂點）一定在圓心 $O$ 上。`,ok:R`頂點在圓心 $O$，就是圓心角。`},
+  {q:R`哪一個是圓心角？`,pic:1,o:[angleFig(CEN,200,330),angleFig([92,138],80,10),angleFig(P(90),235,305)],hint:R`找一找：哪一個角的尖尖剛好在圓心 $O$？`,ok:R`尖尖在圓心 $O$ 才是圓心角。`},
+  {fig:angleFig(P(270),55,125),q:R`這個角的尖尖在餅皮（圓）上，不在圓心。它是圓心角嗎？`,o:['不是','是'],fix:1,hint:R`圓心角的頂點要在圓心 $O$。`,ok:R`頂點不在圓心 $O$，所以不是圓心角。`},
+  {fig:SV(pizza()+sector(20,110)+L(CEN,P(20),'ray')+L(CEN,P(110),'ray')+O()),q:R`紅色部分是「兩條半徑和一段弧」圍成的。它叫做？`,o:['扇形','弓形','直徑'],hint:R`它像一片披薩，尖尖在圓心。`,ok:R`兩半徑 ＋ 一弧 ＝ 扇形。`},
+  {fig:SV(pizza()+L(P(160),P(340),'hline')+O(true,10,26)),q:R`紅色線段通過圓心 $O$。它叫做？`,o:['直徑','半徑','弓形'],hint:R`從圓的一邊，穿過圓心，到另一邊。`,ok:R`通過圓心的弦 ＝ 直徑。`},
+  {fig:SV(pizza()+L(P(200),P(330),'hline')+O()),q:R`紅色線段連接圓上的兩個點。它叫做？`,o:['弦','半徑','扇形'],hint:R`連接圓上任意兩點的線段，叫做弦。`,ok:R`連接圓上兩點的線段 ＝ 弦。`},
+  {fig:SV(pizza()+segment(205,335)+L(P(205),P(335),'ray')+O()),q:R`紅色部分是「一條弦和一段弧」圍成的。它叫做？`,o:['弓形','扇形','直徑'],hint:R`它像一把弓，沒有碰到圓心。`,ok:R`一弦 ＋ 一弧 ＝ 弓形。`}
+ ]},
+{name:'弧長與扇形',tagline:'熟練 2',desc:'求弧長、扇形周長和面積',col:'#F7C97A',who:'起司先生',want:'幫我算這片披薩的邊和大小！',
+ teach:{fig:fractionFig(8,1),
+  items:[R`整個圓周長 $=2\pi r$，整個圓面積 $=\pi r^2$`,
+   R`先算「幾分之幾」：圓心角 $\div 360^\circ$`,
+   R`<strong>弧長</strong> ＝ 圓周長 × 幾分之幾`,
+   R`<strong>扇形面積</strong> ＝ 圓面積 × 幾分之幾`,
+   R`<strong>扇形周長</strong> ＝ 弧長 ＋ 2 條半徑`]},
+ qs:[
+  {tag:R`訂單 1：半徑 $6$，$\angle AOB=45^\circ$`,fig:sectorFig(247.5,292.5,'45°'),q:R`整個圓的周長 $2\pi r=2\pi\times6=$ ？`,o:[R`$12\pi$`,R`$6\pi$`,R`$36\pi$`],hint:R`$2\times6=12$，後面加上 $\pi$。`,ok:R`$2\pi\times6=12\pi$`},
+  {tag:R`訂單 1：半徑 $6$，$\angle AOB=45^\circ$`,fig:fractionFig(8,1),q:R`$45^\circ$ 是一整圈 $360^\circ$ 的幾分之幾？`,o:[R`$\frac{1}{8}$`,R`$\frac{1}{4}$`,R`$\frac{1}{6}$`],hint:R`$360\div45=8$，披薩切成 8 片，拿 1 片。`,ok:R`$\frac{45}{360}=\frac{1}{8}$`},
+  {tag:R`訂單 1：半徑 $6$，$\angle AOB=45^\circ$`,fig:sectorFig(247.5,292.5,'45°'),q:R`弧長 $\overset{\frown}{AB}=12\pi\times\frac{1}{8}=$ ？`,o:[R`$\frac{3}{2}\pi$`,R`$3\pi$`,R`$\frac{1}{2}\pi$`],hint:R`$12\div8=\frac{12}{8}=\frac{3}{2}$`,ok:R`$\overset{\frown}{AB}=\frac{3}{2}\pi$`},
+  {tag:R`訂單 1：半徑 $6$，$\angle AOB=45^\circ$`,fig:sectorFig(247.5,292.5,'45°'),q:R`扇形周長 ＝ 弧長 ＋ 2 條半徑 $=\frac{3}{2}\pi+6+6=$ ？`,o:[R`$\frac{3}{2}\pi+12$`,R`$\frac{3}{2}\pi+6$`,R`$\frac{3}{2}\pi$`],hint:R`兩條半徑 $6+6=12$，別忘了加上去。`,ok:R`周長 $=\frac{3}{2}\pi+12$`},
+  {tag:R`訂單 1：半徑 $6$，$\angle AOB=45^\circ$`,fig:radiusFig('r = 6'),q:R`整個圓面積 $\pi r^2=\pi\times6^2=$ ？`,o:[R`$36\pi$`,R`$12\pi$`,R`$6\pi$`],hint:R`$6^2=6\times6=36$`,ok:R`$\pi\times36=36\pi$`},
+  {tag:R`訂單 1：半徑 $6$，$\angle AOB=45^\circ$`,fig:fractionFig(8,1),q:R`扇形面積 $=36\pi\times\frac{1}{8}=$ ？`,o:[R`$\frac{9}{2}\pi$`,R`$9\pi$`,R`$\frac{3}{2}\pi$`],hint:R`$36\div8=\frac{36}{8}=\frac{9}{2}$`,ok:R`扇形面積 $=\frac{9}{2}\pi$`},
+  {tag:R`訂單 2：直徑 $24$，$\angle AOB=120^\circ$`,fig:sectorFig(120,240,'120°'),q:R`直徑是 $24$，半徑 $r=$ ？`,o:[R`$12$`,R`$24$`,R`$48$`],hint:R`半徑是直徑的一半：$24\div2$。`,ok:R`$r=24\div2=12$`},
+  {tag:R`訂單 2：直徑 $24$，$\angle AOB=120^\circ$`,fig:fractionFig(3,1),q:R`$120^\circ$ 是 $360^\circ$ 的幾分之幾？`,o:[R`$\frac{1}{3}$`,R`$\frac{1}{4}$`,R`$\frac{1}{2}$`],hint:R`$360\div120=3$，披薩切成 3 片，拿 1 片。`,ok:R`$\frac{120}{360}=\frac{1}{3}$`},
+  {tag:R`訂單 2：直徑 $24$，$\angle AOB=120^\circ$`,fig:sectorFig(120,240,'120°'),q:R`弧長 $\overset{\frown}{AB}=2\pi\times12\times\frac{1}{3}=$ ？`,o:[R`$8\pi$`,R`$24\pi$`,R`$4\pi$`],hint:R`先算 $2\times12=24$，再 $24\div3$。`,ok:R`$24\pi\times\frac{1}{3}=8\pi$`},
+  {tag:R`訂單 2：直徑 $24$，$\angle AOB=120^\circ$`,fig:sectorFig(120,240,'120°'),q:R`扇形周長 $=8\pi+12+12=$ ？`,o:[R`$8\pi+24$`,R`$8\pi+12$`,R`$8\pi$`],hint:R`兩條半徑 $12+12=24$。`,ok:R`周長 $=8\pi+24$`},
+  {tag:R`訂單 2：直徑 $24$，$\angle AOB=120^\circ$`,fig:fractionFig(3,1),q:R`扇形面積 $=\pi\times12^2\times\frac{1}{3}=$ ？`,o:[R`$48\pi$`,R`$144\pi$`,R`$16\pi$`],hint:R`$12^2=144$，再 $144\div3$。`,ok:R`$144\pi\times\frac{1}{3}=48\pi$`}
+ ]},
+{name:'找出圓心角',tagline:'熟練 3',desc:'已知扇形面積或弧長，求圓心角',col:'#F4A28C',who:'番茄小姐',want:'這片披薩切了幾度呢？',
+ teach:{fig:fractionFig(4,1),
+  items:[R`倒過來想：先找「這片是整個圓的幾分之幾」`,
+   R`幾分之幾 ＝ 扇形面積 ÷ 圓面積`,
+   R`或 幾分之幾 ＝ 弧長 ÷ 圓周長`,
+   R`<strong>圓心角</strong> ＝ $360^\circ$ × 幾分之幾`]},
+ qs:[
+  {tag:R`題 1：面積 $25\pi$，半徑 $10$`,fig:radiusFig('r = 10'),q:R`整個圓面積 $\pi\times10^2=$ ？`,o:[R`$100\pi$`,R`$20\pi$`,R`$10\pi$`],hint:R`$10^2=10\times10=100$`,ok:R`圓面積 $=100\pi$`},
+  {tag:R`題 1：面積 $25\pi$，半徑 $10$`,q:R`$\frac{25\pi}{100\pi}=$ 幾分之幾？`,o:[R`$\frac{1}{4}$`,R`$\frac{1}{2}$`,R`$\frac{1}{5}$`],hint:R`$\pi$ 可以約掉，看 $\frac{25}{100}$。$100\div25=4$。`,hintFig:fractionFig(4,1),ok:R`$\frac{25}{100}=\frac{1}{4}$`},
+  {tag:R`題 1：面積 $25\pi$，半徑 $10$`,fig:fractionFig(4,1),q:R`圓心角 $=360^\circ\times\frac{1}{4}=$ ？`,o:[R`$90^\circ$`,R`$45^\circ$`,R`$120^\circ$`],hint:R`$360\div4$`,ok:R`圓心角 $=90^\circ$`},
+  {tag:R`題 2：面積 $75\pi$，半徑 $15$`,fig:radiusFig('r = 15'),q:R`整個圓面積 $\pi\times15^2=$ ？`,o:[R`$225\pi$`,R`$30\pi$`,R`$150\pi$`],hint:R`$15\times15=225$`,ok:R`圓面積 $=225\pi$`},
+  {tag:R`題 2：面積 $75\pi$，半徑 $15$`,q:R`$\frac{75\pi}{225\pi}=$ 幾分之幾？`,o:[R`$\frac{1}{3}$`,R`$\frac{1}{4}$`,R`$\frac{1}{2}$`],hint:R`$225\div75=3$`,hintFig:fractionFig(3,1),ok:R`$\frac{75}{225}=\frac{1}{3}$`},
+  {tag:R`題 2：面積 $75\pi$，半徑 $15$`,fig:fractionFig(3,1),q:R`圓心角 $=360^\circ\times\frac{1}{3}=$ ？`,o:[R`$120^\circ$`,R`$90^\circ$`,R`$60^\circ$`],hint:R`$360\div3$`,ok:R`圓心角 $=120^\circ$`},
+  {tag:R`題 3：弧長 $4\pi$，半徑 $10$`,fig:radiusFig('r = 10'),q:R`整個圓周長 $2\pi\times10=$ ？`,o:[R`$20\pi$`,R`$10\pi$`,R`$100\pi$`],hint:R`$2\times10=20$`,ok:R`圓周長 $=20\pi$`},
+  {tag:R`題 3：弧長 $4\pi$，半徑 $10$`,q:R`$\frac{4\pi}{20\pi}=$ 幾分之幾？`,o:[R`$\frac{1}{5}$`,R`$\frac{1}{4}$`,R`$\frac{1}{10}$`],hint:R`$20\div4=5$`,hintFig:fractionFig(5,1),ok:R`$\frac{4}{20}=\frac{1}{5}$`},
+  {tag:R`題 3：弧長 $4\pi$，半徑 $10$`,fig:fractionFig(5,1),q:R`圓心角 $=360^\circ\times\frac{1}{5}=$ ？`,o:[R`$72^\circ$`,R`$36^\circ$`,R`$90^\circ$`],hint:R`$360\div5$`,ok:R`圓心角 $=72^\circ$`},
+  {tag:R`題 4：弧長 $2\pi$，半徑 $8$`,fig:radiusFig('r = 8'),q:R`整個圓周長 $2\pi\times8=$ ？`,o:[R`$16\pi$`,R`$8\pi$`,R`$64\pi$`],hint:R`$2\times8=16$`,ok:R`圓周長 $=16\pi$`},
+  {tag:R`題 4：弧長 $2\pi$，半徑 $8$`,q:R`$\frac{2\pi}{16\pi}=$ 幾分之幾？`,o:[R`$\frac{1}{8}$`,R`$\frac{1}{4}$`,R`$\frac{1}{16}$`],hint:R`$16\div2=8$`,hintFig:fractionFig(8,1),ok:R`$\frac{2}{16}=\frac{1}{8}$`},
+  {tag:R`題 4：弧長 $2\pi$，半徑 $8$`,fig:fractionFig(8,1),q:R`圓心角 $=360^\circ\times\frac{1}{8}=$ ？`,o:[R`$45^\circ$`,R`$90^\circ$`,R`$22.5^\circ$`],hint:R`$360\div8$`,ok:R`圓心角 $=45^\circ$`}
+ ]},
+{name:'弓形披薩',tagline:'熟練 4',desc:'求弓形的面積與周長',col:'#C9B3F0',who:'葡萄阿姨',want:'我只要餅皮邊那一小塊！',
+ teach:{fig:segFig(25,115,'B','A',rmark(25,115)),
+  items:[R`<strong>弓形面積</strong> ＝ 扇形面積 − 三角形面積`,
+   R`<strong>弓形周長</strong> ＝ 弧長 ＋ 弦長`,
+   R`直角三角形的斜邊：$\sqrt{a^2+b^2}$`,
+   R`正三角形：三個角都是 $60^\circ$，三邊一樣長`]},
+ qs:[
+  {tag:R`題 1：半徑 $6$，$\angle AOB=90^\circ$`,fig:segFig(25,115,'B','A',rmark(25,115)),q:R`扇形 $AOB$ 面積 $=\pi\times6^2\times\frac{1}{4}=$ ？`,o:[R`$9\pi$`,R`$36\pi$`,R`$18\pi$`],hint:R`$90^\circ$ 是一圈的 $\frac{1}{4}$。$36\div4=9$`,ok:R`扇形面積 $=9\pi$`},
+  {tag:R`題 1：半徑 $6$，$\angle AOB=90^\circ$`,fig:segFig(25,115,'B','A',rmark(25,115)),q:R`$\triangle AOB$ 面積 $=\frac{1}{2}\times6\times6=$ ？`,o:[R`$18$`,R`$36$`,R`$12$`],hint:R`$6\times6=36$，再除以 $2$。`,ok:R`三角形面積 $=18$`},
+  {tag:R`題 1：半徑 $6$，$\angle AOB=90^\circ$`,fig:segFig(25,115,'B','A',rmark(25,115)),q:R`弓形面積 ＝ 扇形 − 三角形 ＝ ？`,o:[R`$9\pi-18$`,R`$9\pi+18$`,R`$18-9\pi$`],hint:R`大的（扇形 $9\pi$）減掉小的（三角形 $18$）。`,ok:R`弓形面積 $=9\pi-18$`},
+  {tag:R`題 1：半徑 $6$，$\angle AOB=90^\circ$`,fig:segFig(25,115,'B','A',rmark(25,115)),q:R`弧長 $\overset{\frown}{AB}=2\pi\times6\times\frac{1}{4}=$ ？`,o:[R`$3\pi$`,R`$6\pi$`,R`$12\pi$`],hint:R`$2\times6=12$，$12\div4=3$`,ok:R`$\overset{\frown}{AB}=3\pi$`},
+  {tag:R`題 1：半徑 $6$，$\angle AOB=90^\circ$`,fig:segFig(25,115,'B','A',rmark(25,115)),q:R`弦 $\overline{AB}=\sqrt{6^2+6^2}=$ ？`,o:[R`$6\sqrt{2}$`,R`$12$`,R`$6$`],hint:R`$\sqrt{36+36}=\sqrt{72}=\sqrt{36\times2}=6\sqrt{2}$`,ok:R`$\overline{AB}=6\sqrt{2}$`},
+  {tag:R`題 1：半徑 $6$，$\angle AOB=90^\circ$`,fig:segFig(25,115,'B','A',rmark(25,115)),q:R`弓形周長 ＝ 弧長 ＋ 弦 ＝ ？`,o:[R`$3\pi+6\sqrt{2}$`,R`$3\pi+12$`,R`$6\pi+6\sqrt{2}$`],hint:R`弧長 $3\pi$，弦 $6\sqrt{2}$，加起來。`,ok:R`弓形周長 $=3\pi+6\sqrt{2}$`},
+  {tag:R`題 2：半徑 $12$，直角三角形`,fig:segFig(90,180,'A','B',rmark(90,180)),q:R`扇形 $=\pi\times12^2\times\frac{1}{4}=36\pi$，三角形 $=\frac{1}{2}\times12\times12=72$。弓形面積 ＝ ？`,o:[R`$36\pi-72$`,R`$72-36\pi$`,R`$36\pi+72$`],hint:R`弓形 ＝ 扇形 − 三角形。`,ok:R`弓形面積 $=36\pi-72$`},
+  {tag:R`題 2：半徑 $12$，直角三角形`,fig:segFig(90,180,'A','B',rmark(90,180)),q:R`弧長 $=2\pi\times12\times\frac{1}{4}=6\pi$，弦 $\overline{AB}=12\sqrt{2}$。弓形周長 ＝ ？`,o:[R`$6\pi+12\sqrt{2}$`,R`$6\pi+24$`,R`$12\pi+12\sqrt{2}$`],hint:R`弧長 ＋ 弦。`,ok:R`弓形周長 $=6\pi+12\sqrt{2}$`},
+  {tag:R`題 3：半徑 $4$，正 $\triangle AOB$ 面積 $4\sqrt{3}$`,fig:segFig(240,300,'A','B'),q:R`正三角形的每個角是幾度？`,o:[R`$60^\circ$`,R`$90^\circ$`,R`$45^\circ$`],hint:R`三角形內角和 $180^\circ$，三個角一樣大：$180\div3$。`,ok:R`$\angle AOB=60^\circ$`},
+  {tag:R`題 3：半徑 $4$，正 $\triangle AOB$ 面積 $4\sqrt{3}$`,fig:fractionFig(6,1),q:R`扇形面積 $=\pi\times4^2\times\frac{1}{6}=$ ？`,o:[R`$\frac{8}{3}\pi$`,R`$\frac{16}{3}\pi$`,R`$16\pi$`],hint:R`$60^\circ$ 是一圈的 $\frac{1}{6}$。$\frac{16}{6}=\frac{8}{3}$`,ok:R`扇形面積 $=\frac{8}{3}\pi$`},
+  {tag:R`題 3：半徑 $4$，正 $\triangle AOB$ 面積 $4\sqrt{3}$`,fig:segFig(240,300,'A','B'),q:R`弓形面積 ＝ 扇形 − 三角形 ＝ ？`,o:[R`$\frac{8}{3}\pi-4\sqrt{3}$`,R`$\frac{8}{3}\pi+4\sqrt{3}$`,R`$4\sqrt{3}-\frac{8}{3}\pi$`],hint:R`扇形 $\frac{8}{3}\pi$ 減掉三角形 $4\sqrt{3}$。`,ok:R`弓形面積 $=\frac{8}{3}\pi-4\sqrt{3}$`},
+  {tag:R`題 3：半徑 $4$，正 $\triangle AOB$ 面積 $4\sqrt{3}$`,fig:segFig(240,300,'A','B'),q:R`弧長 $=2\pi\times4\times\frac{1}{6}=\frac{4}{3}\pi$，弦 $\overline{AB}=4$。弓形周長 ＝ ？`,o:[R`$\frac{4}{3}\pi+4$`,R`$\frac{4}{3}\pi+8$`,R`$\frac{8}{3}\pi+4$`],hint:R`正三角形三邊一樣長，所以 $\overline{AB}=4$。`,ok:R`弓形周長 $=\frac{4}{3}\pi+4$`},
+  {tag:R`題 4：直徑 $40$，正 $\triangle AOB$ 面積 $100\sqrt{3}$`,fig:segFig(150,210,'A','B'),q:R`直徑 $40$，半徑 $r=$ ？`,o:[R`$20$`,R`$40$`,R`$80$`],hint:R`$40\div2$`,ok:R`$r=20$`},
+  {tag:R`題 4：直徑 $40$，正 $\triangle AOB$ 面積 $100\sqrt{3}$`,fig:segFig(150,210,'A','B'),q:R`扇形 $=\pi\times20^2\times\frac{1}{6}=\frac{200}{3}\pi$。弓形面積 ＝ ？`,o:[R`$\frac{200}{3}\pi-100\sqrt{3}$`,R`$\frac{200}{3}\pi+100\sqrt{3}$`,R`$100\sqrt{3}-\frac{200}{3}\pi$`],hint:R`扇形 − 三角形。`,ok:R`弓形面積 $=\frac{200}{3}\pi-100\sqrt{3}$`},
+  {tag:R`題 4：直徑 $40$，正 $\triangle AOB$ 面積 $100\sqrt{3}$`,fig:segFig(150,210,'A','B'),q:R`弧長 $=2\pi\times20\times\frac{1}{6}=\frac{20}{3}\pi$，弦 $\overline{AB}=20$。弓形周長 ＝ ？`,o:[R`$\frac{20}{3}\pi+20$`,R`$\frac{20}{3}\pi+40$`,R`$\frac{40}{3}\pi+20$`],hint:R`正三角形三邊一樣長，$\overline{AB}=$ 半徑 $=20$。`,ok:R`弓形周長 $=\frac{20}{3}\pi+20$`}
+ ]},
+{name:'灑配料',tagline:'熟練 5',desc:'點與圓的位置關係',col:'#9CC8F2',who:'藍莓弟弟',want:'配料有沒有灑在披薩上？',
+ teach:{fig:SV(pizza()+O()+`<circle cx="${P(60,35)[0]}" cy="${P(60,35)[1]}" r="8" class="pt"/>`+T(P(60,55)[0],P(60,55)[1]+6,'A')+`<circle cx="${P(15)[0]}" cy="${P(15)[1]}" r="8" class="pt"/>`+T(P(15,22)[0],P(15,22)[1]+6,'B')+`<circle cx="${P(300,108)[0]}" cy="${P(300,108)[1]}" r="8" class="pt"/>`+T(P(300,128)[0],P(300,128)[1]+6,'C'),'-10 -10 280 250'),
+  items:[R`量一量：點到圓心的距離 $d$，和半徑 $r$ 比一比。`,
+   R`$d\lt r$ → <strong>在圓內</strong>（配料在披薩上，像 $A$）`,
+   R`$d=r$ → <strong>在圓上</strong>（剛好在餅皮上，像 $B$）`,
+   R`$d\gt r$ → <strong>在圓外</strong>（掉到桌上了，像 $C$）`]},
+ qs:[
+  {fig:pointFig(.45,60,'A'),q:R`點 $A$ 在哪裡？`,o:PO,a:0,fix:1,hint:R`$A$ 在披薩裡面，還沒碰到餅皮。`,ok:R`$A$ 在圓內。`},
+  {fig:pointFig(1,20,'D'),q:R`點 $D$ 在哪裡？`,o:PO,a:1,fix:1,hint:R`$D$ 剛好在餅皮（圓）上。`,ok:R`$D$ 在圓上。`},
+  {fig:pointFig(1.35,300,'E'),q:R`點 $E$ 在哪裡？`,o:PO,a:2,fix:1,hint:R`$E$ 在餅皮外面，掉到桌上了。`,ok:R`$E$ 在圓外。`},
+  {fig:pointFig(.35,200,'C'),q:R`點 $C$ 在哪裡？`,o:PO,a:0,fix:1,hint:R`$C$ 在披薩裡面。`,ok:R`$C$ 在圓內。`},
+  {tag:R`圓 $O$ 的直徑是 $8$`,fig:radiusFig('r = ?'),q:R`直徑是 $8$，半徑 $r=$ ？`,o:[R`$4$`,R`$8$`,R`$16$`],hint:R`半徑是直徑的一半：$8\div2$。`,ok:R`$r=4$`},
+  {tag:R`半徑 $r=4$`,q:R`$\overline{OA}=3$。點 $A$ 在哪裡？`,o:PO,a:0,fix:1,hint:R`比一比 $3$ 和 $4$：距離比半徑短 → 圓內；一樣長 → 圓上；比較長 → 圓外。`,hintFig:pointFig(3/4,60,'A',1),ok:R`$3\lt4$，$A$ 在圓內。`},
+  {tag:R`半徑 $r=4$`,q:R`$\overline{OB}=4$。點 $B$ 在哪裡？`,o:PO,a:1,fix:1,hint:R`比一比 $4$ 和 $4$：一樣長 → 圓上。`,hintFig:pointFig(1,30,'B',1),ok:R`$4=4$，$B$ 在圓上。`},
+  {tag:R`半徑 $r=4$`,q:R`$\overline{OC}=5$。點 $C$ 在哪裡？`,o:PO,a:2,fix:1,hint:R`比一比 $5$ 和 $4$：距離比半徑長 → 圓外。`,hintFig:pointFig(5/4,320,'C',1),ok:R`$5\gt4$，$C$ 在圓外。`},
+  {tag:R`半徑 $r=4$`,q:R`$\overline{OD}=8$。點 $D$ 在哪裡？`,o:PO,a:2,fix:1,hint:R`比一比 $8$ 和 $4$。`,hintFig:pointFig(2,200,'D',1),ok:R`$8\gt4$，$D$ 在圓外。`},
+  {tag:R`半徑 $r=4$`,q:R`$\overline{OE}=10$。點 $E$ 在哪裡？`,o:PO,a:2,fix:1,hint:R`比一比 $10$ 和 $4$。`,hintFig:pointFig(2.5,250,'E',1),ok:R`$10\gt4$，$E$ 在圓外。`}
+ ]},
+{name:'披薩刀',tagline:'熟練 6',desc:'看圖判斷直線與圓的關係',col:'#F2B27A',who:'辣椒哥哥',want:'這一刀有沒有切到披薩？',
+ teach:{fig:SV(`<clipPath id="tc"><rect x="-10" y="-10" width="280" height="250"/></clipPath>`+pizza()+O()+`<g clip-path="url(#tc)">${knife(1.3,180,'A')}${knife(1,90,'B')}${knife(.35,0,'C')}</g>`,'-10 -10 280 250'),
+  items:[R`刀子沒碰到披薩 → <strong>不相交</strong>（0 個交點，像 $A$）`,
+   R`刀子剛好碰到餅皮一點 → <strong>切線</strong>（1 個交點，像 $B$）`,
+   R`刀子切過披薩 → <strong>割線</strong>（2 個交點，像 $C$）`,
+   R`黑點就是直線和圓的交點，數一數就知道！`]},
+ qs:[
+  {fig:lineFig(1.3,180,'A'),q:R`直線 $A$ 和圓 $O$ 是什麼關係？`,o:LO,a:0,fix:1,hint:R`數一數黑色交點：一個都沒有。`,ok:R`0 個交點 → 不相交。`},
+  {fig:lineFig(1,90,'B'),q:R`直線 $B$ 和圓 $O$ 是什麼關係？`,o:LO,a:1,fix:1,hint:R`刀子剛好碰到餅皮 1 個點。`,ok:R`1 個交點 → 切線。`},
+  {fig:lineFig(.4,0,'C'),q:R`直線 $C$ 和圓 $O$ 是什麼關係？`,o:LO,a:2,fix:1,hint:R`刀子切過去，有 2 個交點。`,ok:R`2 個交點 → 割線。`},
+  {fig:lineFig(1,-45,'D'),q:R`直線 $D$ 和圓 $O$ 是什麼關係？`,o:LO,a:1,fix:1,hint:R`只碰到圓 1 個點。`,ok:R`1 個交點 → 切線。`},
+  {fig:lineFig(.65,135,'E'),q:R`直線 $E$ 和圓 $O$ 是什麼關係？`,o:LO,a:2,fix:1,hint:R`數一數黑色交點。`,ok:R`2 個交點 → 割線。`},
+  {fig:lineFig(1.35,270,'F'),q:R`直線 $F$ 和圓 $O$ 是什麼關係？`,o:LO,a:0,fix:1,hint:R`刀子在披薩外面，沒碰到。`,ok:R`0 個交點 → 不相交。`},
+  {fig:lineFig(.5,250,'G'),q:R`直線 $G$ 和圓有幾個交點？`,o:['0 個','1 個','2 個'],a:2,fix:1,hint:R`找黑點，一個一個數。`,ok:R`2 個交點，所以 $G$ 是割線。`},
+  {fig:SV(`<clipPath id="mc"><rect x="-10" y="-10" width="280" height="250"/></clipPath>`+pizza()+O()+`<g clip-path="url(#mc)">${knife(1.3,180,'A')}${knife(1,90,'B')}${knife(.35,0,'C')}</g>`,'-10 -10 280 250'),q:R`哪一條直線離圓心 $O$ <strong>最遠</strong>？`,o:[R`$A$`,R`$B$`,R`$C$`],a:0,fix:1,hint:R`離圓心越遠，越碰不到圓。不相交的那條最遠。`,ok:R`$A$ 不相交，離 $O$ 最遠。`},
+  {fig:SV(`<clipPath id="mc2"><rect x="-10" y="-10" width="280" height="250"/></clipPath>`+pizza()+O()+`<g clip-path="url(#mc2)">${knife(1.3,180,'A')}${knife(1,90,'B')}${knife(.35,0,'C')}</g>`,'-10 -10 280 250'),q:R`哪一條直線離圓心 $O$ <strong>最近</strong>？`,o:[R`$A$`,R`$B$`,R`$C$`],a:2,fix:1,hint:R`割線切進披薩裡面，離圓心最近。`,ok:R`$C$ 是割線，離 $O$ 最近。`}
+ ]},
+{name:'量一量刀距',tagline:'熟練 7',desc:'用距離和半徑判斷直線與圓',col:'#B7E07F',who:'青椒奶奶',want:'不看圖，你也能判斷嗎？',
+ teach:{fig:distFig(.6,'5','3'),
+  items:[R`$d$ ＝ 圓心到直線的距離，$r$ ＝ 半徑`,
+   R`$d\gt r$ → <strong>不相交</strong>`,
+   R`$d=r$ → <strong>切線</strong>`,
+   R`$d\lt r$ → <strong>割線</strong>`]},
+ qs:[
+  {tag:R`圓 $O$ 的直徑是 $10$ 公分`,fig:radiusFig('r = ?'),q:R`半徑 $r=$ ？`,o:[R`$5$`,R`$10$`,R`$20$`],hint:R`$10\div2$`,ok:R`$r=5$ 公分`},
+  {tag:R`半徑 $r=5$`,q:R`圓心到直線 $L$ 的距離 $d=4$。直線 $L$ 是？`,o:LO,a:2,fix:1,hint:R`比一比：$4$ 比 $5$ 小，$d\lt r$。`,hintFig:distFig(4/5,'5','4'),ok:R`$4\lt5$ → $L$ 是割線。`},
+  {tag:R`半徑 $r=5$`,q:R`圓心到直線 $M$ 的距離 $d=5$。直線 $M$ 是？`,o:LO,a:1,fix:1,hint:R`$5$ 和 $5$ 一樣，$d=r$。`,hintFig:distFig(1,'5','5'),ok:R`$5=5$ → $M$ 是切線。`},
+  {tag:R`半徑 $r=5$`,q:R`圓心到直線 $N$ 的距離 $d=6$。直線 $N$ 是？`,o:LO,a:0,fix:1,hint:R`$6$ 比 $5$ 大，$d\gt r$。`,hintFig:distFig(6/5,'5','6'),ok:R`$6\gt5$ → $N$ 與圓不相交。`},
+  {tag:R`半徑 $r=5$`,q:R`圓心到直線 $H$ 的距離 $d=10$。直線 $H$ 是？`,o:LO,a:0,fix:1,hint:R`$10$ 比 $5$ 大很多。`,hintFig:distFig(2,'5','10'),ok:R`$10\gt5$ → $H$ 與圓不相交。`},
+  {tag:R`半徑 $r=8$`,q:R`圓心到直線 $L$ 的距離 $d=3$。直線 $L$ 是？`,o:LO,a:2,fix:1,hint:R`$3$ 比 $8$ 小。`,hintFig:distFig(3/8,'8','3'),ok:R`$3\lt8$ → $L$ 是割線。`},
+  {tag:R`半徑 $r=8$`,q:R`圓心到直線 $M$ 的距離 $d=7$。直線 $M$ 是？`,o:LO,a:2,fix:1,hint:R`$7$ 比 $8$ 小一點點，還是比較小喔。`,hintFig:distFig(7/8,'8','7'),ok:R`$7\lt8$ → $M$ 是割線。`},
+  {tag:R`半徑 $r=8$`,q:R`圓心到直線 $N$ 的距離 $d=8$。直線 $N$ 是？`,o:LO,a:1,fix:1,hint:R`$8$ 和 $8$ 一樣。`,hintFig:distFig(1,'8','8'),ok:R`$8=8$ → $N$ 是切線。`},
+  {tag:R`半徑 $r=8$`,q:R`圓心到直線 $H$ 的距離 $d=12$。直線 $H$ 是？`,o:LO,a:0,fix:1,hint:R`$12$ 比 $8$ 大。`,hintFig:distFig(1.5,'8','12'),ok:R`$12\gt8$ → $H$ 與圓不相交。`}
+ ]}
+];
+
+/* ---------- state ---------- */
+const KEY='pizza-circle-v1';
+let store={stars:{},coins:0,sound:true};
+try{Object.assign(store,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+const app=document.getElementById('app');
+let st=null;
+
+function typesetAll(){if(window.__mj&&MathJax.typesetPromise){MathJax.typesetClear&&MathJax.typesetClear([app]);MathJax.typesetPromise([app]).catch(()=>{});}}
+function tex(el){if(window.__mj&&MathJax.typesetPromise)MathJax.typesetPromise([el]).catch(()=>{});}
+
+/* ---------- sound & speech ---------- */
+let ac=null;
+function beep(notes){if(!store.sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  notes.forEach(([f,t,d])=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(ac.destination);
+    const s=ac.currentTime+t;g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.25,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.start(s);o.stop(s+d+.05);});}catch(e){}}
+const sndOK=()=>beep([[523,0,.15],[659,.1,.15],[784,.2,.3]]);
+const sndNo=()=>beep([[220,0,.25]]);
+const sndWin=()=>beep([[523,0,.15],[659,.15,.15],[784,.3,.15],[1047,.45,.5]]);
+function tex2say(x){let s=x;
+  for(let i=0;i<3;i++)s=s.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g,'$2分之$1').replace(/\\sqrt\{([^{}]*)\}/g,'根號$1').replace(/\\overset\{\\frown\}\{([^{}]*)\}/g,'弧$1').replace(/\\overline\{([^{}]*)\}/g,'$1');
+  return s.replace(/\\lt/g,'小於').replace(/\\gt/g,'大於').replace(/\^\\circ/g,'度').replace(/\^2/g,'的平方').replace(/\\pi/g,'派').replace(/\\times/g,'乘').replace(/\\div/g,'除以')
+   .replace(/\\angle/g,'角').replace(/\\triangle/g,'三角形').replace(/=/g,'等於').replace(/\+/g,'加').replace(/-/g,'減').replace(/[{}\\]/g,'');}
+function say(html){try{const s=html.replace(/<[^>]+>/g,' ').replace(/\$([^$]+)\$/g,(m,x)=>' '+tex2say(x)+' ').replace(/[？]/g,'呢？').replace(/\s+/g,' ');
+  speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='zh-TW';u.rate=.85;speechSynthesis.speak(u);}catch(e){}}
+
+/* ---------- screens ---------- */
+function topbar(){return `<div class="bar"><button class="iconbtn" id="home">菜單</button><div class="brand">圓圓披薩店</div>
+  <span class="chip" title="金幣">${coinSVG}<span id="coins">${store.coins}</span></span>
+  <button class="iconbtn" id="snd" aria-pressed="${store.sound}">${store.sound?'聲音 開':'聲音 關'}</button></div>`;}
+function bindTop(){const h=document.getElementById('home');h&&(h.onclick=showMap);
+  document.getElementById('snd').onclick=e=>{store.sound=!store.sound;save();e.currentTarget.textContent=store.sound?'聲音 開':'聲音 關';};}
+const starsRow=(n,cls='stars')=>`<div class="${cls}">${[0,1,2].map(i=>starSVG(i<n)).join('')}</div>`;
+
+function showMap(){st=null;try{speechSynthesis.cancel();}catch(e){}
+  const demo=[{x:45,y:40,k:0},{x:78,y:52,k:1,a:30},{x:52,y:80,k:2},{x:80,y:82,k:0},{x:35,y:66,k:1,a:-20},{x:64,y:34,k:2}];
+  app.innerHTML=topbar()+`<div class="hero">${pizzaSVG(demo,'')}<div><h1>圓圓披薩店</h1><p>客人來點披薩了！答對一題，披薩就多一片配料。做完披薩，學會「圓」。</p></div></div>
+  <div class="orders">${LEVELS.map((L,i)=>`<button class="order" data-i="${i}"><span class="num">${i+1}</span><span><span class="tagline">${L.tagline}</span><h3>${L.name}</h3><span class="desc">${L.desc}</span>${starsRow(store.stars[i]||0)}</span></button>`).join('')}</div>
+  <p class="note">對應「2-1 點、直線與圓之間的位置關係」熟練 1–7。關卡可以任意選，建議照順序玩。</p>`;
+  document.getElementById('home').hidden=true;bindTop();
+  app.querySelectorAll('.order').forEach(b=>b.onclick=()=>startLevel(+b.dataset.i));window.scrollTo(0,0);}
+
+function startLevel(i){st={li:i,qi:0,first:0,tried:false,combo:0,tops:[],hint:false};showTeach();}
+
+function showTeach(){const L=LEVELS[st.li];
+  app.innerHTML=topbar()+`<section class="card teach"><span class="tag">${L.tagline}・老師說</span><h2>${L.name}</h2>${L.teach.fig}
+   <ul>${L.teach.items.map(t=>`<li>${t}</li>`).join('')}</ul>
+   <div class="btnrow"><button class="ghost" id="rd">${speakSVG.replace('<svg','<svg width="24" height="24" style="vertical-align:middle"')} 念給我聽</button><button class="next" id="go">我懂了，開始做披薩！</button></div></section>`;
+  bindTop();document.getElementById('rd').onclick=()=>say(L.teach.items.join('。'));
+  document.getElementById('go').onclick=()=>{beep([[660,0,.1]]);showQ();};tex(app);window.scrollTo(0,0);}
+
+function counterHTML(fresh=-1,mood='wait'){const L=LEVELS[st.li],n=L.qs.length;
+  return `<div class="counter">${faceSVG(L.col,mood)}<div class="bubble"><div class="who">${L.who}</div><div class="say">${mood==='happy'?'哇，好香！謝謝你！':L.want}</div></div>${pizzaSVG(st.tops,'pzbox',fresh)}</div>
+  <div class="prog"><span>第 ${Math.min(st.qi+1,n)} / ${n} 題</span><div class="track"><i style="width:${st.qi/n*100}%"></i></div></div>`;}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function showQ(){const L=LEVELS[st.li],Q=L.qs[st.qi];st.tried=false;st.hint=false;
+  const correct=Q.a||0;let order=Q.o.map((_,i)=>i);if(!Q.fix)shuffle(order);
+  app.innerHTML=topbar()+`<div id="ctr">${counterHTML()}</div>
+  <section class="card" id="card">${Q.tag?`<span class="tag">${Q.tag}</span>`:''}${Q.fig||''}
+   <div class="qrow"><p class="q">${Q.q}</p><button class="speak" id="spk" aria-label="念題目">${speakSVG}</button></div>
+   <div class="opts ${Q.pic?'pic':'n'+Q.o.length}">${order.map(i=>`<button class="opt" data-i="${i}">${Q.o[i]}</button>`).join('')}</div>
+   <button class="hintbtn" id="hb">給我提示</button><div id="hintbox"></div><div id="fb"></div></section>`;
+  bindTop();
+  document.getElementById('spk').onclick=()=>say(Q.q+(Q.pic?'':'。選項：'+order.map(i=>Q.o[i]).join('，')));
+  document.getElementById('hb').onclick=showHint;
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(b,+b.dataset.i===correct));
+  tex(app);window.scrollTo(0,0);}
+
+function showHint(){if(st.hint)return;st.hint=true;const Q=LEVELS[st.li].qs[st.qi],h=document.getElementById('hintbox');
+  h.innerHTML=`<div class="box hint"><b class="h">提示</b><div>${Q.hint}</div>${Q.hintFig||''}</div>`;document.getElementById('hb').hidden=true;tex(h);}
+
+function pick(btn,ok){const L=LEVELS[st.li],Q=L.qs[st.qi],fb=document.getElementById('fb');
+  if(!ok){st.tried=true;st.combo=0;btn.classList.add('wrong');btn.disabled=true;sndNo();
+    fb.innerHTML=`<div class="box try"><b class="h">差一點！</b><div>沒關係，看看提示，再選一次。</div></div>`;showHint();
+    document.getElementById('hintbox').scrollIntoView({behavior:'smooth',block:'nearest'});return;}
+  app.querySelectorAll('.opt').forEach(b=>b.disabled=true);btn.classList.add('right');sndOK();
+  if(!st.tried){st.first++;st.combo++;store.coins+=10;}else store.coins+=3;save();
+  document.getElementById('coins').textContent=store.coins;
+  const k=st.tops.length%3,ang=Math.random()*Math.PI*2,rad=8+Math.random()*28;
+  st.tops.push({x:+(60+rad*Math.cos(ang)).toFixed(1),y:+(60+rad*Math.sin(ang)).toFixed(1),k,a:Math.round(Math.random()*180)});
+  st.qi++;document.getElementById('ctr').innerHTML=counterHTML(st.tops.length-1);st.qi--;
+  const praise=['答對了！','好棒！','太厲害了！','完全正確！'][Math.floor(Math.random()*4)];
+  const last=st.qi===L.qs.length-1;
+  fb.innerHTML=`<div class="box good"><b class="h">${praise} ${!st.tried?'+10 金幣':'+3 金幣'}</b><div>${Q.ok}</div>${st.combo>=3?`<span class="combo">連續答對 ${st.combo} 題！</span>`:''}</div>
+   <button class="next" id="nx" style="margin-top:12px">${last?'把披薩送給客人':'下一題'}</button>`;
+  document.getElementById('hb').hidden=true;
+  tex(fb);const nx=document.getElementById('nx');nx.onclick=()=>{st.qi++;st.qi>=L.qs.length?finish():showQ();};
+  setTimeout(()=>{nx.scrollIntoView({behavior:'smooth',block:'nearest'});nx.focus({preventScroll:true});},150);}
+
+function finish(){const L=LEVELS[st.li],n=L.qs.length,r=st.first/n,stars=r>=.85?3:r>=.6?2:1;
+  store.stars[st.li]=Math.max(store.stars[st.li]||0,stars);store.coins+=stars*10;save();sndWin();
+  const hasNext=st.li<LEVELS.length-1;
+  app.innerHTML=topbar()+`<div id="ctr">${counterHTML(-1,'happy')}</div><section class="card done"><span class="tag">${L.tagline}・訂單完成</span><h2>披薩送到了！</h2>
+   ${starsRow(stars,'bigstars')}<p>第一次就答對 <b>${st.first}</b> / ${n} 題，再加 <b>${stars*10}</b> 金幣。</p>
+   ${pizzaSVG(st.tops,'fig')}
+   <p>${stars===3?'你是圓圓披薩店的大廚師！':stars===2?'做得很好！再玩一次可以拿到 3 顆星。':'完成了！多練習幾次會更厲害。'}</p>
+   <div class="btnrow" style="width:100%">${hasNext?`<button class="next" id="nl">下一張訂單</button>`:''}<button class="ghost" id="ag">再做一次</button><button class="ghost" id="mp">回菜單</button></div></section>`;
+  bindTop();hasNext&&(document.getElementById('nl').onclick=()=>startLevel(st.li+1));
+  document.getElementById('ag').onclick=()=>startLevel(st.li);document.getElementById('mp').onclick=showMap;
+  confetti();window.scrollTo(0,0);}
+
+function confetti(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const c=document.getElementById('cf');c.hidden=false;
+  const x=c.getContext('2d'),W=c.width=innerWidth,H=c.height=innerHeight,cs=getComputedStyle(document.documentElement),
+  cols=['--sauce','--gold','--basil','--crust'].map(v=>cs.getPropertyValue(v).trim());
+  const ps=Array.from({length:120},()=>({x:Math.random()*W,y:-20-Math.random()*H*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*3,r:4+Math.random()*5,c:cols[Math.floor(Math.random()*4)]}));
+  let t=0;(function f(){x.clearRect(0,0,W,H);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill();});
+    if(++t<200)requestAnimationFrame(f);else{x.clearRect(0,0,W,H);c.hidden=true;}})();}
+
+showMap();
+</script>
+
+</body></html>

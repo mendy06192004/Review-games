@@ -89,7 +89,7 @@ test('離線模式無法處理掃描檔：記錄錯誤、原檔留在 待匯入/
     fs.copyFileSync(path.join(FIX, 'sample-scanned.pdf'), path.join(cfg.importDir, 'scan.pdf'));
     const [item] = await scanImportDir(cfg);
     const rec = await processFile(cfg, item, { offline: true, log: () => {} });
-    assert.match(rec.錯誤, /OCR/);
+    assert.match(rec.錯誤, /讀不到文字/);
     assert.ok(fs.existsSync(item.abs));
   } finally { cleanup(); }
 });

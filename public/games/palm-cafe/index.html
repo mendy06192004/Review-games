@@ -1,0 +1,1212 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>掌心咖啡館</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-bleed walnut counter canvas for hands-on steps; slim progress bar on top, barista speech under it, control slab at the bottom. Single warm evening look, by choice. */
+:root{
+  --walnut:#2a1e17; --oat:#f2e7d5; --oat-dim:#c9b79c; --crema:#e2a867; --sage:#a9bb9c; --ember:#c96a43;
+  --slab:#191614; --lcd:#ffdcae; --paper:#f6eedf; --ink:#33251c;
+  --f-display:"LXGW WenKai TC","Kaiti TC","STKaiti",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+/* Fallbacks for the Tailwind utilities used here, so layout holds even if the CDN is slow or blocked */
+*,*:before,*:after{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;margin:0}
+h1,h2,p,ol,dl,dd{margin:0}ol{padding:0;list-style:none}
+.mx-auto{margin-left:auto;margin-right:auto}.flex{display:flex}.grid{display:grid}.flex-col{flex-direction:column}.flex-1{flex:1 1 0%}.flex-wrap{flex-wrap:wrap}
+.items-center{align-items:center}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.justify-between{justify-content:space-between}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}
+.gap-2{gap:.5rem}.gap-2\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.gap-x-4{column-gap:1rem}.gap-x-5{column-gap:1.25rem}.gap-y-2{row-gap:.5rem}.gap-y-3{row-gap:.75rem}
+.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.text-center{text-align:center}.w-full{width:100%}
+@media (min-width:640px){.sm\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:768px){.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+body{background:var(--walnut);color:var(--oat);font-family:var(--f-body);overflow:hidden;overscroll-behavior:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.disp{font-family:var(--f-display);text-wrap:balance}
+.mono{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.layer{position:fixed;inset:0;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.scrim{background:radial-gradient(120% 90% at 50% 30%,rgba(42,30,23,.8),rgba(20,14,10,.96));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#sStep,#sFinal{padding-top:calc(env(safe-area-inset-top,0px) + 66px)}
+.btn{font-family:var(--f-body);border-radius:999px;padding:.8rem 1.4rem;font-weight:700;letter-spacing:.06em;transition:transform .15s,background .2s,opacity .2s;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.btn:focus-visible,.card:focus-visible,.chip:focus-visible,.pick:focus-visible,.mini:focus-visible,.lcdbox:focus-visible{outline:2px solid var(--crema);outline-offset:3px}
+.btn-main{background:var(--crema);color:#2a1a10}
+.btn-ghost{background:rgba(242,231,213,.08);color:var(--oat);border:1px solid rgba(242,231,213,.18)}
+.card{background:linear-gradient(160deg,rgba(255,240,220,.07),rgba(255,240,220,.025));border:1px solid rgba(242,231,213,.14);border-radius:22px;padding:18px;text-align:left;cursor:pointer;transition:transform .2s,border-color .2s;display:flex;gap:16px;align-items:center}
+.card:hover{border-color:rgba(226,168,103,.6);transform:translateY(-2px)}
+.card .av{width:88px;height:88px;flex:none;border-radius:50%;box-shadow:0 8px 20px rgba(0,0,0,.35),0 0 0 3px rgba(242,231,213,.12)}
+.perk{display:inline-block;font-size:12px;letter-spacing:.04em;color:#2a1a10;background:var(--sage);border-radius:999px;padding:2px 10px;margin-top:6px}
+.eyebrow{font-size:11px;letter-spacing:.24em;color:var(--oat-dim)}
+.chip{border:1px solid rgba(242,231,213,.2);border-radius:14px;padding:12px 14px;text-align:left;cursor:pointer;background:rgba(242,231,213,.04);transition:all .2s}
+.chip[aria-pressed="true"]{border-color:var(--crema);background:rgba(226,168,103,.14)}
+.chip[disabled]{opacity:.45;cursor:not-allowed}
+.mini{border:1px solid rgba(242,231,213,.22);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--oat);background:transparent}
+.mini[aria-pressed="true"]{background:var(--crema);color:#2a1a10;border-color:var(--crema)}
+.mini[disabled]{opacity:.4}
+.pick{border:1px solid rgba(242,231,213,.16);border-radius:18px;padding:12px 10px;background:rgba(242,231,213,.04);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;cursor:pointer;transition:all .2s;min-width:0}
+.pick[aria-pressed="true"]{border-color:var(--crema);background:rgba(226,168,103,.13);transform:translateY(-2px)}
+.pk-sub{font-size:12px;color:var(--crema)}
+.pk-notes{font-size:12px;color:var(--oat-dim);line-height:1.5}
+.step-h{font-size:clamp(24px,7vw,32px);line-height:1.25}
+.cta-bar{position:sticky;bottom:calc(-1 * env(safe-area-inset-bottom,0px) - 16px);padding-block:14px calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(180deg,rgba(20,14,10,0),rgba(20,14,10,.96) 35%);margin-top:4px}
+.sayRow{display:flex;gap:10px;align-items:flex-start}
+.sayAv{width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 2px rgba(242,231,213,.22)}
+.bubble{background:rgba(246,238,223,.96);color:var(--ink);border-radius:4px 16px 16px 16px;padding:8px 12px;font-size:14px;line-height:1.6;min-width:0;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.bubble b{font-family:var(--f-display);font-weight:400;color:#a4532f;margin-right:6px}
+.sec-h{font-size:12px;letter-spacing:.2em;color:var(--oat-dim);margin-top:6px}
+/* top bar */
+#topbar{position:fixed;left:0;right:0;top:0;z-index:30;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,rgba(22,16,12,.92),rgba(22,16,12,0));pointer-events:none}
+#topbar>*{pointer-events:auto}
+#prog{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+#progTxt{font-family:var(--f-display);font-size:15px}
+#progDots{display:flex;gap:4px;width:100%;max-width:300px}
+#progDots i{flex:1;height:4px;border-radius:4px;background:rgba(242,231,213,.15)}
+#progDots i.done{background:rgba(226,168,103,.5)}#progDots i.on{background:var(--crema)}
+.ic{width:42px;height:42px;border-radius:14px;background:rgba(25,20,17,.8);border:1px solid rgba(242,231,213,.12);display:grid;place-items:center;color:var(--oat);cursor:pointer;flex:none}
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+#hud .pe{pointer-events:auto}
+#say{position:absolute;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 66px);max-width:520px;margin:0 auto}
+#stageCard{position:absolute;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 66px);max-width:520px;margin:0 auto;background:rgba(25,20,17,.82);border:1px solid rgba(242,231,213,.12);border-radius:18px;padding:10px 14px 12px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#stageTag{font-family:var(--f-display);color:var(--crema);font-size:15px}
+#stageMain{font-size:14px;line-height:1.5;margin-top:2px}
+#segs{display:flex;gap:4px;margin-top:8px}
+#segs i{flex:1;height:4px;border-radius:4px;background:rgba(242,231,213,.12);overflow:hidden;position:relative}
+#segs i b{position:absolute;inset:0;width:0;background:var(--crema);border-radius:4px}
+#panel{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:min(460px,calc(100% - 24px));
+  background:linear-gradient(180deg,#24201d,var(--slab));border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 40px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07)}
+.lcdbox{background:#0e0c0b;border-radius:14px;padding:8px 12px 9px;display:flex;flex-direction:column;gap:1px;border:1px solid rgba(255,220,174,.06);text-align:left;min-width:0;color:inherit}
+.lcdbox .lbl{font-family:var(--f-data);font-size:10px;letter-spacing:.2em;color:rgba(255,220,174,.45);display:flex;justify-content:space-between;gap:6px}
+.lcdbox .val{font-family:var(--f-data);font-variant-numeric:tabular-nums;color:var(--lcd);font-size:clamp(22px,6.4vw,30px);font-weight:500;line-height:1.1;text-shadow:0 0 12px rgba(255,190,120,.35);white-space:nowrap}
+.lcdbox .val small{font-size:.5em;margin-left:3px;opacity:.7}
+.lcdbox .sub{font-size:11px;color:rgba(255,220,174,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--oat-dim);line-height:1.5}
+.meter{height:8px;border-radius:8px;background:rgba(242,231,213,.1);overflow:hidden}
+.meter b{display:block;height:100%;width:0;background:var(--crema);border-radius:8px;transition:width .15s}
+#gauge{position:absolute;left:12px;top:52%;transform:translateY(-50%);width:44px;display:flex;flex-direction:column;align-items:center;gap:6px}
+#gTrack{width:14px;height:150px;border-radius:10px;background:rgba(25,20,17,.75);border:1px solid rgba(242,231,213,.15);position:relative;overflow:hidden;cursor:ns-resize;touch-action:none}
+#gFill{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#9fc4d6,#e9f4f8);border-radius:10px}
+#gLock{position:absolute;left:-2px;right:-2px;height:2px;background:var(--crema);display:none}
+#gauge .t{font-size:11px;color:var(--oat-dim);text-align:center}
+#finishBtn{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 128px)}
+#toast{position:fixed;z-index:40;left:50%;top:calc(env(safe-area-inset-top,0px) + 150px);transform:translate(-50%,-6px);background:rgba(242,231,213,.96);color:var(--ink);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+/* counter + cards */
+.scene{border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.45);background:#3b2a20}
+.scene svg{display:block;width:100%;height:auto}
+.mcard{background:var(--paper);color:var(--ink);border-radius:6px 18px 18px 18px;padding:16px 18px;box-shadow:0 14px 30px rgba(0,0,0,.35);transform:rotate(-1.2deg);position:relative}
+.mcard:before{content:"";position:absolute;top:-8px;left:22px;width:46px;height:16px;background:rgba(169,187,156,.75);transform:rotate(-4deg)}
+.fcard{background:var(--paper);color:var(--ink);border-radius:26px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.fcard .tear{border-top:2px dashed rgba(51,37,28,.18);margin:0 18px;position:relative}
+.fcard .tear:before,.fcard .tear:after{content:"";position:absolute;top:-12px;width:22px;height:22px;border-radius:50%;background:#1d1511}
+.fcard .tear:before{left:-30px}.fcard .tear:after{right:-30px}
+.bar{height:6px;border-radius:6px;background:rgba(51,37,28,.1);overflow:hidden}
+.bar b{display:block;height:100%;width:0;background:var(--ink);border-radius:6px;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.stat dt{font-size:11px;letter-spacing:.12em;color:rgba(51,37,28,.55)}
+.stat dd{font-family:var(--f-data);font-variant-numeric:tabular-nums;font-size:15px;font-weight:500}
+.fk{font-size:11px;letter-spacing:.2em;color:rgba(51,37,28,.55)}
+.trivia{background:#efe2cb;border-radius:16px;padding:14px 16px}
+.eyes{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}95%{transform:scaleY(.12)}}
+.breathe{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(1.5px)}}
+.steam path{animation:steam 3.2s ease-in-out infinite;opacity:0}
+.steam path:nth-child(2){animation-delay:1.1s}.steam path:nth-child(3){animation-delay:2.1s}
+@keyframes steam{0%{opacity:0;transform:translateY(6px)}40%{opacity:.6}100%{opacity:0;transform:translateY(-12px)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pop{from{opacity:0;transform:scale(.9) rotate(-4deg)}to{opacity:1;transform:rotate(-1.2deg)}}
+.popin{animation:pop .5s cubic-bezier(.2,.8,.2,1) both}
+@media (prefers-reduced-motion:reduce){.rise,.popin,.eyes,.breathe,.steam path{animation:none}.steam path{opacity:.4}.card,.btn,.pick{transition:none}}
+</style>
+
+<canvas id="cv" aria-label="咖啡工作檯"></canvas>
+
+<div id="topbar" hidden>
+  <button class="ic" id="backBtn" aria-label="返回選擇咖啡師">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <div id="prog"><div id="progTxt">1 / 9・選豆</div><div id="progDots"></div></div>
+  <button class="ic" id="sndBtn" aria-label="聲音開關" aria-pressed="true">
+    <svg id="sndOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg>
+    <svg id="sndOff" hidden width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 10l4 4M21 10l-4 4"/></svg>
+  </button>
+</div>
+
+<div id="hud" hidden>
+  <div id="say" class="pe"></div>
+  <div id="stageCard" hidden>
+    <div id="stageTag">【階段 1/3 悶蒸】</div>
+    <div id="stageMain"></div>
+    <div id="segs"></div>
+  </div>
+  <div id="gauge" class="pe" hidden>
+    <div class="t">水流</div>
+    <div id="gTrack" aria-label="拖曳鎖定水流大小"><div id="gFill"></div><div id="gLock"></div></div>
+    <div class="t" id="gWord">細</div>
+    <button class="mini" id="gMode" style="font-size:10px;padding:3px 6px">時長</button>
+  </div>
+  <button id="finishBtn" class="btn btn-main pe" hidden>完成沖煮</button>
+  <div id="panel" class="pe"></div>
+</div>
+<div id="toast" role="status"></div>
+
+<!-- Barista select -->
+<section id="sSelect" class="layer scrim">
+  <div class="mx-auto flex flex-col gap-6" style="max-width:980px;padding-block:24px 40px">
+    <header class="flex flex-col items-center gap-3 text-center rise">
+      <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M10 40c4 12 14 18 22 18s18-6 22-18" fill="none" stroke="#e2a867" stroke-width="3" stroke-linecap="round"/>
+        <path d="M20 30h24v8a12 12 0 0 1-24 0z" fill="#f2e7d5"/><path d="M44 32h3a4 4 0 0 1 0 8h-3" fill="none" stroke="#f2e7d5" stroke-width="2.5"/>
+        <path d="M27 12c-3 4 3 6 0 11M34 10c-3 4 3 7 0 12" fill="none" stroke="#c9b79c" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="eyebrow">PALM CAFÉ · POUR-OVER</div>
+      <h1 class="disp" style="font-size:clamp(40px,11vw,68px);line-height:1;letter-spacing:.06em">掌心咖啡館</h1>
+      <p style="color:var(--oat-dim);max-width:30ch;line-height:1.7">從挑豆子到端上櫃檯，選一位咖啡師陪你慢慢做今晚這一杯。</p>
+    </header>
+    <div id="baristaList" class="grid gap-4 md:grid-cols-3"></div>
+    <p class="text-center" style="font-size:12px;color:var(--oat-dim)">建議手機直向遊玩・開啟聲音更療癒</p>
+  </div>
+</section>
+
+<!-- Guide -->
+<section id="sGuide" class="layer scrim" hidden>
+  <div class="mx-auto flex flex-col gap-5" style="max-width:520px;padding-block:20px 40px">
+    <div class="flex items-center gap-4 rise">
+      <div id="gAvatar" style="width:72px;height:72px;flex:none;border-radius:50%;overflow:hidden;box-shadow:0 0 0 3px rgba(242,231,213,.15)"></div>
+      <div style="min-width:0"><div class="eyebrow" id="gTitle"></div><div class="disp" style="font-size:30px" id="gName"></div></div>
+    </div>
+    <p class="disp rise" id="gQuote" style="font-size:19px;line-height:1.6"></p>
+    <div class="flex flex-col gap-2 rise">
+      <div class="eyebrow">選擇沖煮法</div>
+      <button class="chip" id="rThree" aria-pressed="true">
+        <div class="disp" style="font-size:18px">三段式手沖法</div>
+        <div style="font-size:13px;color:var(--oat-dim);margin-top:2px">15g 咖啡粉・220g 水 ── 悶蒸 30 秒 → 大水流至 120g → 細水繞圈至 220g</div>
+      </button>
+      <button class="chip" id="rFour" aria-pressed="false">
+        <div class="disp" style="font-size:18px">4:6 沖煮法 <span id="lock46" style="font-size:12px;font-family:var(--f-body);color:var(--crema);margin-left:6px"></span></div>
+        <div style="font-size:13px;color:var(--oat-dim);margin-top:2px">20g 咖啡粉・300g 水 ── 每 45 秒一投、共五投。前 40% 調酸甜，後 60% 調濃淡</div>
+      </button>
+      <div id="variantRow" class="flex flex-wrap gap-2" hidden>
+        <button class="mini" data-v="sweet" aria-pressed="false">偏甜 50 / 70</button>
+        <button class="mini" data-v="balance" aria-pressed="true">平衡 60 / 60</button>
+        <button class="mini" data-v="bright" aria-pressed="false">明亮 70 / 50</button>
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 rise">
+      <div class="eyebrow">今晚的流程</div>
+      <div id="flowList" class="flex flex-wrap gap-2" style="font-size:13px"></div>
+    </div>
+    <div class="flex gap-3 rise">
+      <button class="btn btn-ghost" id="gBack">換人</button>
+      <button class="btn btn-main flex-1" id="gStart">開始・去選豆</button>
+    </div>
+  </div>
+</section>
+
+<!-- HTML steps -->
+<section id="sStep" class="layer scrim" hidden>
+  <div id="stepBody" class="mx-auto flex flex-col gap-4" style="max-width:560px"></div>
+</section>
+
+<!-- Final card -->
+<section id="sFinal" class="layer scrim" hidden>
+  <div class="mx-auto flex flex-col gap-4" style="max-width:440px;padding-bottom:40px" id="finalWrap"></div>
+</section>
+
+<script>
+(()=>{
+const TAU=Math.PI*2, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t;
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const rand=(a,b)=>a+Math.random()*(b-a), pick=a=>a[Math.floor(Math.random()*a.length)];
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* =================== DATA =================== */
+const BARISTAS=[
+  {id:'ning',name:'甯遠',title:'禪意手沖師',perk:'水流穩定度 +20%',stab:.2,tolMul:1,aroma:1,snack:'hojicha',
+   quote:'「先深呼吸。水線穩了，味道就穩了。今天我們不趕時間。」',desc:'安靜、慢節奏，說話像在寫詩。注水時水柱特別穩。'},
+  {id:'xiang',name:'庠和',title:'風味實驗家',perk:'容錯 ×2・解鎖 4:6 沖煮法',stab:0,tolMul:2,aroma:1,unlock46:true,snack:'canele',
+   quote:'「比例是骨架，風味是肉。今天要做什麼實驗？我已經把秤歸零了。」',desc:'數據控、愛做對照組，講到萃取就停不下來。'},
+  {id:'ting',name:'婷安',title:'傳統烘豆師',perk:'悶蒸香氣 +40%・風味加分',stab:0,tolMul:1,aroma:1.4,snack:'pineapple',
+   quote:'「這幾支豆子都是我上週親手烘的。來，我帶你一步一步做。」',desc:'溫暖又照顧人，熟知每支豆子的脾氣。'}
+];
+const ROAST={light:{name:'淺焙',temp:[92,95],color:'#9a6a40',dots:1},medium:{name:'中焙',temp:[89,92],color:'#6e4024',dots:2},dark:{name:'深焙',temp:[85,88],color:'#3e2518',dots:3}};
+const BEANS=[
+  {id:'yirg',name:'衣索比亞 耶加雪菲',short:'耶加雪菲',proc:'水洗',roast:'light',notes:['茉莉花','佛手柑','紅茶'],label:'#e7c46a'},
+  {id:'kenya',name:'肯亞 涅里 AA',short:'肯亞 AA',proc:'水洗',roast:'light',notes:['黑醋栗','莓果','葡萄柚'],label:'#c96a7a'},
+  {id:'panama',name:'巴拿馬 波奎特',short:'波奎特',proc:'日曬',roast:'light',notes:['水蜜桃','荔枝','蜜糖'],label:'#e89a6a'},
+  {id:'alishan',name:'台灣 阿里山',short:'阿里山',proc:'蜜處理',roast:'medium',notes:['蜂蜜','烏龍茶','桂圓'],label:'#9bb092'},
+  {id:'huila',name:'哥倫比亞 薇拉',short:'薇拉',proc:'水洗',roast:'medium',notes:['紅蘋果','焦糖','杏仁'],label:'#d29a5a'},
+  {id:'mandheling',name:'印尼 曼特寧',short:'曼特寧',proc:'濕剝',roast:'dark',notes:['黑巧克力','雪松','香料'],label:'#7a6a9a'}
+];
+const GRINDS=[
+  {id:'f',name:'細',ey:1.2,drain:.72,turn:1.0},{id:'mf',name:'中細',ey:.5,drain:.88,turn:1.2},{id:'m',name:'中',ey:0,drain:1,turn:1.4},
+  {id:'mc',name:'中粗',ey:-.5,drain:1.12,turn:1.6},{id:'c',name:'粗',ey:-1.1,drain:1.28,turn:1.9}];
+const DRIPPERS={
+  v60:{name:'Hario V60',sub:'錐形・大單孔',note:'流速快，風味明亮乾淨',drain:1.12,acid:.4,body:-.2,aroma:0,rim:['#fffaf2','#e2d6c3'],tab:'#e9dfcf',hole:'big'},
+  wave:{name:'Kalita Wave',sub:'平底・三小孔',note:'流速穩定，均衡好上手',drain:.9,acid:0,body:.25,aroma:0,rim:['#f1f3f4','#99a2a8'],tab:null,hole:'three',flat:true},
+  kono:{name:'Kono 名門',sub:'錐形・短肋骨',note:'流速較慢，口感厚實圓潤',drain:.78,acid:-.3,body:.5,aroma:0,rim:['rgba(206,160,112,.97)','rgba(126,80,44,.97)'],tab:'rgba(150,100,60,.95)',hole:'big'},
+  origami:{name:'Origami 摺紙',sub:'20 道摺紋',note:'外型像花，香氣奔放',drain:1.08,acid:.3,body:-.1,aroma:.5,rim:['#d5e0cd','#8fa384'],tab:null,hole:'big',pleat:true}
+};
+const SERVERS={glass:{name:'玻璃分享壺',sub:'看得見咖啡顏色'},clay:{name:'手捏陶壺',sub:'保溫、手感溫潤'},mug:{name:'直接沖進馬克杯',sub:'一人份，簡單直接'}};
+const CUPS=[
+  {id:'porcelain',name:'白瓷拿鐵杯',desc:'杯口寬，香氣溫和散開'},{id:'wood',name:'柴燒陶杯',desc:'粗獷土味，捧在手心很暖'},
+  {id:'celadon',name:'青瓷小杯',desc:'淡青釉色，適合細細品'},{id:'amber',name:'琥珀玻璃杯',desc:'看得見咖啡透亮的色澤'},
+  {id:'tenmoku',name:'天目釉杯',desc:'深色釉面，襯出油脂光澤'},{id:'indigo',name:'藍染手繪杯',desc:'手繪藍紋，帶點旅行的心情'}];
+const SNACKS=[
+  {id:'hojicha',name:'焙茶費南雪',pair:'焙茶的烘烤香和咖啡的焦糖調互相呼應'},{id:'canele',name:'可麗露',pair:'焦脆外殼的苦甜，襯出咖啡的果酸'},
+  {id:'pineapple',name:'鳳梨酥',pair:'酸甜內餡讓明亮的咖啡更多汁'},{id:'cinnamon',name:'肉桂捲',pair:'肉桂香料和深焙的可可調很合'},
+  {id:'basque',name:'巴斯克乳酪蛋糕',pair:'濃郁乳香讓咖啡尾韻更圓潤'},{id:'scone',name:'莓果司康',pair:'奶油香配莓果醬，和淺焙剛剛好'}];
+const MOODS=[['tired','有點累'],['calm','平靜'],['happy','開心'],['anxious','有點焦慮'],['miss','想念某人'],['hope','期待明天']];
+const MOODCARD={
+  ning:{tired:'累了，就先放下吧。這杯咖啡不需要你做任何事，只要慢慢喝完。',calm:'平靜很珍貴。像水穿過粉層，不急，自然會到。',
+    happy:'開心的時候，記得深呼吸一次，把這一刻好好收起來。',anxious:'吸氣四秒，吐氣六秒。焦慮像悶蒸的氣泡，冒完了，就會沉靜下來。',
+    miss:'想念是一種溫度。替那個人也留一口吧，下次一起喝。',hope:'明天的事，明天的水會沖開。今晚先好好睡。'},
+  xiang:{tired:'觀察結果：疲勞＋咖啡因 ≠ 休息。喝完這杯請早點關燈，這是咖啡師囑。',calm:'平靜時味覺最敏銳，現在是品嚐的最佳實驗條件。試著找找第三口的尾韻。',
+    happy:'偵測到開心數值上升！建議再配一口點心，讓快樂再多 12%（數據純屬直覺）。',anxious:'焦慮就像還沒算好的粉水比，一次只調一個變因。先處理最小的那件事，其他之後再修正。',
+    miss:'想念一個人的時候，把這支豆子記下來，下次沖給他喝。分享是最好喝的萃取方式。',hope:'期待明天？很好，那今天就是成功的前置作業。實驗紀錄：狀態良好。'},
+  ting:{tired:'辛苦了。今天先把自己顧好，咖啡喝完記得喝杯溫水，早點休息喔。',calm:'平靜的晚上最適合喝咖啡了。慢慢喝，想聊什麼我都在櫃檯這邊。',
+    happy:'看你笑我也跟著開心了！下次來，我請你試喝新烘的豆子。',anxious:'別擔心，事情會一件一件變好的。就像烘豆，火候到了，香氣自然就出來了。',
+    miss:'你想念的人，一定也在某個地方想著你。要不要帶一包豆子給他？',hope:'有期待的日子最好了！明天也要好好吃飯，加油喔。'}
+};
+const LINES={
+  ning:{bean:'挑一支今天想慢慢喝的豆子。第一眼喜歡的，通常就對了。',
+    beanPick:b=>`${b.short}……有${b.notes[0]}的味道。慢慢喝，它會一層一層打開。`,
+    weigh:'一匙一匙來。最後幾顆，用指尖輕輕放。',weighGood:'剛剛好。你的手很穩。',weighOff:'差一點也沒關係，記住這個手感就好。',
+    grind:'順時針，一秒一圈。聽它碎裂的聲音。',grindFast:'慢一點。太快，豆子會發熱。',grindDone:'香氣出來了。聞到了嗎？',
+    gear:'器具像呼吸的節奏，選一個你覺得舒服的。',gearPick:d=>`${d.name}。${d.note}，跟著它的節奏就好。`,
+    paper:'先把濾紙放進濾杯。',pour:'把磨好的粉倒進去。',level:'輕輕拍幾下濾杯，像整理床鋪那樣。',levelGood:'很平。水會走得很均勻。',
+    boil:'按住加熱。水在說話，聽到細細的聲音就差不多了。',boilGood:'這個溫度，剛剛好。',boilHot:'太燙了。讓它歇一會兒。',
+    brew:'從中心開始，慢慢畫圓。',brewDone:'辛苦了。讓最後幾滴自己落下。',
+    cup:'盛咖啡的杯子，也是心情的形狀。',cupPick:c=>`${c.name}。${c.desc}。`,
+    counter:'你的咖啡。坐下來，慢慢喝。',snackPick:s=>`${s.name}，${s.pair}。`,snackRec:'這也是我最喜歡的一塊。',
+    mood:'今天的心情是什麼顏色？我寫一張卡片給你。'},
+  xiang:{bean:'今天想做哪個實驗？看「處理法」挑：日曬偏甜，水洗乾淨。',
+    beanPick:b=>`${b.short}，${b.proc}・${ROAST[b.roast].name}。建議水溫 ${ROAST[b.roast].temp[0]}–${ROAST[b.roast].temp[1]}°C，${b.notes[0]}調性很值得測！`,
+    weigh:'誤差 0.1g 以內就是勝利！不過我給你寬一點的容錯，放心。',weighGood:'漂亮！這個精準度可以寫進實驗紀錄了。',weighOff:'偏了一點，粉水比我幫你重算了，OK 的。',
+    grind:'轉速維持每秒一圈左右，粒徑分布會比較集中。',grindFast:'轉太快啦！細粉會變多，等一下會苦喔。',grindDone:'研磨完成！現在是香氣最活躍的時候。',
+    gear:'濾杯就是變因！流速快偏明亮，流速慢偏厚實。',gearPick:d=>`${d.name}：${d.note}。流速係數 ×${d.drain}，記下來了。`,
+    paper:'步驟一：濾紙放進濾杯。',pour:'步驟二：倒粉。粉要集中在中間。',level:'粉面平整＝水路一致＝萃取均勻。拍它！',levelGood:'平整度達標，這是物理的勝利。',
+    boil:'按住加熱。每差 1°C 萃取速度都會變，目標區間我標好了。',boilGood:'溫度命中目標區間，完美。',boilHot:'超過了！放一下讓它降溫，我們等它。',
+    brew:'注意秤上的數字，我們照比例來。',brewDone:'數據收集完畢！來看看成果。',
+    cup:'杯口寬窄會影響香氣集中度喔，這也是變因。',cupPick:c=>`${c.name}，${c.desc}。好選擇，有數據支持。`,
+    counter:'實驗成功！請品嚐你的成果。',snackPick:s=>`${s.name}？${s.pair}，我測過，相容性很高。`,snackRec:'而且這是我的私心推薦！',
+    mood:'最後一個變因：你今天的心情。我來寫觀察報告。'},
+  ting:{bean:'這幾支都是我上週烘的，每一支個性都不一樣。你今天想喝什麼味道？',
+    beanPick:b=>`${b.short}是我烘的${ROAST[b.roast].name}，${b.notes[1]}的甜感一出來我就下豆了，你喝喝看。`,
+    weigh:'豆子要量準，等一下才不會太濃或太淡喔。',weighGood:'好準！你一定很常泡咖啡吧？',weighOff:'差一點點啦，沒關係，下次會更準的。',
+    grind:'慢慢磨就好，豆子會謝謝你的。',grindFast:'欸欸，慢一點，磨太快粉會不均勻。',grindDone:'哇，好香！這就是新鮮豆子的味道。',
+    gear:'我自己最常用 V60，不過每個濾杯都有它的脾氣。',gearPick:d=>`${d.name}啊，${d.note}，用起來很順手喔。`,
+    paper:'先放濾紙，摺線要對好喔。',pour:'把粉倒進去，慢慢來別灑出來。',level:'倒好粉記得拍一拍，粉面平平的，等一下悶蒸才會漂亮。',levelGood:'好平！等一下一定膨得很漂亮。',
+    boil:'按住加熱。淺焙豆喜歡熱一點的水，深焙要溫柔一點。',boilGood:'溫度剛好，來，開始吧！',boilHot:'太滾了啦，等它涼一下下。',
+    brew:'等一下悶蒸要看它膨脹，那是最療癒的一刻。',brewDone:'好香喔！你做得很好。',
+    cup:'用你喜歡的杯子，咖啡會更好喝喔。',cupPick:c=>`${c.name}！${c.desc}，我也很喜歡這個。`,
+    counter:'來，你的咖啡。今天辛苦了！',snackPick:s=>`${s.name}好吃喔！${s.pair}。`,snackRec:'這是我們家手工做的，多拿一塊也可以。',
+    mood:'今天過得怎麼樣？選一個心情，我寫張卡片給你。'}
+};
+const TRIVIA=[
+  ['悶蒸氣泡從哪來？','咖啡豆烘焙後會保留大量二氧化碳。熱水一碰到粉，氣體被擠出來，粉層就像漢堡麵包一樣鼓起。豆子越新鮮，泡泡越多。'],
+  ['為什麼要悶蒸？','先用少量水讓二氧化碳排掉，後面的熱水才能順利接觸咖啡粉。跳過悶蒸，氣體會擋住水流，萃取容易不均勻。'],
+  ['粉水比黃金定律','手沖常見的粉水比落在 1:15 到 1:17。水越少越濃郁厚實，水越多越清爽，可以從 1:15 開始依口味微調。'],
+  ['金杯準則','精品咖啡協會（SCA）建議萃取率約 18–22%，濃度 TDS 約 1.15–1.35%。低於這個範圍常偏酸、單薄，高於則容易苦澀。'],
+  ['水溫怎麼選？','水溫越高萃取越快。淺焙豆常用 92–96°C 帶出花果調；深焙豆用 85–90°C，可以避免苦味過重。'],
+  ['4:6 沖煮法的由來','由日本咖啡師粕谷哲提出，他在 2016 年世界盃沖煮大賽奪冠。總水量的前 40% 調整酸甜，後 60% 調整濃淡。'],
+  ['V60 名字的意思','Hario V60 的 V 是錐形，60 是錐角 60 度。內壁的螺旋肋骨讓濾紙與杯壁間留出空氣通道，水流得更順。'],
+  ['為什麼不要沖濾紙？','水直接打在濾紙邊，會沿著紙面流下而沒經過粉層，這叫「旁流（bypass）」，會讓咖啡變淡。'],
+  ['研磨度的影響','磨得越細，萃取越快、流速越慢；磨得越粗則相反。沖起來太苦就調粗一點，太酸就調細一點。'],
+  ['為什麼要現磨？','咖啡磨成粉後表面積大增，香氣散失得很快。沖煮前才研磨，香氣最完整。'],
+  ['為什麼要拍平粉面？','粉面不平時，水會往低處流，造成有的地方萃取過度、有的不足。輕拍濾杯讓粉面平整，萃取更均勻。'],
+  ['手磨的節奏','手搖磨豆維持穩定、不急的轉速，研磨顆粒會比較一致。轉太快容易產生較多細粉，讓咖啡多了雜味。'],
+  ['水質也是風味','一杯咖啡絕大部分是水。水中適量的鈣、鎂離子能幫助帶出風味；用純水沖出來的咖啡反而容易平淡。'],
+  ['圓豆是什麼？','咖啡櫻桃裡通常有兩顆對生的種子。偶爾只長出一顆，形狀圓滾，稱為圓豆（Peaberry）。'],
+  ['沖完記得搖一搖','分享壺裡先滴下的咖啡較濃、後滴下的較淡。倒杯前輕輕搖晃，上下濃度才會一致。']
+];
+const ORDER=[['bean','選豆'],['weigh','稱豆'],['grind','磨豆'],['gear','器具'],['filter','濾紙與粉'],['boil','燒水'],['brew','沖煮'],['cup','選杯'],['counter','櫃檯']];
+const CANVAS_STEPS=['weigh','grind','filter','boil','brew'];
+
+/* =================== SVG ART =================== */
+const SK='#f1cba7',HR='#1d1512',LN='#3a2418';
+function avParts(id,smile){
+  let bg,back='',body,hair,eyes,mouth,extra='',apron;
+  const openSmile=`<path d="M50 63q10 11 20 0z" fill="#fff" stroke="${LN}" stroke-width="2" stroke-linejoin="round"/>`;
+  if(id==='ning'){
+    bg='#d79b5f';apron='#7a5236';
+    body=`<path d="M12 120C16 94 36 84 60 84S104 94 108 120Z" fill="#273350"/><path d="M50 84q10 8 20 0" fill="none" stroke="#1b2438" stroke-width="3"/>`;
+    hair=`<path d="M33 52C30 28 44 19 60 19C77 19 90 28 87 52C85 43 81 39 77 38L74 45L68 36L62 44L55 35L49 43L45 37C40 41 36 45 33 52Z" fill="${HR}"/>`;
+    eyes=`<path d="M46 55q4.5-5 9 0M65 55q4.5-5 9 0" fill="none" stroke="${LN}" stroke-width="2.4" stroke-linecap="round"/>`;
+    mouth=`<path d="M49 63q11 12 22 0z" fill="#fff" stroke="${LN}" stroke-width="2" stroke-linejoin="round"/>`;
+  }else if(id==='xiang'){
+    bg='#9fb393';apron='#46566e';
+    body=`<path d="M12 120C16 94 36 84 60 84S104 94 108 120Z" fill="#161414"/><path d="M47 84L60 97L53 102L42 89ZM73 84L60 97L67 102L78 89Z" fill="#2c2927"/><circle cx="60" cy="106" r="1.6" fill="#3a3633"/>`;
+    hair=`<path d="M35 49C33 31 39 23 45 20L43 11L51 17L53 6L60 16L66 6L68 17L77 11L75 21C83 25 88 34 86 49C82 40 76 34 60 33C46 33 39 40 35 49Z" fill="${HR}"/>`;
+    eyes=`<circle cx="49.5" cy="54.5" r="2" fill="${LN}"/><circle cx="70.5" cy="54.5" r="2" fill="${LN}"/>`;
+    extra=`<g fill="rgba(255,255,255,.18)" stroke="#c9a35a" stroke-width="1.7"><rect x="41.5" y="48" width="16" height="12" rx="5"/><rect x="62.5" y="48" width="16" height="12" rx="5"/></g><path d="M57.5 52q3-2.4 5 0M41.5 52L36 51M78.5 52L84 51" fill="none" stroke="#c9a35a" stroke-width="1.6"/>`;
+    mouth=smile?openSmile:`<path d="M53 66q7 4.5 14-1" fill="none" stroke="${LN}" stroke-width="2.2" stroke-linecap="round"/>`;
+  }else{
+    bg='#d8b4a0';apron='#c4a27a';
+    back=`<path d="M32 54C29 26 45 17 60 17C77 17 91 27 88 54L90 92C80 96 72 88 70 80L50 80C48 88 40 96 30 92Z" fill="${HR}"/><path d="M85 30C100 33 103 60 96 84C93 66 90 52 82 42Z" fill="#2a201b"/>`;
+    body=`<path d="M12 120C16 94 36 84 60 84S104 94 108 120Z" fill="#bcc5b2"/><path d="M48 85L60 102L72 85Z" fill="#8f918c"/><path d="M60 102V120" stroke="#9aa392" stroke-width="2"/><path d="M40 88q-6 8-6 20M80 88q6 8 6 20" fill="none" stroke="#a6b09b" stroke-width="2"/>`;
+    hair=`<path d="M36 47C36 29 47 22 60 22C74 22 85 30 84 47C80 41 77 39 73 41L69 34L63 41L57 34L51 41L45 36C41 40 38 43 36 47Z" fill="${HR}"/>`;
+    eyes=`<circle cx="50" cy="55" r="2.1" fill="${LN}"/><circle cx="70" cy="55" r="2.1" fill="${LN}"/>`;
+    mouth=smile?openSmile:`<path d="M53 65q7 5 14 0" fill="none" stroke="${LN}" stroke-width="2.2" stroke-linecap="round"/>`;
+  }
+  const face=`<ellipse cx="36" cy="55" rx="5" ry="6" fill="${SK}"/><ellipse cx="84" cy="55" rx="5" ry="6" fill="${SK}"/>
+    <rect x="52" y="68" width="16" height="18" fill="#e3b892"/><ellipse cx="60" cy="52" rx="24" ry="27" fill="${SK}"/><g class="eyes">${eyes}</g>${mouth}
+    <ellipse cx="45" cy="62" rx="5" ry="3" fill="#ec9f86" opacity=".45"/><ellipse cx="75" cy="62" rx="5" ry="3" fill="#ec9f86" opacity=".45"/>`;
+  const apronSvg=`<path d="M42 96L78 96L82 122L38 122Z" fill="${apron}"/><path d="M44 96L50 85M76 96L70 85" stroke="${apron}" stroke-width="3"/><rect x="52" y="104" width="16" height="8" rx="2" fill="rgba(255,255,255,.15)"/>`;
+  return {bg,inner:`${back}${body}${face}${hair}${extra}`,apron:apronSvg};
+}
+let avN=0;
+function avatar(id){const p=avParts(id,false),cid='av'+(avN++);return `<svg viewBox="0 0 120 120" width="100%" height="100%" role="img" aria-label="咖啡師插畫"><defs><clipPath id="${cid}"><circle cx="60" cy="60" r="60"/></clipPath></defs><g clip-path="url(#${cid})"><circle cx="60" cy="60" r="60" fill="${p.bg}"/><circle cx="60" cy="60" r="44" fill="rgba(255,255,255,.12)"/>${p.inner}</g></svg>`}
+function avatarBare(id){const p=avParts(id,true);return p.inner.replace('<ellipse cx="36"',p.apron+'<ellipse cx="36"')}
+const steamSvg=(x,y,s=1)=>`<g class="steam" fill="none" stroke="rgba(255,250,240,.75)" stroke-width="${2.2*s}" stroke-linecap="round" transform="translate(${x} ${y})"><path d="M-10 0c-5-7 5-11 0-18"/><path d="M0 0c-5-7 5-11 0-18"/><path d="M10 0c-5-7 5-11 0-18"/></g>`;
+function cupInner(id){
+  const cof='#4a2a18', saucer=(c)=>`<ellipse cx="60" cy="90" rx="48" ry="8" fill="${c}"/><ellipse cx="60" cy="88" rx="40" ry="5.5" fill="rgba(0,0,0,.06)"/>`;
+  switch(id){
+    case 'porcelain':return saucer('#f4efe7')+`<path d="M95 50q17 2 13 17q-4 8-15 5" fill="none" stroke="#efe9df" stroke-width="6"/><path d="M24 40Q26 84 60 86Q94 84 96 40Z" fill="#fbf8f3" stroke="#e3d9cb"/><ellipse cx="60" cy="40" rx="36" ry="8" fill="#fff" stroke="#e3d9cb"/><ellipse cx="60" cy="41" rx="31" ry="6" fill="${cof}"/><ellipse cx="54" cy="40" rx="12" ry="2.4" fill="rgba(210,150,90,.35)"/>`;
+    case 'wood':return `<ellipse cx="60" cy="88" rx="30" ry="5" fill="rgba(0,0,0,.2)"/><path d="M33 30L36 85Q60 92 84 85L87 30Z" fill="#9c6a4a"/><path d="M33 30L34 46Q42 52 48 44Q56 54 64 45Q72 53 80 44Q85 50 86 44L87 30Z" fill="#7d8a5e" opacity=".7"/><circle cx="44" cy="66" r="1.5" fill="#5a3a26"/><circle cx="70" cy="72" r="1.8" fill="#5a3a26"/><circle cx="58" cy="60" r="1.2" fill="#c49a70"/><ellipse cx="60" cy="30" rx="27" ry="6" fill="#6e4a33"/><ellipse cx="60" cy="31" rx="23" ry="4.6" fill="${cof}"/>`;
+    case 'celadon':return saucer('#c5d9c6')+`<path d="M36 46Q38 82 60 84Q82 82 84 46Z" fill="#bcd3bf" stroke="#a7c2ab"/><ellipse cx="60" cy="46" rx="24" ry="6" fill="#d6e6d6" stroke="#a7c2ab"/><ellipse cx="60" cy="47" rx="20" ry="4.4" fill="${cof}"/><path d="M42 54q2 18 10 24" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none"/>`;
+    case 'amber':return `<ellipse cx="60" cy="88" rx="30" ry="5" fill="rgba(0,0,0,.2)"/><path d="M36 46L38 84Q60 90 82 84L84 46Z" fill="rgba(70,32,12,.88)"/><path d="M34 30L38 84Q60 90 82 84L86 30Z" fill="rgba(222,150,70,.32)" stroke="rgba(255,210,150,.75)" stroke-width="1.5"/><ellipse cx="60" cy="46" rx="24" ry="5" fill="#7a4220"/><ellipse cx="60" cy="30" rx="26" ry="6" fill="none" stroke="rgba(255,215,160,.8)" stroke-width="1.5"/><path d="M42 36L44 78" stroke="rgba(255,255,255,.45)" stroke-width="2.5" stroke-linecap="round"/>`;
+    case 'tenmoku':return `<ellipse cx="60" cy="90" rx="22" ry="4" fill="rgba(0,0,0,.25)"/><rect x="48" y="80" width="24" height="8" rx="2" fill="#6a4630"/><path d="M24 38Q34 84 60 86Q86 84 96 38Z" fill="#2a1a14"/><path d="M28 46Q40 74 60 76Q80 74 92 46" fill="none" stroke="rgba(160,90,40,.35)" stroke-width="5"/><ellipse cx="60" cy="38" rx="36" ry="8" fill="#3a2418" stroke="#a5652e" stroke-width="2.5"/><ellipse cx="60" cy="39" rx="31" ry="6" fill="#3e2416"/>`;
+    default:return saucer('#eef0f2')+`<path d="M88 46q16 2 12 16q-4 8-13 5" fill="none" stroke="#f3f1ec" stroke-width="6"/><path d="M32 32L32 82Q60 90 88 82L88 32Z" fill="#f7f4ee" stroke="#dcd6cc"/><path d="M32 46Q60 52 88 46L88 54Q60 60 32 54Z" fill="#2f4f8a"/><g fill="#2f4f8a"><circle cx="42" cy="68" r="2.4"/><circle cx="54" cy="72" r="2.4"/><circle cx="66" cy="72" r="2.4"/><circle cx="78" cy="68" r="2.4"/></g><path d="M36 38q6 4 12 0t12 0t12 0t12 0" stroke="#2f4f8a" stroke-width="1.6" fill="none"/><ellipse cx="60" cy="32" rx="28" ry="6.5" fill="#fff" stroke="#dcd6cc"/><ellipse cx="60" cy="33" rx="24" ry="5" fill="${cof}"/>`;
+  }
+}
+const cupTop={porcelain:34,wood:24,celadon:40,amber:24,tenmoku:30,indigo:26};
+const cupSvg=(id,steam)=>`<svg viewBox="0 -14 120 114" width="100%" role="img" aria-label="咖啡杯">${cupInner(id)}${steam?steamSvg(60,cupTop[id]):''}</svg>`;
+function snackInner(id){
+  const plate=`<ellipse cx="50" cy="58" rx="46" ry="9" fill="#f4efe6" stroke="#e2d8c8"/><ellipse cx="50" cy="57" rx="34" ry="5" fill="rgba(0,0,0,.05)"/>`;
+  switch(id){
+    case 'hojicha':return plate+`<rect x="24" y="34" width="52" height="20" rx="5" fill="#9a6a3c"/><rect x="26" y="34" width="48" height="8" rx="4" fill="#c08a52"/><path d="M30 46h40" stroke="rgba(0,0,0,.12)"/>`;
+    case 'canele':return plate+`<path d="M34 55L37 28Q50 21 63 28L66 55Z" fill="#5a2a12"/><path d="M42 30V54M50 27V55M58 30V54" stroke="#7a3c1a" stroke-width="3"/><ellipse cx="50" cy="28" rx="13" ry="4" fill="#7a3a18"/><ellipse cx="50" cy="28" rx="5" ry="1.6" fill="#3a1a0a"/>`;
+    case 'pineapple':return plate+`<rect x="28" y="32" width="44" height="22" rx="3" fill="#d9a24c"/><rect x="28" y="32" width="44" height="7" rx="3" fill="#ebc070"/><circle cx="50" cy="45" r="5" fill="none" stroke="#b98236" stroke-width="1.5"/>`;
+    case 'cinnamon':return plate+`<ellipse cx="50" cy="44" rx="24" ry="13" fill="#c88a4f"/><path d="M50 44m-3 0a3 3 0 1 1 6 0a7 6 0 1 1-14 0a11 9 0 1 1 22 0a15 10 0 1 1-30 0" fill="none" stroke="#8a5428" stroke-width="2"/><path d="M34 38q8 6 14-1t14 2" stroke="#fff6e8" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+    case 'basque':return plate+`<path d="M24 55L78 55L78 32L24 44Z" fill="#f3dca5"/><path d="M24 44L78 32L82 30L28 42Z" fill="#3d2416"/><path d="M78 32L82 30L82 53L78 55Z" fill="#e3bf80"/>`;
+    default:return plate+`<path d="M26 54Q28 28 48 26Q68 28 70 54Z" fill="#d6a462"/><path d="M34 40q14-6 28 0" stroke="#b37f3e" stroke-width="2" fill="none"/><ellipse cx="80" cy="54" rx="9" ry="4.5" fill="#a8304a"/><ellipse cx="78" cy="52" rx="4" ry="2" fill="#fff4f0" opacity=".7"/>`;
+  }
+}
+const snackSvg=id=>`<svg viewBox="0 0 100 70" width="100%" role="img" aria-label="點心">${snackInner(id)}</svg>`;
+function bagSvg(b){const r=ROAST[b.roast];let dots='';for(let i=0;i<3;i++)dots+=`<circle cx="${32+i*8}" cy="64" r="2.6" fill="${i<r.dots?'#2a1a10':'rgba(42,26,16,.25)'}"/>`;
+  return `<svg viewBox="0 0 80 100" width="100%" role="img" aria-label="咖啡豆袋"><path d="M14 24L66 24L71 94Q40 99 9 94Z" fill="#c9a27a"/><path d="M14 24L66 24L64 32L16 32Z" fill="rgba(0,0,0,.1)"/><rect x="16" y="8" width="48" height="18" rx="2" fill="#b88f66"/><path d="M16 14h48" stroke="rgba(0,0,0,.15)"/><rect x="21" y="40" width="38" height="32" rx="3" fill="${b.label}"/><path d="M27 50h26M27 55h18" stroke="#2a1a10" stroke-width="2" stroke-linecap="round" opacity=".7"/>${dots}<ellipse cx="40" cy="84" rx="5" ry="3.4" fill="${r.color}"/><path d="M36 84q4-1.5 8 0" stroke="#1a0e08" stroke-width="1"/></svg>`}
+function dripperSvg(id){
+  switch(id){
+    case 'wave':return `<svg viewBox="0 0 100 80" width="100%"><defs><linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="#8f979c"/><stop offset=".5" stop-color="#eef1f3"/><stop offset="1" stop-color="#8f979c"/></linearGradient></defs><path d="M18 20L82 20L68 62L32 62Z" fill="url(#st)"/><path d="M28 22L38 61M38 22L44 61M50 22V61M62 22L56 61M72 22L62 61" stroke="rgba(0,0,0,.15)"/><ellipse cx="50" cy="20" rx="34" ry="6" fill="#f3f5f6" stroke="#9aa3a9"/><ellipse cx="50" cy="66" rx="24" ry="4.5" fill="#c4cacd"/></svg>`;
+    case 'kono':return `<svg viewBox="0 0 100 80" width="100%"><path d="M84 26q14 4 8 18" stroke="rgba(150,100,60,.9)" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M20 18L80 18L55 64L45 64Z" fill="rgba(170,110,60,.78)" stroke="rgba(110,70,36,.9)"/><path d="M42 50L45 62M58 50L55 62M50 48V63" stroke="rgba(255,230,200,.4)" stroke-width="1.5"/><ellipse cx="50" cy="18" rx="34" ry="6" fill="rgba(200,150,100,.9)" stroke="rgba(110,70,36,.9)"/><ellipse cx="50" cy="68" rx="20" ry="4" fill="rgba(150,100,60,.9)"/></svg>`;
+    case 'origami':{let top='';for(let i=0;i<=20;i++){const x=16+i*3.4;top+=(i?'L':'M')+x+' '+(i%2?14:20)}
+      let lines='';for(let i=1;i<20;i++){const x=16+i*3.4;lines+=`M${x} ${i%2?14:20}L${44+i*.6} 64`}
+      return `<svg viewBox="0 0 100 80" width="100%"><path d="${top}L56 64L44 64Z" fill="#b7c8ad"/><path d="${lines}" stroke="rgba(60,80,50,.25)"/><ellipse cx="50" cy="68" rx="20" ry="4" fill="#a3b598"/></svg>`;}
+    default:return `<svg viewBox="0 0 100 80" width="100%"><path d="M83 24q15 4 9 18" stroke="#efe7da" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M18 18L82 18L56 64L44 64Z" fill="#f5efe4" stroke="#d9cdb8"/><path d="M30 22q10 18 18 40M70 22q-10 18-18 40" stroke="rgba(160,130,90,.25)" fill="none"/><ellipse cx="50" cy="18" rx="36" ry="6" fill="#fffaf2" stroke="#d9cdb8"/><ellipse cx="50" cy="68" rx="22" ry="4" fill="#ece3d4"/></svg>`;
+  }
+}
+function serverSvg(id){
+  if(id==='clay')return `<svg viewBox="0 0 100 80" width="100%"><path d="M78 34q16 4 10 20" stroke="#8a5a3e" stroke-width="7" fill="none"/><path d="M22 26Q16 72 50 74Q84 72 78 26Z" fill="#a36a48"/><circle cx="38" cy="52" r="1.5" fill="#6e4430"/><circle cx="60" cy="60" r="1.5" fill="#6e4430"/><ellipse cx="50" cy="26" rx="28" ry="6" fill="#7e4f35"/><path d="M22 28L14 24" stroke="#a36a48" stroke-width="5" stroke-linecap="round"/></svg>`;
+  if(id==='mug')return `<svg viewBox="0 0 100 80" width="100%"><path d="M76 34q16 2 12 18q-4 8-12 5" stroke="#f1ede6" stroke-width="7" fill="none"/><path d="M26 24L26 70Q50 78 74 70L74 24Z" fill="#f7f3ec" stroke="#dcd4c8"/><ellipse cx="50" cy="24" rx="24" ry="5.5" fill="#fff" stroke="#dcd4c8"/></svg>`;
+  return `<svg viewBox="0 0 100 80" width="100%"><path d="M78 34q16 4 10 20" stroke="rgba(230,240,245,.7)" stroke-width="5" fill="none"/><path d="M22 26Q18 72 50 74Q82 72 78 26Z" fill="rgba(220,235,240,.18)" stroke="rgba(240,245,250,.8)" stroke-width="1.5"/><path d="M24 52Q24 72 50 72Q76 72 76 52Z" fill="rgba(90,46,20,.75)"/><ellipse cx="50" cy="26" rx="28" ry="6" fill="none" stroke="rgba(240,245,250,.8)" stroke-width="1.5"/><path d="M30 34v28" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round"/></svg>`;
+}
+
+/* =================== SESSION =================== */
+const S={barista:BARISTAS[0],recipeId:'three',variant:'balance',recipe:null,bean:null,weighed:0,weighQ:0,grind:'mf',steady:.7,
+  dripper:'v60',server:'glass',flat:.5,temp:24,tempQ:0,brewRes:null,cup:null,snack:null,mood:null};
+const L=()=>LINES[S.barista.id];
+const doseOf=()=>S.recipe?S.recipe.dose:15;
+function newCup(){Object.assign(S,{bean:null,weighed:0,weighQ:0,grind:S.recipeId==='fourSix'?'mc':'mf',steady:.7,dripper:'v60',server:'glass',flat:.5,temp:24,tempQ:0,brewRes:null,cup:null,snack:null,mood:null})}
+function buildRecipe(id,variant){
+  if(id==='three') return {id,name:'三段式手沖法',dose:15,total:220,ideal:[150,190],tolT:8,stages:[
+    {name:'悶蒸',target:35,lo:30,start:0,force:[.08,.45],text:'注水至 30g – 40g，靜置等待 30 秒'},
+    {name:'大水流攪動',target:120,start:30,force:[.55,1],text:'用較粗的水流繞圈攪動粉層，注水至 120g'},
+    {name:'細水繞圈',target:220,start:65,force:[0,.4],text:'細水長流，由內往外慢慢繞圈至 220g'}]};
+  const f=variant==='sweet'?[50,70]:variant==='bright'?[70,50]:[60,60];
+  const cum=[f[0],120,180,240,300], names=['第一投・悶蒸','第二投','第三投','第四投','第五投'];
+  return {id,variant,name:'4:6 沖煮法',dose:20,total:300,ideal:[195,240],tolT:10,stages:cum.map((t,i)=>({
+    name:names[i],target:t,start:i*45,force:[.22,.72],
+    text:i<2?`注水至 ${t}g（前 40%：${i===0?'這一投越多越明亮':'決定酸甜平衡'}）`:`注水至 ${t}g（後 60%：控制濃淡）`}))};
+}
+
+/* =================== AUDIO =================== */
+let ac=null,soundOn=true,noiseBuf=null,pourCh=null,boilCh=null;
+function audioInit(){
+  if(ac){if(ac.state==='suspended')ac.resume();return}
+  try{
+    ac=new (window.AudioContext||window.webkitAudioContext)();
+    const len=ac.sampleRate*2;noiseBuf=ac.createBuffer(1,len,ac.sampleRate);const d=noiseBuf.getChannelData(0);let l=0;
+    for(let i=0;i<len;i++){const w=Math.random()*2-1;l=(l+.03*w)/1.03;d[i]=l*3+w*.25}
+    pourCh=chain('bandpass',900,.8);boilCh=chain('lowpass',360,.7);
+  }catch(e){ac=null}
+}
+function chain(type,f,q){const s=ac.createBufferSource();s.buffer=noiseBuf;s.loop=true;const fl=ac.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;const g=ac.createGain();g.gain.value=0;s.connect(fl).connect(g).connect(ac.destination);s.start();return{f:fl,g}}
+function setGain(ch,v,tc=.08){if(ac&&ch)ch.g.gain.setTargetAtTime(soundOn?v:0,ac.currentTime,tc)}
+function blip(f0,f1,dur,vol){if(!ac||!soundOn)return;const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;
+  o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur*.5);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur+.02)}
+function tick(f,vol,dur){if(!ac||!soundOn)return;const s=ac.createBufferSource();s.buffer=noiseBuf;const fl=ac.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f;fl.Q.value=1.4;const g=ac.createGain(),t=ac.currentTime;
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(fl).connect(g).connect(ac.destination);s.start(t,Math.random()*1.5,dur+.05)}
+const drip=()=>blip(rand(900,1500),rand(1500,2300),.14,.035);
+const crunch=()=>tick(rand(1500,4200),rand(.1,.22),rand(.04,.08));
+const beanClick=()=>tick(rand(2500,4500),.08,.03);
+function silence(){setGain(pourCh,0,.03);setGain(boilCh,0,.05)}
+$('#sndBtn').onclick=()=>{soundOn=!soundOn;$('#sndBtn').setAttribute('aria-pressed',soundOn);$('#sndOn').hidden=!soundOn;$('#sndOff').hidden=soundOn;audioInit();if(!soundOn)silence()};
+
+/* =================== UI HELPERS =================== */
+let toastTimer=0;
+function toast(msg,ms=1800){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('on'),ms)}
+const sayBlock=t=>`<div class="sayRow"><div class="sayAv">${avatar(S.barista.id)}</div><div class="bubble"><b>${S.barista.name}</b><span class="sayText">${t}</span></div></div>`;
+function say(t){$$('.sayText').forEach(e=>e.textContent=t)}
+const ctaBar=(label,id,dis)=>`<div class="cta-bar"><button class="btn btn-main w-full" id="${id}" ${dis?'disabled':''}>${label}</button></div>`;
+function stepHtml(h){$('#stepBody').innerHTML=h;$('#sStep').scrollTop=0}
+function panel(h){$('#panel').innerHTML=h}
+function setProgress(id){
+  const i=ORDER.findIndex(o=>o[0]===id);
+  $('#progDots').innerHTML=ORDER.map((_,k)=>`<i class="${k<i?'done':k===i?'on':''}"></i>`).join('');
+  $('#progTxt').textContent=i>=0?`${i+1} / ${ORDER.length}・${ORDER[i][1]}`:'今日風味卡';
+  if(i<0)$('#progDots').innerHTML=ORDER.map(()=>'<i class="done"></i>').join('');
+}
+
+/* =================== CANVAS =================== */
+const cv=$('#cv'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1,cx=0,cy=0,R=100,bedR=60,woodCv=null,baseCv=null,rigCv=null,rigBare=null,bedCv=null,jarCv=null;
+const N=26;const mask=new Uint8Array(N*N);
+for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=(i+.5)/N*2-1,y=(j+.5)/N*2-1;mask[j*N+i]=x*x+y*y<=1?1:0}
+function off(w,h){const c=document.createElement('canvas');c.width=Math.max(1,Math.ceil(w*DPR));c.height=Math.max(1,Math.ceil(h*DPR));const g=c.getContext('2d');g.scale(DPR,DPR);return[c,g]}
+let TOP=150,BOT=600;
+function resize(){
+  DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);
+  TOP=150;BOT=H-(screen==='brew'?150:200);cy=(TOP+BOT)/2;cx=W/2;
+  R=Math.max(64,Math.min(W*.34,(BOT-TOP)*.4));bedR=R*.6;
+  buildWood();buildBed();buildJar();buildGear();
+}
+function buildWood(){
+  const [c,g]=off(W,H);woodCv=c;const rnd=mulberry(11),ph=Math.max(96,H/6.2);
+  for(let y=-ph*.35;y<H;y+=ph){
+    const t=rnd();g.fillStyle=`hsl(${22+t*7},${36+t*10}%,${27+t*8}%)`;g.fillRect(0,y,W,ph);
+    for(let j=0;j<30;j++){const gy=y+rnd()*ph,amp=1.5+rnd()*5,fr=.003+rnd()*.012,p0=rnd()*6;
+      g.strokeStyle=rnd()<.55?`rgba(25,12,6,${.06+rnd()*.1})`:`rgba(255,215,170,${.03+rnd()*.06})`;g.lineWidth=.5+rnd()*1.5;g.beginPath();
+      for(let x=0;x<=W+8;x+=8){const yy=gy+Math.sin(x*fr+p0)*amp+Math.sin(x*fr*3.3+p0)*amp*.3;x?g.lineTo(x,yy):g.moveTo(x,yy)}g.stroke()}
+    if(rnd()<.45){const kx=rnd()*W,ky=y+ph*(.3+rnd()*.4);for(let k=1;k<6;k++){g.strokeStyle=`rgba(30,14,6,${.12-k*.015})`;g.lineWidth=1;g.beginPath();g.ellipse(kx,ky,k*7,k*2.6,0,0,TAU);g.stroke()}}
+    g.fillStyle='rgba(0,0,0,.4)';g.fillRect(0,y+ph-1.5,W,1.5);g.fillStyle='rgba(255,225,190,.07)';g.fillRect(0,y+ph,W,1);
+  }
+  const vg=g.createRadialGradient(W*.5,H*.45,10,W*.5,H*.45,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(255,200,130,.14)');vg.addColorStop(.5,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(10,5,2,.55)');
+  g.fillStyle=vg;g.fillRect(0,0,W,H);
+}
+function plate(g,x,y,s){
+  g.save();g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=26;g.shadowOffsetY=12;g.fillStyle='#1d1a18';g.beginPath();g.roundRect(x-s/2,y-s/2,s,s,s*.08);g.fill();g.restore();
+  const lg=g.createLinearGradient(x-s/2,y-s/2,x+s/2,y+s/2);lg.addColorStop(0,'#34302c');lg.addColorStop(1,'#1a1816');
+  g.fillStyle=lg;g.beginPath();g.roundRect(x-s/2+4,y-s/2+4,s-8,s-8,s*.07);g.fill();g.strokeStyle='rgba(255,255,255,.06)';g.lineWidth=1;g.stroke();
+  g.fillStyle='rgba(255,220,174,.22)';g.font=`500 ${Math.max(9,s*.028)}px "IBM Plex Mono",monospace`;g.textAlign='center';g.fillText('PALM · 0.1 g',x,y+s/2-s*.04);
+}
+function buildGear(){
+  const [c,g]=off(W,H);baseCv=c;g.drawImage(woodCv,0,0,W,H);plate(g,cx,cy,R*2.55);
+  g.save();g.shadowColor='rgba(0,0,0,.4)';g.shadowBlur=18;g.shadowOffsetY=8;
+  if(S.server==='clay'){g.fillStyle='#8f5a3c';g.beginPath();g.arc(cx,cy,R*1.1,0,TAU);g.fill();g.restore();
+    g.lineWidth=R*.08;g.strokeStyle='#8f5a3c';g.beginPath();g.roundRect(cx+R*1.04,cy-R*.18,R*.38,R*.36,R*.14);g.stroke();
+    const rr=mulberry(3);for(let i=0;i<120;i++){const a=rr()*TAU,r=R*(1+rr()*.1);g.fillStyle=`rgba(60,30,15,${.2+rr()*.3})`;g.fillRect(cx+Math.cos(a)*r,cy+Math.sin(a)*r,1.5,1.5)}}
+  else if(S.server==='mug'){g.fillStyle='#f4efe7';g.beginPath();g.arc(cx,cy,R*1.06,0,TAU);g.fill();g.restore();
+    g.lineWidth=R*.1;g.strokeStyle='#ece5da';g.beginPath();g.roundRect(cx+R*1.02,cy-R*.2,R*.42,R*.4,R*.16);g.stroke();}
+  else{g.fillStyle='rgba(230,240,245,.06)';g.beginPath();g.arc(cx,cy,R*1.1,0,TAU);g.fill();g.restore();
+    g.strokeStyle='rgba(240,245,250,.42)';g.lineWidth=2.4;g.beginPath();g.arc(cx,cy,R*1.1,0,TAU);g.stroke();
+    g.lineWidth=R*.07;g.strokeStyle='rgba(240,245,250,.28)';g.beginPath();g.roundRect(cx+R*1.06,cy-R*.2,R*.4,R*.4,R*.14);g.stroke();
+    g.fillStyle='rgba(240,245,250,.25)';g.beginPath();g.moveTo(cx-R*1.08,cy-R*.12);g.lineTo(cx-R*1.24,cy);g.lineTo(cx-R*1.08,cy+R*.12);g.fill();}
+  rigBare=paintRig(false);rigCv=paintRig(true);
+}
+function paintRig(paper){
+  const d=DRIPPERS[S.dripper],[c,g]=off(W,H);
+  const flange=()=>{g.beginPath();if(d.pleat){for(let a=0;a<=TAU+.001;a+=TAU/200){const r=R*(1+.04*Math.cos(a*20));const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;a?g.lineTo(x,y):g.moveTo(x,y)}g.closePath()}else g.arc(cx,cy,R,0,TAU)};
+  g.save();g.shadowColor='rgba(20,10,5,.55)';g.shadowBlur=24;g.shadowOffsetY=10;g.fillStyle=d.rim[1];flange();g.fill();g.restore();
+  if(d.tab){g.fillStyle=d.tab;g.beginPath();g.roundRect(cx-R*1.26,cy-R*.17,R*.36,R*.34,R*.12);g.fill()}
+  const fg=g.createRadialGradient(cx-R*.3,cy-R*.4,R*.1,cx,cy,R);fg.addColorStop(0,d.rim[0]);fg.addColorStop(1,d.rim[1]);g.fillStyle=fg;flange();g.fill();
+  if(d.pleat){g.strokeStyle='rgba(60,80,50,.22)';g.lineWidth=1;for(let k=0;k<20;k++){const a=(k+.5)/20*TAU;g.beginPath();g.moveTo(cx+Math.cos(a)*R*.2,cy+Math.sin(a)*R*.2);g.lineTo(cx+Math.cos(a)*R*1.03,cy+Math.sin(a)*R*1.03);g.stroke()}}
+  g.strokeStyle='rgba(60,40,20,.22)';g.lineWidth=1.2;g.beginPath();g.arc(cx,cy,R*.93,0,TAU);g.stroke();
+  if(!paper){
+    const ig=g.createRadialGradient(cx,cy,R*.05,cx,cy,R*.9);ig.addColorStop(0,'rgba(0,0,0,.45)');ig.addColorStop(1,'rgba(0,0,0,.05)');g.fillStyle=ig;g.beginPath();g.arc(cx,cy,R*.9,0,TAU);g.fill();
+    g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=2;
+    if(S.dripper==='v60'){for(let k=0;k<12;k++){const a0=k/12*TAU;g.beginPath();for(let t=0;t<=1;t+=.05){const a=a0+t*1.2,r=R*(.88-.66*t);const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;t?g.lineTo(x,y):g.moveTo(x,y)}g.stroke()}}
+    else if(S.dripper==='kono'){for(let k=0;k<12;k++){const a=k/12*TAU;g.beginPath();g.moveTo(cx+Math.cos(a)*R*.18,cy+Math.sin(a)*R*.18);g.lineTo(cx+Math.cos(a)*R*.42,cy+Math.sin(a)*R*.42);g.stroke()}}
+    if(d.flat){g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.arc(cx,cy,R*.36,0,TAU);g.fill();g.fillStyle='#120c08';for(let k=0;k<3;k++){const a=k/3*TAU-Math.PI/2;g.beginPath();g.arc(cx+Math.cos(a)*R*.12,cy+Math.sin(a)*R*.12,R*.035,0,TAU);g.fill()}}
+    else{g.fillStyle='#120c08';g.beginPath();g.arc(cx,cy,R*.1,0,TAU);g.fill()}
+  }else{
+    const pr=R*.9;g.beginPath();
+    for(let a=0;a<=TAU+.01;a+=TAU/160){const r=pr*(1+(d.flat?.03:.012)*Math.sin(a*(d.flat?20:24)));const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;a?g.lineTo(x,y):g.moveTo(x,y)}
+    const pg=g.createRadialGradient(cx,cy,bedR*.8,cx,cy,pr);pg.addColorStop(0,'#cdbd9f');pg.addColorStop(.35,'#e9dec9');pg.addColorStop(1,'#f8f1e3');g.fillStyle=pg;g.fill();
+    g.strokeStyle='rgba(140,110,70,.12)';g.lineWidth=1;const n=d.flat?20:28;
+    for(let k=0;k<n;k++){const a=k/n*TAU;g.beginPath();g.moveTo(cx+Math.cos(a)*bedR*1.02,cy+Math.sin(a)*bedR*1.02);g.lineTo(cx+Math.cos(a)*pr*.98,cy+Math.sin(a)*pr*.98);g.stroke()}
+    if(!d.flat){g.strokeStyle='rgba(140,110,70,.22)';g.lineWidth=2;g.beginPath();g.moveTo(cx+bedR*.7,cy-bedR*.7);g.lineTo(cx+pr*.68,cy-pr*.68);g.stroke()}
+  }
+  return c;
+}
+function buildBed(){
+  const s=bedR*2,[c,g]=off(s,s);bedCv=c;const rnd=mulberry(5);g.fillStyle='#7a5235';g.fillRect(0,0,s,s);
+  const n=Math.min(26000,s*s*.9);
+  for(let i=0;i<n;i++){const t=rnd();g.fillStyle=t<.3?'#5b3b26':t<.6?'#8a5f3e':t<.85?'#6a4630':'#a07450';g.globalAlpha=.55+rnd()*.45;g.fillRect(rnd()*s,rnd()*s,.6+rnd()*1.4,.6+rnd()*1.4)}
+  g.globalAlpha=1;const sh=g.createRadialGradient(s/2,s/2,s*.1,s/2,s/2,s/2);sh.addColorStop(0,'rgba(0,0,0,.18)');sh.addColorStop(.6,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(40,20,8,.35)');g.fillStyle=sh;g.fillRect(0,0,s,s);
+}
+function beanCol(){return S.bean?ROAST[S.bean.roast].color:'#6e4024'}
+function drawBean(g,x,y,rot,k,col){
+  const rx=R*.045*k,ry=R*.032*k;g.save();g.translate(x,y);g.rotate(rot);
+  g.fillStyle=col;g.beginPath();g.ellipse(0,0,rx,ry,0,0,TAU);g.fill();
+  g.fillStyle='rgba(255,230,200,.18)';g.beginPath();g.ellipse(-rx*.25,-ry*.35,rx*.5,ry*.3,0,0,TAU);g.fill();
+  g.strokeStyle='rgba(20,10,5,.7)';g.lineWidth=Math.max(.8,rx*.16);g.beginPath();g.moveTo(-rx*.75,0);g.quadraticCurveTo(0,ry*.35,rx*.75,0);g.stroke();g.restore();
+}
+function buildJar(){
+  const r=R*.5,[c,g]=off(r*2+8,r*2+8);jarCv=c;const o=r+4;
+  g.fillStyle='rgba(30,20,14,.9)';g.beginPath();g.arc(o,o,r,0,TAU);g.fill();
+  const rnd=mulberry(9),col=beanCol();
+  for(let i=0;i<70;i++){const a=rnd()*TAU,d=Math.sqrt(rnd())*r*.85;drawBean(g,o+Math.cos(a)*d,o+Math.sin(a)*d,rnd()*TAU,1,col)}
+  g.strokeStyle='rgba(230,240,245,.5)';g.lineWidth=3;g.beginPath();g.arc(o,o,r,0,TAU);g.stroke();
+  g.strokeStyle='rgba(255,255,255,.25)';g.lineWidth=2;g.beginPath();g.arc(o,o,r*.82,-2.4,-1.4);g.stroke();
+}
+
+/* =================== INPUT =================== */
+const P={down:false,tx:0,ty:0,x:0,y:0,force:0,hold:0,mode:'時長',lock:null,forceSeen:false,fVals:new Set(),rMin:1e9,rMax:0,raw:-1,isTouch:false};
+function readTouch(t){
+  const f=t.force||0;
+  if(f>0&&f<1&&f!==.5){P.fVals.add(Math.round(f*50));if(P.fVals.size>3)P.forceSeen=true}
+  if(P.forceSeen){P.mode='壓力';P.raw=clamp((f-.04)/.62,0,1);return}
+  const r=t.radiusX||0;if(r>0){P.rMin=Math.min(P.rMin,r);P.rMax=Math.max(P.rMax,r)}
+  if(P.rMax-P.rMin>3){P.mode='面積';P.raw=clamp((r-P.rMin)/(P.rMax-P.rMin),0,1);return}
+  P.mode='時長';P.raw=-1;
+}
+const M=()=>MODES[screen];
+cv.addEventListener('touchstart',e=>{const m=M();if(!m)return;e.preventDefault();const t=e.changedTouches[0];P.isTouch=true;P.down=true;P.hold=0;readTouch(t);audioInit();m.down&&m.down(t.clientX,t.clientY,true)},{passive:false});
+cv.addEventListener('touchmove',e=>{const m=M();if(!m)return;e.preventDefault();const t=e.touches[0];if(!t)return;readTouch(t);m.move&&m.move(t.clientX,t.clientY,true)},{passive:false});
+const tEnd=e=>{if(e.touches&&e.touches.length)return;P.down=false;const m=M();m&&m.up&&m.up()};
+cv.addEventListener('touchend',tEnd);cv.addEventListener('touchcancel',tEnd);
+cv.addEventListener('mousedown',e=>{const m=M();if(!m||P.isTouch)return;P.down=true;P.hold=0;P.raw=-1;audioInit();m.down&&m.down(e.clientX,e.clientY,false)});
+addEventListener('mousemove',e=>{if(P.isTouch)return;const m=M();m&&m.move&&m.move(e.clientX,e.clientY,false)});
+addEventListener('mouseup',()=>{if(P.isTouch||!P.down)return;P.down=false;const m=M();m&&m.up&&m.up()});
+cv.addEventListener('wheel',e=>{if(screen!=='brew')return;e.preventDefault();P.lock=clamp((P.lock??P.force)-e.deltaY*.0012,0,1);updLock()},{passive:false});
+addEventListener('keydown',e=>{if(screen!=='brew')return;if(e.key==='ArrowUp'||e.key==='ArrowDown'){P.lock=clamp((P.lock??.3)+(e.key==='ArrowUp'?.08:-.08),0,1);updLock()}});
+const gT=$('#gTrack');
+function gaugeAt(e){const r=gT.getBoundingClientRect();P.lock=clamp(1-(e.clientY-r.top)/r.height,0,1);updLock()}
+gT.addEventListener('pointerdown',e=>{gT.setPointerCapture(e.pointerId);gaugeAt(e)});
+gT.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')gaugeAt(e)});
+$('#gMode').onclick=()=>{P.lock=null;updLock()};
+function updLock(){const l=$('#gLock');if(P.lock==null)l.style.display='none';else{l.style.display='block';l.style.bottom=(P.lock*100)+'%'}}
+function targetForce(){if(P.lock!=null)return P.lock;if(P.raw>=0&&P.mode!=='時長')return P.raw;return clamp(.1+P.hold*.48,0,1)}
+
+/* =================== MODE: WEIGH =================== */
+const Wg={};
+const weighGeo=()=>({bx:cx+R*.1,by:cy+R*.2,br:R*.62,jx:cx-R*.92,jy:cy-R*.92,jr:R*.5});
+function weighEnter(){
+  Object.assign(Wg,{beans:[],fly:[],weight:0,acc:0,holding:false,ht:0,scoop:0});buildJar();
+  say(L().weigh);
+  panel(`<div class="grid grid-cols-2 gap-2.5">
+    <div class="lcdbox"><span class="lbl"><span>WEIGHT</span><span>咖啡豆</span></span><span class="val" id="wgW">0.0<small>g</small></span><span class="sub" id="wgS">目標 ${doseOf().toFixed(1)}g</span></div>
+    <div class="flex flex-col gap-2 justify-center"><button class="mini" id="wgOut" style="padding:9px 12px">取出 1 顆</button><span class="hint">按住＝連續舀豆<br>輕點＝放一顆</span></div></div>
+    <button class="btn btn-main" id="wgOk" disabled>就這個重量・去磨豆</button>`);
+  $('#wgOut').onclick=()=>{const b=Wg.beans.pop();if(!b)return;Wg.weight-=b.w;const g=weighGeo();Wg.fly.push({x0:b.x,y0:b.y,x1:g.jx,y1:g.jy,t:0,w:0,rot:b.rot,back:true});beanClick()};
+  $('#wgOk').onclick=()=>{const dose=doseOf(),err=Math.abs(Wg.weight-dose),tol=.2*S.barista.tolMul;
+    S.weighed=Math.round(Wg.weight*10)/10;S.weighQ=err<=tol?1-.2*err/tol:Math.max(0,.8-(err-tol)/1.2);
+    toast(err<=tol?L().weighGood:L().weighOff,2200);go('grind')};
+}
+function spawnBean(){const g=weighGeo();const gx=()=>(Math.random()+Math.random()+Math.random()-1.5)/1.5;
+  let x1=g.bx+gx()*g.br*.38,y1=g.by+gx()*g.br*.38;const d=Math.hypot(x1-g.bx,y1-g.by);if(d>g.br*.7){x1=g.bx+(x1-g.bx)*g.br*.7/d;y1=g.by+(y1-g.by)*g.br*.7/d}
+  Wg.fly.push({x0:g.bx-g.br*.5,y0:g.by-g.br*.62,x1,y1,t:0,w:rand(.12,.18),rot:rand(0,TAU),back:false})}
+const MODES={};
+MODES.weigh={enter:weighEnter,
+  down(){Wg.holding=true;Wg.ht=0;spawnBean()},up(){Wg.holding=false},
+  update(dt){
+    Wg.scoop=lerp(Wg.scoop,Wg.holding?1:0,Math.min(1,dt*10));
+    if(Wg.holding){Wg.ht+=dt;if(Wg.ht>.3){const rate=P.raw>=0&&P.mode==='壓力'?6+22*P.raw:8+16*clamp((Wg.ht-.3)/2,0,1);Wg.acc+=rate*dt;while(Wg.acc>=1){Wg.acc--;spawnBean()}}}
+    for(const f of Wg.fly){f.t+=dt/.24;if(f.t>=1&&!f.done){f.done=true;if(!f.back){Wg.beans.push({x:f.x1,y:f.y1,rot:f.rot,w:f.w});Wg.weight+=f.w;beanClick()}}}
+    Wg.fly=Wg.fly.filter(f=>!f.done);
+    const w=Math.max(0,Wg.weight),dose=doseOf();
+    $('#wgW').innerHTML=w.toFixed(1)+'<small>g</small>';
+    const diff=w-dose;$('#wgS').textContent=Math.abs(diff)<=.2*S.barista.tolMul?`目標 ${dose.toFixed(1)}g・剛剛好`:diff>0?`目標 ${dose.toFixed(1)}g・多了 ${diff.toFixed(1)}g`:`目標 ${dose.toFixed(1)}g・還差 ${(-diff).toFixed(1)}g`;
+    $('#wgOk').disabled=w<dose-1.5;
+  },
+  draw(){
+    const g=weighGeo(),col=beanCol();ctx.drawImage(woodCv,0,0,W,H);plate(ctx,g.bx,g.by,R*1.85);
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=18;ctx.shadowOffsetY=8;ctx.fillStyle='#e9dfcf';ctx.beginPath();ctx.arc(g.bx,g.by,g.br,0,TAU);ctx.fill();ctx.restore();
+    const og=ctx.createRadialGradient(g.bx-g.br*.3,g.by-g.br*.35,g.br*.1,g.bx,g.by,g.br);og.addColorStop(0,'#fbf6ee');og.addColorStop(1,'#d8ccb8');ctx.fillStyle=og;ctx.beginPath();ctx.arc(g.bx,g.by,g.br,0,TAU);ctx.fill();
+    const ig=ctx.createRadialGradient(g.bx+g.br*.2,g.by+g.br*.2,g.br*.1,g.bx,g.by,g.br*.86);ig.addColorStop(0,'#efe5d4');ig.addColorStop(1,'#c9b99e');ctx.fillStyle=ig;ctx.beginPath();ctx.arc(g.bx,g.by,g.br*.86,0,TAU);ctx.fill();
+    for(const b of Wg.beans)drawBean(ctx,b.x,b.y,b.rot,1,col);
+    for(const f of Wg.fly){const t=clamp(f.t,0,1),x=lerp(f.x0,f.x1,t),y=lerp(f.y0,f.y1,t)-Math.sin(t*Math.PI)*R*.12;drawBean(ctx,x,y,f.rot+t*3,1+(1-t)*.5,col)}
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=16;ctx.shadowOffsetY=8;ctx.drawImage(jarCv,g.jx-g.jr-4,g.jy-g.jr-4,g.jr*2+8,g.jr*2+8);ctx.restore();
+    // scoop
+    const s=Wg.scoop,tx=lerp(g.jx+g.jr*.1,g.bx-g.br*.5,s),ty=lerp(g.jy+g.jr*.1,g.by-g.br*.62,s),ang=Math.atan2(g.jy-ty,g.jx-tx)+(s<.5?Math.PI*.25:0);
+    ctx.save();ctx.translate(tx,ty);ctx.rotate(ang);
+    ctx.strokeStyle='#9a6c45';ctx.lineWidth=R*.05;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(R*.14,0);ctx.lineTo(R*.62,0);ctx.stroke();
+    ctx.fillStyle='#b88a5c';ctx.beginPath();ctx.ellipse(0,0,R*.16,R*.12,0,0,TAU);ctx.fill();ctx.fillStyle='#8f6640';ctx.beginPath();ctx.ellipse(0,0,R*.12,R*.085,0,0,TAU);ctx.fill();
+    if(s>.5){for(let i=0;i<5;i++)drawBean(ctx,Math.cos(i*1.3)*R*.05,Math.sin(i*1.9)*R*.04,i,.9,col)}
+    ctx.restore();
+  }};
+
+/* =================== MODE: GRIND =================== */
+const Gr={};
+function grindEnter(){
+  const n=Math.round(S.weighed/.15),rnd=mulberry(21);
+  Object.assign(Gr,{ang:-Math.PI/2,prev:-Math.PI/2,lastA:null,ground:0,omega:0,samples:[],sT:0,crunch:0,started:false,done:false,lastWarn:0,
+    beans:Array.from({length:n},()=>({a:rnd()*TAU,r:R*(.16+rnd()*.36),rot:rnd()*TAU}))});
+  say(L().grind);
+  const rec=S.recipeId==='fourSix'?'mc':'mf';
+  panel(`<div class="flex flex-col gap-1.5"><div class="flex justify-between hint"><span>研磨度（建議：${GRINDS.find(g=>g.id===rec).name}）</span><span id="grTps">0.0 圈/秒</span></div>
+    <div class="prow" id="grSize">${GRINDS.map(g=>`<button class="mini" data-g="${g.id}" aria-pressed="${S.grind===g.id}">${g.name}</button>`).join('')}</div></div>
+    <div class="flex flex-col gap-1.5"><div class="flex justify-between hint"><span id="grTxt">在磨豆機上順時針畫圈轉動把手</span><span id="grPct" class="mono">0%</span></div><div class="meter"><b id="grBar"></b></div></div>
+    <button class="btn btn-main" id="grOk" disabled>磨好了・去選器具</button>`);
+  $('#grSize').onclick=e=>{const b=e.target.closest('.mini');if(!b||Gr.started)return;S.grind=b.dataset.g;$$('#grSize .mini').forEach(x=>x.setAttribute('aria-pressed',x.dataset.g===S.grind))};
+  $('#grOk').onclick=()=>go('gear');
+}
+MODES.grind={enter:grindEnter,
+  down(x,y){Gr.lastA=Math.atan2(y-cy,x-cx)},
+  move(x,y){if(!P.down||Gr.lastA===null)return;const a=Math.atan2(y-cy,x-cx);let d=a-Gr.lastA;while(d>Math.PI)d-=TAU;while(d<-Math.PI)d+=TAU;Gr.lastA=a;
+    if(Math.hypot(x-cx,y-cy)<R*.2)return;
+    if(d>0){Gr.ang+=d;if(!Gr.started){Gr.started=true;$$('#grSize .mini').forEach(b=>b.disabled=true)}
+      if(!Gr.done){const gs=GRINDS.find(g=>g.id===S.grind);Gr.ground=Math.min(S.weighed,Gr.ground+d/TAU*gs.turn);Gr.crunch+=d*3.2;while(Gr.crunch>=1){Gr.crunch--;crunch()}
+        if(Gr.ground>=S.weighed){Gr.done=true;say(L().grindDone);finishGrind()}}}
+    else if(d<-.08&&T-Gr.lastWarn>2.5){Gr.lastWarn=T;toast('順時針轉喔')}},
+  up(){Gr.lastA=null},
+  update(dt){
+    const inst=Math.max(0,Gr.ang-Gr.prev)/Math.max(dt,1e-3);Gr.prev=Gr.ang;Gr.omega=lerp(Gr.omega,inst,Math.min(1,dt*5));
+    const tps=Gr.omega/TAU;
+    if(P.down&&!Gr.done&&tps>.15){Gr.sT+=dt;if(Gr.sT>.2){Gr.sT=0;Gr.samples.push(tps)}}
+    if(tps>2.2&&!Gr.done&&T-Gr.lastWarn>3){Gr.lastWarn=T;say(L().grindFast)}
+    $('#grTps').textContent=tps.toFixed(1)+' 圈/秒'+(tps>2.2?'・太快':tps>.5&&tps<1.6?'・剛好':'');
+    const p=Gr.ground/S.weighed;$('#grBar').style.width=(p*100)+'%';$('#grPct').textContent=Math.round(p*100)+'%';
+  },
+  draw(){
+    ctx.drawImage(woodCv,0,0,W,H);
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=28;ctx.shadowOffsetY=12;ctx.fillStyle='#4a2f20';ctx.beginPath();ctx.arc(cx,cy,R*.8,0,TAU);ctx.fill();ctx.restore();
+    const wg=ctx.createRadialGradient(cx-R*.3,cy-R*.3,R*.1,cx,cy,R*.8);wg.addColorStop(0,'#8a5a3b');wg.addColorStop(1,'#4a2f20');ctx.fillStyle=wg;ctx.beginPath();ctx.arc(cx,cy,R*.8,0,TAU);ctx.fill();
+    ctx.strokeStyle='rgba(30,14,6,.25)';ctx.lineWidth=1;for(let k=0;k<5;k++){ctx.beginPath();ctx.arc(cx,cy,R*(.66+k*.03),0,TAU);ctx.stroke()}
+    const sg=ctx.createLinearGradient(cx-R*.64,cy-R*.64,cx+R*.64,cy+R*.64);sg.addColorStop(0,'#e3e6e8');sg.addColorStop(.5,'#8d9599');sg.addColorStop(1,'#d5d9db');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(cx,cy,R*.64,0,TAU);ctx.fill();ctx.fillStyle='#2a2522';ctx.beginPath();ctx.arc(cx,cy,R*.58,0,TAU);ctx.fill();
+    const vis=Math.ceil(Gr.beans.length*(1-Gr.ground/Math.max(.1,S.weighed))),col=beanCol();
+    for(let i=0;i<vis;i++){const b=Gr.beans[i],a=b.a+Gr.ang*.12*(1-b.r/R);drawBean(ctx,cx+Math.cos(a)*b.r,cy+Math.sin(a)*b.r,b.rot+Gr.ang*.1,1,col)}
+    if(vis<Gr.beans.length*.5){ctx.fillStyle='rgba(110,70,40,.35)';ctx.beginPath();ctx.arc(cx,cy,R*.3,0,TAU);ctx.fill()}
+    // crank
+    const kx=cx+Math.cos(Gr.ang)*R*1.02,ky=cy+Math.sin(Gr.ang)*R*1.02;
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=12;ctx.shadowOffsetY=8;ctx.lineCap='round';
+    ctx.strokeStyle='#6f777b';ctx.lineWidth=R*.1;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(kx,ky);ctx.stroke();ctx.restore();
+    ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=R*.025;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(kx,ky);ctx.stroke();
+    const hg=ctx.createRadialGradient(cx-R*.04,cy-R*.04,1,cx,cy,R*.13);hg.addColorStop(0,'#f2f4f5');hg.addColorStop(1,'#6f777b');ctx.fillStyle=hg;ctx.beginPath();ctx.arc(cx,cy,R*.13,0,TAU);ctx.fill();
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=14;ctx.shadowOffsetY=8;const kg=ctx.createRadialGradient(kx-R*.05,ky-R*.05,1,kx,ky,R*.16);kg.addColorStop(0,'#c08a5c');kg.addColorStop(1,'#6a4026');ctx.fillStyle=kg;ctx.beginPath();ctx.arc(kx,ky,R*.16,0,TAU);ctx.fill();ctx.restore();
+    if(!Gr.started){ctx.strokeStyle='rgba(242,231,213,.55)';ctx.lineWidth=2.5;ctx.setLineDash([6,8]);ctx.beginPath();ctx.arc(cx,cy,R*1.25,-1.2+T*.6,1.6+T*.6);ctx.stroke();ctx.setLineDash([]);
+      const a=1.6+T*.6,ax=cx+Math.cos(a)*R*1.25,ay=cy+Math.sin(a)*R*1.25;ctx.fillStyle='rgba(242,231,213,.7)';ctx.beginPath();ctx.moveTo(ax+Math.cos(a+1.57)*10,ay+Math.sin(a+1.57)*10);ctx.lineTo(ax+Math.cos(a)*7,ay+Math.sin(a)*7);ctx.lineTo(ax-Math.cos(a)*7,ay-Math.sin(a)*7);ctx.fill()}
+  }};
+function finishGrind(){
+  const s=Gr.samples;let st=.7;
+  if(s.length>=3){const m=s.reduce((a,b)=>a+b,0)/s.length,sd=Math.sqrt(s.reduce((a,b)=>a+(b-m)**2,0)/s.length),fast=s.filter(v=>v>1.9).length/s.length;st=clamp(1-(sd/m)*.8-fast*.6,0,1)}
+  S.steady=st;$('#grTxt').textContent=`研磨完成・轉速穩定度 ${Math.round(st*100)}%`;$('#grOk').disabled=false;
+}
+
+/* =================== MODE: FILTER =================== */
+const Fl={};
+const homePos=()=>({x:Math.min(W-R*.45,cx+R*1.0),y:Math.min(cy+R*1.3,BOT-R*.3)});
+function filterEnter(){
+  buildGear();const h=homePos();
+  Object.assign(Fl,{phase:'paper',px:h.x,py:h.y,drag:false,placed:0,gin:0,M:new Float32Array(N*N),taps:0,flat:0,shake:0,specks:[]});
+  say(L().paper);
+  panel(`<div class="flex flex-col gap-1.5"><div class="flex justify-between hint"><span id="flTxt">把濾紙拖進濾杯</span><span id="flVal" class="mono"></span></div><div class="meter"><b id="flBar"></b></div></div>
+    <button class="btn btn-main" id="flOk" disabled>整平了・去燒水</button>`);
+  $('#flOk').onclick=()=>{S.flat=Fl.flat;go('boil')};
+}
+function flatness(){let s=0,n=0;for(let c=0;c<N*N;c++)if(mask[c]){s+=Fl.M[c];n++}const m=s/n;let v=0;for(let c=0;c<N*N;c++)if(mask[c])v+=(Fl.M[c]-m)**2;return m>0?clamp(1-Math.sqrt(v/n)/m*1.15,0,1):0}
+MODES.filter={enter:filterEnter,
+  down(x,y){
+    if(Fl.phase==='paper'||Fl.phase==='pour'){if(Math.hypot(x-Fl.px,y-Fl.py)<R*.55){Fl.drag=true;Fl.ox=Fl.px-x;Fl.oy=Fl.py-y}}
+    else if(Fl.phase==='level'){Fl.shake=1;Fl.taps++;tick(rand(300,600),.25,.08);
+      let s=0,n=0;for(let c=0;c<N*N;c++)if(mask[c]){s+=Fl.M[c];n++}const m=s/n;for(let c=0;c<N*N;c++)if(mask[c])Fl.M[c]=lerp(Fl.M[c],m,.3)+m*rand(-.02,.02);
+      Fl.flat=flatness();if(Fl.flat>.88&&!Fl.saidGood){Fl.saidGood=true;say(L().levelGood)}$('#flOk').disabled=false}},
+  move(x,y){if(Fl.drag){Fl.px=x+Fl.ox;Fl.py=y+Fl.oy}},
+  up(){if(!Fl.drag)return;Fl.drag=false;
+    if(Fl.phase==='paper'){if(Math.hypot(Fl.px-cx,Fl.py-cy)<R*.6){Fl.phase='placing';tick(900,.12,.1)}else{const h=homePos();Fl.px=h.x;Fl.py=h.y}}
+    else if(Fl.phase==='pour'){const h=homePos();Fl.px=h.x;Fl.py=h.y}},
+  update(dt){
+    Fl.shake=Math.max(0,Fl.shake-dt*3);
+    if(Fl.phase==='placing'){Fl.placed=Math.min(1,Fl.placed+dt*2.5);if(Fl.placed>=1){Fl.phase='pour';const h=homePos();Fl.px=h.x;Fl.py=h.y;say(L().pour)}}
+    if(Fl.phase==='pour'&&Fl.drag){const d=Math.hypot(Fl.px-cx,Fl.py-cy);
+      if(d<R*.75){const add=Math.min(S.weighed-Fl.gin,5.5*dt);Fl.gin+=add;
+        const dx=cx-Fl.px,dy=cy-Fl.py,dl=Math.max(1,Math.hypot(dx,dy)),lx=Fl.px+dx/dl*R*.28,ly=Fl.py+dy/dl*R*.28;
+        let tx=lx+rand(-6,6),ty=ly+rand(-6,6);const td=Math.hypot(tx-cx,ty-cy);if(td>bedR*.8){tx=cx+(tx-cx)*bedR*.8/td;ty=cy+(ty-cy)*bedR*.8/td}
+        const cs=2*bedR/N,rad=bedR*.38;for(let j=0;j<N;j++)for(let i=0;i<N;i++){const c=j*N+i;if(!mask[c])continue;const ex=cx-bedR+(i+.5)*cs-tx,ey=cy-bedR+(j+.5)*cs-ty;Fl.M[c]+=add*Math.exp(-(ex*ex+ey*ey)/(2*rad*rad))*.05}
+        for(let k=0;k<3;k++)Fl.specks.push({x:lx+rand(-4,4),y:ly+rand(-4,4),tx:tx+rand(-10,10),ty:ty+rand(-10,10),t:0});
+        if(Math.random()<dt*20)tick(rand(5000,8000),.04,.03);
+        if(Fl.gin>=S.weighed-.01){Fl.phase='level';Fl.drag=false;const h=homePos();Fl.px=h.x;Fl.py=h.y;Fl.flat=flatness();say(L().level)}}}
+    for(const s of Fl.specks)s.t+=dt*4;Fl.specks=Fl.specks.filter(s=>s.t<1);
+    const txt={paper:'把濾紙拖進濾杯',placing:'濾紙放好了',pour:'把粉杯拖到濾杯上方，按住倒粉',level:'輕點畫面拍拍濾杯，讓粉面變平'}[Fl.phase];
+    $('#flTxt').textContent=txt;
+    if(Fl.phase==='level'){$('#flVal').textContent=`平整度 ${Math.round(Fl.flat*100)}%・拍了 ${Fl.taps} 下`;$('#flBar').style.width=(Fl.flat*100)+'%'}
+    else{$('#flVal').textContent=Fl.phase==='pour'?`${Fl.gin.toFixed(1)} / ${S.weighed.toFixed(1)}g`:'';$('#flBar').style.width=(Fl.phase==='pour'?Fl.gin/S.weighed*100:Fl.placed*100)+'%'}
+  },
+  draw(){
+    const sx=Math.sin(T*70)*Fl.shake*4;
+    ctx.drawImage(baseCv,0,0,W,H);
+    ctx.save();ctx.translate(sx,0);
+    ctx.drawImage(rigBare,0,0,W,H);
+    if(Fl.placed>0){ctx.globalAlpha=Fl.placed;ctx.drawImage(rigCv,0,0,W,H);ctx.globalAlpha=1}
+    if(Fl.gin>0){
+      const fill=Fl.gin/S.weighed,rb=bedR*(.5+.5*Math.min(1,fill*1.4));
+      ctx.save();ctx.beginPath();ctx.arc(cx,cy,rb,0,TAU);ctx.clip();ctx.drawImage(bedCv,cx-bedR,cy-bedR,bedR*2,bedR*2);
+      let s=0,n=0;for(let c=0;c<N*N;c++)if(mask[c]){s+=Fl.M[c];n++}const m=s/n||1e-3;
+      for(let c=0;c<N*N;c++){const k=c*4,h=mask[c]?(Fl.M[c]-m)/m:0;
+        if(h>0){wetImg.data[k]=220;wetImg.data[k+1]=180;wetImg.data[k+2]=135;wetImg.data[k+3]=Math.min(.55,h*.45)*255}
+        else{wetImg.data[k]=25;wetImg.data[k+1]=12;wetImg.data[k+2]=6;wetImg.data[k+3]=Math.min(.6,-h*.6)*255}}
+      wetG.putImageData(wetImg,0,0);ctx.drawImage(wetCv,cx-bedR,cy-bedR,bedR*2,bedR*2);ctx.restore();
+    }
+    ctx.restore();
+    for(const s of Fl.specks){ctx.fillStyle='#5b3b26';ctx.fillRect(lerp(s.x,s.tx,s.t),lerp(s.y,s.ty,s.t),2,2)}
+    if(Fl.phase==='paper'){
+      ctx.save();ctx.translate(Fl.px,Fl.py);ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=10;ctx.shadowOffsetY=5;ctx.fillStyle='#f8f1e3';
+      if(DRIPPERS[S.dripper].flat){ctx.beginPath();for(let a=0;a<=TAU+.01;a+=TAU/80){const r=R*.36*(1+.06*Math.sin(a*20));a?ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r):ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.fill();ctx.shadowColor='transparent';ctx.strokeStyle='rgba(140,110,70,.25)';ctx.beginPath();ctx.arc(0,0,R*.18,0,TAU);ctx.stroke()}
+      else{ctx.beginPath();ctx.moveTo(-R*.32,R*.28);ctx.arc(-R*.32,R*.28,R*.62,-1.57,0);ctx.closePath();ctx.fill();ctx.shadowColor='transparent';ctx.strokeStyle='rgba(140,110,70,.3)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-R*.32,R*.28);ctx.lineTo(R*.12,-R*.16);ctx.stroke()}
+      ctx.restore();
+    }else if(Fl.phase==='pour'||Fl.phase==='placing'){
+      const over=Fl.drag&&Math.hypot(Fl.px-cx,Fl.py-cy)<R*.75,rem=1-Fl.gin/S.weighed;
+      ctx.save();ctx.translate(Fl.px,Fl.py);if(over)ctx.rotate(Math.atan2(cy-Fl.py,cx-Fl.px));ctx.scale(over?.8:1,1);
+      ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=14;ctx.shadowOffsetY=8;
+      const cg=ctx.createRadialGradient(-R*.08,-R*.08,2,0,0,R*.3);cg.addColorStop(0,'#e6e9eb');cg.addColorStop(1,'#7f878c');ctx.fillStyle=cg;ctx.beginPath();ctx.arc(0,0,R*.3,0,TAU);ctx.fill();
+      ctx.shadowColor='transparent';ctx.fillStyle='#3a2a20';ctx.beginPath();ctx.arc(0,0,R*.25,0,TAU);ctx.fill();
+      if(rem>0){ctx.save();ctx.beginPath();ctx.arc(0,0,R*.25*Math.sqrt(rem),0,TAU);ctx.clip();ctx.drawImage(bedCv,-R*.25,-R*.25,R*.5,R*.5);ctx.restore()}
+      ctx.restore();
+      if(!Fl.drag&&Fl.phase==='pour'){ctx.strokeStyle=`rgba(242,231,213,${.4+.3*Math.sin(T*4)})`;ctx.lineWidth=2;ctx.setLineDash([5,6]);ctx.beginPath();ctx.arc(Fl.px,Fl.py,R*.4,0,TAU);ctx.stroke();ctx.setLineDash([])}
+    }
+    if(Fl.phase==='paper'&&!Fl.drag){ctx.strokeStyle=`rgba(242,231,213,${.4+.3*Math.sin(T*4)})`;ctx.lineWidth=2;ctx.setLineDash([5,6]);ctx.beginPath();ctx.arc(cx,cy,R*.9,0,TAU);ctx.stroke();ctx.setLineDash([])}
+  }};
+
+/* =================== MODE: BOIL =================== */
+const Bo={};
+function boilEnter(){
+  Object.assign(Bo,{T:24,heating:false,steam:[],glow:0,said:{}});
+  const [t0,t1]=ROAST[S.bean.roast].temp;say(L().boil);
+  panel(`<div class="grid grid-cols-2 gap-2.5">
+    <div class="lcdbox"><span class="lbl"><span>TEMP</span><span id="boSt">冷水</span></span><span class="val" id="boT">24.0<small>°C</small></span><span class="sub">目標 ${t0}–${t1}°C・${ROAST[S.bean.roast].name}</span></div>
+    <button class="btn btn-ghost" id="boHeat" style="border-radius:14px;touch-action:none">按住加熱</button></div>
+    <button class="btn btn-main" id="boOk" disabled>倒進手沖壺・開始沖煮</button>`);
+  const h=$('#boHeat'),on=e=>{e.preventDefault();Bo.heating=true;audioInit()},off_=()=>{Bo.heating=false};
+  h.addEventListener('pointerdown',on);['pointerup','pointerleave','pointercancel'].forEach(ev=>h.addEventListener(ev,off_));
+  $('#boOk').onclick=()=>{const [a,b]=ROAST[S.bean.roast].temp,t=Bo.T,d=t<a?a-t:t>b?t-b:0;S.temp=Math.round(t*10)/10;S.tempQ=Math.max(0,1-d/6);go('brew')};
+}
+MODES.boil={enter:boilEnter,down(){Bo.heating=true},up(){Bo.heating=false},
+  update(dt){
+    const heat=Bo.heating||P.down;
+    if(heat)Bo.T=Math.min(100,Bo.T+(Bo.T<80?7:2.4)*dt);else Bo.T=Math.max(24,Bo.T-(Bo.T>95?.9:.3)*dt);
+    Bo.glow=lerp(Bo.glow,heat?1:0,Math.min(1,dt*3));
+    const [a,b]=ROAST[S.bean.roast].temp;
+    if(Bo.T>=a&&Bo.T<=b&&!Bo.said.good){Bo.said.good=true;say(L().boilGood);blip(880,1320,.25,.05)}
+    if(Bo.T>=99&&!Bo.said.hot){Bo.said.hot=true;say(L().boilHot)}
+    if(Bo.T<b-1)Bo.said.hot=false;
+    const sr=Math.max(0,(Bo.T-55)/45);if(Math.random()<dt*14*sr)Bo.steam.push({x:0,y:0,src:Math.random()<.7?0:1,life:0,r:R*.06,dx:rand(-6,6)});
+    for(const s of Bo.steam){s.life+=dt;s.y-=dt*R*.35;s.x+=s.dx*dt+Math.sin(s.life*2)*dt*8;s.r+=dt*R*.12}
+    Bo.steam=Bo.steam.filter(s=>s.life<2.6);
+    setGain(boilCh,Bo.T>45?clamp((Bo.T-45)/55,0,1)*.22*(Bo.T>=99?rand(.7,1.3):rand(.85,1.1)):0,.1);
+    $('#boT').innerHTML=Bo.T.toFixed(1)+'<small>°C</small>';
+    $('#boSt').textContent=Bo.T>=99?'沸騰':Bo.T>=a&&Bo.T<=b?'剛好':Bo.T>b?'偏燙':Bo.T>70?'快好了':'加熱中';
+    $('#boOk').disabled=Bo.T<80;$('#boHeat').textContent=heat?'加熱中…':'按住加熱';
+  },
+  draw(){
+    const fy=cy+R*.62;
+    const wg=ctx.createLinearGradient(0,0,0,fy);wg.addColorStop(0,'#3a2a20');wg.addColorStop(1,'#5a4232');ctx.fillStyle=wg;ctx.fillRect(0,0,W,fy);
+    ctx.strokeStyle='rgba(255,230,200,.06)';ctx.lineWidth=1;const th=R*.22;
+    for(let y=fy-th,r=0;y>0;y-=th,r++){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();for(let x=(r%2)*th;x<W;x+=th*2){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+th);ctx.stroke()}}
+    const lamp=ctx.createRadialGradient(cx,TOP-20,10,cx,TOP,R*2.6);lamp.addColorStop(0,'rgba(255,205,140,.22)');lamp.addColorStop(1,'rgba(255,205,140,0)');ctx.fillStyle=lamp;ctx.fillRect(0,0,W,fy);
+    ctx.save();ctx.beginPath();ctx.rect(0,fy,W,H-fy);ctx.clip();ctx.drawImage(woodCv,0,0,W,H);ctx.restore();
+    ctx.fillStyle='rgba(255,220,180,.15)';ctx.fillRect(0,fy,W,2);
+    // induction plate
+    const pw=R*1.7;ctx.fillStyle='#161413';ctx.beginPath();ctx.roundRect(cx-pw/2,fy-R*.1,pw,R*.12,R*.04);ctx.fill();
+    if(Bo.glow>.02){const gl=ctx.createRadialGradient(cx,fy-R*.08,2,cx,fy-R*.08,R*.8);gl.addColorStop(0,`rgba(255,120,50,${.45*Bo.glow})`);gl.addColorStop(1,'rgba(255,120,50,0)');ctx.fillStyle=gl;ctx.fillRect(cx-R,fy-R*.6,R*2,R*.7)}
+    // kettle
+    const by=fy-R*.1,kw=R*1.25,kh=R*.85;
+    ctx.save();ctx.lineCap='round';
+    ctx.strokeStyle='#8a5a3b';ctx.lineWidth=R*.09;ctx.beginPath();ctx.moveTo(cx+kw*.42,by-kh*.88);ctx.bezierCurveTo(cx+kw*.85,by-kh*.95,cx+kw*.8,by-kh*.25,cx+kw*.46,by-kh*.22);ctx.stroke();
+    ctx.strokeStyle='#1e1b19';ctx.lineWidth=R*.075;ctx.beginPath();ctx.moveTo(cx-kw*.4,by-kh*.2);ctx.bezierCurveTo(cx-kw*.78,by-kh*.15,cx-kw*.68,by-kh*.9,cx-kw*.98,by-kh*1.05);ctx.stroke();
+    ctx.strokeStyle='rgba(255,240,220,.18)';ctx.lineWidth=R*.02;ctx.stroke();
+    const kg=ctx.createLinearGradient(cx-kw/2,0,cx+kw/2,0);kg.addColorStop(0,'#1a1715');kg.addColorStop(.35,'#3a3531');kg.addColorStop(1,'#141210');
+    ctx.fillStyle=kg;ctx.beginPath();ctx.moveTo(cx-kw*.5,by);ctx.lineTo(cx-kw*.47,by-kh*.7);ctx.quadraticCurveTo(cx-kw*.44,by-kh,cx-kw*.25,by-kh);ctx.lineTo(cx+kw*.25,by-kh);ctx.quadraticCurveTo(cx+kw*.44,by-kh,cx+kw*.47,by-kh*.7);ctx.lineTo(cx+kw*.5,by);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#24201d';ctx.beginPath();ctx.roundRect(cx-kw*.22,by-kh*1.08,kw*.44,kh*.1,4);ctx.fill();
+    ctx.fillStyle='#9a6a45';ctx.beginPath();ctx.ellipse(cx,by-kh*1.12,kw*.07,kh*.06,0,0,TAU);ctx.fill();
+    // thermometer dial
+    const dx=cx,dy=by-kh*.5,dr=R*.17;ctx.fillStyle='#f3ece0';ctx.beginPath();ctx.arc(dx,dy,dr,0,TAU);ctx.fill();ctx.strokeStyle='#8f969b';ctx.lineWidth=2;ctx.stroke();
+    const [a,b]=ROAST[S.bean.roast].temp,toA=t=>Math.PI*.75+(t-20)/80*Math.PI*1.5;
+    ctx.strokeStyle='rgba(201,106,67,.85)';ctx.lineWidth=dr*.22;ctx.beginPath();ctx.arc(dx,dy,dr*.72,toA(a),toA(b));ctx.stroke();
+    ctx.strokeStyle='#33251c';ctx.lineWidth=1;for(let t=20;t<=100;t+=10){const an=toA(t);ctx.beginPath();ctx.moveTo(dx+Math.cos(an)*dr*.82,dy+Math.sin(an)*dr*.82);ctx.lineTo(dx+Math.cos(an)*dr*.95,dy+Math.sin(an)*dr*.95);ctx.stroke()}
+    const na=toA(Bo.T);ctx.strokeStyle='#c96a43';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(dx+Math.cos(na)*dr*.78,dy+Math.sin(na)*dr*.78);ctx.stroke();ctx.fillStyle='#33251c';ctx.beginPath();ctx.arc(dx,dy,2.5,0,TAU);ctx.fill();
+    ctx.restore();
+    const src=[{x:cx-kw*.98,y:by-kh*1.05},{x:cx,y:by-kh*1.12}];
+    for(const s of Bo.steam){const o=src[s.src],x=o.x+s.x,y=o.y+s.y,al=Math.sin(Math.min(1,s.life/2.6)*Math.PI)*.18*clamp((Bo.T-50)/50,0,1);
+      const sg=ctx.createRadialGradient(x,y,0,x,y,s.r);sg.addColorStop(0,`rgba(255,250,240,${al})`);sg.addColorStop(1,'rgba(255,250,240,0)');ctx.fillStyle=sg;ctx.fillRect(x-s.r,y-s.r,s.r*2,s.r*2)}
+  }};
+
+/* =================== MODE: BREW =================== */
+const wetCv=document.createElement('canvas');wetCv.width=wetCv.height=N;const wetG=wetCv.getContext('2d');const wetImg=wetG.createImageData(N,N);
+const blCv=document.createElement('canvas');blCv.width=blCv.height=N;const blG=blCv.getContext('2d');const blImg=blG.createImageData(N,N);
+const G={};let lastHint='';let introOpen=false;
+function resetBrew(){
+  const r=S.recipe;
+  Object.assign(G,{brewT:0,timerOn:false,started:false,poured:0,pool:0,server:0,spill:0,bypass:0,flow:0,
+    wet:new Float32Array(N*N),co2:new Float32Array(N*N).fill(S.barista.aroma),bloom:new Float32Array(N*N),
+    k:0,phase:'pour',idle:0,rec:r.stages.map(()=>({startT:null,endW:null,fSum:0,water:0})),
+    bubbles:[],ripples:[],grounds:[],steam:[],spills:[],aromaCount:0,finished:false,drainDone:0,ripT:0,dripT:0,lastToast:0,jit:0,kettle:0,ix:undefined,iy:undefined});
+  lastHint='';
+}
+function brewEnter(){
+  resetBrew();buildGear();say(L().brew);
+  $('#segs').innerHTML=S.recipe.stages.map(()=>'<i><b></b></i>').join('');
+  panel(`<div class="grid grid-cols-2 gap-2.5">
+    <button id="timerBtn" class="lcdbox" aria-label="計時器：點擊開始或暫停"><span class="lbl"><span>TIMER</span><span id="tState">● 待機</span></span><span class="val" id="tTxt">00:00.00</span><span class="sub" id="tSub">注水自動開始</span></button>
+    <div class="lcdbox"><span class="lbl"><span>WEIGHT</span><span id="flowTxt">0.0 g/s</span></span><span class="val" id="wTxt">0.0<small>g</small></span><span class="sub" id="wSub"></span></div></div>`);
+  $('#timerBtn').onclick=()=>{G.timerOn=!G.timerOn;G.started=true;audioInit()};
+  introOpen=false;
+  toast(P.forceSeen?'按住畫圈注水・按越用力水流越粗':'按住畫圈注水・按越久水流越粗',3200);
+}
+$('#finishBtn').onclick=()=>finishBrew();
+function setPourTarget(x,y,touch){P.tx=x;P.ty=touch?y-52:y}
+function deposit(x,y,amt,rad){
+  const cs=2*bedR/N,x0=cx-bedR,y0=cy-bedR;let sum=0;const ws=[];
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const c=j*N+i;if(!mask[c])continue;const dx=x0+(i+.5)*cs-x,dy=y0+(j+.5)*cs-y;const w=Math.exp(-(dx*dx+dy*dy)/(2*rad*rad));if(w>.01){ws.push(c,w);sum+=w}}
+  if(sum<=0)return;for(let k=0;k<ws.length;k+=2)G.wet[ws[k]]+=amt*ws[k+1]/sum;
+}
+MODES.brew={enter:brewEnter,
+  down(x,y,touch){if(introOpen){P.down=false;return}setPourTarget(x,y,touch);if((G.kettle||0)<.2){P.x=P.tx;P.y=P.ty}},
+  move(x,y,touch){setPourTarget(x,y,touch)},
+  update(dt){
+    const pouring=P.down&&!G.finished&&!introOpen;
+    const tf=pouring?targetForce():0;P.force+=(tf-P.force)*Math.min(1,dt*(pouring?7:12));
+    P.x+=(P.tx-P.x)*Math.min(1,dt*11);P.y+=(P.ty-P.y)*Math.min(1,dt*11);
+    const amp=R*.05*(.25+P.force)*(1-S.barista.stab);
+    G.ix=P.x+amp*(Math.sin(T*6.1)+.5*Math.sin(T*13.7+1.3));G.iy=P.y+amp*(Math.cos(T*5.3)+.5*Math.sin(T*11.2+.4));
+    G.kettle=lerp(G.kettle,pouring?1:0,Math.min(1,dt*7));
+    const st=S.recipe.stages,last=st.length-1;
+    if(pouring){
+      if(!G.started){G.started=true;G.timerOn=true}
+      if(G.phase==='wait'){G.rec[G.k].endW=G.poured;G.k++;G.phase='pour'}
+      else if(G.phase==='drawdown'){G.phase='pour';$('#finishBtn').hidden=true}
+      const r=G.rec[G.k];if(r.startT===null)r.startT=G.brewT;
+      const flow=1+7.4*Math.pow(P.force,1.25),add=flow*dt;G.flow=flow;const d=Math.hypot(G.ix-cx,G.iy-cy);
+      if(d<=R*.9){G.poured+=add;G.pool+=add;r.fSum+=P.force*add;r.water+=add;
+        if(d<=bedR*1.08)deposit(G.ix,G.iy,add,bedR*(.09+.08*P.force));
+        else{G.bypass+=add;if(T-G.lastToast>2.5){G.lastToast=T;toast('水沖到濾紙邊了，往中間一點')}}
+        G.ripT-=dt;if(G.ripT<=0){G.ripT=.07-.03*P.force;G.ripples.push({x:G.ix,y:G.iy,r:2,v:26+P.force*50,a:.5})}
+        if(P.force>.5&&d<bedR*1.05){for(let i=0;i<Math.round(P.force*5);i++)G.grounds.push({x:G.ix,y:G.iy,a:Math.random()*TAU,r:3+Math.random()*(10+P.force*22),w:(Math.random()<.5?-1:1)*(4+Math.random()*6),life:1,c:Math.random()<.3?'#d9b48a':Math.random()<.5?'#3d2416':'#6b4128'})}
+      }else{G.spill+=add;if(Math.random()<.4)G.spills.push({x:G.ix+rand(-5,5),y:G.iy+rand(-5,5),r:rand(3,10)});if(G.spills.length>220)G.spills.shift();
+        if(T-G.lastToast>2.5){G.lastToast=T;toast('水倒到濾杯外了')}}
+      G.idle=0;
+    }else{G.idle+=dt;G.flow=0}
+    if(G.timerOn)G.brewT+=dt;
+    if(G.pool>0){const gf=GRINDS.find(g=>g.id===S.grind).drain*DRIPPERS[S.dripper].drain;const early=G.brewT<25?.75:1;const dd=Math.min(G.pool,(1.3+G.pool*.03)*early*gf*dt);G.pool-=dd;G.server+=dd;
+      G.dripT-=dt;if(G.dripT<=0){G.dripT=rand(.35,.95);if(!pouring)drip()}}
+    const s=st[G.k],thr=(s.lo??s.target-2);
+    if(G.phase==='pour'&&!pouring&&G.idle>.5&&G.poured>=thr)G.phase=G.k===last?'drawdown':'wait';
+    if(G.phase==='drawdown'){$('#finishBtn').hidden=false;if(G.pool<.5){G.drainDone+=dt;if(G.drainDone>1.4)finishBrew()}}else G.drainDone=0;
+    for(let c=0;c<N*N;c++){if(!mask[c])continue;const w=G.wet[c];
+      if(w>.05&&G.co2[c]>.01){const rel=G.co2[c]*Math.min(1,w*3)*dt*.07;G.co2[c]-=rel;G.bloom[c]=Math.min(1,G.bloom[c]+rel*6);
+        if(Math.random()<rel*130&&G.bubbles.length<280){const cs=2*bedR/N,i=c%N,j=(c/N)|0;
+          G.bubbles.push({x:cx-bedR+(i+Math.random())*cs,y:cy-bedR+(j+Math.random())*cs,r:.5,m:1.2+Math.random()*3.2*S.barista.aroma,g:2+Math.random()*4,pop:false,a:1});if(G.brewT<50)G.aromaCount++}}
+      else if(G.bloom[c]>0)G.bloom[c]=Math.max(0,G.bloom[c]-dt*.01)}
+    for(const b of G.bubbles){if(!b.pop){b.r+=b.g*dt;if(b.r>=b.m)b.pop=true}else{b.a-=dt*4;b.r+=dt*6}}G.bubbles=G.bubbles.filter(b=>b.a>0);
+    for(const r of G.ripples){r.r+=r.v*dt;r.a-=dt*.9}G.ripples=G.ripples.filter(r=>r.a>0);
+    for(const g of G.grounds){g.a+=g.w*dt/Math.max(.4,g.r/12);g.r+=dt*6;g.life-=dt*1.4}G.grounds=G.grounds.filter(g=>g.life>0);
+    if((G.pool>2||G.poured>5)&&Math.random()<dt*6)G.steam.push({x:cx+rand(-.6,.6)*bedR,y:cy+rand(-.4,.4)*bedR,r:bedR*.25,a:0,life:0});
+    for(const p of G.steam){p.life+=dt;p.y-=dt*16;p.x+=Math.sin(p.life*1.3+p.r)*dt*6;p.r+=dt*6;p.a=Math.sin(Math.min(1,p.life/4)*Math.PI)*.07}G.steam=G.steam.filter(p=>p.life<4);
+    setGain(pourCh,pouring?.04+P.force*.16:0,.07);if(ac&&pourCh)pourCh.f.frequency.setTargetAtTime(650+P.force*1500+(G.pool>20?-200:0),ac.currentTime,.1);
+    G.jit=pouring?rand(-.05,.05):0;
+    renderBrewHud();
+  },
+  draw(){
+    ctx.drawImage(baseCv,0,0,W,H);
+    const cf=clamp(G.server/S.recipe.total,0,1);
+    if(cf>0&&S.server==='glass'){ctx.beginPath();ctx.arc(cx,cy,R*1.08,0,TAU);ctx.arc(cx,cy,R*.98,0,TAU,true);ctx.fillStyle=`rgba(80,40,18,${.25+cf*.6})`;ctx.fill()}
+    ctx.drawImage(rigCv,0,0,W,H);
+    let bAvg=0,cnt=0;for(let c=0;c<N*N;c++)if(mask[c]){bAvg+=G.bloom[c];cnt++}bAvg/=cnt||1;
+    const sub=clamp(G.pool/60,0,1),swell=bAvg*.055*(1-sub*.6),br=bedR*(1+swell);
+    ctx.save();ctx.beginPath();ctx.arc(cx,cy,br,0,TAU);ctx.clip();ctx.drawImage(bedCv,cx-br,cy-br,br*2,br*2);
+    const fl=S.flat;
+    for(let c=0;c<N*N;c++){const w=G.wet[c],k=c*4,a=mask[c]?Math.min(1,w*2.2)*.82:0;
+      wetImg.data[k]=46;wetImg.data[k+1]=26;wetImg.data[k+2]=15;wetImg.data[k+3]=a*255;
+      const b=G.bloom[c]*(1-sub*.7);blImg.data[k]=196;blImg.data[k+1]=146;blImg.data[k+2]=96;blImg.data[k+3]=b*120}
+    wetG.putImageData(wetImg,0,0);blG.putImageData(blImg,0,0);ctx.imageSmoothingEnabled=true;ctx.drawImage(wetCv,cx-br,cy-br,br*2,br*2);ctx.drawImage(blCv,cx-br,cy-br,br*2,br*2);
+    if(fl<.6&&G.poured<1){ctx.fillStyle=`rgba(230,190,140,${(.6-fl)*.35})`;ctx.beginPath();ctx.arc(cx+br*.1,cy-br*.08,br*.45,0,TAU);ctx.fill()}
+    if(bAvg>.02){const dg=ctx.createRadialGradient(cx-br*.3,cy-br*.35,br*.05,cx,cy,br);dg.addColorStop(0,`rgba(255,225,180,${bAvg*.28})`);dg.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=dg;ctx.fillRect(cx-br,cy-br,br*2,br*2)}
+    const rim=ctx.createRadialGradient(cx,cy,br*.7,cx,cy,br);rim.addColorStop(0,'rgba(0,0,0,0)');rim.addColorStop(1,'rgba(30,14,5,.45)');ctx.fillStyle=rim;ctx.fillRect(cx-br,cy-br,br*2,br*2);ctx.restore();
+    if(G.pool>1.5){const pr=bedR*(1+.42*Math.min(1,G.pool/90)),a=Math.min(.82,.22+G.pool/110);
+      const pg=ctx.createRadialGradient(cx-pr*.25,cy-pr*.3,pr*.1,cx,cy,pr);pg.addColorStop(0,`rgba(150,92,48,${a*.75})`);pg.addColorStop(1,`rgba(96,52,24,${a})`);
+      ctx.fillStyle=pg;ctx.beginPath();ctx.arc(cx,cy,pr,0,TAU);ctx.fill();ctx.strokeStyle=`rgba(226,180,125,${Math.min(.6,a)})`;ctx.lineWidth=2.5;ctx.stroke();
+      ctx.fillStyle=`rgba(255,240,220,${a*.18})`;ctx.beginPath();ctx.ellipse(cx-pr*.35,cy-pr*.4,pr*.28,pr*.1,-.6,0,TAU);ctx.fill()}
+    for(const b of G.bubbles){ctx.globalAlpha=b.a;ctx.fillStyle='rgba(205,160,110,.35)';ctx.strokeStyle='rgba(250,230,200,.6)';ctx.lineWidth=.8;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,TAU);if(!b.pop)ctx.fill();ctx.stroke();
+      if(!b.pop&&b.r>1.6){ctx.fillStyle='rgba(255,250,240,.8)';ctx.beginPath();ctx.arc(b.x-b.r*.35,b.y-b.r*.35,b.r*.25,0,TAU);ctx.fill()}}
+    ctx.globalAlpha=1;
+    for(const g of G.grounds){ctx.globalAlpha=Math.min(1,g.life*1.5);ctx.fillStyle=g.c;ctx.fillRect(g.x+Math.cos(g.a)*g.r,g.y+Math.sin(g.a)*g.r,1.8,1.8)}ctx.globalAlpha=1;
+    for(const r of G.ripples){ctx.strokeStyle=`rgba(255,236,210,${r.a*.6})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,TAU);ctx.stroke()}
+    for(const s of G.spills){ctx.fillStyle='rgba(200,225,240,.13)';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,TAU);ctx.fill()}
+    for(const p of G.steam){const sg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);sg.addColorStop(0,`rgba(255,250,240,${p.a})`);sg.addColorStop(1,'rgba(255,250,240,0)');ctx.fillStyle=sg;ctx.fillRect(p.x-p.r,p.y-p.r,p.r*2,p.r*2)}
+    drawKettle();
+  }};
+function drawKettle(){
+  const k=G.kettle||0,rest={x:W-R*.55,y:R*.9+70},ix=G.ix??rest.x,iy=G.iy??rest.y;
+  const tip={x:lerp(rest.x,ix+16,k),y:lerp(rest.y,iy-30,k)},body={x:W+R*.15,y:-R*.05},br=R*.85;
+  ctx.save();ctx.lineCap='round';
+  const path=()=>{ctx.beginPath();ctx.moveTo(body.x-br*.75,body.y+br*.55);ctx.bezierCurveTo(body.x-br*.95,body.y+br*1.5,tip.x+R*.75,tip.y-R*.2,tip.x,tip.y)};
+  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=16;ctx.shadowOffsetY=10;path();ctx.strokeStyle='#14110f';ctx.lineWidth=R*.13;ctx.stroke();ctx.shadowColor='transparent';
+  path();ctx.strokeStyle='#2b2723';ctx.lineWidth=R*.1;ctx.stroke();path();ctx.strokeStyle='rgba(255,240,220,.22)';ctx.lineWidth=R*.025;ctx.stroke();
+  ctx.fillStyle='#0b0908';ctx.beginPath();ctx.ellipse(tip.x,tip.y,R*.05,R*.035,-.5,0,TAU);ctx.fill();
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=30;ctx.shadowOffsetY=12;
+  const kg=ctx.createRadialGradient(body.x-br*.4,body.y+br*.3,br*.1,body.x,body.y,br);kg.addColorStop(0,'#3a3530');kg.addColorStop(1,'#151210');ctx.fillStyle=kg;ctx.beginPath();ctx.arc(body.x,body.y,br,0,TAU);ctx.fill();ctx.shadowColor='transparent';
+  ctx.fillStyle='#0e0c0b';ctx.beginPath();ctx.arc(body.x-br*.15,body.y+br*.15,br*.18,0,TAU);ctx.fill();ctx.fillStyle='#b8865a';ctx.beginPath();ctx.arc(body.x-br*.15,body.y+br*.15,br*.1,0,TAU);ctx.fill();
+  ctx.restore();
+  if(P.down&&k>.6&&!introOpen){const w=1.4+P.force*6;
+    const sg=ctx.createLinearGradient(tip.x,tip.y,ix,iy);sg.addColorStop(0,'rgba(235,245,250,.95)');sg.addColorStop(1,'rgba(210,232,242,.7)');
+    ctx.strokeStyle=sg;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(tip.x,tip.y);ctx.quadraticCurveTo((tip.x+ix)/2+Math.sin(T*20)*P.force*1.5,(tip.y+iy)/2,ix,iy);ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=Math.max(.6,w*.25);ctx.stroke();
+    const f=3+P.force*9+Math.sin(T*30)*1.2;ctx.fillStyle='rgba(255,248,236,.55)';ctx.beginPath();ctx.arc(ix,iy,f,0,TAU);ctx.fill()}
+}
+const fmtT=t=>{const m=Math.floor(t/60),s=Math.floor(t%60),c=Math.floor((t%1)*100);return`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(c).padStart(2,'0')}`};
+const fmtS=t=>{t=Math.max(0,Math.ceil(t));return`${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`};
+function renderBrewHud(){
+  const st=S.recipe.stages,n=st.length,s=st[G.k],tol=3*S.barista.tolMul;
+  let tag=`【階段 ${G.k+1}/${n} ${s.name}】`,main=s.text;
+  if(G.phase==='pour'){if(G.k>0&&G.rec[G.k].startT===null&&G.brewT<s.start-1)main=`等到 ${fmtS(s.start)} 再開始・${s.text}`;if(G.poured>s.target+tol)main=`已超過目標 ${s.target}g，先停手吧`}
+  else if(G.phase==='wait'){const nx=st[G.k+1],rem=nx.start-G.brewT;tag=`【階段 ${G.k+1}/${n} 完成】`;
+    main=rem>0?(G.k===0?`悶蒸中，看粉層冒泡膨脹…… ${fmtS(rem)} 後開始「${nx.name}」`:`靜置中…… ${fmtS(rem)} 後開始「${nx.name}」`):`時間到了，開始【${nx.name}】${nx.text}`}
+  else if(G.phase==='drawdown'){tag='【滴濾中】';main=`水正在穿過粉層，滴完就完成了・壺中剩 ${G.pool.toFixed(0)}g`}
+  const h=tag+main;if(h!==lastHint){lastHint=h;$('#stageTag').textContent=tag;$('#stageMain').textContent=main}
+  const segs=$('#segs').children;let prev=0;for(let i=0;i<n;i++){const f=clamp((G.poured-prev)/(st[i].target-prev),0,1);segs[i].firstChild.style.width=(f*100)+'%';prev=st[i].target}
+  $('#tTxt').textContent=fmtT(G.brewT);$('#tState').textContent=G.timerOn?'● 計時中':G.started?'Ⅱ 暫停':'● 待機';
+  $('#tSub').textContent=G.started?(G.timerOn?'點擊暫停':'點擊繼續'):'注水自動開始・也可點擊';
+  $('#wTxt').innerHTML=Math.max(0,G.poured+G.jit).toFixed(1)+'<small>g</small>';$('#flowTxt').textContent=G.flow.toFixed(1)+' g/s';
+  $('#wSub').textContent=G.phase==='drawdown'?`完成 ${S.recipe.total}g・粉 ${S.weighed}g`:`目標 ${s.target}g・粉 ${S.weighed}g`;
+  $('#gFill').style.height=(P.force*100)+'%';$('#gWord').textContent=P.force<.35?'細':P.force<.6?'中':'粗';$('#gMode').textContent=P.lock!=null?'自動':P.mode;
+}
+function computeBrew(){
+  const rc=S.recipe,st=rc.stages,tol=3*S.barista.tolMul,last=st.length-1;
+  let sum=0,n=0;for(let c=0;c<N*N;c++)if(mask[c]){sum+=G.wet[c];n++}
+  const mean=sum/n;let v=0,cov=0;for(let c=0;c<N*N;c++)if(mask[c]){v+=(G.wet[c]-mean)**2;if(G.wet[c]>mean*.3)cov++}
+  const cvv=mean>0?Math.sqrt(v/n)/mean:2;let E=mean>0?clamp(100*(.55*(1-Math.min(cvv,1.6)/1.6)+.45*cov/n),0,100):0;
+  E=clamp(E*.85+S.flat*15+(S.dripper==='wave'?4:0),0,100);
+  let fs=0,fw=0,fAll=0;
+  st.forEach((s,i)=>{const r=G.rec[i];if(r.water<1)return;const a=r.fSum/r.water;fAll+=r.fSum;const d=a<s.force[0]?s.force[0]-a:a>s.force[1]?a-s.force[1]:0;fs+=clamp(1-d*2.4,0,1)*r.water;fw+=r.water});
+  const F=fw?100*fs/fw:0,avgF=fw?fAll/fw:0;
+  let ws=0,ts=0,tn=0;
+  st.forEach((s,i)=>{const r=G.rec[i];const endW=r.endW??(i===last||r.startT!==null?G.poured:0);const e=Math.abs(endW-s.target);ws+=e<=tol?1-.3*e/tol:Math.max(0,.7-(e-tol)/(tol*3));
+    if(i>0){tn++;if(r.startT!==null){const te=Math.abs(r.startT-s.start);ts+=te<=rc.tolT?1-.25*te/rc.tolT:Math.max(0,.75-(te-rc.tolT)/30)}}});
+  ws/=st.length;ts=tn?ts/tn:1;
+  const tt=G.brewT,[lo,hi]=rc.ideal,td=tt<lo?lo-tt:tt>hi?tt-hi:0,tsc=Math.max(0,1-td/45);
+  const loss=(G.spill+G.bypass)/Math.max(1,G.poured+G.spill),pen=Math.min(30,loss*160);
+  const Pp=clamp(100*(.45*ws+.3*ts+.25*tsc)-pen,0,100);
+  const aromaBonus=S.barista.id==='ting'?Math.round(3+3*Math.min(1,G.aromaCount/90)):0;
+  const score=clamp(Math.round(.3*E+.3*F+.4*Pp+aromaBonus),0,100);
+  const dose=S.weighed||rc.dose,ratio=G.poured/dose,bypassF=G.bypass/Math.max(1,G.poured),mid=(lo+hi)/2;
+  const gd=GRINDS.find(g=>g.id===S.grind),dr=DRIPPERS[S.dripper],ro=ROAST[S.bean.roast],tmid=(ro.temp[0]+ro.temp[1])/2;
+  const EY=clamp(19.6+(tt-mid)/40*1.4+(avgF-.45)*2.5-bypassF*9+(E/100-.7)*2+(ratio-15)*.25+gd.ey+(S.temp-tmid)*.18+(1-dr.drain)*1.5+(1-S.steady)*.5,15,25);
+  const vAcid=rc.variant==='bright'?.8:rc.variant==='sweet'?-.6:0,vSweet=rc.variant==='sweet'?.6:0,bloomQ=Math.min(1,G.aromaCount/80);
+  const rAcid=S.bean.roast==='light'?.6:S.bean.roast==='dark'?-.9:0,rBody=S.bean.roast==='dark'?.7:S.bean.roast==='light'?-.2:.2;
+  const radar={酸質:clamp(2.8+(20-EY)*.55+vAcid+dr.acid+rAcid,.5,5),甜感:clamp(1.2+E/100*1.8+(1-Math.abs(EY-20)/3)*1.6+vSweet,.5,5),
+    醇厚:clamp(2.2+(EY-19.5)*.5+(15-ratio)*.3+avgF*.6+dr.body+rBody,.5,5),乾淨度:clamp(4.6-bypassF*18-loss*8-(1-E/100)*1.6-(1-S.steady)*.8,.5,5),
+    香氣:clamp(1.8+bloomQ*2.2+(S.barista.id==='ting'?.8:0)+dr.aroma,.5,5)};
+  const taste=EY<18.5?'萃取稍嫌不足，口感明亮偏酸、輕盈如茶':EY<=22?'萃取落在甜蜜點，酸甜平衡、尾韻回甘':'萃取偏高，醇厚濃郁，帶一點可可般的苦韻';
+  return{E,F,P:Pp,score,aromaBonus,ratio,EY,tt,radar,taste,loss,poured:G.poured,spill:G.spill+G.bypass};
+}
+function finishBrew(){if(G.finished)return;G.finished=true;P.down=false;G.rec[S.recipe.stages.length-1].endW=G.poured;G.timerOn=false;
+  S.brewRes=computeBrew();silence();say(L().brewDone);toast('沖煮完成！'+L().brewDone,2200);setTimeout(()=>go('cup'),1200)}
+
+/* =================== HTML STEPS =================== */
+function renderBean(){
+  stepHtml(`${sayBlock(S.bean?L().beanPick(S.bean):L().bean)}
+    <h2 class="disp step-h">選一支今天的豆子</h2>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" id="beanGrid">${BEANS.map(b=>`<button class="pick" data-id="${b.id}" aria-pressed="${S.bean&&S.bean.id===b.id}">
+      <div style="width:58px">${bagSvg(b)}</div><div class="disp" style="font-size:16px;line-height:1.3">${b.name}</div>
+      <div class="pk-sub">${b.proc}・${ROAST[b.roast].name}</div><div class="pk-notes">${b.notes.join('・')}</div></button>`).join('')}</div>
+    ${ctaBar('就決定是你了・去稱豆','beanOk',!S.bean)}`);
+  $('#beanGrid').onclick=e=>{const p=e.target.closest('.pick');if(!p)return;S.bean=BEANS.find(b=>b.id===p.dataset.id);
+    $$('#beanGrid .pick').forEach(x=>x.setAttribute('aria-pressed',x===p));say(L().beanPick(S.bean));$('#beanOk').disabled=false;tick(1200,.06,.05)};
+  $('#beanOk').onclick=()=>go('weigh');
+}
+function renderGear(){
+  stepHtml(`${sayBlock(L().gear)}
+    <h2 class="disp step-h">選濾杯與承接的壺</h2>
+    <div class="sec-h">濾杯</div>
+    <div class="grid grid-cols-2 gap-3" id="drGrid">${Object.entries(DRIPPERS).map(([k,d])=>`<button class="pick" data-id="${k}" aria-pressed="${S.dripper===k}">
+      <div style="width:84px">${dripperSvg(k)}</div><div class="disp" style="font-size:16px">${d.name}</div><div class="pk-sub">${d.sub}</div><div class="pk-notes">${d.note}</div></button>`).join('')}</div>
+    <div class="sec-h">承接</div>
+    <div class="grid grid-cols-3 gap-3" id="svGrid">${Object.entries(SERVERS).map(([k,d])=>`<button class="pick" data-id="${k}" aria-pressed="${S.server===k}">
+      <div style="width:64px">${serverSvg(k)}</div><div class="disp" style="font-size:15px;line-height:1.3">${d.name}</div><div class="pk-notes">${d.sub}</div></button>`).join('')}</div>
+    ${ctaBar('擺好了・放濾紙','gearOk',false)}`);
+  $('#drGrid').onclick=e=>{const p=e.target.closest('.pick');if(!p)return;S.dripper=p.dataset.id;$$('#drGrid .pick').forEach(x=>x.setAttribute('aria-pressed',x===p));say(L().gearPick(DRIPPERS[S.dripper]));tick(900,.06,.05)};
+  $('#svGrid').onclick=e=>{const p=e.target.closest('.pick');if(!p)return;S.server=p.dataset.id;$$('#svGrid .pick').forEach(x=>x.setAttribute('aria-pressed',x===p));tick(900,.06,.05)};
+  $('#gearOk').onclick=()=>go('filter');
+}
+function renderCup(){
+  const r=S.brewRes;
+  stepHtml(`${sayBlock(L().cup)}
+    <div class="flex items-center gap-3" style="background:rgba(242,231,213,.06);border-radius:16px;padding:10px 14px">
+      <span class="mono" style="font-size:28px;color:var(--crema)">${r?r.score:'—'}</span><span class="hint">沖煮分數・${S.bean.short}・${S.recipe.name}<br>完整評分會寫在今日風味卡上</span></div>
+    <h2 class="disp step-h">選一個好看的杯子</h2>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" id="cupGrid">${CUPS.map(c=>`<button class="pick" data-id="${c.id}" aria-pressed="${S.cup===c.id}">
+      <div style="width:96px">${cupSvg(c.id,false)}</div><div class="disp" style="font-size:16px">${c.name}</div><div class="pk-notes">${c.desc}</div></button>`).join('')}</div>
+    ${ctaBar('倒進杯子・端到櫃檯','cupOk',!S.cup)}`);
+  $('#cupGrid').onclick=e=>{const p=e.target.closest('.pick');if(!p)return;S.cup=p.dataset.id;$$('#cupGrid .pick').forEach(x=>x.setAttribute('aria-pressed',x===p));say(L().cupPick(CUPS.find(c=>c.id===S.cup)));$('#cupOk').disabled=false;blip(1400,2100,.2,.04)};
+  $('#cupOk').onclick=()=>go('counter');
+}
+function counterScene(){
+  const sn=S.snack?`<g transform="translate(234 166) scale(.58)">${snackInner(S.snack)}</g>`:'';
+  return `<svg viewBox="0 0 360 280" role="img" aria-label="${S.barista.name}在櫃檯後面微笑">
+    <defs><linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a20"/><stop offset="1" stop-color="#5b4334"/></linearGradient>
+    <radialGradient id="lg1" cx=".5" cy="0" r=".9"><stop offset="0" stop-color="rgba(255,205,140,.5)"/><stop offset="1" stop-color="rgba(255,205,140,0)"/></radialGradient>
+    <linearGradient id="ct" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a3b"/><stop offset="1" stop-color="#5a3a26"/></linearGradient></defs>
+    <rect width="360" height="280" fill="url(#wl)"/>
+    <ellipse cx="180" cy="40" rx="200" ry="150" fill="url(#lg1)"/>
+    <path d="M70 0V28M290 0V28" stroke="#1a1310" stroke-width="1.5"/>
+    <path d="M56 28h28l-6 14h-16z" fill="#2a2420"/><ellipse cx="70" cy="44" rx="7" ry="3" fill="#ffd9a0"/>
+    <path d="M276 28h28l-6 14h-16z" fill="#2a2420"/><ellipse cx="290" cy="44" rx="7" ry="3" fill="#ffd9a0"/>
+    <rect x="0" y="86" width="360" height="5" fill="#6e4a33"/>
+    ${[ [26,'#946038'],[52,'#6e4024'],[284,'#9bb092'],[310,'#3e2518'] ].map(([x,c])=>`<rect x="${x}" y="60" width="20" height="26" rx="4" fill="rgba(230,240,245,.25)" stroke="rgba(240,245,250,.4)"/><rect x="${x+2}" y="70" width="16" height="14" rx="2" fill="${c}"/><rect x="${x+4}" y="56" width="12" height="5" rx="1" fill="#b88a5c"/>`).join('')}
+    <path d="M330 86q-6-18 4-26q8 12-4 26zM336 86q8-14 16-14q-6 12-16 14z" fill="#7d9a6e"/>
+    <rect x="18" y="104" width="74" height="58" rx="4" fill="#1f1b18" stroke="#6e4a33" stroke-width="3"/>
+    <text x="55" y="122" text-anchor="middle" font-size="10" fill="rgba(242,231,213,.7)" font-family="LXGW WenKai TC,serif">今日豆單</text>
+    <text x="55" y="140" text-anchor="middle" font-size="12" fill="#f2e7d5" font-family="LXGW WenKai TC,serif">${S.bean.short}</text>
+    <text x="55" y="154" text-anchor="middle" font-size="8.5" fill="#e2a867" font-family="Noto Sans TC,sans-serif">${S.bean.notes.slice(0,2).join('・')}</text>
+    <g class="breathe"><g transform="translate(108 58) scale(1.2)">${avatarBare(S.barista.id)}</g></g>
+    <rect x="0" y="196" width="360" height="12" fill="#a8774f"/><rect x="0" y="196" width="360" height="3" fill="rgba(255,230,200,.35)"/>
+    <rect x="0" y="208" width="360" height="72" fill="url(#ct)"/>
+    ${Array.from({length:12},(_,i)=>`<path d="M${15+i*30} 212V280" stroke="rgba(0,0,0,.18)"/>`).join('')}
+    <ellipse cx="132" cy="198" rx="10" ry="6" fill="${SK}"/><ellipse cx="236" cy="198" rx="10" ry="6" fill="${SK}"/>
+    <g transform="translate(146 140) scale(.6)">${cupInner(S.cup)}${steamSvg(60,cupTop[S.cup])}</g>
+    ${sn}
+    <text x="340" y="268" text-anchor="end" font-size="10" fill="rgba(242,231,213,.45)" font-family="LXGW WenKai TC,serif">掌心咖啡館</text>
+  </svg>`;
+}
+function renderCounter(){
+  const rec=SNACKS.find(s=>s.id===S.barista.snack);
+  stepHtml(`<div class="scene rise" id="sceneBox">${counterScene()}</div>
+    ${sayBlock(L().counter+` 要不要配一塊${rec.name}？`)}
+    <div class="sec-h">選一份小點心</div>
+    <div class="grid grid-cols-3 gap-2.5" id="snGrid">${SNACKS.map(s=>`<button class="pick" data-id="${s.id}" aria-pressed="${S.snack===s.id}" style="padding:8px 6px">
+      <div style="width:72px">${snackSvg(s.id)}</div><div class="disp" style="font-size:14px;line-height:1.3">${s.name}</div>${s.id===rec.id?'<div class="pk-sub" style="font-size:11px">咖啡師推薦</div>':''}</button>`).join('')}</div>
+    <div class="sec-h">今天的心情</div>
+    <div class="flex flex-wrap gap-2" id="mdRow">${MOODS.map(([k,v])=>`<button class="mini" data-m="${k}" aria-pressed="${S.mood===k}">${v}</button>`).join('')}</div>
+    <div id="mcBox"></div>
+    ${ctaBar('收下今日風味卡','ctOk',!(S.snack&&S.mood))}`);
+  if(S.mood)showMoodCard(false);
+  const check=()=>{$('#ctOk').disabled=!(S.snack&&S.mood)};
+  $('#snGrid').onclick=e=>{const p=e.target.closest('.pick');if(!p)return;S.snack=p.dataset.id;$$('#snGrid .pick').forEach(x=>x.setAttribute('aria-pressed',x===p));
+    const s=SNACKS.find(x=>x.id===S.snack);say(L().snackPick(s)+(s.id===rec.id?' '+L().snackRec:''));$('#sceneBox').innerHTML=counterScene();tick(1100,.08,.06);check()};
+  $('#mdRow').onclick=e=>{const b=e.target.closest('.mini');if(!b)return;S.mood=b.dataset.m;$$('#mdRow .mini').forEach(x=>x.setAttribute('aria-pressed',x===b));showMoodCard(true);check()};
+  $('#ctOk').onclick=()=>go('final');
+}
+function showMoodCard(anim){
+  const mv=MOODS.find(m=>m[0]===S.mood)[1];
+  $('#mcBox').innerHTML=`<div class="mcard ${anim?'popin':''}"><div class="fk">心情卡片・${mv}</div><p class="disp" style="font-size:18px;line-height:1.7;margin-top:6px">${MOODCARD[S.barista.id][S.mood]}</p><div style="text-align:right;font-family:var(--f-display);font-size:15px;color:#a4532f">── ${S.barista.name}</div></div>`;
+  if(anim){say(L().mood);blip(1200,1800,.3,.04)}
+}
+function radarSvg(r){
+  const keys=Object.keys(r),c=90,rad=62,pt=(i,v)=>{const a=-Math.PI/2+i/keys.length*TAU;return[c+Math.cos(a)*rad*v/5,c+Math.sin(a)*rad*v/5]};
+  let grid='';for(let l=1;l<=5;l++)grid+=`<polygon points="${keys.map((_,i)=>pt(i,l).join(',')).join(' ')}" fill="none" stroke="rgba(51,37,28,.12)"/>`;
+  const poly=keys.map((k,i)=>pt(i,r[k]).join(',')).join(' ');
+  const lbl=keys.map((k,i)=>{const[x,y]=pt(i,6.6);return`<text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" fill="#33251c" font-family="Noto Sans TC,sans-serif">${k}</text>`}).join('');
+  return`<svg viewBox="0 0 180 180" width="100%" style="max-width:190px" role="img" aria-label="風味雷達圖">${grid}<polygon points="${poly}" fill="rgba(201,106,67,.28)" stroke="#c96a43" stroke-width="2" stroke-linejoin="round"/>${lbl}</svg>`;
+}
+function renderFinal(){
+  const r=S.brewRes,d=new Date(),ds=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  const prep=Math.round(100*(.25*S.weighQ+.25*S.steady+.2*S.flat+.3*S.tempQ));
+  const total=Math.round(.7*r.score+.3*prep);
+  const grade=total>=90?'職人一杯':total>=78?'溫潤順口':total>=62?'日常好味':'下一杯會更好';
+  const bar=(k,v)=>`<div class="flex flex-col gap-1"><div class="flex justify-between" style="font-size:12.5px"><span>${k}</span><span class="mono">${Math.round(v)}</span></div><div class="bar"><b data-w="${v}"></b></div></div>`;
+  const tv=pick(TRIVIA),sn=SNACKS.find(s=>s.id===S.snack),cup=CUPS.find(c=>c.id===S.cup),mv=MOODS.find(m=>m[0]===S.mood)[1];
+  const note=r.loss>.08?'注水時有不少水繞過粉層，下次試著把水柱留在粉層範圍內。':r.E<60?'粉層有些地方沒被照顧到，畫圈時可以從中心慢慢往外擴。':'粉層濕潤得很均勻，杯中的味道很整齊。';
+  $('#finalWrap').innerHTML=`
+  <div class="fcard rise">
+    <div style="padding:22px 22px 16px" class="flex flex-col gap-4">
+      <div class="flex items-start justify-between gap-3"><div style="min-width:0"><div class="fk">TODAY'S CUP · ${ds}</div><div class="disp" style="font-size:28px;line-height:1.2">今日風味卡</div>
+        <div style="font-size:12px;color:rgba(51,37,28,.6)">${S.barista.name}・${S.recipe.name}${S.recipe.id!=='three'?`（${{sweet:'偏甜',balance:'平衡',bright:'明亮'}[S.recipe.variant]}）`:''}・${cup.name}</div></div>
+        <div style="width:84px;flex:none;background:#3b2a20;border-radius:16px;padding:6px 4px 2px">${cupSvg(S.cup,true)}</div></div>
+      <div class="flex items-end gap-4"><div class="mono" style="font-size:72px;line-height:.9;font-weight:500;color:#c96a43">${total}</div>
+        <div style="padding-bottom:6px;min-width:0"><div class="disp" style="font-size:22px">${grade}</div><div style="font-size:12px;color:rgba(51,37,28,.6)">沖煮 ${r.score}・準備 ${prep}${r.aromaBonus?`・香氣加成 +${r.aromaBonus}`:''}</div></div></div>
+      <div class="grid gap-x-5 gap-y-3" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+        ${bar('注水均勻度',r.E)}${bar('水流力道',r.F)}${bar('比例與時間',r.P)}${bar('稱豆精準',S.weighQ*100)}${bar('研磨穩定',S.steady*100)}${bar('粉面平整',S.flat*100)}${bar('水溫控制',S.tempQ*100)}</div>
+    </div>
+    <div class="tear"></div>
+    <div style="padding:16px 22px" class="flex flex-col gap-3">
+      <div class="flex items-center gap-3"><div style="width:42px;flex:none">${bagSvg(S.bean)}</div><div style="min-width:0"><div class="fk">今日豆單</div><div class="disp" style="font-size:20px">${S.bean.name}</div>
+        <div style="font-size:12px;color:rgba(51,37,28,.6)">${S.bean.proc}・${ROAST[S.bean.roast].name}・${S.bean.notes.join('、')}</div></div></div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <div style="flex:1 1 170px;display:grid;place-items:center">${radarSvg(r.radar)}</div>
+        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 stat" style="flex:1 1 170px">
+          <div><dt>粉量</dt><dd>${S.weighed.toFixed(1)}g</dd></div><div><dt>研磨度</dt><dd>${GRINDS.find(g=>g.id===S.grind).name}</dd></div>
+          <div><dt>濾杯</dt><dd style="font-size:13px">${DRIPPERS[S.dripper].name}</dd></div><div><dt>水溫</dt><dd>${S.temp.toFixed(1)}°C</dd></div>
+          <div><dt>粉水比</dt><dd>1:${r.ratio.toFixed(1)}</dd></div><div><dt>總時間</dt><dd>${fmtS(r.tt)}</dd></div>
+          <div><dt>萃取率估算</dt><dd>${r.EY.toFixed(1)}%</dd></div><div><dt>注水</dt><dd>${r.poured.toFixed(0)}g</dd></div></dl></div>
+      <p style="font-size:14px;line-height:1.7">${r.taste}。${note}</p>
+    </div>
+    <div class="tear"></div>
+    <div style="padding:16px 22px" class="flex flex-col gap-3">
+      <div class="flex items-center gap-3"><div style="width:70px;flex:none">${snackSvg(S.snack)}</div><div style="min-width:0"><div class="fk">搭配點心</div><div class="disp" style="font-size:18px">${sn.name}</div><div style="font-size:12.5px;color:rgba(51,37,28,.65);line-height:1.5">${sn.pair}</div></div></div>
+      <div style="background:#fff9ef;border-radius:14px;padding:12px 14px;border:1px solid rgba(51,37,28,.08)"><div class="fk">心情卡片・${mv}</div>
+        <p class="disp" style="font-size:17px;line-height:1.7;margin-top:4px">${MOODCARD[S.barista.id][S.mood]}</p>
+        <div class="flex items-center justify-end gap-2" style="font-family:var(--f-display);color:#a4532f"><span>── ${S.barista.name}</span><span style="width:28px;height:28px;border-radius:50%;overflow:hidden;display:inline-block">${avatar(S.barista.id)}</span></div></div>
+    </div>
+    <div class="tear"></div>
+    <div style="padding:16px 22px 22px"><div class="trivia"><div style="font-size:11px;letter-spacing:.2em;color:#c96a43">手沖小知識</div><div class="disp" style="font-size:18px;margin:2px 0 4px">${tv[0]}</div><p style="font-size:13.5px;line-height:1.7">${tv[1]}</p></div></div>
+  </div>
+  <div class="flex gap-3 rise" style="animation-delay:.15s"><button class="btn btn-ghost" id="fSwap">換咖啡師</button><button class="btn btn-main flex-1" id="fAgain">再做一杯</button></div>`;
+  $('#sFinal').scrollTop=0;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$$('#finalWrap .bar b').forEach(b=>b.style.width=b.dataset.w+'%')));
+  $('#fAgain').onclick=()=>{newCup();go('bean')};$('#fSwap').onclick=()=>go('select');
+}
+
+/* =================== FLOW =================== */
+let screen='select';
+function go(s){
+  screen=s;P.down=false;silence();
+  ['#sSelect','#sGuide','#sStep','#sFinal'].forEach(q=>$(q).hidden=true);
+  $('#hud').hidden=!CANVAS_STEPS.includes(s);$('#topbar').hidden=s==='select'||s==='guide';
+  $('#say').hidden=s==='brew';$('#stageCard').hidden=s!=='brew';$('#gauge').hidden=s!=='brew';$('#finishBtn').hidden=true;introOpen=false;
+  if(s!=='select'&&s!=='guide')setProgress(s==='final'?'final':s);
+  if(s==='select')$('#sSelect').hidden=false;
+  else if(s==='guide'){$('#sGuide').hidden=false;fillGuide()}
+  else if(s==='final'){$('#sFinal').hidden=false;renderFinal()}
+  else if(CANVAS_STEPS.includes(s)){$('#say').innerHTML=sayBlock('');resize();MODES[s].enter()}
+  else{$('#sStep').hidden=false;({bean:renderBean,gear:renderGear,cup:renderCup,counter:renderCounter})[s]()}
+}
+$('#backBtn').onclick=(()=>{let arm=0;return()=>{if(performance.now()-arm<2200)go('select');else{arm=performance.now();toast('再點一次回到選擇咖啡師')}}})();
+
+/* select + guide */
+$('#baristaList').innerHTML=BARISTAS.map((b,i)=>`
+  <button class="card rise" style="animation-delay:${.1+i*.08}s" data-id="${b.id}">
+    <div class="av">${avatar(b.id)}</div>
+    <div style="min-width:0"><div class="eyebrow">${b.title}</div><div class="disp" style="font-size:28px;line-height:1.2">${b.name}</div>
+      <div style="font-size:13px;color:var(--oat-dim);line-height:1.5;margin-top:2px">${b.desc}</div><span class="perk">${b.perk}</span></div>
+  </button>`).join('');
+$('#baristaList').addEventListener('click',e=>{const c=e.target.closest('.card');if(!c)return;S.barista=BARISTAS.find(b=>b.id===c.dataset.id);audioInit();go('guide')});
+$('#flowList').innerHTML=ORDER.map(([,l],i)=>`<span style="border:1px solid rgba(242,231,213,.18);border-radius:999px;padding:3px 10px"><span class="mono" style="color:var(--crema)">${i+1}</span> ${l}</span>`).join('');
+function fillGuide(){
+  const b=S.barista;$('#gAvatar').innerHTML=avatar(b.id);$('#gName').textContent=b.name;$('#gTitle').textContent=b.title;$('#gQuote').textContent=b.quote;
+  const ok=!!b.unlock46;$('#rFour').disabled=!ok;$('#lock46').textContent=ok?'庠和獨家':'僅限庠和';if(!ok&&S.recipeId==='fourSix')S.recipeId='three';syncRecipeUi();
+}
+function syncRecipeUi(){
+  $('#rThree').setAttribute('aria-pressed',S.recipeId==='three');$('#rFour').setAttribute('aria-pressed',S.recipeId==='fourSix');$('#variantRow').hidden=S.recipeId!=='fourSix';
+  $$('#variantRow .mini').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.variant));
+}
+$('#rThree').onclick=()=>{S.recipeId='three';syncRecipeUi()};
+$('#rFour').onclick=()=>{if(S.barista.unlock46){S.recipeId='fourSix';syncRecipeUi()}};
+$('#variantRow').addEventListener('click',e=>{const b=e.target.closest('.mini');if(!b)return;S.variant=b.dataset.v;syncRecipeUi()});
+$('#gBack').onclick=()=>go('select');
+$('#gStart').onclick=()=>{S.recipe=buildRecipe(S.recipeId,S.variant);newCup();go('bean')};
+
+/* =================== LOOP =================== */
+let T=0,lastT=performance.now();
+addEventListener('resize',()=>{resize();if(screen==='filter'||screen==='brew')buildGear()});
+resize();
+const idleSteam=[];
+function frame(now){
+  const dt=Math.min(.05,(now-lastT)/1000);lastT=now;T+=dt;if(P.down)P.hold+=dt;
+  const m=MODES[screen];
+  try{
+    if(m){m.update(dt);m.draw()}
+    else{ctx.drawImage(woodCv,0,0,W,H);if(Math.random()<dt*3)idleSteam.push({x:cx+rand(-.5,.5)*R,y:cy,r:R*.3,life:0});
+      for(const p of idleSteam){p.life+=dt;p.y-=dt*14;const a=Math.sin(Math.min(1,p.life/4)*Math.PI)*.06,sg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);sg.addColorStop(0,`rgba(255,250,240,${a})`);sg.addColorStop(1,'rgba(255,250,240,0)');ctx.fillStyle=sg;ctx.fillRect(p.x-p.r,p.y-p.r,p.r*2,p.r*2)}
+      while(idleSteam.length&&idleSteam[0].life>4)idleSteam.shift()}
+  }catch(err){console.error(err)}
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.__palm={S,go,G,Gr,Fl,Bo,Wg};
+})();
+</script>
+
+</body></html>

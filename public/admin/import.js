@@ -94,8 +94,21 @@
   ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, () => drop.classList.remove('over')));
   drop.addEventListener('drop', (e) => { e.preventDefault(); if (e.dataTransfer.files.length) upload(e.dataTransfer.files); });
 
+  // ---------- 貼上文字 ----------
+  $('#p-add').addEventListener('click', async () => {
+    try {
+      const r = await api('/api/admin/import/text', { method: 'POST', body: JSON.stringify({ 文字: $('#p-text').value, 科目: $('#u-subject').value, 版本: $('#u-version').value.trim(), 年級: $('#u-grade').value }) });
+      $('#p-text').value = '';
+      toast(`已加入待匯入清單：${r.檔案}`);
+      await loadFiles();
+      window.refreshAdminCounts?.();
+    } catch (e) { toast(e.message); }
+  });
+
   // ---------- 金鑰 ----------
+  let offlineSet = false;
   function showKey(info, forceBox) {
+    if (!offlineSet) { offlineSet = true; if (!info.有金鑰) $('#offline').checked = true; }
     $('#keystatus').hidden = !info.有金鑰;
     $('#keystatus-text').textContent = info.有金鑰 ? `✔ 已有 Claude API 金鑰（${info.金鑰末碼 || ''}，來源：${info.金鑰來源 || '環境變數'}）` : '';
     $('#keybox').hidden = info.有金鑰 && !forceBox;

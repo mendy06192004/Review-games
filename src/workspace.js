@@ -106,6 +106,38 @@ function createWorkspaceRouter(cfg, opts = {}) {
     res.json({ 檔案: path.relative(cfg.importDir, target).split(path.sep).join('/') });
   });
 
+  // 貼上題目文字：存成 待匯入/科目/版本/年級/貼上的題目-時間.txt，之後跟其他檔案一樣勾選匯入
+  r.post('/import/text', async (req, res) => {
+    const text = String(req.body?.文字 || '').trim();
+    if (!text) throw new HttpError(400, '請先貼上題目文字');
+    if (text.length > 200000) throw new HttpError(400, '文字太長，請分成幾次貼上');
+    const dirs = [req.body?.科目, req.body?.版本, req.body?.年級].map(cleanName).filter(Boolean);
+    const dir = path.join(cfg.importDir, ...dirs);
+    await fsp.mkdir(dir, { recursive: true });
+    const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+    const target = D.uniquePath(path.join(dir, `貼上的題目-${stamp}.txt`));
+    await fsp.writeFile(target, text, 'utf8');
+    res.json({ 檔案: path.relative(cfg.importDir, target).split(path.sep).join('/') });
+  });
+
+  // 手動新增一題空白草稿（不需要考卷檔案）
+  r.post('/drafts-new', async (req, res) => {
+    const subject = cfg.subjects[req.body?.科目代碼] ? req.body.科目代碼 : null;
+    const file = path.join(cfg.reviewDir, '手動新增.json');
+    let data = { 來源檔: '後台手動新增', 來源位置: null, 處理時間: new Date().toISOString(), 抽取方式: '手動', 題目: [] };
+    try { data = JSON.parse(await fsp.readFile(file, 'utf8')); } catch { /* 第一次建立 */ }
+    const q = {
+      草稿編號: D.newDraftKey(), 原題號: null, 科目代碼: subject, id: null,
+      題幹: '', 選項: ['', '', '', ''], 答案: null, 答案依據: '老師手動輸入', 難度: null, 圖片: null, 解析: null,
+      歸屬: [{ 版本: null, 年級: null, 冊: null, 章: null, 節: null }],
+      needs_review: true, 待確認欄位: ['題幹', '選項', '答案'], 審核: { 狀態: '待審核', 原因: null, 時間: null },
+    };
+    data.題目 = [q, ...(data.題目 || [])];
+    data.處理時間 = new Date().toISOString();
+    await D.atomicWriteJson(file, data);
+    res.json({ 題目: q });
+  });
+
   // 刪除放錯的待匯入檔案
   r.delete('/import/files', async (req, res) => {
     const rel = String(req.query.檔案 || '');

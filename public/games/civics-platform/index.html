@@ -1,0 +1,1606 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>公民大平台</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: quiet paper-toned civics workshop. Ink-line drawings, muted subject colors, clay stamp for correct answers. Single light theme. Learn mode scales type up for resource-class students. */
+:root{
+  --paper:#f3eee3; --paper2:#e9e2d2; --card:#fbf8f1; --sheet:#fffdf8; --ink:#2e2b3a; --ink2:#5b5868; --muted:#857d6c; --line:#d6ccb8;
+  --indigo:#3c4a6e; --clay:#b4553d; --sage:#5f7f6f; --ochre:#b8862f;
+  --ok-bg:#e6eee8; --no-bg:#f5e4de; --hint-bg:#f6efdc;
+  --c-sort:#9a5c4a; --c-law:#5d6b8c; --c-econ:#b8862f; --c-pol:#5f7f6f; --c-seq:#7a5f8c; --c-ruler:#4f7d8a;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --r:12px; --fz:1;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+body.learn{--fz:1.14}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+button{font-family:inherit;cursor:pointer;border:0;color:inherit;background:none}
+button:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none;display:inline-block;vertical-align:middle}
+#app{height:100%;display:grid;grid-template-rows:auto 1fr}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;align-items:center;gap:10px;padding-block:10px;border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:1.22rem;letter-spacing:.06em;white-space:nowrap}
+.seal{width:30px;height:30px;border:1.5px solid var(--clay);color:var(--clay);display:grid;place-items:center;font-size:.92rem;font-weight:700;border-radius:4px;transform:rotate(-4deg);flex:none}
+.top .sp{flex:1}
+.iconbtn{border:1px solid var(--line);color:var(--ink2);border-radius:999px;padding:6px 13px;font-size:.86rem;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
+.iconbtn:hover{background:var(--card)}
+.iconbtn[aria-pressed="true"].tog{background:var(--indigo);color:var(--card);border-color:var(--indigo)}
+main{position:relative;min-height:0}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;min-height:0}
+#home{overflow-y:auto}
+.home-in{padding-block:20px 28px;display:flex;flex-direction:column;gap:22px;max-width:1180px;width:100%;margin:0 auto;box-sizing:border-box}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);align-items:end;gap:18px 32px}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--serif);font-weight:700;font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0;line-height:1.35;text-wrap:balance}
+.hero p{margin:8px 0 0;color:var(--ink2);max-width:46ch;line-height:1.8}
+.settings{display:flex;flex-direction:column;gap:14px;min-width:0}
+.label{font-size:.72rem;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+.chips-row{display:flex;flex-wrap:wrap;gap:6px}
+.chip{color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:.88rem;display:inline-flex;gap:5px;align-items:baseline}
+.chip small{font-size:.72rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip[aria-pressed="true"] small{color:var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--card)}
+.seg button{border-radius:999px;padding:6px 16px;font-size:.92rem;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--indigo);color:var(--card)}
+.mode-note{font-size:.82rem;color:var(--muted);margin-top:6px;max-width:46ch;line-height:1.65}
+.games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.gcard{position:relative;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 13px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;min-width:0;transition:transform .2s, box-shadow .2s, opacity .2s}
+.gcard:hover{transform:translateY(-3px);box-shadow:0 10px 22px -14px rgba(46,43,58,.45)}
+.gcard .band{position:absolute;inset:0 auto 0 0;width:3px;border-radius:var(--r) 0 0 var(--r);background:var(--c)}
+.gcard .art{width:52px;height:52px;color:var(--c);grid-row:span 3}
+.gcard .theme{font-size:.74rem;color:var(--muted);letter-spacing:.05em}
+.gcard h3{margin:0;font-family:var(--serif);font-weight:700;font-size:1.15rem}
+.gcard p{margin:0;color:var(--ink2);font-size:.86rem;line-height:1.65;grid-column:1/-1;margin-top:6px}
+.gcard .meta{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;padding-top:9px;border-top:1px dashed var(--line);font-size:.77rem;color:var(--muted)}
+.gcard .meta b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:1px 8px;border:1px solid var(--c);border-radius:999px;font-size:.7rem;color:var(--c);white-space:nowrap}
+.tag.rec{background:var(--c);color:var(--card)}
+.gcard.dim{opacity:.5}
+.panes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:14px}
+.pane{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0}
+.pane h4{margin:0 0 4px;font-family:var(--serif);font-size:1.05rem;display:flex;gap:8px;align-items:center}
+.pane .sub{margin:0 0 10px;font-size:.82rem;color:var(--muted);line-height:1.6}
+.wrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.wrow:last-child{border-bottom:0}
+.wrow .ic{color:var(--c)}
+.wrow .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink2);white-space:nowrap}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:0 22px;max-height:300px;overflow:auto}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) 64px 40px;gap:8px;align-items:center;font-size:.85rem;padding:5px 0}
+.mrow .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .nm small{color:var(--muted);margin-right:5px}
+.mrow .bar{height:5px;background:var(--paper2);border-radius:9px;overflow:hidden}
+.mrow .bar i{display:block;height:100%;background:var(--sage)}
+.mrow.weak .bar i{background:var(--clay)}
+.mrow.weak .nm{color:var(--clay)}
+.mrow .pct{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2);font-size:.8rem}
+.tips{display:flex;flex-wrap:wrap;gap:6px 22px;color:var(--muted);font-size:.84rem}
+.portrait-hint{display:none;border:1px solid var(--ochre);color:var(--ink2);border-radius:var(--r);padding:10px 14px;font-size:.88rem;background:var(--card)}
+@media (orientation:portrait) and (max-width:700px){.portrait-hint{display:block}}
+@media (max-width:980px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.panes{grid-template-columns:1fr}}
+@media (max-width:520px){.games{grid-template-columns:1fr}}
+@media (max-height:520px) and (orientation:landscape){.gcard p{display:none}.gcard .art{width:38px;height:38px}.home-in{padding-block:10px 16px;gap:14px}.hero p{display:none}.top{padding-block:6px}}
+
+.btn{background:var(--ink);color:var(--paper);border-radius:999px;padding:10px 20px;font-size:calc(.95rem*var(--fz));white-space:nowrap}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.go{background:var(--indigo);color:var(--card)}
+.btn.sm{padding:6px 14px;font-size:calc(.85rem*var(--fz))}
+.btn:disabled{opacity:.45;cursor:default}
+.lnk{color:var(--indigo);text-decoration:underline;text-underline-offset:3px;font-size:.84rem;padding:4px 6px;white-space:nowrap}
+.lnk:disabled{color:var(--muted);text-decoration:none;cursor:default}
+.speak{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:.8rem;color:var(--ink2);background:var(--card);white-space:nowrap}
+.speak:hover{border-color:var(--indigo);color:var(--indigo)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.kicker{font-size:.75rem;letter-spacing:.06em;color:var(--muted)}
+
+.ghead{display:flex;align-items:center;gap:12px;padding-block:8px;flex-wrap:wrap}
+.ghead h2{margin:0;font-family:var(--serif);font-weight:700;font-size:1.1rem;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.mode-pill{font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--ink2);font-family:var(--sans);font-weight:400}
+.stats{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.stat{border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:.82rem;color:var(--ink2);font-variant-numeric:tabular-nums;white-space:nowrap;background:var(--card)}
+.stat b{font-weight:700;color:var(--ink)}
+.stage{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;padding-block:0 12px}
+.groot{flex:1;min-height:0;position:relative}
+
+.ovl{position:absolute;inset:0;display:grid;place-items:center;background:rgba(46,43,58,.32);z-index:8;padding:16px;overflow:auto}
+.panel{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px 24px;max-width:560px;width:100%;box-shadow:0 18px 40px -24px rgba(46,43,58,.6);animation:pop .3s ease;box-sizing:border-box}
+.panel h3{margin:0 0 10px;font-family:var(--serif);font-weight:700;font-size:calc(1.28rem*var(--fz))}
+.panel p{margin:0 0 10px;line-height:1.8}
+.panel ul{margin:0 0 12px;padding-left:1.2em;line-height:1.85;color:var(--ink2);font-size:calc(.93rem*var(--fz))}
+.panel .pic{width:64px;height:64px;margin-bottom:6px;color:var(--c)}
+.defs{display:grid;gap:6px;margin:4px 0 12px}
+.defs div{background:var(--paper);border-radius:8px;padding:8px 12px;font-size:calc(.9rem*var(--fz));line-height:1.6}
+.defs b{font-family:var(--serif);margin-right:6px}
+
+.fb{position:relative;display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--sage);border-radius:10px;padding:11px 14px;overflow:hidden;animation:pop .2s}
+.fb.no{border-left-color:var(--clay)}
+.fb-ic{color:var(--sage);display:flex}
+.fb.no .fb-ic{color:var(--clay)}
+.fb-tx{flex:1;min-width:0;font-size:calc(.92rem*var(--fz));line-height:1.7}
+.fb-tx b{display:block;font-family:var(--serif);font-weight:700}
+.fb-act{display:flex;gap:6px;align-items:center;flex:none;flex-wrap:wrap;justify-content:flex-end}
+.fb-bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--indigo);transform-origin:left;opacity:.55}
+.hintline{background:var(--hint-bg);border:1px solid #e3d3a7;border-radius:10px;padding:9px 12px;font-size:calc(.9rem*var(--fz));line-height:1.65;display:flex;gap:8px;align-items:flex-start;animation:pop .2s}
+.hintline .ic{color:var(--ochre);margin-top:3px}
+
+.duel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px}
+@media (orientation:portrait){.duel{grid-template-columns:1fr;overflow-y:auto;align-content:start}}
+.qside{display:flex;flex-direction:column;gap:12px;min-height:0;overflow-y:auto;padding-bottom:4px}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px 18px;position:relative}
+.qcard .qtext{font-family:var(--serif);font-size:calc(1.08rem*var(--fz));line-height:1.75;font-weight:600;margin-top:4px}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+body.learn .opts{grid-template-columns:1fr}
+@media (max-width:440px){.opts{grid-template-columns:1fr}}
+.opt{background:var(--card);color:var(--ink);text-align:left;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:calc(.95rem*var(--fz));line-height:1.55;min-height:54px;display:flex;gap:10px;align-items:center;transition:border-color .15s, background .15s}
+body.learn .opt{min-height:60px;padding:12px 16px}
+.opt:hover:not(:disabled){border-color:var(--indigo)}
+.opt .k{flex:none;width:24px;height:24px;border:1px solid var(--muted);border-radius:50%;color:var(--ink2);display:grid;place-items:center;font-size:.78rem;font-family:var(--serif)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--sage);background:var(--ok-bg)}
+.opt.right .k{background:var(--sage);border-color:var(--sage);color:var(--card)}
+.opt.wrong{border-color:var(--clay);background:var(--no-bg);animation:shake .35s;opacity:.7}
+.opt.wrong .k{background:var(--clay);border-color:var(--clay);color:var(--card)}
+.opt.fade{opacity:.45}
+.opt .ob{display:flex;flex-direction:column;gap:2px;min-width:0}
+.opt .an{font-family:var(--serif);font-weight:700}
+.opt .at{font-size:.84rem;color:var(--ink2);line-height:1.55}
+
+.qtop{padding-right:58px}
+.receipt h4{padding-right:60px}
+.stamp{position:absolute;right:6px;top:-12px;width:52px;height:52px;font-size:.9rem!important;border:2px solid var(--clay);color:var(--clay);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:1rem;border-radius:6px;transform:rotate(-12deg);animation:stampIn .35s cubic-bezier(.2,1.6,.4,1);pointer-events:none;background:rgba(251,248,241,.85);z-index:2}
+@keyframes stampIn{from{transform:rotate(-12deg) scale(2.2);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes hit{0%{opacity:1}40%{opacity:.25}100%{opacity:1}}
+@keyframes cardIn{from{transform:translateY(26px);opacity:0}to{transform:none;opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(95,127,111,.5)}50%{box-shadow:0 0 0 7px rgba(95,127,111,0)}}
+.shake{animation:shake .4s}
+
+/* SORT */
+.sort{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:12px}
+.sort-head{display:flex;align-items:center;gap:12px;min-width:0}
+.sort-ic{width:40px;height:40px;color:var(--c-sort);flex:none}
+.sort-title{font-family:var(--serif);font-weight:700;font-size:calc(1.12rem*var(--fz))}
+.sort-left{margin-left:auto;font-size:.84rem;color:var(--ink2);white-space:nowrap}
+.bins{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:10px}
+.bin{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 8px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;transition:border-color .15s, background .2s;position:relative;min-width:0}
+.bin .basket{width:46px;height:34px;color:var(--ink2);display:flex}
+.bin .basket .ic{width:100%;height:100%}
+.bin b{font-family:var(--serif);font-size:calc(.98rem*var(--fz));line-height:1.35}
+.bin small{font-size:calc(.76rem*var(--fz));color:var(--ink2);line-height:1.5}
+.bin .key{position:absolute;top:5px;left:8px;font-size:.7rem;color:var(--muted)}
+.bin:hover{border-color:var(--c-sort)}
+.bin.hit{border-color:var(--sage);background:var(--ok-bg)}
+.bin.miss{border-color:var(--clay);background:var(--no-bg);animation:shake .35s}
+.bin.reveal{border-color:var(--sage);animation:pulse 1.2s infinite}
+.throwzone{position:relative;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;padding:6px 0 4px;overflow-y:auto}
+.tz-ask{font-size:calc(.9rem*var(--fz));color:var(--ink2);text-align:center;line-height:1.6}
+.tcard.ok{border-color:var(--sage);background:var(--ok-bg)}
+.tcard.no{border-color:var(--clay);background:var(--no-bg)}
+.tcard.flying{opacity:.5}
+.tcard .res{display:block;font-family:var(--sans);font-size:calc(.86rem*var(--fz));font-weight:500;color:var(--sage);margin-top:4px}
+.tcard.no .res{color:var(--clay)}
+.tcard .res:empty{display:none}
+body.learn .tcard{cursor:default;touch-action:manipulation}
+.ghost{position:fixed;z-index:50;pointer-events:none;background:var(--sheet);border:1px solid var(--c-sort);border-radius:14px;padding:14px 20px;font-family:var(--serif);font-weight:600;font-size:1.1rem;line-height:1.5;text-align:center;box-sizing:border-box;box-shadow:0 12px 26px -16px rgba(46,43,58,.6)}
+.bin .got{font-size:.74rem;color:var(--sage);font-weight:500}
+.bin .got:empty{display:none}
+.tcard{position:relative;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:18px 26px;max-width:min(560px,94%);box-sizing:border-box;font-family:var(--serif);font-size:calc(clamp(1.08rem,2.3vw,1.4rem)*var(--fz));font-weight:600;line-height:1.6;text-align:center;box-shadow:0 12px 26px -16px rgba(46,43,58,.6);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;z-index:3}
+.tcard.drag{cursor:grabbing}
+.tcard.enter{animation:cardIn .3s ease}
+.tcard .speak{position:absolute;right:8px;bottom:-13px;font-family:var(--sans);font-weight:400}
+.tz-hint{font-size:.8rem;color:var(--muted);text-align:center}
+.ctimer{width:min(560px,94%);height:3px;background:var(--paper2);overflow:hidden;border-radius:3px}
+.ctimer i{display:block;height:100%;background:var(--c-sort);transform-origin:left}
+.tz-fb{width:100%;display:flex;justify-content:center}
+.tz-fb>*{width:min(660px,100%)}
+.tz-hintbox{width:min(560px,94%)}
+@media (max-width:620px){.bins{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-height:560px){.bin small{display:none}.bin .basket{width:34px;height:26px}.tcard{padding:12px 20px}.sort{gap:8px}}
+
+/* LAW */
+.casefile{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto;position:relative}
+.cf-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.8rem;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:8px;flex-wrap:wrap}
+.cf-boss{display:flex;align-items:center;gap:8px;color:var(--ink2)}
+.cf-boss .bic{width:28px;height:28px;color:var(--c-law);display:flex}
+.cf-boss .bic .ic{width:100%;height:100%}
+.hpbar{width:90px;height:5px;border-radius:99px;background:var(--paper2);overflow:hidden}
+.hpbar i{display:block;height:100%;background:var(--clay);transition:width .4s}
+.cf-title{margin:0;font-family:var(--serif);font-size:calc(1.18rem*var(--fz))}
+.cf-story{margin:0;font-family:var(--serif);font-size:calc(1.02rem*var(--fz));line-height:1.95}
+.cf-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto}
+.cf-steps{list-style:none;margin:0;padding:0;display:flex;gap:6px;flex-wrap:wrap}
+.cf-steps li{font-size:.76rem;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.cf-steps li.now{border-color:var(--c-law);color:var(--c-law)}
+.cf-steps li.done{background:var(--paper2);color:var(--ink2)}
+.hearts{display:flex;gap:3px;color:var(--clay)}
+.hearts .ic{width:16px;height:16px}
+.hearts .off{color:var(--line)}
+.hitfx{animation:hit .5s}
+
+/* ECON */
+.econ{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px}
+@media (orientation:portrait){.econ{grid-template-columns:1fr;overflow-y:auto;align-content:start}}
+.eleft{display:flex;flex-direction:column;gap:10px;min-height:0}
+.shop{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:12px}
+.shop .cup{width:42px;height:42px;color:var(--c-econ);display:flex}
+.shop .cup .ic{width:100%;height:100%}
+.shop-name{font-family:var(--serif);font-weight:700;margin-bottom:4px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chipv{border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:.76rem;color:var(--ink2);font-variant-numeric:tabular-nums;background:var(--paper);white-space:nowrap}
+.chipv.alert{border-color:var(--clay);color:var(--clay)}
+.chipv.good{border-color:var(--sage);color:var(--sage)}
+.pricetag{border:1px solid var(--ochre);color:var(--ink);border-radius:6px;padding:3px 10px;font-family:var(--serif);font-weight:700;font-variant-numeric:tabular-nums;background:var(--sheet);margin-left:auto;white-space:nowrap}
+.chartbox{position:relative;flex:1;min-height:190px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.chartbox canvas{position:absolute;inset:0;width:100%;height:100%}
+.histbox{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.hl{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);gap:8px}
+.hl b{color:var(--ink);font-variant-numeric:tabular-nums}
+.hist{display:grid;grid-template-columns:repeat(var(--d),1fr);gap:4px;height:36px;align-items:end;border-bottom:1px solid var(--line)}
+.hist i{background:var(--ochre);border-radius:2px 2px 0 0;min-height:1px;opacity:.85}
+.hist i.neg{background:var(--clay)}
+.gbar{height:4px;background:var(--paper2);border-radius:9px;overflow:hidden}
+.gbar i{display:block;height:100%;background:var(--sage);transition:width .5s}
+.ctrl{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.ctrl h4{margin:0;font-family:var(--serif);font-size:calc(1.02rem*var(--fz))}
+.ctrl label{display:grid;grid-template-columns:4.5em auto minmax(0,1fr) auto 5em;gap:8px;align-items:center;font-size:calc(.9rem*var(--fz))}
+.ctrl input[type=range]{width:100%;accent-color:var(--c-econ)}
+.ctrl .val{font-family:var(--serif);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.stepbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--sheet);font-size:1.1rem;font-weight:700}
+.est{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.est div{background:var(--paper);border-radius:8px;padding:8px 6px;text-align:center;font-size:.76rem;color:var(--muted)}
+.est b{display:block;font-family:var(--serif);font-size:calc(1.05rem*var(--fz));color:var(--ink);font-variant-numeric:tabular-nums}
+.est b.neg{color:var(--clay)}
+.tipline{font-size:calc(.84rem*var(--fz));color:var(--ink2);line-height:1.65;display:flex;gap:6px}
+.tipline .ic{color:var(--ochre);margin-top:3px}
+.receipt{background:var(--sheet);border:1px dashed var(--line);border-radius:10px;padding:14px 16px;font-size:calc(.9rem*var(--fz));line-height:1.85;position:relative}
+.receipt h4{margin:0 0 6px;font-family:var(--serif)}
+.receipt .ln{display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums}
+.receipt .ln span:first-child{color:var(--ink2)}
+.receipt .tot{border-top:1px solid var(--line);margin-top:6px;padding-top:6px;font-weight:700}
+.receipt .neg{color:var(--clay)}
+.receipt .msg{margin-top:8px;font-size:.86rem;color:var(--ink2)}
+
+/* POL */
+.runner{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--paper)}
+.runner canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.r-top{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:10px;align-items:center;background:rgba(251,248,241,.95);border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-family:var(--serif);font-weight:600;font-size:calc(clamp(.92rem,1.8vw,1.1rem)*var(--fz));line-height:1.5;z-index:3}
+.r-top .kicker{font-family:var(--sans);font-weight:400;white-space:nowrap}
+.r-top .ic{width:22px;height:22px;color:var(--c-pol)}
+.r-top .grow{flex:1;min-width:0}
+.r-order{position:absolute;inset:0;display:grid;place-items:center;padding:16px;background:rgba(243,238,227,.6);z-index:6;overflow:auto}
+.r-order .panel{text-align:center}
+.r-order .big{font-family:var(--serif);font-weight:700;font-size:calc(clamp(1.12rem,2.6vw,1.45rem)*var(--fz));line-height:1.65;margin:8px 0 12px}
+.cd{height:3px;background:var(--paper2);margin:0 0 14px;overflow:hidden;border-radius:3px}
+.cd i{display:block;height:100%;background:var(--c-pol);transform-origin:left}
+.r-lanes{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px;z-index:3}
+.lane{background:rgba(251,248,241,.96);border:1px solid var(--line);border-radius:10px;padding:6px 6px 7px;font-size:calc(clamp(.8rem,1.6vw,.98rem)*var(--fz));line-height:1.35;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+.lane .k{font-size:.68rem;color:var(--muted)}
+.lane.on{border-color:var(--c-pol);background:#e3ece6;box-shadow:0 0 0 2px rgba(95,127,111,.35)}
+.lane.right{border-color:var(--sage);background:var(--ok-bg)}
+.lane.wrong{border-color:var(--clay);background:var(--no-bg);opacity:.75}
+.r-fb{position:absolute;left:10px;right:10px;bottom:78px;z-index:5;display:flex;justify-content:center}
+.r-fb>*{width:min(680px,100%)}
+.gobtn{position:absolute;left:50%;transform:translateX(-50%);top:66px;z-index:4;font-size:1.05rem;padding:12px 26px;box-shadow:0 8px 18px -10px rgba(46,43,58,.6)}
+@media (max-height:460px){.r-fb{bottom:62px}.lane{padding:4px}.lane .k{display:none}.gobtn{top:58px;padding:8px 18px}}
+
+/* SEQ */
+.seq{display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:12px;overflow-y:auto}
+.seq-q{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;display:flex;gap:12px;align-items:center}
+.seq-q .ic{width:38px;height:38px;color:var(--c-seq)}
+.seq-q .qt{font-family:var(--serif);font-weight:700;font-size:calc(1.08rem*var(--fz));line-height:1.6;flex:1;min-width:0}
+.slots{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.slot{flex:1 1 150px;min-height:70px;border:1.5px dashed var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;background:var(--paper);position:relative;min-width:0}
+.slot .no{font-family:var(--serif);font-weight:700;color:var(--c-seq);font-size:.9rem}
+.slot .tx{font-size:calc(.92rem*var(--fz));line-height:1.5}
+.slot.filled{border-style:solid;background:var(--sheet);border-color:var(--c-seq);cursor:pointer;animation:pop .2s}
+.slot.fixed{cursor:default;background:var(--ok-bg);border-color:var(--sage)}
+.slot.ok{border-color:var(--sage);background:var(--ok-bg)}
+.slot.bad{border-color:var(--clay);background:var(--no-bg)}
+.slot .arrow{position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem}
+.pool{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.pcard{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-family:var(--serif);font-weight:600;font-size:calc(.98rem*var(--fz));line-height:1.5;max-width:300px;box-shadow:0 6px 14px -10px rgba(46,43,58,.5);text-align:left}
+.pcard:hover{border-color:var(--c-seq)}
+.pcard.wrong{animation:shake .35s;border-color:var(--clay)}
+.seqfoot{display:flex;flex-direction:column;gap:10px}
+
+/* RULER */
+.ruler{display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:12px;overflow-y:auto}
+.rq{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;position:relative}
+.rq .qtext{font-family:var(--serif);font-weight:700;font-size:calc(1.1rem*var(--fz));line-height:1.7;margin-top:4px}
+.rbox{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:44px 20px 14px;position:relative}
+.rbar{position:relative;height:46px;margin:0 6px}
+.rline{position:absolute;left:0;right:0;top:20px;height:2px;background:var(--ink)}
+.tick{position:absolute;top:14px;width:1px;height:14px;background:var(--ink)}
+.tick.m{top:17px;height:8px;background:var(--muted)}
+.tlab{position:absolute;top:32px;transform:translateX(-50%);font-size:.74rem;color:var(--ink2);font-variant-numeric:tabular-nums}
+.zone{position:absolute;top:0;height:14px;border-radius:3px;font-size:.66rem;line-height:14px;text-align:center;color:var(--card);overflow:hidden;white-space:nowrap;animation:pop .3s}
+.marker{position:absolute;top:-38px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;color:var(--c-ruler);transition:left .45s cubic-bezier(.3,.7,.4,1);pointer-events:none}
+.marker .ic{width:26px;height:26px}
+.marker b{font-family:var(--serif);font-size:.95rem;background:var(--sheet);border:1px solid var(--c-ruler);border-radius:6px;padding:0 6px;line-height:1.4;white-space:nowrap}
+.rctrl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.bigchip{min-width:96px;padding:12px 18px;border-radius:14px;border:1.5px solid var(--line);background:var(--sheet);font-family:var(--serif);font-weight:700;font-size:calc(1.15rem*var(--fz))}
+.bigchip:hover{border-color:var(--c-ruler)}
+.bigchip.wrong{border-color:var(--clay);background:var(--no-bg);opacity:.6;animation:shake .35s}
+.bigchip.right{border-color:var(--sage);background:var(--ok-bg)}
+.rslider{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;align-items:center;width:100%}
+.rslider input{width:100%;accent-color:var(--c-ruler)}
+.rnum{font-family:var(--serif);font-weight:700;font-size:1.4rem;min-width:4.5em;text-align:center;font-variant-numeric:tabular-nums}
+
+.stars{display:flex;gap:8px;margin:6px 0 14px}
+.stars span{width:46px;height:46px;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--line);font-weight:700;font-family:var(--serif);border-radius:4px;transform:rotate(-8deg);font-size:.9rem}
+.stars span.on{border-color:var(--clay);color:var(--clay);animation:stampIn .35s cubic-bezier(.2,1.6,.4,1) both}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.rgrid div{border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center}
+.rgrid b{display:block;font-family:var(--serif);font-size:1.3rem;font-variant-numeric:tabular-nums}
+.rgrid small{color:var(--muted)}
+.notes{max-height:34vh;overflow:auto;border-top:1px solid var(--line);padding-top:10px}
+.notes h4{margin:0 0 6px;font-size:.88rem;color:var(--muted);font-weight:500;display:flex;gap:6px;align-items:center}
+.note{font-size:.87rem;line-height:1.7;padding:9px 0;border-bottom:1px dashed var(--line)}
+.note b{color:var(--clay);font-weight:500}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;z-index:60;max-width:calc(100% - 32px);font-size:.88rem;animation:pop .25s;box-sizing:border-box}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media (max-height:460px){.ghead{padding-block:4px}.ghead h2{font-size:.98rem}.qcard{padding:10px 12px}.opt{min-height:42px;padding:8px 10px}}
+</style>
+
+<div id="app">
+  <header class="top wrap">
+    <div class="logo"><span class="seal">公</span>公民大平台</div>
+    <div class="sp"></div>
+    <button class="iconbtn tog" id="readBtn" aria-pressed="false" hidden></button>
+    <button class="iconbtn" id="soundBtn" aria-pressed="true"></button>
+  </header>
+  <main>
+    <section class="screen" id="home">
+      <div class="home-in wrap">
+        <div class="portrait-hint">請將手機轉成橫向，遊戲畫面會更寬，閱讀也更輕鬆。</div>
+        <div class="hero">
+          <div>
+            <h1>會考公民，慢慢玩，也能讀懂</h1>
+            <p>題目依翰林版六冊課本編寫。六款玩法各練一種公民思考：分類、推理、經營、判斷機關、排流程、記數字。答錯的題目會收進錯題本。</p>
+          </div>
+          <div class="settings">
+            <div>
+              <div class="label">一、選擇冊次（翰林版）</div>
+              <div class="chips-row" id="books" role="group" aria-label="冊次"></div>
+            </div>
+            <div>
+              <div class="label">二、選擇模式</div>
+              <div class="seg" id="modes" role="group" aria-label="模式">
+                <button data-m="learn" aria-pressed="true">見習公民</button>
+                <button data-m="exam" aria-pressed="false">模擬會考</button>
+              </div>
+              <div class="mode-note" id="modeNote"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="label">三、選擇遊戲</div>
+          <div class="games" id="games"></div>
+        </div>
+        <div class="panes">
+          <div class="pane" id="wrongPane"></div>
+          <div class="pane" id="masteryPane"></div>
+        </div>
+        <div class="tips">
+          <span>電腦：數字鍵 1–4 選答、方向鍵換車道、Enter 繼續</span>
+          <span>手機：拖曳丟卡、點選答案、左右滑動換車道</span>
+          <span>紀錄只存在這台裝置上</span>
+        </div>
+      </div>
+    </section>
+    <section class="screen" id="game" hidden>
+      <div class="ghead wrap">
+        <button class="iconbtn" id="backBtn">← 回大廳</button>
+        <h2 id="gTitle"></h2>
+        <div class="stats" id="gStats"></div>
+      </div>
+      <div class="stage wrap" id="stage"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ================= 線稿圖示 ================= */
+const ICON = {
+  speaker:'<path d="M8 19h7l9-7v24l-9-7H8z"/><path d="M32 18q4 6 0 12"/><path d="M36 14q7 10 0 20"/>',
+  mute:'<path d="M8 19h7l9-7v24l-9-7H8z"/><path d="M33 19l10 10M43 19L33 29"/>',
+  read:'<path d="M6 12q9-3 18 3q9-6 18-3v26q-9-3-18 3q-9-6-18-3z"/><path d="M24 15v26"/><path d="M36 4q4 3 0 6M40 1q7 6 0 12"/>',
+  twopeople:'<circle cx="18" cy="16" r="6"/><path d="M6 40c0-8 5-13 12-13s12 5 12 13"/><circle cx="32" cy="18" r="5"/><path d="M30 28c6 0 12 4 12 11"/>',
+  scales:'<path d="M24 8v32M14 40h20M12 14h24"/><path d="M12 14l-6 12h12zM36 14l-6 12h12z"/>',
+  gavel:'<path d="M16 22l10-10 8 8-10 10z"/><path d="M10 40l10-10"/><path d="M8 42h24"/>',
+  parliament:'<path d="M6 42h36M10 18h28L24 8z"/><path d="M14 22v16M22 22v16M26 22v16M34 22v16"/>',
+  bubbles:'<path d="M7 12h22v14H16l-9 7v-7H7z"/><path d="M28 22h13v12h-3v6l-6-6h-4z"/>',
+  globe:'<circle cx="24" cy="24" r="16"/><path d="M8 24h32"/><ellipse cx="24" cy="24" rx="7" ry="16"/>',
+  book:'<path d="M6 12q9-3 18 3q9-6 18-3v28q-9-3-18 3q-9-6-18-3z"/><path d="M24 15v28"/>',
+  ballot:'<path d="M8 22h32v18H8z"/><path d="M12 22V14h24v8"/><path d="M24 14V8"/><path d="M18 31h12"/>',
+  pen:'<path d="M30 9l9 9L20 37l-11 3 3-11z"/><path d="M26 13l9 9"/>',
+  parcel:'<path d="M8 16l16-8 16 8v16l-16 8-16-8z"/><path d="M8 16l16 8 16-8M24 24v16"/>',
+  scroll:'<path d="M14 10h20v28H14z"/><path d="M14 10a3 3 0 00-3 3M34 38a3 3 0 003-3"/><path d="M20 18h10M20 24h10M20 30h6"/>',
+  tag:'<path d="M8 24L24 8h16v16L24 40z"/><circle cx="34" cy="14" r="2.5"/>',
+  person:'<circle cx="24" cy="12" r="6"/><path d="M12 42c0-10 5-18 12-18s12 8 12 18"/>',
+  heart:'<path d="M24 40L8 24a9 9 0 0116-8 9 9 0 0116 8z"/>',
+  notebook:'<path d="M12 6h24v36H12z"/><path d="M18 6v36M22 16h10M22 23h10M22 30h6"/>',
+  office:'<path d="M10 42V8h28v34M6 42h36"/><path d="M17 14h4M27 14h4M17 22h4M27 22h4M17 30h4M27 30h4"/>',
+  lens:'<circle cx="21" cy="21" r="11"/><path d="M29 29l11 11"/>',
+  paper:'<path d="M12 6h18l8 8v28H12z"/><path d="M18 24h12M18 30h12M18 36h8"/>',
+  flag:'<path d="M12 42V6"/><path d="M12 8h24l-6 7 6 7H12"/>',
+  city:'<path d="M6 42V22h10v20M16 42V10h10v32M26 42V18h16v24M6 42h36"/>',
+  house:'<path d="M8 24L24 10l16 14"/><path d="M12 21v21h24V21"/><path d="M21 42V32h6v10"/>',
+  check:'<path d="M10 25l9 9 19-20"/>',
+  cross:'<path d="M14 14l20 20M34 14L14 34"/>',
+  hoop:'<path d="M7 14h34"/><path d="M10 14l5 24h18l5-24"/><path d="M12 22h24M14 30h20M17 14l3 24M24 14v24M31 14l-3 24"/>',
+  cup:'<path d="M13 16h22l-3 26H16z"/><path d="M11 16h26"/><path d="M26 16l5-11"/><circle cx="20" cy="36" r="1.6"/><circle cx="25" cy="38" r="1.6"/><circle cx="28" cy="33" r="1.6"/>',
+  road:'<path d="M19 6L8 42M29 6l11 36"/><path d="M24 10v5M24 21v6M24 33v8"/>',
+  umbrella:'<path d="M6 24a18 18 0 0 1 36 0z"/><path d="M24 24v13a4 4 0 0 1-8 0"/>',
+  bulb:'<path d="M24 6a12 12 0 0 0-7 22v6h14v-6a12 12 0 0 0-7-22z"/><path d="M19 40h10M21 44h6"/>',
+  chart:'<path d="M8 8v32h32"/><path d="M13 13l23 22"/>',
+  steps:'<path d="M6 40h9v-9h9v-9h9v-9h9"/><path d="M36 8l6 5-6 5"/>',
+  ruler:'<rect x="4" y="16" width="40" height="16" rx="2"/><path d="M10 16v6M16 16v4M22 16v6M28 16v4M34 16v6M40 16v4"/>',
+  school:'<path d="M6 20L24 10l18 10"/><path d="M10 20v20h28V20"/><path d="M20 40V30h8v10"/>',
+  mountain:'<path d="M4 40l14-22 8 12 6-8 12 18z"/>',
+  id:'<rect x="6" y="12" width="36" height="24" rx="3"/><circle cx="17" cy="23" r="4"/><path d="M11 32c1-3 3-4 6-4s5 1 6 4M27 20h10M27 26h10"/>',
+  card:'<rect x="6" y="12" width="36" height="24" rx="3"/><path d="M6 20h36M12 30h8"/>',
+  factory:'<path d="M6 42V22l10 6v-6l10 6v-6l10 6V10h6v32z"/>',
+  shield:'<path d="M24 6l16 6v12c0 10-7 16-16 18C15 40 8 34 8 24V12z"/>',
+  plus:'<rect x="8" y="8" width="32" height="32" rx="4"/><path d="M24 15v18M15 24h18"/>',
+  coin:'<circle cx="24" cy="24" r="15"/><path d="M24 15v18M19 19.5h7a2.5 2.5 0 010 5h-5a2.5 2.5 0 000 5h7"/>',
+  tv:'<rect x="6" y="12" width="36" height="24" rx="2"/><path d="M18 6l6 6 6-6M18 42h12"/>'
+};
+const I = (n, size) => `<svg class="ic" viewBox="0 0 48 48"${size?` style="width:${size};height:${size}"`:''} aria-hidden="true">${ICON[n]||''}</svg>`;
+
+/* ================= 冊次、單元、遊戲 ================= */
+const BOOK_NAME = {1:'第一冊',2:'第二冊',3:'第三冊',4:'第四冊',5:'第五冊',6:'第六冊'};
+const BOOK_SEM  = {1:'七上',2:'七下',3:'八上',4:'八下',5:'九上',6:'九下'};
+const GAMES = {
+  sort:{name:'概念分類投籃',theme:'六冊共通・分類',art:'hoop',books:[1,2,3,4,5,6],c:'var(--c-sort)',desc:'把情境卡丟進正確的分類籃。課本裡的分類重點幾乎都在這裡：社會規範、親屬關係、基本權利、誘因、匯率……'},
+  law:{name:'法庭攻防戰',theme:'法律與人權・案情推理',art:'scales',books:[1,4,5,6],c:'var(--c-law)',desc:'先讀案情，再一步步判斷：要負什麼責任、依據哪部法律、可以怎麼救濟。'},
+  econ:{name:'夜市大老闆',theme:'經濟生活・經營模擬',art:'cup',books:[5],c:'var(--c-econ)',desc:'經營珍奶攤：決定售價，看看買的人和利潤怎麼變。中途外銷日本，體驗匯率、通貨膨脹與勞動法規。'},
+  pol:{name:'市政快遞員',theme:'政府與政治・第一人稱跑酷',art:'road',books:[3],c:'var(--c-pol)',desc:'讀懂訂單，騎上車道，把公文送到正確的機關。總統、五院、地方政府、選舉原則都會遇到。'},
+  seq:{name:'程序接力賽',theme:'流程與步驟・排序',art:'steps',books:[1,2,3,4,5],c:'var(--c-seq)',desc:'把打散的步驟排回正確順序：刑事訴訟、行政救濟、班會流程、修憲、投票、預算……'},
+  ruler:{name:'公民數字尺',theme:'年齡與期限・數字',art:'ruler',books:[1,3,4,5,6],c:'var(--c-ruler)',desc:'幾歲成年？幾歲可以投票？猶豫期幾天？在數字尺上找出答案，順便看懂年齡分界。'}
+};
+const MODE_NOTE = {
+  learn:'見習公民（適合資源班）：字體放大、題目可朗讀、三選一、答錯可以再試，有提示、不限時，看完解析自己按「下一題」。',
+  exam:'模擬會考：題目更接近會考情境、四選一、只有一次機會，部分遊戲限時並有生命值。詳細解析在結算時整理。'
+};
+
+/* ================= 題庫：概念分類投籃 ================= */
+/* 每回合：bins = [名稱, 說明]；cards = [文字, 正確籃, 難度(1基礎/2會考), 補充說明] */
+const SORT_RAW = [
+/* 第一冊 七上 */
+{id:'nat',b:1,u:'公民與公民德性',ic:'id',t:'國籍怎麼取得？',bins:[['血統規則','屬人原則：父或母是本國人，就取得國籍。'],['出生地規則','屬地原則：出生在該國領土內，就取得國籍。'],['歸化','透過婚姻、收養、投資移民等方式取得國籍。']],
+ cards:[['出生時爸爸是我國國民',0,1],['媽媽是我國國民，在日本出生',0,2],['在美國出生，取得美國國籍',1,1],['只要出生在該國領土就有國籍',1,1],['新住民結婚後申請取得我國國籍',2,1],['被我國人收養而取得國籍',2,1],['外國人以投資移民取得國籍',2,2],['外籍傳教士因長期貢獻歸化臺灣',2,2]]},
+{id:'virtue',b:1,u:'公民與公民德性',ic:'twopeople',t:'現代公民的五種德性',bins:[['參與公共事務','主動付出、關心公共議題'],['遵守法律規範','守法，維護社會秩序'],['理性思考批判','蒐集查證資訊，不盲從'],['和平尊重包容','尊重不同意見，和平討論'],['捍衛公平正義','讓弱勢也能平等享有權利']],
+ cards:[['假日參加社區服務',0,1],['蒐集資料了解藻礁議題',0,2],['開車時依法禮讓行人',1,1],['遵守交通規則，不闖紅燈',1,1],['看到網路消息，先警覺、查明、證實',2,1],['對政治人物的說法保持批判思考',2,2],['意見不同時，先聽完再理性討論',3,1],['和意見不同的人和平共處',3,2],['爭取設置無障礙設施',4,1],['讓最弱勢的成員獲得較多資源',4,2]]},
+{id:'gender',b:1,u:'人性尊嚴與人權保障',ic:'pen',t:'性別刻板印象、偏見與歧視',bins:[['性別刻板印象','對性別形成固定、僵化的看法'],['性別偏見','對特定性別抱持負面態度'],['性別歧視','因性別而有不公平的對待，使權益受損']],
+ cards:[['認為女生比較細心，適合做家事',0,1],['男生就應該讀理工科',0,1],['公主就應該溫柔、皮膚白皙',0,2],['看不起喜歡跳舞的男生',1,1],['覺得某個性別的人都很差勁而討厭他們',1,2],['只因為是女性，就不讓她升主管',2,1],['同樣的工作，女性薪水比男性少',2,1],['個性陰柔的同學被勸退，不能當體育股長',2,2]]},
+{id:'gl3',b:1,u:'人性尊嚴與人權保障',ic:'book',t:'性平三法',bins:[['性別平等教育法','校園性別事件，一方是學生'],['性別平等工作法','職場性別事件：雇主、員工、求職者'],['性騷擾防治法','校園、職場以外的性騷擾']],
+ cards:[['學生在學校被同學性騷擾',0,1],['學校招生不能因性別而差別待遇',0,2],['學校設置性別平等教育委員會調查',0,2],['雇主對員工性騷擾',1,1],['求職面試時被雇主性騷擾',1,2],['公司對男女同工不同酬',1,1],['在捷運上被陌生人性騷擾',2,1],['在公園被路人性騷擾',2,1]]},
+{id:'kin',b:1,u:'家庭生活',ic:'house',t:'民法的親屬關係',bins:[['配偶','因婚姻而互為配偶'],['血親','自然血親（直系、旁系）、法定血親（收養）'],['姻親','血親的配偶、配偶的血親、配偶的血親的配偶'],['沒有親屬關係','不在民法規定的範圍內']],
+ cards:[['爸爸和媽媽',0,1],['我和爺爺',1,1],['我和姊姊',1,1],['養父母和養子女',1,2,'收養成立的是法定血親（擬制血親），法律上視同自然血親。'],['我和舅媽',2,1,'舅媽是舅舅（我的血親）的配偶，屬於「血親的配偶」。'],['太太和丈夫的爸爸',2,2,'丈夫的爸爸是「配偶的血親」。'],['兩兄弟的太太（妯娌）',2,2,'屬於「配偶的血親的配偶」。'],['爺爺和外公（互稱親家）',3,2,'親家屬於「血親的配偶的血親」，不在民法的姻親範圍內。']]},
+{id:'ftype',b:1,u:'家庭生活',ic:'house',t:'三種基本家庭型態',bins:[['小家庭','又稱核心家庭：一對夫妻和未婚子女'],['折衷家庭','又稱主幹家庭：小家庭加上直系尊親屬，多為三代同堂'],['大家庭','又稱擴展家庭：數個有血緣關係的小家庭一起生活']],
+ cards:[['爸爸、媽媽、我和弟弟住在一起',0,1],['一對夫妻和未婚的女兒',0,1],['爸媽、我和爺爺奶奶三代同堂',1,1],['小家庭加上曾祖父母一起住',1,2],['爺爺奶奶和兩位已婚伯伯的家庭同住',2,1],['好幾個有血緣關係的小家庭住在同一個大宅院',2,2]]},
+{id:'ffun',b:1,u:'變遷中的家庭',ic:'house',t:'家庭的功能',bins:[['生育功能','生兒育女，傳承家族血緣'],['保護與照顧功能','照顧家人的生活、健康與安全'],['教育功能','家庭是第一個社會化的團體'],['經濟功能','提供家人食衣住行所需']],
+ cards:[['夫妻生兒育女',0,1],['生育率下降，出現少子化',0,2],['媽媽照顧生病的弟弟',1,1],['部分照顧工作由托育中心、安養機構協助',1,2],['在家學會生活習慣與禮貌',2,1],['部分教育功能由學校、傳播媒體輔助',2,2],['爸媽工作賺錢支付家用',3,1],['家庭從生產單位轉為以消費為主',3,2]]},
+{id:'fgov',b:1,u:'變遷中的家庭',ic:'umbrella',t:'政府如何協助家庭？',bins:[['少子化','鼓勵結婚與生育'],['高齡社會','分擔照顧長者的辛勞'],['家庭暴力','保護被害人']],
+ cards:[['提供育嬰假',0,1],['發放生育補助',0,1],['推動公共托育',0,1],['補助不孕症治療（試管嬰兒）',0,2],['建立長期照護制度',1,1],['提供到宅服務、日間照顧',1,1],['向法院聲請保護令',2,1],['法院限制施暴父母行使親權',2,2]]},
+{id:'srights',b:1,u:'學生權利與校園生活',ic:'school',t:'學生在校園的權利',bins:[['受教育權與學習權','接受教育、自主學習'],['身體自主權','自己是身心的主人，不可任意碰觸'],['人格發展權','健康、名譽、隱私等人的價值與尊嚴']],
+ cards:[['學校設圖書館讓學生自主學習',0,1],['被打到住院，無法到校上課',0,2],['同學不喜歡肢體接觸就應立即停止',1,1],['沒經過同意不可碰觸他人身體',1,1],['不偷看同學的聯絡簿或訊息',2,1],['不用言語辱罵同學',2,1],['不散布他人的隱私',2,2]]},
+{id:'tribe',b:1,u:'部落與公民參與',ic:'mountain',t:'部落面臨的挑戰',bins:[['傳統文化的斷層','文化與族語傳承出現斷層'],['部落經濟的停滯','回到部落缺乏工作與產業'],['傳統領域的爭議','傳統領域變成公有或私人土地'],['文化與法律的衝突','傳統文化和現代法律不一致']],
+ cards:[['年輕族人到都市生活，不會說族語',0,1],['耆老記錄族語和歌謠，努力傳承',0,2,'這是為了解決傳統文化斷層所做的努力。'],['回到部落找不到工作機會',1,1],['推出原住民烤豬認證，協助創業',1,2,'目的是改善部落經濟停滯。'],['政府在部落附近開發，族人抗議',2,1],['部落爭取保護傳統領域',2,2],['因持有獵槍而遭法辦',3,1],['狩獵傳統與保育法規的爭議',3,2]]},
+/* 第二冊 七下 */
+{id:'cult3',b:2,u:'多元文化',ic:'globe',t:'文化的內涵',bins:[['器物','人類創造的物品，例如建築、交通工具'],['制度','人們建立的制度，例如法律'],['理念','宗教信仰、價值觀']],
+ cards:[['發明環保吸管',0,1],['建築、交通工具',0,1],['手機、電腦',0,2],['政府禁用塑膠餐具的政策',1,1],['法律',1,1],['學校的校規',1,2],['環保理念',2,1],['宗教信仰、價值觀',2,1]]},
+{id:'cultf',b:2,u:'多元文化',ic:'globe',t:'文化的特性（以婚禮為例）',bins:[['普遍性','不同文化有共通點'],['差異性','不同文化之間有差別'],['累積性','代代相傳，累積與延續'],['制約性','讓人表現出符合文化的行為']],
+ cards:[['每個文化都有慶祝結婚的儀式',0,1],['世界各地都有過年的習俗',0,2],['臺灣和日本的禮金袋顏色不同',1,1],['有些地方用手吃飯，有些用餐具',1,2],['紙本喜帖發展出電子喜帖',2,1],['傳統技藝一代代傳承又創新',2,2],['參加婚禮時大多會包禮金',3,1],['到泰國時不摸小孩的頭',3,2]]},
+{id:'cult',b:2,u:'多元文化',ic:'globe',t:'主流文化、次文化與文化位階',bins:[['主流文化','社會上多數人認同的價值、信仰和規範'],['次文化','部分群體因年齡、職業、族群等形成的獨特文化，沒有高低之分'],['文化位階','認為自己的文化比較優越，對其他文化分高低']],
+ cards:[['社會上多數人認同的價值與規範',0,1],['民主自由是全球多數國家認同的價值',0,2],['青少年之間的流行語',1,1],['電競玩家特有的用語',1,1],['新住民帶來的家鄉文化',1,2],['認為某些語言比較高級',2,1],['因為口音不同而取笑別人',2,1],['過去限制說母語的語言政策',2,2]]},
+{id:'respect',b:2,u:'多元文化',ic:'twopeople',t:'為什麼要尊重文化差異？',bins:[['減少文化衝突','了解、溝通與換位思考'],['肯定自我文化','重視並傳承自己的文化'],['維護文化多樣性','不讓文化變得單一而消失']],
+ cards:[['等基督徒朋友禱告完再開動',0,1],['用雙語解釋誤會，化解爭吵',0,2],['向外國朋友介紹媽祖遶境',1,1],['珍惜並傳承自己的傳統文化',1,1],['保存瀕臨消失的少數族群語言',2,1],['大賣場販賣各種文化的食物',2,2]]},
+{id:'norm',b:2,u:'社會規範',ic:'book',t:'社會規範的種類',bins:[['風俗習慣','長期累積、相沿成習的慣例'],['宗教信仰','以經典和戒律約束信徒'],['倫理道德','判斷善惡是非，自發遵守'],['法律','立法機關制定，唯一具有強制力']],
+ cards:[['過年穿新衣、向親友拜年',0,1],['寶寶週歲時抓周',0,1],['泰國的潑水節',0,2],['穆斯林不吃豬肉',1,1],['印度教徒不吃牛肉',1,1],['教徒每週日做禮拜',1,2],['禮讓優先席',2,1],['關懷長輩',2,1],['重視公德的「第六倫」',2,2],['騎機車要戴安全帽',3,1],['警察取締違規',3,1],['在捷運站內飲食會被罰鍰',3,2]]},
+{id:'punish',b:2,u:'社會規範',ic:'gavel',t:'違反規範會怎樣？',bins:[['國家公權力處罰','違反法律，國家可以強制處罰'],['良心譴責、輿論批評','違反風俗、宗教、道德，沒有國家強制力']],
+ cards:[['在捷運禁止飲食區吃東西被罰鍰',0,1],['酒駕被判刑',0,1],['電影院強制禁帶外食被處罰',0,2],['在公車上吃東西被乘客批評',1,2,'公車禁止飲食沒有法條罰責，只能靠公德心與司機勸導。'],['沒讓座給孕婦被網友批評',1,1],['說謊後內心感到不安',1,1],['插隊被旁人指責',1,1]]},
+{id:'isgroup',b:2,u:'團體與志願結社',ic:'twopeople',t:'是不是「團體」？',bins:[['團體','兩人以上、互相影響、有共同目標、遵守共同規範'],['不是團體','只是剛好在同一個地方']],
+ cards:[['學校拔河隊的選手',0,1],['班級',0,1],['社區守望相助隊',0,1],['歌友會裡的粉絲',0,2],['公車上的乘客',1,1],['電影院裡的觀眾',1,1],['路口一起等紅燈的人',1,2]]},
+{id:'group',b:2,u:'團體與志願結社',ic:'twopeople',t:'志願結社的四個特徵',bins:[['民間性','由人民組成，不是政府機關'],['自主性','成員自主決定行動'],['非營利性','自籌經費，盈餘用在組織目標'],['組織性','有系統的組織分工']],
+ cards:[['野鳥學會由民間愛鳥人士組成',0,1],['不是政府機關的一部分',0,1],['成員自主決定行動，不受政府影響',1,1],['球員工會自動自發要求球員自律',1,2],['喜憨兒烘焙坊的盈餘用來照顧喜憨兒',2,1],['靠會費和募款維持，不以賺錢為目的',2,1],['家扶基金會依專長分工',3,1],['有組織架構和章程',3,2]]},
+{id:'opinion',b:2,u:'公共意見',ic:'bubbles',t:'公共意見的特性',bins:[['公開性','公開且是公眾關切的議題'],['差異性','有支持也有反對的意見'],['影響性','可能影響政府的施政方針'],['變動性','時空與環境改變，民意也會變']],
+ cards:[['「行人地獄」在網路上被公開討論',0,1],['大家都關心的公共議題',0,2],['有人支持加重罰則，也有人反對',1,1],['同一議題有不同立場',1,2],['政府順應民意修法',2,1],['公共意見影響施政',2,2],['修法後塞車，民意又改變',3,1],['民意如流水',3,2]]},
+{id:'media',b:2,u:'公共意見',ic:'tv',t:'媒體現象與媒體識讀',bins:[['報導未必反映真實','可能誇大不實或片面'],['報導可能有特定立場','可能「帶風向」'],['閱聽人的媒體識讀','懷疑、查證、謹慎轉發']],
+ cards:[['為了吸引目光而誇大標題',0,1],['因商業考量篩選內容',0,2],['刻意「帶風向」',1,1],['各家媒體頭條呈現不同面貌',1,2],['使用事實查核平臺',2,1],['接觸不同立場的媒體',2,1],['看到消息先懷疑、查證，再謹慎轉發',2,1]]},
+{id:'status',b:2,u:'公平正義',ic:'scales',t:'社會地位從哪裡來？',bins:[['與生俱來或傳承而得','通常無法改變'],['經由個人努力取得','是一種成就的表現']],
+ cards:[['種族',0,1],['性別',0,1],['家世背景',0,1],['家庭排行',0,2],['日本天皇的世襲地位',0,2],['教育程度',1,1],['所得收入',1,1],['職業聲望',1,2],['努力練舉重得到奧運金牌',1,1]]},
+{id:'unfair',b:2,u:'公平正義',ic:'scales',t:'社會中的不公平現象',bins:[['貧富差距','貧窮在世代間循環'],['性別','特定性別遭到差別待遇'],['族群','因族群受到歧視或不尊重'],['城鄉差距','偏鄉的資源需求無法滿足']],
+ cards:[['低所得家庭資源缺乏，貧窮世代循環',0,1],['勞工付出卻沒得到合理薪資',0,2],['女性同工不同酬',1,1],['女性負擔大部分家庭照顧',1,2],['移工因刻板印象得不到尊重',2,1],['因族群背景被歧視',2,1],['偏鄉醫療資源不足',3,1],['偏鄉學校藏書少、書店很遠',3,1]]},
+{id:'justice',b:2,u:'公平正義',ic:'scales',t:'怎麼追求公平正義？',bins:[['每個人公平取得資源','人人都有公平的機會'],['對弱勢群體更多照顧','在機會平等的前提下，多照顧弱勢']],
+ cards:[['雇主不可因種族、宗教、性別歧視求職者',0,1],['在缺少資源的地區設立圖書館',0,1],['每個人享有基本自由與公平機會',0,2],['提供社會福利給無力自助的人',1,1],['設計無障礙空間',1,1],['補足偏鄉的醫護人力',1,2]]},
+{id:'ss',b:2,u:'社會安全與國家責任',ic:'umbrella',t:'社會福利制度',bins:[['社會保險','平時繳保費，遇到風險時領取給付'],['社會津貼','符合特定身分就能領，不必先繳保費'],['社會救助','經資產調查，協助生活困難的人']],
+ cards:[['看病時使用健保卡',0,1],['勞工退休領勞保老年給付',0,1],['失業時領就業保險的失業給付',0,2],['育有幼兒的家庭領育兒津貼',1,1],['老農津貼',1,1],['低收入戶領生活扶助',2,1],['遭逢火災的家庭申請急難救助',2,1],['重大天災後發放的災害救助',2,2]]},
+/* 第三冊 八上 */
+{id:'state',b:3,u:'國家與民主政治',ic:'flag',t:'國家的四個組成要素',bins:[['人民','擁有該國國籍的國民'],['領土','領陸、領海與領空'],['政府','國家的統治機關'],['主權','對內最高、對外獨立']],
+ cards:[['全國人口大約2,300萬',0,1],['擁有我國國籍的國民',0,2],['土地面積3萬6,197平方公里',1,1],['領陸、領海與領空',1,1],['管理與分配國家資源',2,1],['行使公權力治理國家',2,2],['與邦交國建立夥伴關係',3,1],['不受其他國家或國際組織干涉',3,1]]},
+{id:'demo',b:3,u:'國家與民主政治',ic:'ballot',t:'民主政治的特色',bins:[['民意政治','政府運作以民意為依歸'],['責任政治','施政須向人民負責'],['法治政治','政府運作受法律限制'],['政黨政治','政黨公平競爭取得執政權']],
+ cards:[['政府舉辦公聽會聽取民意',0,1],['政策要盡量取得社會共識',0,2],['政策失敗，官員辭職下臺',1,1],['官員違法要負法律責任',1,2],['警察依法開罰單',2,1],['政府與人民都受法律約束',2,2],['選後產生執政黨與在野黨',3,1],['政黨輪替',3,1]]},
+{id:'const',b:3,u:'憲法與權利保障',ic:'book',t:'憲法的三個特性',bins:[['最高性','法律與命令牴觸憲法者無效'],['原則性','內容簡潔，細節交給法律'],['固定性','變動不宜頻繁，修正較困難']],
+ cards:[['法律與命令不可牴觸憲法',0,1],['民法「意見不一致由父行使」違憲而失效',0,2],['萬法之母、眾法之源',1,1],['重要原則寫在憲法，細節由法律規定',1,1],['修憲門檻很高',2,1],['18歲公民權修憲案未通過複決',2,2]]},
+{id:'lawname',b:3,u:'憲法與權利保障',ic:'paper',t:'法律還是命令？',bins:[['法律','名稱：法、律、條例、通則（立法院制定）'],['命令','名稱：規程、規則、細則、辦法、綱要、標準、準則（行政機關訂定）']],
+ cards:[['國民教育法',0,1],['性別平等工作法',0,1],['道路交通管理處罰條例',0,1],['地方制度法',0,2],['國民教育法施行細則',1,1],['道路交通安全規則',1,1],['工作場所性騷擾防治措施準則',1,2]]},
+{id:'rights',b:3,u:'憲法與權利保障',ic:'shield',t:'憲法保障的基本權利',bins:[['平等權','在法律上一律平等'],['自由權','防止國家不當干涉'],['受益權','可要求國家有所作為'],['參政權','參與政治的權利']],
+ cards:[['男女在職場有相同的升遷機會',0,1],['無分宗教、種族，在法律上一律平等',0,2],['搬家到新竹（居住遷徙自由）',1,1],['參加集會遊行',1,1],['信仰宗教的自由',1,2],['參加勞動部的職業訓練（工作權）',2,1],['被環保局開罰而提起訴願',2,2],['接受國民教育',2,1],['參加國家考試擔任公務人員',3,1],['投票選舉與罷免',3,1]]},
+{id:'power',b:3,u:'法治與權力分立',ic:'scales',t:'權利還是權力？',bins:[['權利','法律保障下，人民不受任意侵害、追求利益'],['權力','以強制的力量影響他人行為']],
+ cards:[['人民可以拒絕警察非法逮捕',0,1],['人民享有言論自由',0,1],['受國民教育',0,2],['政府對違法者開罰',1,1],['警察依法取締違規',1,1],['政府執行公權力',1,2]]},
+{id:'rule',b:3,u:'法治與權力分立',ic:'scales',t:'人治與法治',bins:[['人治','統治者的意思就是法律'],['法治','人民與政府都受法律約束']],
+ cards:[['統治者可以隨意變更法律',0,1],['法律只約束人民，統治者不用遵守',0,1],['警察看心情決定要不要攔查',0,2],['人民選出代表制定法律',1,1],['政府必須依法行政',1,1],['限制總統任期，避免擴張權力',1,2]]},
+{id:'five',b:3,u:'法治與權力分立',ic:'parliament',t:'五權分立',bins:[['行政權','執行法律與政策'],['立法權','制定、修改和廢止法律'],['司法權','以法律公正裁判'],['考試權','選拔國家公務員'],['監察權','監督政府施政與經費']],
+ cards:[['執行政策',0,1],['審查政府預算',1,1],['制定法律',1,1],['審判各種訴訟',2,1],['舉辦國家考試',3,1],['從行政權獨立出來，避免濫用私人',3,2],['彈劾違法失職的公務人員',4,1],['從立法權獨立出來，避免國會專制',4,2]]},
+{id:'level',b:3,u:'地方政府',ic:'city',t:'中央還是地方？',bins:[['中央政府','有全國一致性質的事務'],['地方政府','有因地制宜性質的事務']],
+ cards:[['外交',0,1],['國防',0,1],['司法權、考試權、監察權',0,2],['宣布颱風天停班停課',1,1],['地方的垃圾清運',1,1],['衛生所接種流感疫苗',1,2],['舉辦地方特色茶葉競賽',1,2]]},
+{id:'elect',b:3,u:'政治參與',ic:'ballot',t:'對「人」還是對「事」？',bins:[['對人的選舉與罷免','選出或罷免行政首長、民意代表'],['對事的投票','公民投票：落實創制權與複決權']],
+ cards:[['選出總統',0,1],['選出立法委員',0,1],['罷免不適任的民意代表',0,1],['選出縣市議員',0,2],['對重大政策投票表決',1,1],['公投第17案',1,2],['複決既有的法律或政策',1,2]]},
+{id:'vote4',b:3,u:'政治參與',ic:'ballot',t:'公平投票的四個原則',bins:[['普通原則','符合法定資格，人人都有投票權'],['平等原則','一人一票，票票等值'],['直接原則','不透過代理人投票'],['無記名原則','祕密投票，不可亮票']],
+ cards:[['不分性別、宗教、財產都有投票權',0,1],['不分種族都有投票權',0,2],['一人一票，票票等值',1,1],['每張選票的價值相同',1,2],['自己親自投票',2,1],['用投票所的專用戳章圈選',3,1],['不可主動亮票',3,1],['選票上不可寫自己的名字',3,2]]},
+/* 第四冊 八下 */
+{id:'lawtype',b:4,u:'生活中的契約',ic:'book',t:'生活中的三種法律',bins:[['民法','規範私人之間的權利義務'],['刑法','規定犯罪與刑罰'],['行政法規','規範國家行政機關行使職權']],
+ cards:[['借羽球拍不小心弄壞',0,1],['婚後可以保有本姓',0,2],['買賣、租賃、借貸契約',0,1],['在超商順手牽羊',1,1],['故意刺破別人的輪胎',1,2],['違規停車被開罰單',2,1],['辦理出生登記（戶籍法）',2,1],['申辦健保卡（全民健康保險法）',2,2]]},
+{id:'cprin',b:4,u:'生活中的契約',ic:'scroll',t:'訂立契約的原則',bins:[['誠實信用原則','訂契約要誠實無欺'],['契約自由原則','可自由訂約，但不可違法或違反善良風俗'],['消滅時效','請求權利有時間限制'],['權利濫用禁止原則','行使權利不可傷害他人']],
+ cards:[['商店誠實標示即期品',0,1],['標示3斤的櫻桃其實只有2斤（違反）',0,2],['自由選購喜歡的商品',1,1],['契約內容不得違反善良風俗',1,2],['借錢15年都沒要求還，權利受到限制',2,1],['法律不保障讓權利睡著的人',2,2],['用書本雜物占用多人座位（違反）',3,1],['行使權利不能傷害他人',3,1]]},
+{id:'cform',b:4,u:'生活中的契約',ic:'scroll',t:'契約要用什麼形式？',bins:[['意思一致就成立','一般契約，口頭承諾也可以'],['需要書面並登記','結婚、離婚、土地所有權移轉']],
+ cards:[['在早餐店買早餐',0,1],['向水果攤買櫻桃',0,1],['口頭答應購買商品',0,2],['結婚',1,1],['離婚',1,1],['土地所有權移轉',1,2]]},
+{id:'ability',b:4,u:'生活中的契約',ic:'person',t:'民法上的行為能力',bins:[['無行為能力人','未滿7歲、受監護宣告者'],['限制行為能力人','7歲以上未滿18歲'],['完全行為能力人','滿18歲且精神健全']],
+ cards:[['5歲的小新',0,1],['受監護宣告的25歲青年',0,2],['13歲的國中生',1,1],['17歲的高中生',1,1],['15歲的阿哲',1,1],['22歲的艾莎',2,1],['剛滿18歲、精神健全的人',2,2]]},
+{id:'civil',b:4,u:'民事糾紛的解決',ic:'scales',t:'民事責任的兩種類型',bins:[['侵權行為','故意或過失損害他人權利'],['債務不履行','簽了契約卻不履行義務']],
+ cards:[['不小心打破鄰居的窗戶',0,1],['沒經過同意把他人照片上傳社群',0,1],['惡作劇害同學受傷',0,2],['線上預購蛋糕，店家沒有如期送達',1,1],['借錢不還',1,1],['租屋後不付租金',1,2]]},
+{id:'settle',b:4,u:'民事糾紛的解決',ic:'scales',t:'民事糾紛的處理方式',bins:[['訴訟外和解','私下簽和解契約，沒有強制執行力'],['訴訟上和解','在法官面前和解，與判決同效力'],['調解','公正第三方協調，經法院核定與判決同效力'],['民事訴訟','請法官判決，最耗時傷財']],
+ cards:[['雙方私下簽訂和解契約',0,1],['車禍後雙方私下協議賠償',0,2],['在法官面前達成和解，終止訴訟',1,1],['離婚官司在法庭上和解',1,2],['到區公所請調解委員協助',2,1],['調解書送法院核定',2,2],['請法官作出判決',3,1],['解決民事糾紛的最後手段',3,2]]},
+{id:'crimpen',b:4,u:'刑法與刑罰',ic:'gavel',t:'刑罰的種類',bins:[['主刑','可以單獨科處：死刑、無期徒刑、有期徒刑、拘役、罰金'],['從刑','附加在主刑上：褫奪公權'],['沒收','剝奪不法所得或犯罪工具']],
+ cards:[['有期徒刑',0,1],['拘役',0,1],['罰金',0,1],['死刑',0,2],['褫奪公權',1,1],['剝奪擔任公務員、公職候選人的資格',1,2],['沒收黃牛的犯罪所得',2,1],['沒收犯罪工具',2,2]]},
+{id:'crimgoal',b:4,u:'刑法與刑罰',ic:'gavel',t:'刑罰的三個目的',bins:[['處罰','給犯罪者應有的刑責，伸張正義'],['預防','產生威嚇效果，預防犯罪'],['矯正','教化受刑人，改過向善']],
+ cards:[['給犯罪者應有的刑責',0,1],['剝奪犯罪者的自由或財產',0,2],['讓大眾因害怕受罰而不敢犯罪',1,1],['做為社會大眾的前車之鑑',1,2],['受刑人在監獄學一技之長',2,1],['讓受刑人改過向善',2,1]]},
+{id:'gaolun',b:4,u:'刑事案件的追訴',ic:'gavel',t:'告訴乃論之罪？',bins:[['告訴乃論之罪','須由被害人或親屬提出告訴'],['非告訴乃論之罪','檢察官應依職權追訴']],
+ cards:[['誹謗',0,1],['毀損',0,1],['過失傷害',0,1],['公然侮辱',0,2],['殺人',1,1],['竊盜',1,1],['詐欺',1,1]]},
+{id:'report',b:4,u:'刑事案件的追訴',ic:'bubbles',t:'告訴、告發與自首',bins:[['告訴','被害人或其親屬報案並請求追訴'],['告發','任何人發現犯罪向偵查機關報案'],['自首','犯罪嫌疑人主動報案']],
+ cards:[['被害人報案並要求追訴',0,1],['被害人的爸媽替他報案',0,2],['路人看到搶劫向警察報案',1,1],['任何人發現犯罪事實而報案',1,2],['犯罪嫌疑人主動向警方說明自己的罪行',2,1]]},
+{id:'roles',b:4,u:'刑事案件的追訴',ic:'person',t:'警察、檢察官與法官',bins:[['警察','隸屬行政院，輔助偵查犯罪'],['檢察官','代表國家追訴犯罪'],['法官','隸屬司法院，依法獨立審判']],
+ cards:[['受檢察官指揮，調查犯罪、蒐集證據',0,1],['在路口攔查酒駕',0,2],['實施偵查、提起公訴',1,1],['指揮判決的執行',1,2],['判定是否有罪',2,1],['確定刑罰的範圍',2,2]]},
+{id:'admin',b:4,u:'行政法規與行政救濟',ic:'paper',t:'行政處分：有利還是不利？',bins:[['有利的行政處分','帶來利益或許可'],['不利的行政處分','處罰或造成不利']],
+ cards:[['學校頒發畢業證書',0,1],['政府發給醫師執業執照',0,1],['核發建築執照',0,2],['警察開罰單給違規駕駛',1,1],['違規停車被拖吊',1,1],['撤銷攤位的營業許可',1,2]]},
+{id:'fine',b:4,u:'行政法規與行政救濟',ic:'coin',t:'罰鍰還是罰金？',bins:[['罰鍰','行政罰，由行政機關依法科處，不會留刑事紀錄'],['罰金','刑罰（主刑），由法院宣告']],
+ cards:[['違規停車被開罰',0,1],['在公共場所喧嘩被罰（社會秩序維護法）',0,2],['貓咪沒辦寵物登記被罰',0,2],['由行政機關科處',0,1],['竊盜被法院判處',1,1],['由法院宣告',1,1],['屬於主刑的一種',1,2]]},
+{id:'kidlaw',b:4,u:'兒少權益的維護',ic:'shield',t:'保護兒少的法律',bins:[['兒童及少年福利與權益保障法','兒少的保護措施與福利措施'],['兒童及少年性剝削防制條例','防止兒少遭受性剝削'],['勞動基準法（童工）','保障童工身心健康']],
+ cards:[['店家不可賣菸酒給兒少',0,1],['影集與遊戲的分級制度',0,1],['停車場設置婦幼停車位',0,2],['無故持有兒少性影像會受刑罰',1,1],['不可散布兒少的私密影像',1,1],['15歲員工不可在晚上8點後工作',2,1],['雇用童工須經法定代理人同意',2,2]]},
+{id:'youth',b:4,u:'兒少權益的維護',ic:'shield',t:'少年事件的分類',bins:[['曝險行為','由少年輔導委員會輔導處置'],['少年保護事件','12～未滿14歲，或14～未滿18歲情節輕微'],['少年刑事案件','14～未滿18歲且情節重大']],
+ cards:[['無正當理由經常攜帶危險器械',0,1],['施用毒品但尚未觸犯刑罰法律',0,2],['預備犯罪而法律不處罰',0,2],['13歲偷竊',1,1],['16歲犯罪但情節輕微',1,1],['15歲犯殺人罪',2,1],['16歲犯擄人勒贖罪',2,2]]},
+/* 第五冊 九上 */
+{id:'goods',b:5,u:'選擇與消費',ic:'globe',t:'自由財與經濟財',bins:[['自由財','不具稀少性，不需付出代價'],['經濟財','具稀少性，須付出代價']],
+ cards:[['陽光',0,1],['一般地區的空氣',0,1],['自然吹來的風',0,2],['空汙嚴重地區的乾淨空氣',1,2,'空汙地區的乾淨空氣變得稀少，要付出代價才能取得。'],['手搖飲料',1,1],['零用錢',1,1],['課餘的時間',1,2]]},
+{id:'alloc',b:5,u:'選擇與消費',ic:'twopeople',t:'資源分配的方式（籃球場）',bins:[['抽籤','機會均等，全憑運氣'],['輪流使用','大家都有機會'],['預約登記','節省等候時間'],['使用者付費','資源被有效率使用']],
+ cards:[['所有人機會均等',0,1],['無法靠努力獲得',0,2],['大家都有機會使用',1,1],['輪到的人不一定需要',1,2],['不用排隊等候',2,1],['無法應付臨時需求',2,2],['付費才能使用',3,1],['沒能力付費的人無法使用',3,2]]},
+{id:'incent',b:5,u:'選擇與消費',ic:'coin',t:'誘因的四種類型',bins:[['正向金錢誘因','提高利益，可用金錢衡量'],['正向非金錢誘因','提高利益，無法用金錢衡量'],['負向金錢誘因','提高損害，可用金錢衡量'],['負向非金錢誘因','提高損害，無法用金錢衡量']],
+ cards:[['做家事可以得到零用錢',0,1],['自備環保杯折5元',0,1],['主動回答問題加平時成績',1,1],['表現好得到榮譽獎狀',1,1],['沒寫功課就減少零用錢',2,1],['違規被罰款',2,2],['上課吵鬧被記點',3,1],['違反校規被記過',3,2]]},
+{id:'cfactor',b:5,u:'選擇與消費',ic:'cup',t:'影響消費者的因素',bins:[['商品價格','價格高少買，價格低多買'],['個人偏好','喜歡或不喜歡'],['收入多寡','收入提高或減少'],['預期心理','預期未來價格變化']],
+ cards:[['飲料從45元漲到60元，大家少買',0,1],['特價時多買一些',0,1],['因為喜歡的明星代言而購買',1,1],['喜歡某品牌的外型',1,2],['收入提高後，旅遊花費增加',2,1],['領到年終獎金去吃大餐',2,2],['預期油價要漲，先去加油',3,1],['聽說下週要漲價，今天先買',3,2]]},
+{id:'res',b:5,u:'生產與生產資源',ic:'factory',t:'四種生產資源',bins:[['土地','生產需要的空間，例如農田'],['人力','勞力資源，例如員工'],['資本','人造工具，例如廠房、設備'],['企業才能','運用資源生產的經營能力']],
+ cards:[['種植棉花的農田',0,1],['擴大耕作面積',0,2],['工廠的員工',1,1],['和工作夥伴親自採收',1,2],['工廠的機器設備',2,1],['申請貸款購買插秧機',2,2],['研發新商品',3,1],['改種蕎麥並開發蕎麥點心',3,2]]},
+{id:'prodq',b:5,u:'生產與生產資源',ic:'factory',t:'生產者的三個課題',bins:[['生產什麼','選擇利益最大的商品'],['如何生產','選擇最適合的生產方式'],['為誰生產','設定主要消費族群']],
+ cards:[['要賣甜甜圈還是馬卡龍？',0,1],['選擇生產利益最大的商品',0,2],['用新鮮水果還是水果罐頭？',1,1],['選擇最適合的生產方式',1,2],['要賣給學生還是上班族？',2,1],['設定主要消費族群',2,2]]},
+{id:'comp',b:5,u:'市場與競爭',ic:'tag',t:'價格競爭與非價格競爭',bins:[['價格競爭','促銷、降價'],['非價格競爭','服務、創新、聯名、企業形象']],
+ cards:[['買一送一',0,1],['第二件半價',0,1],['推出價格更低的福袋',0,2],['推出聯名商品',1,1],['邀請明星代言',1,1],['提供完善的服務',1,1],['推出循環杯，善盡社會責任',1,2]]},
+{id:'complv',b:5,u:'市場與競爭',ic:'tag',t:'市場競爭程度',bins:[['競爭程度較高','廠商多，消費者有多樣選擇'],['競爭程度較低','廠商少，較有決定價格的能力']],
+ cards:[['同一條街有很多家手搖飲店',0,1],['餐廳、超商、理髮店',0,1],['消費者選擇多元',0,2],['電影院裡只有一家販賣部',1,1],['臺灣只有兩家石油煉製廠商',1,1],['水、電等民生產業',1,2]]},
+{id:'cplaw',b:5,u:'市場與競爭',ic:'scales',t:'消保法還是公平交易法？',bins:[['消費者保護法','規範廠商與消費者的消費關係'],['公平交易法','規範廠商之間的競爭關係']],
+ cards:[['網購有7天猶豫期',0,1],['買到腐壞商品向消保官申訴',0,1],['撥打1950消費者服務專線',0,2],['廠商約定共同漲價',1,1],['企業合併可能壟斷市場而被審查',1,1],['公平交易委員會開罰',1,1]]},
+{id:'labor',b:5,u:'勞動參與',ic:'person',t:'有酬勞動與無酬勞動',bins:[['有酬勞動','又稱市場勞動，獲取收入'],['無酬勞動','又稱非市場勞動，沒有實質報酬']],
+ cards:[['研究生兼職擔任翻譯',0,1],['專職居家服務員照顧失能老人',0,1],['老闆經營公司賺取利潤',0,2],['假日到育幼院當志工',1,1],['退休後在家帶孫子',1,1],['在家照顧家人的生活起居',1,1],['學校志工家長幫忙導護',1,2]]},
+{id:'lablaw',b:5,u:'勞動參與',ic:'shield',t:'勞基法還是就業保險法？',bins:[['勞動基準法','工資、工時、休假、職災補償、退休'],['就業保險法','職業訓練、失業給付']],
+ cards:[['規定工資、工作時間、休假',0,1],['職業災害補償與退休',0,2],['老闆要求超時工作被處罰',0,1],['非自願離職領失業給付',1,1],['政府提供職業訓練',1,1],['失業期間的生活津貼',1,2]]},
+{id:'mfunc',b:5,u:'貨幣的使用',ic:'coin',t:'貨幣的四種功能',bins:[['交易媒介','作為交易的支付工具'],['價值衡量','計價的單位'],['儲藏價值','儲存起來供未來使用'],['清償債務','用來還債']],
+ cards:[['用錢買早餐',0,1],['用貨幣支付車資',0,2],['菜單上標示價格',1,1],['用金額比較兩種商品的價值',1,2],['把零用錢存起來',2,1],['存錢準備未來使用',2,2],['用錢還清借款',3,1],['借貸契約以貨幣記載',3,2]]},
+{id:'pay',b:5,u:'貨幣的使用',ic:'card',t:'儲值卡、信用卡與現金',bins:[['儲值卡','先儲值，後消費'],['信用卡','先消費，後付款'],['現金（法定貨幣）','具法律強制力，可隨時使用']],
+ cards:[['悠遊卡',0,1],['連鎖咖啡店的儲值卡',0,1],['大多用於小額支付',0,2],['銀行發行，具延後支付功能',1,1],['沒全額繳清會被收高額利息',1,2],['由中央銀行發行',2,1],['不受電力、網路限制',2,2]]},
+{id:'fx',b:5,u:'國際貿易與外幣',ic:'globe',t:'匯率變動，誰比較有利？',bins:[['新臺幣升值時有利','有利進口、出國、買外幣'],['新臺幣貶值時有利','有利出口、賣外幣']],
+ cards:[['進口商',0,1],['出國旅遊的人',0,1],['購買外幣',0,1],['到國外留學',0,2],['出口商',1,1],['出售外幣換回新臺幣',1,1],['電子零件出口到美國',1,2]]},
+{id:'open',b:5,u:'國際貿易與外幣',ic:'globe',t:'開放外國商品進口的影響',bins:[['本國消費者','選擇更多元、價格較合理'],['本國生產者','競爭壓力擴大、促進創新']],
+ cards:[['選購的商品更多元',0,1],['商品價格趨於穩定或下降',0,1],['可以吃到臺灣較難種植的蔬菜',0,2],['較缺乏競爭優勢',1,1],['競爭壓力擴大',1,1],['激發技術創新、提升品質',1,2]]},
+/* 第六冊 九下 */
+{id:'ip',b:6,u:'科技發展',ic:'bulb',t:'智慧財產權',bins:[['著作權','保障語文、音樂、攝影、畫作等，完成時就取得'],['專利權','保障發明與創作，申請審查通過才取得'],['商標權','保障品牌標誌，申請審查通過才取得']],
+ cards:[['小說、音樂、攝影作品',0,1],['畫作、建築',0,1],['著作人死後50年內受保護',0,2],['特殊造型的無線耳機',1,1],['新的發明',1,1],['品牌標誌',2,1],['運動品牌的圖案',2,1],['保障消費者辨識商品，維護公平競爭',2,2]]},
+{id:'itrisk',b:6,u:'科技發展',ic:'tv',t:'降低資訊科技的風險',bins:[['政府','立法管理與規範'],['企業','善盡社會責任'],['使用者','培養資訊倫理']],
+ cards:[['制定個人資料保護法',0,1],['修法處罰網路性別暴力',0,2],['電信業者強化資訊安全',1,1],['提供安全的網路環境',1,2],['不隨便公開個人資料',2,1],['轉傳訊息前多方查證',2,1]]},
+{id:'glob',b:6,u:'全球化的影響與挑戰',ic:'globe',t:'全球化的三個面向',bins:[['經濟全球化','經濟活動跨越國界'],['政治全球化','各國受國際規範影響'],['文化全球化','文化傳播、交流、影響']],
+ cards:[['跨國企業在各國僱用員工',0,1],['加入WTO後開放市場',0,1],['國際分工與資金流動',0,2],['簽約國受氣候變遷綱要公約約束',1,1],['因應WTO要求推動產地標章',1,2],['日本動漫在臺灣流行',2,1],['各地音樂、飲食流通全球',2,1],['國人進口肉品需求增加',2,2]]},
+{id:'refugee',b:6,u:'全球化的影響與挑戰',ic:'twopeople',t:'難民與移民',bins:[['難民','因迫害、戰爭或暴力被迫離開'],['移民','為了改善生活而遷居外國']],
+ cards:[['因戰爭被迫逃離家園',0,1],['因宗教或政治立場遭迫害而離開',0,1],['烏克蘭人民因戰爭逃到歐洲',0,2],['為了工作搬到外國居住',1,1],['為了教育遷居國外',1,1],['須經移入國批准才能居住',1,2]]},
+{id:'gchal',b:6,u:'全球化的影響與挑戰',ic:'globe',t:'全球化的挑戰',bins:[['貧富不均','國際間貧富差距擴大'],['難民和移民','跨國人口流動的爭議'],['文化','文化單一化與文化衝突']],
+ cards:[['開發中國家只能負責低附加價值的生產',0,1],['血汗工廠剝削工人',0,1],['少數人掌握大部分財富',0,2],['非法移民問題',1,1],['難民占用公共資源的爭議',1,2],['全球生活方式愈來愈相似',2,1],['禁止戴面紗引發伊斯蘭教徒抗議',2,2]]},
+{id:'inter',b:6,u:'國際參與',ic:'flag',t:'國際社會的互動方式',bins:[['國際交流','學術文化、藝術、體育往來'],['國際合作','結盟或簽訂條約解決共同問題'],['國際援助','基於人道關懷給予協助'],['國際衝突','若處理不當可能引發戰爭']],
+ cards:[['奧運體育競賽',0,1],['藝術表演交流',0,1],['170多國簽訂全球塑膠公約',1,1],['各國結盟解決共同問題',1,2],['疫情初期捐贈口罩給其他國家',2,1],['臺灣搜救隊到土耳其救災',2,1],['俄羅斯進攻烏克蘭',3,1],['經濟制裁',3,2]]},
+{id:'io',b:6,u:'國際參與',ic:'flag',t:'國際組織的類型',bins:[['政府間國際組織','由主權國家簽訂條約成立，具官方性質'],['國際非政府組織','由民間人士組成，非營利、志願性']],
+ cards:[['聯合國（UN）',0,1],['世界貿易組織（WTO）',0,1],['世界衛生組織（WHO）',0,1],['亞太經濟合作會議（APEC）',0,2],['無國界醫生',1,1],['國際特赦組織',1,1],['國際反地雷組織',1,2]]}
+];
+const SORT = SORT_RAW.map(r=>({...r,cards:r.cards.map((c,i)=>({id:`${r.id}-${i}`,t:c[0],bin:c[1],lv:c[2],why:c[3]||'',b:r.b,u:r.u}))}));
+
+/* ================= 題庫：法庭攻防戰 ================= */
+const LAWD = {
+  '民法':'規範私人之間的權利義務','刑法':'規定哪些行為是犯罪，以及刑罰','行政法規':'規範國家行政機關行使職權',
+  '消費者保護法':'規範廠商與消費者的消費關係','公平交易法':'規範廠商之間的競爭關係','勞動基準法':'保障工資、工時、童工等勞動條件',
+  '少年事件處理法':'處理12歲以上未滿18歲少年的事件','兒童及少年福利與權益保障法':'兒少的保護措施與福利措施',
+  '家庭暴力防治法':'被害人可向法院聲請保護令','著作權法':'保障著作人的著作權益','商標法':'保障商標權與消費者利益','性別平等教育法':'處理校園性別事件'
+};
+const LAW = [
+ {id:'c1',b:4,u:'民事糾紛的解決',lv:1,t:'腳踏車撞傷路人',s:'國二的小駿騎腳踏車時不小心撞傷朵拉，朵拉要求賠償醫療費用。',steps:[
+  {k:'判斷責任',q:'小駿要負哪一種責任？',c:'民事責任（侵權行為）',w:['刑事責任','行政責任'],h:'這是私人之間的賠償問題。',e:'因過失傷害他人身體是侵權行為，要負損害賠償的民事責任。'},
+  {k:'找出法律',card:1,q:'朵拉要求賠償，依據哪一部法律？',c:'民法',w:['刑法','消費者保護法','公平交易法'],e:'民法規定：因故意或過失，不法侵害他人權利，要負損害賠償責任。'},
+  {k:'誰來賠',q:'小駿未滿18歲，誰要一起負賠償責任？',c:'父母（法定代理人）連帶負責',w:['學校老師','沒有人，未成年不用賠','朵拉自己負責'],h:'未成年人的法定代理人通常是誰？',e:'限制行為能力人造成損害，由法定代理人負連帶賠償責任。'}]},
+ {id:'c2',b:4,u:'生活中的契約',lv:1,t:'偷偷買平板電腦',s:'14歲的阿哲沒有告訴爸媽，自己到店裡買了一臺高價的平板電腦。媽媽知道後表示不同意。',steps:[
+  {k:'判斷身分',q:'阿哲在民法上是？',c:'限制行為能力人',w:['無行為能力人','完全行為能力人','受監護宣告者'],h:'7歲以上、未滿18歲。',e:'年滿7歲未滿18歲是限制行為能力人。'},
+  {k:'契約效力',q:'這筆買賣契約的效力是？',c:'要法定代理人同意才有效，媽媽不同意就無效',w:['一定有效','付了錢就有效','由店員決定'],e:'限制行為能力人買高價商品，須得到法定代理人事前允許或事後承認。'},
+  {k:'例外',q:'下列哪個行為，阿哲不用爸媽同意也有效？',c:'用零用錢買文具',w:['簽約買機車','自己租房子','辦信用卡'],h:'日常生活所必需的小事。',e:'日常生活所必需、純獲法律上利益（例如接受禮物）的行為，不需法定代理人同意。'}]},
+ {id:'c3',b:4,u:'刑法與刑罰',lv:1,t:'超商順手牽羊',s:'30歲的大明在超商偷了一瓶飲料，被店員發現後報警。',steps:[
+  {k:'違法或犯罪',q:'大明的行為是？',c:'犯罪（觸犯刑法竊盜罪）',w:['只是違法，不算犯罪','只是違反校規'],h:'偷竊有沒有規定在刑法裡？',e:'觸犯刑法的行為才是犯罪。犯罪一定違法，違法不一定是犯罪。'},
+  {k:'找出法律',card:1,q:'處罰大明依據的是？',c:'刑法',w:['民法','消費者保護法','勞動基準法'],e:'刑法規定哪些行為構成犯罪，以及應受的刑罰。'},
+  {k:'告訴乃論',q:'如果店家不提告，國家還能追訴嗎？',c:'可以，竊盜是非告訴乃論之罪',w:['不行，一定要店家提告','只能私下和解'],e:'竊盜是非告訴乃論之罪，檢察官應依職權追訴。'}]},
+ {id:'c4',b:4,u:'兒少權益的維護',lv:1,t:'15歲的偷竊案',s:'15歲的阿凱在書店偷漫畫，情節輕微，被移送少年法院（庭）。',steps:[
+  {k:'事件類型',q:'這屬於哪一類少年事件？',c:'少年保護事件',w:['少年刑事案件','曝險行為','一般成人刑事案件'],h:'14歲以上，但情節輕微。',e:'年滿14歲未滿18歲但情節輕微，屬少年保護事件。'},
+  {k:'處理結果',q:'法官可能裁定？',c:'保護處分，例如假日生活輔導',w:['死刑','罰鍰','無期徒刑'],e:'保護處分有：訓誡、假日生活輔導、保護管束、安置輔導、感化教育。'},
+  {k:'找出法律',card:1,q:'處理少年事件依據的是？',c:'少年事件處理法',w:['消費者保護法','民法','公平交易法'],e:'少年事件處理法以保護教化優先於刑事懲罰。'}]},
+ {id:'c5',b:5,u:'市場與競爭',lv:1,t:'網購福袋想退貨',s:'小敏在網路上買了新春福袋，收到第3天發現衣服有瑕疵，想退貨卻被客服拒絕。',steps:[
+  {k:'找出法律',card:1,q:'保障小敏的是哪一部法律？',c:'消費者保護法',w:['公平交易法','刑法','勞動基準法'],e:'消費者保護法規範廠商與消費者之間的消費關係。'},
+  {k:'猶豫期',q:'網購商品享有幾天的猶豫期？',c:'7天',w:['3天','30天','沒有猶豫期'],e:'網購、電視購物等非實體店面購物，有7天猶豫期。'},
+  {k:'求助',q:'業者不處理，可以撥打哪支專線？',c:'1950 消費者服務專線',w:['1953 防制校園霸凌專線','165 反詐騙專線','113 保護專線'],e:'1950 提供消費諮詢與申訴服務。'}]},
+ {id:'c6',b:4,u:'刑事案件的追訴',lv:2,t:'公園裡的辱罵',s:'阿德在公園當眾用粗鄙的話辱罵小強，小強很生氣。',steps:[
+  {k:'判斷性質',q:'公然侮辱罪屬於？',c:'告訴乃論之罪',w:['非告訴乃論之罪','行政罰','民事責任'],e:'公然侮辱是告訴乃論之罪，須由被害人提出告訴。'},
+  {k:'救濟途徑',q:'小強可以怎麼做？',c:'先到區公所聲請調解，不成再提告',w:['只能等檢察官主動追訴','向監察院陳情','提起訴願'],e:'告訴乃論的案件可以先調解，調解不成再透過訴訟解決。'},
+  {k:'怎麼報案',q:'被害人報案並請求追訴，稱為？',c:'告訴',w:['告發','自首','自訴'],e:'告訴是被害人或親屬報案並請求追訴；告發是任何人報案。'}]},
+ {id:'c7',b:4,u:'刑事案件的追訴',lv:1,t:'酒駕被攔下',s:'警察在路口攔下酒駕的駕駛，吐氣酒測值超過標準，移送地檢署。',steps:[
+  {k:'罪刑法定',q:'為什麼酒駕現在是犯罪？',c:'1999年修法，酒駕列入刑法公共危險罪',w:['因為大家覺得不好','由法官自己決定','由警察決定'],e:'罪刑法定原則：只有行為時法律明文規定是犯罪，才能處罰。'},
+  {k:'偵查起訴',q:'負責偵查、提起公訴的是？',c:'檢察官',w:['法官','警察','律師'],e:'檢察官代表國家追訴犯罪；警察受檢察官指揮輔助偵查。'},
+  {k:'審判',q:'由誰判定被告是否有罪？',c:'法官',w:['檢察官','警察','被害人'],e:'法官依法獨立審判；判決確定前，被告要推定為無罪。'}]},
+ {id:'c8',b:4,u:'行政法規與行政救濟',lv:1,t:'貓咪沒有登記',s:'2026年起，貓咪也要辦理寵物登記。林先生沒有辦，被開了3,000元罰鍰，他覺得處罰不合理。',steps:[
+  {k:'判斷責任',q:'罰鍰屬於哪一種責任？',c:'行政責任（行政罰）',w:['刑事責任','民事責任'],e:'違反行政法規，由行政機關處以罰鍰，是行政罰。'},
+  {k:'第一步',q:'林先生不服，第一步要提起？',c:'訴願',w:['請願','民事訴訟','刑事告訴'],h:'對行政處分不服的救濟。',e:'對行政處分不服，先經由原處分機關向訴願管轄機關提起訴願。'},
+  {k:'下一步',q:'如果不服訴願結果呢？',c:'向行政法院提起行政訴訟',w:['向少年法院聲請','請檢察官起訴'],e:'行政救濟：先訴願，再行政訴訟。'}]},
+ {id:'c9',b:4,u:'民事糾紛的解決',lv:1,t:'朋友間的金錢糾紛',s:'澤村和倉持因為借錢的事吵了起來，兩人都不想花大錢打官司。',steps:[
+  {k:'選擇途徑',q:'哪個方法有公正第三方協助，又不用打官司？',c:'到區公所聲請調解',w:['提起訴願','向監察院陳情','請警察逮捕'],e:'鄉鎮市區公所調解委員會提供免費調解服務。'},
+  {k:'調解效力',q:'調解成立並經法院核定後？',c:'與法院判決有相同效力',w:['沒有任何效力','只有道德約束'],e:'經法院核定的調解，當事人就該事件不得再起訴。'},
+  {k:'比較',q:'如果兩人私下簽和解契約後反悔呢？',c:'沒有強制執行力，另一方可再提起訴訟',w:['反悔的人會被判刑','與法院判決同效力'],e:'訴訟外和解只有契約效力，不具強制執行力。'}]},
+ {id:'c10',b:4,u:'行政法規與行政救濟',lv:2,t:'無照駕駛撞傷人',s:'18歲的阿明沒有駕照就騎機車上路，撞傷了一位路人。',steps:[
+  {k:'無照駕駛',q:'「無照駕駛」要負什麼責任？',c:'行政責任（罰鍰）',w:['刑事責任','民事責任'],e:'無照駕駛違反道路交通管理處罰條例，處以罰鍰。'},
+  {k:'撞傷他人',q:'「撞傷他人」可能觸犯？',c:'刑法過失傷害罪（刑事責任）',w:['只有行政責任','不需負責'],e:'過失傷害他人可能觸犯刑法過失傷害罪。'},
+  {k:'醫療費用',q:'路人的醫療費用怎麼處理？',c:'依民法負損害賠償責任',w:['由政府支付','用罰鍰抵銷'],e:'一個行為可能同時要負行政、刑事、民事三種責任。'}]},
+ {id:'c11',b:4,u:'刑法與刑罰',lv:2,t:'刮車與刺輪胎',s:'國中生小雄騎腳踏車被狗嚇到，不小心刮傷路邊的汽車；30歲的阿霖則故意在深夜刺破鄰居的輪胎。',steps:[
+  {k:'小雄',q:'小雄要負什麼責任？',c:'只要負民事賠償責任',w:['刑事責任','行政責任'],h:'刑法的毀損罪處罰「故意」還是「過失」？',e:'刑法沒有處罰過失毀損，小雄只需負民事賠償責任（由法定代理人連帶）。'},
+  {k:'阿霖',q:'阿霖呢？',c:'刑事責任（毀損罪）和民事賠償責任',w:['只有民事責任','只有行政責任'],e:'故意毀損觸犯刑法毀損罪，也造成他人損失，須負民事賠償。'},
+  {k:'刑罰',q:'毀損罪可判的刑罰中，哪一個是主刑？',c:'有期徒刑',w:['褫奪公權','沒收'],e:'主刑：死刑、無期徒刑、有期徒刑、拘役、罰金。'}]},
+ {id:'c12',b:1,u:'變遷中的家庭',lv:1,t:'不安全的家',s:'小安的爸爸喝酒後常常打媽媽，小安很害怕。',steps:[
+  {k:'找出法律',card:1,q:'保護媽媽的是哪一部法律？',c:'家庭暴力防治法',w:['消費者保護法','公平交易法','著作權法'],e:'家庭暴力防治法讓被害人可以透過警察、社會局處求助，並聲請保護令。'},
+  {k:'保護措施',q:'媽媽可以向法院聲請什麼？',c:'保護令',w:['罰鍰','訴願'],e:'保護令可以禁止繼續施暴、命令加害人不得靠近被害人。'},
+  {k:'親權',q:'對經常使用暴力的父母，法院可以依民法？',c:'限制或禁止父母行使親權',w:['頒發獎狀','什麼都不能做'],e:'民法規定，法院可宣告限制或禁止施暴父母行使親權。'}]},
+ {id:'c13',b:4,u:'兒少權益的維護',lv:1,t:'16歲想買啤酒',s:'16歲的小宇到便利商店買啤酒，店員要他出示證件後拒絕販售。',steps:[
+  {k:'找出法律',card:1,q:'店員拒絕賣酒的依據是？',c:'兒童及少年福利與權益保障法',w:['消費者保護法','公平交易法','著作權法'],e:'兒少法規定兒少不能抽菸或飲酒，店家不能提供菸酒。'},
+  {k:'處罰',q:'如果店家明知小宇未成年還賣酒呢？',c:'店家會被處罰，例如罰鍰',w:['只有小宇會被判刑','沒有人會被處罰'],e:'兒少法賦予相關業者保護兒少的責任，違反將受行政罰。'},
+  {k:'措施類型',q:'禁止兒少飲酒，屬於兒少法的哪一種措施？',c:'保護措施',w:['福利措施'],e:'保護措施：禁菸酒、分級制度；福利措施：親子車位、親子廁所等。'}]},
+ {id:'c14',b:1,u:'學生權利與校園生活',lv:1,t:'校園霸凌',s:'小芳在學校常被同學推打、辱罵，嚴重到不敢來上學。',steps:[
+  {k:'推打',q:'被同學推打，侵害了小芳的哪一項權利？',c:'身體自主權',w:['人格發展權','受教育權與學習權'],e:'毆打他人侵害身體自主權。'},
+  {k:'辱罵',q:'被同學辱罵，侵害的是？',c:'人格發展權',w:['身體自主權','受教育權與學習權'],e:'言語辱罵傷害名譽，侵害人格發展權。'},
+  {k:'求助',q:'目睹霸凌，可以撥打哪支專線？',c:'1953 防制校園霸凌專線',w:['1950 消費者服務專線','165 反詐騙專線'],e:'也可以主動關懷被霸凌的同學，並告訴師長或家長。'},
+  {k:'申訴',q:'如果學生權益被學校不當侵害，可以向誰提出？',c:'學生申訴評議委員會',w:['監察院','消保官'],e:'學生可透過學生申訴評議委員會，理性解決問題。'}]},
+ {id:'c15',b:4,u:'兒少權益的維護',lv:2,t:'少年車手',s:'17歲的阿蔡被詐騙集團說「未成年不會被判刑」騙去當車手，被逮捕後，被害人提告求償。',steps:[
+  {k:'求償',q:'被害人要求賠錢，是哪一種責任？誰要負責？',c:'民事責任，父母負連帶賠償',w:['刑事責任，父母一起坐牢','行政責任，由警察賠償'],e:'限制行為能力人的民事賠償責任，由法定代理人連帶負責。'},
+  {k:'罪名性質',q:'詐欺罪屬於？',c:'非告訴乃論之罪',w:['告訴乃論之罪'],e:'詐欺、竊盜、殺人都是非告訴乃論之罪。'},
+  {k:'刑事責任',q:'如果阿蔡犯行重大，可能？',c:'成為少年刑事案件，仍可能被判刑',w:['一定不會被判刑','只會被罰鍰'],e:'「未成年不會被判刑」是錯誤觀念；14歲以上未滿18歲、情節重大者可能受刑罰。'}]},
+ {id:'c16',b:4,u:'刑法與刑罰',lv:2,t:'黃牛搶票',s:'張男用程式搶演唱會門票再加價轉售，法院判他有期徒刑，並沒收犯罪所得。',steps:[
+  {k:'沒收',q:'「沒收犯罪所得」的目的是？',c:'讓犯罪者無法從犯罪中獲利',w:['把錢賠給歌手','增加國家稅收'],e:'只要確認是不法所得，即使未判決確定，也可以單獨宣告沒收。'},
+  {k:'刑罰種類',q:'有期徒刑屬於？',c:'主刑',w:['從刑','沒收'],e:'主刑可以單獨科處；從刑（褫奪公權）須附加在主刑上。'},
+  {k:'原則',q:'行為要有法律明文規定才能處罰，這是？',c:'罪刑法定原則',w:['誠實信用原則','契約自由原則'],e:'罪刑法定原則保障人民，防止國家任意處罰。'}]},
+ {id:'c17',b:4,u:'行政法規與行政救濟',lv:2,t:'扭轉直播鏡頭',s:'10名遊客在阿里山強行扭轉風景區的直播鏡頭自拍，造成畫面當機。',steps:[
+  {k:'沒損壞時',q:'如果鏡頭沒壞，依發展觀光條例處罰，屬於？',c:'行政責任（罰鍰）',w:['刑事責任','民事責任'],e:'發展觀光條例是行政法規，處以罰鍰屬行政責任。'},
+  {k:'毀損時',q:'如果鏡頭被弄壞了，可能觸犯？',c:'刑法毀損罪',w:['消費者保護法','著作權法'],e:'故意毀損他人之物，可能觸犯刑法毀損罪，也要負民事賠償。'},
+  {k:'罪名性質',q:'毀損罪屬於？',c:'告訴乃論之罪',w:['非告訴乃論之罪'],e:'毀損罪須由被害人（阿管處）提出告訴。'}]},
+ {id:'c18',b:6,u:'科技發展',lv:2,t:'剪輯電影的YouTuber',s:'一位YouTuber把電影剪成精華版、加上評論上傳賺取點閱，被片商指控侵權。',steps:[
+  {k:'找出法律',card:1,q:'片商主張的權利受哪一部法律保障？',c:'著作權法',w:['商標法','消費者保護法','公平交易法'],e:'電影是著作，受著作權法保障。'},
+  {k:'合理使用',q:'剪出整部片的精華，違反合理使用的哪一項基準？',c:'利用的質與量占原著作的比例過重',w:['著作完成時就取得權利','商標須申請審查'],e:'合理使用看四個基準：原創性、商業目的、利用比例、是否影響市場價值。'},
+  {k:'法律責任',q:'侵害著作權要負什麼責任？',c:'民事責任，情節嚴重者還有刑事責任',w:['不用負責','只有行政責任'],e:'這位YouTuber最後賠償和解金並刊登道歉聲明。'}]}
+];
+
+/* ================= 題庫：夜市大老闆 ================= */
+const ECON = [
+ {id:'e1',st:1,u:'選擇與消費',lv:1,k:'市場快訊',t:'明星代言',s:'一位明星在影片中推薦你的珍奶，客人變多了。',fx:{a:30},q:'這是影響消費的哪一個因素？',c:'個人偏好',w:['收入多寡','預期心理','商品價格'],e:'消費者因為喜歡的明星代言而更想購買，屬於個人偏好。'},
+ {id:'e2',st:1,u:'選擇與消費',lv:1,k:'市場快訊',t:'年終獎金發下來了',s:'附近公司發了年終獎金，上班族紛紛來買珍奶。',fx:{a:20},q:'這是影響消費的哪一個因素？',c:'收入多寡',w:['個人偏好','預期心理','商品價格'],e:'收入提高，消費者願意多花錢。'},
+ {id:'e3',st:1,u:'選擇與消費',lv:2,k:'市場快訊',t:'聽說下週要漲價',s:'新聞說下週珍珠奶茶要全面漲價，今天很多客人搶著來買。',fx:{a:15},q:'這是影響消費的哪一個因素？',c:'預期心理',w:['個人偏好','收入多寡','商品價格'],e:'預期價格將上漲而提前購買，是預期心理。'},
+ {id:'e4',st:1,u:'選擇與消費',lv:1,k:'經營觀念',t:'漲價之後',s:'你把價格從45元調到60元，買的人變少了。',fx:null,q:'其他條件不變，商品價格變高時，消費者會？',c:'減少購買',w:['增加購買','完全不受影響'],e:'價格高時消費者會少買；價格低時會多買。'},
+ {id:'e5',st:1,u:'生產與生產資源',lv:1,k:'成本變動',t:'原料漲價',s:'茶葉批發價上漲，你的每杯成本增加6元。',fx:{c:6},q:'如果售價不變，生產成本增加，利潤會？',c:'減少',w:['增加','不變'],e:'利潤＝銷貨收入－生產成本。成本增加，利潤就減少。'},
+ {id:'e6',st:1,u:'生產與生產資源',lv:1,k:'經營策略',t:'買了自動封膜機',s:'你引進自動封膜機，每杯成本降低5元。',fx:{c:-5},q:'這是用哪一種方法提高利潤？',c:'降低生產成本',w:['提高商品價格','減少銷售量'],e:'提高利潤可以增加銷貨收入，或降低生產成本。'},
+ {id:'e7',st:1,u:'生產與生產資源',lv:1,k:'開店成本',t:'繳交攤位租金',s:'你每天要付500元租用夜市攤位。',fx:null,q:'攤位租金是使用哪一種生產資源的成本？',c:'土地（地租）',w:['人力（薪資）','資本（利息）','企業才能'],e:'使用土地付地租、聘用員工付薪資、購買設備付利息。'},
+ {id:'e8',st:1,u:'生產與生產資源',lv:2,k:'經營策略',t:'研發新口味',s:'你研發出「黑糖芋泥」新口味，吸引更多客人。',fx:{a:10},q:'研發新商品屬於哪一種生產資源？',c:'企業才能',w:['土地','人力','資本'],e:'企業才能是生產者運用資源、設計商品的經營能力。'},
+ {id:'e9',st:1,u:'選擇與消費',lv:1,k:'老闆的抉擇',t:'營業還是去打工？',s:'今天你可以營業賺約1,500元、去美食展打工賺1,200元，或在家休息。你決定營業。',fx:null,q:'選擇營業的機會成本是？',c:'1,200元',w:['1,500元','2,700元','0元'],e:'機會成本是放棄的選項中價值最高的那一個，不是全部加起來。'},
+ {id:'e10',st:1,u:'選擇與消費',lv:1,k:'經營策略',t:'自備杯折5元',s:'你推出「自備環保杯折5元」，自備杯的客人變多了。',fx:null,q:'這是哪一種誘因？',c:'正向的金錢誘因',w:['負向的金錢誘因','正向的非金錢誘因','負向的非金錢誘因'],e:'給予折扣是提高利益、可用金錢衡量的正向金錢誘因。'},
+ {id:'e11',st:1,u:'市場與競爭',lv:1,k:'競爭對手',t:'隔壁開了新飲料店',s:'隔壁又開了兩家手搖飲店，你的客人少了一些。',fx:{a:-20},q:'飲料店變多，競爭程度提高，對消費者的影響是？',c:'選擇更多元',w:['選擇變少','價格一定上漲','沒有影響'],e:'廠商多、競爭程度高，消費者有更多選擇。'},
+ {id:'e12',st:1,u:'市場與競爭',lv:1,k:'經營策略',t:'推出聯名杯',s:'你和知名插畫家推出聯名杯套，買氣上升。',fx:{a:12},q:'這是哪一種競爭方式？',c:'非價格競爭',w:['價格競爭'],e:'不調整價格，而用聯名、服務、創新吸引消費者，是非價格競爭。'},
+ {id:'e13',st:1,u:'市場與競爭',lv:2,k:'市場秩序',t:'漲價聯盟的邀請',s:'附近幾家飲料店老闆約你一起把價格統一漲到80元。',fx:null,q:'如果同意，可能違反哪一部法律？',c:'公平交易法',w:['消費者保護法','勞動基準法','就業保險法'],e:'廠商約定共同提高價格，由公平交易委員會處理。'},
+ {id:'e14',st:1,u:'勞動參與',lv:1,k:'勞動權益',t:'15歲的工讀生',s:'15歲的阿光想來夜市幫忙，每天工作到晚上10點。',fx:null,q:'依勞動基準法，可以這樣安排嗎？',c:'不行，童工不得在晚上8點到隔天早上6點工作',w:['可以，只要他願意','可以，只要付加班費'],e:'15歲以上未滿16歲是童工，每天不超過8小時，不得夜間或例假日工作。'},
+ {id:'e15',st:1,u:'生產與生產資源',lv:2,k:'經營觀念',t:'雞排價格大漲',s:'最近雞排價格大漲，賣雞排比賣珍奶更賺錢。',fx:null,q:'生產者通常會怎麼做？',c:'把部分資源轉去生產雞排',w:['堅持只賣珍奶','把攤位收掉'],e:'商品價格高時，生產者會增加生產，價格變動會影響資源分配。'},
+ {id:'x1',st:2,u:'國際貿易與外幣',lv:1,k:'開放外銷',t:'日本訂單',s:'日本代理商想進口你的珍奶，每杯出價2美元。目前匯率是1美元兌30新臺幣。從今天起，你可以把部分產量外銷。',fx:{exp:true},q:'每外銷一杯，可以換回多少新臺幣？',c:'60元',w:['15元','32元','2元'],e:'美元 × 匯率 ＝ 新臺幣，2 × 30 ＝ 60。'},
+ {id:'x2',st:2,u:'國際貿易與外幣',lv:1,k:'匯率變動',t:'匯率變成1：33',s:'匯率變成1美元兌33新臺幣。',fx:{r:33},q:'新臺幣是升值還是貶值？對你的外銷呢？',c:'貶值，有利出口',w:['升值，有利出口','貶值，不利出口','升值，不利出口'],e:'要用更多新臺幣才能換1美元，是新臺幣貶值；貶值有利出口、不利進口。'},
+ {id:'x3',st:2,u:'國際貿易與外幣',lv:2,k:'匯率變動',t:'匯率變成1：28',s:'匯率變成1美元兌28新臺幣。你的奶粉是從國外進口的。',fx:{r:28},q:'這時進口奶粉的成本會？',c:'變便宜，因為新臺幣升值',w:['變貴，因為新臺幣升值','變便宜，因為新臺幣貶值'],e:'新臺幣升值有利進口、不利出口。'},
+ {id:'x4',st:2,u:'國際貿易與外幣',lv:1,k:'開放進口',t:'進口粉圓上市',s:'政府開放國外粉圓進口，你的每杯原料成本降低3元。',fx:{c:-3},q:'開放進口對本國消費者的影響是？',c:'選擇更多元，價格趨於穩定或下降',w:['選擇變少','價格一定上漲'],e:'對本國生產者則是競爭壓力擴大，但也會激發創新。'},
+ {id:'x5',st:2,u:'國際貿易與外幣',lv:1,k:'國際趨勢',t:'跨國生產',s:'你的杯子在越南生產、茶葉從斯里蘭卡進口、在臺灣調製後賣到日本。',fx:null,q:'這種把生產活動分散在各國的現象是？',c:'國際分工',w:['自給自足','以物易物'],e:'運用各地最有利的生產條件，選擇機會成本最低的組合。'},
+ {id:'x6',st:2,u:'國際貿易與外幣',lv:2,k:'理財',t:'準備去日本參展',s:'你要去日本參加美食展，需要換日圓。',fx:null,q:'什麼時候換外幣最划算？',c:'新臺幣升值時',w:['新臺幣貶值時','匯率不會影響'],e:'本國貨幣升值時，可用較少的新臺幣換到外幣。'},
+ {id:'s1',st:3,u:'貨幣的使用',lv:1,k:'意外事件',t:'通貨膨脹',s:'市場上的貨幣太多，物價長期而且持續上漲，你的成本上漲了12%。',fx:{infl:1.12,a:5},q:'通貨膨脹時，貨幣的購買力會？',c:'下降',w:['上升','不變'],e:'相同金額能買的東西變少，貨幣價值降低，民眾可能搶購、囤積物資。'},
+ {id:'s2',st:3,u:'貨幣的使用',lv:1,k:'支付工具',t:'行動支付',s:'越來越多客人用手機掃碼付款。',fx:null,q:'行動支付最後仍要用什麼結清？',c:'法定貨幣',w:['商品貨幣','以物易物'],e:'行動支付、儲值卡、信用卡都只是支付工具，最後仍以法定貨幣支付。'},
+ {id:'s3',st:3,u:'貨幣的使用',lv:1,k:'支付工具',t:'刷卡付款',s:'一位客人用信用卡付款。',fx:null,q:'信用卡的特色是？',c:'先消費，後付款',w:['先儲值，後消費','只能付現金'],e:'信用卡有延後支付功能；沒全額繳清會被收高額利息。'},
+ {id:'s4',st:3,u:'貨幣的使用',lv:2,k:'貨幣功能',t:'新的價目表',s:'你在招牌寫上「珍奶60元」。',fx:null,q:'這表現了貨幣的哪一種功能？',c:'價值衡量',w:['交易媒介','儲藏價值','清償債務'],e:'貨幣是計價的單位，讓商品價值有一致的衡量標準。'},
+ {id:'s5',st:3,u:'勞動參與',lv:1,k:'勞動權益',t:'工讀生沒有加班費',s:'工讀生反映：每天工作10小時，卻沒有加班費。',fx:null,q:'這違反哪一部法律？',c:'勞動基準法',w:['就業保險法','公平交易法','消費者保護法'],e:'勞動基準法規範工資、工時、休假等最低標準。'},
+ {id:'s6',st:3,u:'勞動參與',lv:2,k:'勞動權益',t:'隔壁攤位收掉了',s:'隔壁攤位收掉，工讀生小美非自願離職。',fx:{a:8},q:'小美可以依哪一部法律申請失業給付？',c:'就業保險法',w:['勞動基準法','消費者保護法'],e:'就業保險法提供職業訓練與失業給付，一般最長6個月。'},
+ {id:'s7',st:3,u:'生產與生產資源',lv:1,k:'意外事件',t:'颱風來襲',s:'颱風讓茶葉減產，原料成本增加，夜市人潮也變少。',fx:{c:5,a:-10},q:'如果售價不變，利潤會？',c:'減少',w:['增加','不變'],e:'生產成本增加，利潤就會減少。'}
+];
+
+/* ================= 題庫：市政快遞員 ================= */
+const POL = [
+ {id:'p1',u:'中央政府',lv:1,q:'審查中央政府總預算',c:'立法院',w:['行政院','監察院','司法院'],e:'立法院負責制定法律、審查預算、監督政府。'},
+ {id:'p2',u:'中央政府',lv:1,q:'制定、修改法律',c:'立法院',w:['行政院','考試院','總統'],e:'立法院是我國最高立法機關。'},
+ {id:'p3',u:'中央政府',lv:1,q:'質詢行政院院長',c:'立法院',w:['監察院','司法院','考試院'],e:'行政院對立法院負責，要接受立法委員質詢。'},
+ {id:'p4',u:'中央政府',lv:1,q:'彈劾違法失職的公務人員',c:'監察院',w:['立法院','司法院','考試院'],e:'監察委員可行使彈劾、糾舉權；彈劾後交由懲戒法院審理。'},
+ {id:'p5',u:'中央政府',lv:2,q:'審核各機關的年度決算',c:'監察院',w:['行政院','立法院','考試院'],e:'監察院下設審計部，行使審計權。'},
+ {id:'p6',u:'中央政府',lv:2,q:'對行政機關的不當施政提出糾正',c:'監察院',w:['立法院','司法院','總統'],e:'糾正以「事」為對象；彈劾、糾舉以「人」為對象。'},
+ {id:'p7',u:'中央政府',lv:2,q:'審理總統、副總統彈劾案',c:'司法院',w:['立法院','監察院','行政院'],e:'立法院提出彈劾案後，由大法官組成憲法法庭審理。'},
+ {id:'p8',u:'中央政府',lv:2,q:'懲戒違法失職的公務人員',c:'司法院',w:['監察院','考試院','行政院'],e:'司法院設懲戒法院，處理公務人員懲戒事項。'},
+ {id:'p9',u:'中央政府',lv:1,q:'各級法院審判各種訴訟',c:'司法院',w:['行政院','監察院','立法院'],e:'司法院是我國最高司法機關。'},
+ {id:'p10',u:'中央政府',lv:1,q:'舉辦公務人員國家考試',c:'考試院',w:['行政院','立法院','監察院'],e:'考試院設考選部，主管國家考試。'},
+ {id:'p11',u:'中央政府',lv:2,q:'公務人員的銓敘、撫卹、退休',c:'考試院',w:['行政院','監察院','立法院'],e:'考試院設銓敘部負責。'},
+ {id:'p12',u:'中央政府',lv:1,q:'規畫國家政策、執行法案',c:'行政院',w:['立法院','總統','監察院'],e:'行政院是我國最高行政機關。'},
+ {id:'p13',u:'中央政府',lv:2,q:'認為法案窒礙難行，移請覆議',c:'行政院',w:['司法院','監察院','考試院'],e:'行政院可經總統核可，移請立法院覆議。'},
+ {id:'p14',u:'中央政府',lv:1,q:'統率全國陸海空三軍',c:'總統',w:['行政院','立法院','監察院'],e:'總統是國家元首，也是三軍統帥。'},
+ {id:'p15',u:'中央政府',lv:2,q:'發布緊急命令',c:'總統',w:['立法院','行政院','司法院'],e:'經行政院會議決議後由總統發布，10日內送立法院追認。'},
+ {id:'p16',u:'中央政府',lv:2,q:'對行政院院長提出不信任案',c:'立法院',w:['監察院','總統','司法院'],e:'不信任案通過，院長須辭職，並得呈請總統解散立法院。'},
+ {id:'o1',u:'中央政府',lv:1,dest:1,q:'總統怎麼產生？',c:'人民直接選舉',w:['總統提名，立法院同意','立法委員互選','總統直接任命'],e:'總統由人民直接選舉，任期四年，連選得連任一次。'},
+ {id:'o2',u:'中央政府',lv:1,dest:1,q:'立法委員怎麼產生？',c:'人民直接選舉',w:['總統直接任命','總統提名，立法院同意','立法委員互選'],e:'立法委員由人民直接選舉，任期四年。'},
+ {id:'o3',u:'中央政府',lv:1,dest:1,q:'行政院院長怎麼產生？',c:'總統直接任命',w:['人民直接選舉','總統提名，立法院同意','立法委員互選'],e:'行政院院長由總統任命，不需立法院同意。'},
+ {id:'o4',u:'中央政府',lv:1,dest:1,q:'大法官怎麼產生？',c:'總統提名，立法院同意',w:['人民直接選舉','總統直接任命','立法委員互選'],e:'司法、考試、監察三院的重要人員由總統提名，經立法院同意後任命。'},
+ {id:'o5',u:'中央政府',lv:2,dest:1,q:'監察委員怎麼產生？',c:'總統提名，立法院同意',w:['人民直接選舉','總統直接任命','立法委員互選'],e:'立法院以人事同意權制衡其他機關。'},
+ {id:'o6',u:'中央政府',lv:2,dest:1,q:'立法院院長怎麼產生？',c:'立法委員互選',w:['人民直接選舉','總統直接任命','總統提名，立法院同意'],e:'立法院院長、副院長由立法委員互選產生。'},
+ {id:'l1',u:'地方政府',lv:1,q:'外交與國防事務',c:'中央政府',w:['縣市政府','縣市議會','鄉鎮市公所'],e:'有全國一致性質的事務屬於中央。'},
+ {id:'l2',u:'地方政府',lv:1,q:'宣布颱風天停班停課',c:'縣市政府',w:['中央政府','縣市議會','立法院'],e:'因地制宜的事務屬於地方。'},
+ {id:'l3',u:'地方政府',lv:1,q:'議決地方自治條例與預算',c:'縣市議會',w:['縣市政府','立法院','行政院'],e:'地方立法機關議決自治條例與預算，並質詢監督地方行政機關。'},
+ {id:'l4',u:'地方政府',lv:2,q:'推動地方自治、執行上級委辦事項',c:'縣市政府',w:['縣市議會','立法院','監察院'],e:'地方行政機關負責推動地方自治工作。'},
+ {id:'l5',u:'地方政府',lv:1,q:'滿14歲，辦理國民身分證',c:'戶政事務所',w:['衛生所','地政事務所','兵役課'],e:'戶政事務所辦理身分證、戶籍登記。'},
+ {id:'l6',u:'地方政府',lv:1,q:'接種流感疫苗',c:'衛生所',w:['戶政事務所','社會課','地政事務所'],e:'屬於地方政府的安全衛生事務。'},
+ {id:'l7',u:'地方政府',lv:2,q:'滿65歲申請敬老卡',c:'社會課',w:['衛生所','兵役課','戶政事務所'],e:'屬於地方政府的社會福利事務。'},
+ {id:'l8',u:'地方政府',lv:2,q:'買新房子辦理房屋登記',c:'地政事務所',w:['戶政事務所','社會課','衛生所'],e:'地政事務所辦理土地與房屋登記。'},
+ {id:'l9',u:'地方政府',lv:2,dest:1,q:'桃園市屬於哪一種行政區？',c:'直轄市',w:['與縣同級的市','與鄉鎮同級的市','縣'],e:'我國有6個直轄市：臺北、新北、桃園、臺中、臺南、高雄。'},
+ {id:'l10',u:'地方政府',lv:2,dest:1,q:'嘉義市屬於哪一種行政區？',c:'與縣同級的市',w:['直轄市','與鄉鎮同級的市','縣'],e:'與縣同級的市有基隆市、新竹市、嘉義市。'},
+ {id:'l11',u:'地方政府',lv:1,dest:1,q:'地方政府擁有哪些權力？',c:'行政權與立法權',w:['五權都有','司法權與考試權','只有監察權'],e:'司法、考試、監察權仍屬於中央。'},
+ {id:'v1',u:'政治參與',lv:1,dest:1,q:'一人一票，票票等值',c:'平等原則',w:['普通原則','直接原則','無記名原則'],e:'公平投票四原則：普通、平等、直接、無記名。'},
+ {id:'v2',u:'政治參與',lv:1,dest:1,q:'投票時不可主動亮票',c:'無記名原則',w:['平等原則','普通原則','直接原則'],e:'又稱祕密投票原則，讓選民依自由意志投票。'},
+ {id:'v3',u:'政治參與',lv:1,dest:1,q:'自己親自投票，不透過代理人',c:'直接原則',w:['普通原則','平等原則','無記名原則'],e:'直接原則落實主權在民。'},
+ {id:'v4',u:'政治參與',lv:2,dest:1,q:'不分性別、宗教、財產都有投票權',c:'普通原則',w:['平等原則','直接原則','無記名原則'],e:'符合法定資格，人人都有投票權。'},
+ {id:'v5',u:'政治參與',lv:2,dest:1,q:'立法委員的選舉制度',c:'單一選區兩票制',w:['比例代表制','複數選區制','總統指派'],e:'每區選一位區域立委；一票選人、一票選黨，政黨票超過5%才分配不分區席次。'},
+ {id:'v6',u:'國家與民主政治',lv:1,dest:1,q:'政策失敗，官員辭職下臺',c:'責任政治',w:['民意政治','法治政治','政黨政治'],e:'政府施政須向人民負責。'},
+ {id:'v7',u:'國家與民主政治',lv:1,dest:1,q:'選後在野黨成為執政黨',c:'政黨政治',w:['民意政治','責任政治','法治政治'],e:'政黨透過定期選舉公平競爭，和平轉移政權。'}
+];
+const BLD_ICON = {'立法院':'parliament','行政院':'office','司法院':'scales','監察院':'lens','考試院':'paper','總統':'flag','縣市政府':'city','縣市議會':'ballot','中央政府':'globe','鄉鎮市公所':'house','戶政事務所':'id','衛生所':'plus','地政事務所':'house','兵役課':'shield','社會課':'twopeople','直轄市':'city','縣':'mountain'};
+
+/* ================= 題庫：程序接力賽 ================= */
+const SEQ = [
+ {id:'q1',b:4,u:'刑事案件的追訴',ic:'gavel',lv:1,t:'刑事訴訟的四個階段',q:'把犯罪的追訴過程排好順序。',steps:['偵查：檢察官調查犯罪','起訴：檢察官提起公訴','審判：法官判決是否有罪','執行：檢察官指揮執行判決'],e:'刑事訴訟依序是偵查、起訴、審判、執行。'},
+ {id:'q2',b:4,u:'行政法規與行政救濟',ic:'paper',lv:1,t:'行政救濟',q:'人民不服行政機關的處分，該怎麼一步步救濟？',steps:['行政機關作出行政處分','人民不服，提起訴願','不服訴願結果','向行政法院提起行政訴訟'],e:'先訴願，再行政訴訟。'},
+ {id:'q3',b:4,u:'民事糾紛的解決',ic:'scales',lv:1,t:'調解的流程',q:'鄰居糾紛想要調解，順序是？',steps:['雙方向區公所調解委員會聲請','調解委員居中協調','調解成立，作成調解書','送法院核定，與判決同效力'],e:'調解不成立也不影響當事人提起訴訟的權利。'},
+ {id:'q4',b:1,u:'學生權利與校園生活',ic:'school',lv:1,t:'班會流程',q:'把班會的程序排好。',steps:['選出主席、司儀、紀錄','宣布開會','報告事項','討論事項','臨時動議','散會'],e:'臨時動議用來討論與提案無關的議題。'},
+ {id:'q5',b:1,u:'學生權利與校園生活',ic:'school',lv:1,t:'學生自治的步驟',q:'學生自治要怎麼開始？',steps:['成立自治組織（如班會、社團）','訂定自治規範（如班級公約）','推展各項自治活動'],e:'透過學生自治，培養參與公共事務的能力。'},
+ {id:'q6',b:1,u:'人性尊嚴與人權保障',ic:'shield',lv:2,t:'校園性別事件處理',q:'學生遇到校園性騷擾，學校處理的順序是？',steps:['被害人或檢舉人申請調查','學務處（或教導處）受理','移送性別平等教育委員會調查','彙報教育主管機關'],e:'依性別平等教育法，學校須設置性別平等教育委員會。'},
+ {id:'q7',b:3,u:'中央政府',ic:'flag',lv:2,t:'總統發布緊急命令',q:'國家遭遇緊急危難時，緊急命令的程序是？',steps:['國家遭遇緊急危難','行政院會議決議','總統發布緊急命令','10日內交立法院追認'],e:'立法院不同意，緊急命令立即失效。'},
+ {id:'q8',b:3,u:'中央政府',ic:'coin',lv:2,t:'中央政府預算',q:'中央政府的錢怎麼編、怎麼審？',steps:['行政院編列預算','立法院審查預算','行政院執行預算、做成決算','監察院審計部審核決算'],e:'立法院審預算、監察院審決算，彼此制衡。'},
+ {id:'q9',b:3,u:'憲法與權利保障',ic:'book',lv:2,t:'修改憲法',q:'我國憲法修正的程序是？',steps:['立法院提出憲法修正案','公告半年','選舉人投票複決'],e:'修憲門檻高，展現憲法的固定性。'},
+ {id:'q10',b:3,u:'政治參與',ic:'ballot',lv:1,t:'到投票所投票',q:'投票當天，進投票所後依序要做什麼？',steps:['出示身分證和投票通知單','領取選票','到圈票處用專用戳章圈選','把選票投進票箱'],e:'選票與票箱顏色要一樣，投完就離開投票所。'},
+ {id:'q11',b:3,u:'政治參與',ic:'ballot',lv:1,t:'選舉的過程',q:'一場選舉從開始到結束？',steps:['登記參選','競選活動','投票','開票、計票','公布選舉結果'],e:'選後要有民主風度，尊重投票結果。'},
+ {id:'q12',b:3,u:'中央政府',ic:'parliament',lv:2,t:'覆議制度',q:'行政院覺得立法院通過的法律窒礙難行，怎麼辦？',steps:['立法院通過法律案','行政院認為窒礙難行','經總統核可，移請立法院覆議','立法委員投票決定維持或否決'],e:'覆議是行政權與立法權互動的制衡方式。'},
+ {id:'q13',b:3,u:'中央政府',ic:'parliament',lv:2,t:'不信任案與解散立法院',q:'立法院對行政院院長提出不信任案並通過後？',steps:['立法院提出不信任案','不信任案通過','行政院院長辭職，並得呈請總統解散立法院','立法委員重新選舉'],e:'不信任案未通過，一年內不得對同一院長再提出。'},
+ {id:'q14',b:4,u:'兒少權益的維護',ic:'shield',lv:1,t:'少年保護事件',q:'13歲少年偷竊，少年法院怎麼處理？',steps:['少年觸犯刑罰法律','少年法院（庭）調查','少年法院（庭）審理','裁定保護處分'],e:'未滿14歲屬少年保護事件，接受保護處分。'},
+ {id:'q15',b:5,u:'貨幣的使用',ic:'coin',lv:1,t:'貨幣的演變',q:'人類交易方式是怎麼演變的？',steps:['以物易物','商品貨幣（貝殼、黃金）','法定貨幣（紙幣、硬幣）','新型態支付工具（儲值卡、行動支付）'],e:'以物易物不方便，才出現了貨幣。'},
+ {id:'q16',b:2,u:'公共意見',ic:'tv',lv:1,t:'媒體識讀三步驟',q:'看到網路上的驚人消息，應該？',steps:['懷疑','查證','謹慎轉發'],e:'具備媒體識讀能力，才不會成為錯誤訊息的傳播者。'},
+ {id:'q17',b:1,u:'公民與公民德性',ic:'tv',lv:1,t:'打擊假訊息',q:'教育部宣導辨別不實訊息的步驟是？',steps:['警覺','查明','證實'],e:'理性思考批判是公民德性之一。'},
+ {id:'q18',b:5,u:'生產與生產資源',ic:'factory',lv:2,t:'從生產到利潤',q:'計算利潤的思考順序是？',steps:['決定商品價格','乘上銷售量，得到銷貨收入','扣除生產成本','得到利潤'],e:'利潤＝銷貨收入－生產成本；銷貨收入＝價格×銷售量。'}
+];
+
+/* ================= 題庫：公民數字尺 ================= */
+/* num：在尺上找數字；cls：看位置判斷身分 */
+const RULER = [
+ {id:'r1',b:4,u:'生活中的契約',lv:1,ty:'num',q:'民法規定滿幾歲是成年？',ans:18,min:0,max:30,unit:'歲',ch:[14,18,20],e:'滿18歲且精神健全，是完全行為能力人。',z:'civil'},
+ {id:'r2',b:4,u:'生活中的契約',lv:1,ty:'num',q:'未滿幾歲的未成年人是「無行為能力人」？',ans:7,min:0,max:20,unit:'歲',ch:[6,7,12],e:'未滿7歲、受監護宣告者是無行為能力人。',z:'civil'},
+ {id:'r3',b:4,u:'刑法與刑罰',lv:1,ty:'num',q:'刑法規定，未滿幾歲的人行為不處罰？',ans:14,min:0,max:30,unit:'歲',ch:[12,14,18],e:'未滿14歲是無責任能力人，不以刑法處罰。',z:'crim'},
+ {id:'r4',b:4,u:'刑法與刑罰',lv:2,ty:'num',q:'滿幾歲以上的人犯罪，得減輕其刑？',ans:80,min:50,max:100,unit:'歲',ch:[65,70,80],e:'年滿80歲以上是限制責任能力人。',z:'crim'},
+ {id:'r5',b:4,u:'兒少權益的維護',lv:1,ty:'num',q:'少年事件處理法的「少年」是幾歲以上、未滿18歲？',ans:12,min:0,max:20,unit:'歲',ch:[7,12,14],e:'少年是指12歲以上未滿18歲的人。',z:'youth'},
+ {id:'r6',b:4,u:'兒少權益的維護',lv:2,ty:'num',q:'依兒少法，未滿幾歲是「兒童」？',ans:12,min:0,max:20,unit:'歲',ch:[10,12,15],e:'兒童未滿12歲；少年12歲以上未滿18歲。聯合國兒童權利公約則把未滿18歲都稱為兒童。',z:'youth'},
+ {id:'r7',b:4,u:'兒少權益的維護',lv:1,ty:'num',q:'雇主不得僱用未滿幾歲的人工作？',ans:15,min:10,max:20,unit:'歲',ch:[12,15,18],e:'15歲以上未滿16歲的受僱者稱為童工。'},
+ {id:'r8',b:4,u:'兒少權益的維護',lv:2,ty:'num',q:'童工每天工作不得超過幾小時？',ans:8,min:0,max:12,unit:'小時',ch:[6,8,10],e:'童工也不得在晚上8點到隔天早上6點工作。'},
+ {id:'r9',b:3,u:'政治參與',lv:1,ty:'num',q:'幾歲以上有選舉權？',ans:20,min:10,max:30,unit:'歲',ch:[18,20,23],e:'選舉權年滿20歲；公民投票年滿18歲。',z:'vote'},
+ {id:'r10',b:3,u:'政治參與',lv:1,ty:'num',q:'幾歲以上有公民投票權？',ans:18,min:10,max:30,unit:'歲',ch:[16,18,20],e:'18歲公民權修憲案未通過複決，所以選舉權仍是20歲。',z:'vote'},
+ {id:'r11',b:3,u:'政治參與',lv:2,ty:'num',q:'總統、副總統候選人至少要幾歲？',ans:40,min:20,max:60,unit:'歲',ch:[30,35,40],e:'直轄市長、縣市長30歲；鄉鎮市長26歲；村里長與民意代表23歲。'},
+ {id:'r12',b:3,u:'政治參與',lv:2,ty:'num',q:'縣市議員（民意代表）候選人至少要幾歲？',ans:23,min:18,max:40,unit:'歲',ch:[20,23,30],e:'村（里）長與各級民意代表，參選年齡都是23歲。'},
+ {id:'r13',b:3,u:'中央政府',lv:1,ty:'num',q:'總統一任是幾年？',ans:4,min:0,max:10,unit:'年',ch:[4,5,6],e:'總統任期四年，連選得連任一次；立法委員任期也是四年。'},
+ {id:'r14',b:3,u:'中央政府',lv:2,ty:'num',q:'總統發布緊急命令後，幾日內要交立法院追認？',ans:10,min:0,max:30,unit:'日',ch:[7,10,30],e:'立法院不同意，緊急命令立即失效。'},
+ {id:'r15',b:3,u:'政治參與',lv:2,ty:'num',q:'政黨票得票率超過多少，才能分配不分區立委？',ans:5,min:0,max:20,unit:'%',ch:[3,5,10],e:'立法委員共113席，採單一選區兩票制。'},
+ {id:'r16',b:5,u:'市場與競爭',lv:1,ty:'num',q:'網路購物享有幾天的猶豫期？',ans:7,min:0,max:30,unit:'天',ch:[3,7,14],e:'實體店面購買的商品沒有猶豫期。'},
+ {id:'r17',b:5,u:'勞動參與',lv:2,ty:'num',q:'勞動力是指年滿幾歲、有工作能力與意願的人？',ans:15,min:10,max:25,unit:'歲',ch:[15,18,20],e:'勞動力包括就業者與失業者。'},
+ {id:'r18',b:5,u:'勞動參與',lv:2,ty:'num',q:'非自願離職，一般最長可領幾個月失業給付？',ans:6,min:0,max:12,unit:'個月',ch:[3,6,12],e:'依就業保險法，政府也提供職業訓練。'},
+ {id:'r19',b:1,u:'變遷中的家庭',lv:2,ty:'num',q:'65歲以上人口超過多少比例，稱為「超高齡社會」？',ans:20,min:0,max:30,unit:'%',ch:[7,14,20],e:'7%以上是高齡化社會、14%以上是高齡社會、20%以上是超高齡社會。'},
+ {id:'r20',b:1,u:'變遷中的家庭',lv:2,ty:'num',q:'員工可以在子女滿幾歲前申請育嬰假？',ans:3,min:0,max:10,unit:'歲',ch:[1,3,6],e:'依性別平等工作法，不分性別，任職滿6個月後可申請。'},
+ {id:'r21',b:6,u:'科技發展',lv:2,ty:'num',q:'著作財產權保障到著作人死後幾年？',ans:50,min:0,max:100,unit:'年',ch:[20,50,70],e:'期限屆滿後，民眾可以自由運用。'},
+ {id:'r22',b:4,u:'生活中的契約',lv:2,ty:'num',q:'債務請求返還的權利，原則上幾年不行使就受限制？',ans:15,min:0,max:30,unit:'年',ch:[5,10,15],e:'這是消滅時效：法律不保障讓權利睡著的人。'},
+ {id:'r23',b:4,u:'生活中的契約',lv:1,ty:'cls',q:'15歲的阿哲，在民法上是？',age:15,c:'限制行為能力人',w:['無行為能力人','完全行為能力人'],e:'7歲以上未滿18歲是限制行為能力人。',z:'civil'},
+ {id:'r24',b:4,u:'生活中的契約',lv:1,ty:'cls',q:'5歲的小新自己去買東西，他在民法上是？',age:5,c:'無行為能力人',w:['限制行為能力人','完全行為能力人'],e:'無行為能力人的行為，要由法定代理人代為處理。',z:'civil'},
+ {id:'r25',b:4,u:'刑法與刑罰',lv:1,ty:'cls',q:'13歲打傷同學，在刑法上是？',age:13,c:'無責任能力人',w:['限制責任能力人','完全責任能力人'],e:'未滿14歲不以刑法處罰，但可能由少年法院處理。',z:'crim'},
+ {id:'r26',b:4,u:'刑法與刑罰',lv:2,ty:'cls',q:'16歲犯罪，在刑法上是？',age:16,c:'限制責任能力人',w:['無責任能力人','完全責任能力人'],e:'14歲以上未滿18歲，得減輕其刑。',z:'crim'},
+ {id:'r27',b:4,u:'刑法與刑罰',lv:2,ty:'cls',q:'85歲的老先生犯罪，在刑法上是？',age:85,c:'限制責任能力人',w:['無責任能力人','完全責任能力人'],e:'年滿80歲以上，得減輕其刑。',z:'crim'},
+ {id:'r28',b:4,u:'兒少權益的維護',lv:1,ty:'cls',q:'依兒少法，10歲的小朋友是？',age:10,c:'兒童',w:['少年','成年人'],e:'兒童未滿12歲。',z:'youth'},
+ {id:'r29',b:3,u:'政治參與',lv:2,ty:'cls',q:'19歲的大學生，可以參加哪一種投票？',age:19,c:'只能投公民投票',w:['只能投選舉','兩種都可以'],e:'18歲可投公投，20歲才有選舉權。',z:'vote'}
+];
+const ZONES = {
+  civil:[[0,7,'無行為能力','#857d6c'],[7,18,'限制行為能力','#b8862f'],[18,100,'完全行為能力','#5f7f6f']],
+  crim:[[0,14,'無責任能力','#857d6c'],[14,18,'限制責任能力','#b8862f'],[18,80,'完全責任能力','#5f7f6f'],[80,100,'限制責任能力','#b8862f']],
+  youth:[[0,12,'兒童','#4f7d8a'],[12,18,'少年','#b8862f'],[18,100,'成年','#5f7f6f']],
+  vote:[[18,20,'可投公投','#b8862f'],[20,100,'選舉＋公投','#5f7f6f']]
+};
+
+/* ================= 工具 ================= */
+const $ = s => document.querySelector(s);
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+const fmt = n => (n<0?'-':'')+'$'+Math.abs(Math.round(n)).toLocaleString('en-US');
+const reduceMotion = (()=>{ try{ return matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } })();
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem('civ3_'+k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem('civ3_'+k, JSON.stringify(v)); }catch(e){} }
+};
+let soundOn = store.get('sound') !== false;
+let actx = null;
+function beep(f=600,d=.12,type='sine',vol=.05,slide=0){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain(), t=actx.currentTime;
+    o.type=type; o.frequency.setValueAtTime(f,t); if(slide) o.frequency.exponentialRampToValueAtTime(f*slide,t+d);
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t+d);
+  }catch(e){}
+}
+const sfx = {
+  ok(){ beep(660,.1,'triangle'); setTimeout(()=>beep(990,.16,'triangle'),90); },
+  bad(){ beep(240,.2,'sine',.04,.7); },
+  coin(){ beep(1200,.08,'square',.025); setTimeout(()=>beep(1600,.12,'square',.025),70); },
+  whoosh(){ beep(400,.18,'sine',.03,2.2); },
+  win(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle'),i*110)); }
+};
+function toast(msg,ms=2600){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),ms); }
+const canSpeak = (()=>{ try{ return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance!=='undefined'; }catch(e){ return false; } })();
+function speak(text){ if(!canSpeak||!text) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(text).replace(/｜/g,'，')); u.lang='zh-TW'; u.rate=.9; speechSynthesis.speak(u); }catch(e){} }
+function stopSpeak(){ if(canSpeak){ try{ speechSynthesis.cancel(); }catch(e){} } }
+function autoSpeak(text){ if(S.autoRead && !isExam()) speak(text); }
+function speakBtn(getText, label='朗讀'){
+  if(!canSpeak) return null;
+  const b=document.createElement('button'); b.type='button'; b.className='speak'; b.innerHTML=`${I('speaker','14px')}${label}`;
+  b.addEventListener('click',e=>{ e.stopPropagation(); speak(getText()); });
+  b.addEventListener('pointerdown',e=>e.stopPropagation());
+  return b;
+}
+
+/* ================= 狀態、紀錄 ================= */
+const S = { book: store.get('book') || 'all', mode: store.get('mode') || 'learn', autoRead: !!store.get('autoRead'), game:null, opts:{}, cleanup:null };
+const isExam = () => S.mode==='exam';
+function getWrong(g){ const W=store.get('wrong')||{}; return W[g]||[]; }
+function record(g,id,u,ok){
+  const m=store.get('mastery')||{}; m[u]=m[u]||[0,0]; m[u][1]++; if(ok) m[u][0]++; store.set('mastery',m);
+  const W=store.get('wrong')||{}; const set=new Set(W[g]||[]); if(ok) set.delete(id); else set.add(id); W[g]=[...set]; store.set('wrong',W);
+}
+function byBook(list, g, min){
+  if(S.book==='all') return list;
+  const f=list.filter(x=>(x.b||3)===+S.book);
+  if(f.length>=min) return f;
+  toast(`《${GAMES[g].name}》在${BOOK_NAME[S.book]}的內容較少，已改用完整範圍`);
+  return list;
+}
+function prefer(list, n, g){
+  const wrong=new Set(getWrong(g)); const exam=isExam();
+  let src=list; if(!exam){ const easy=list.filter(x=>x.lv!==2); if(easy.length>=Math.min(n,list.length)) src=easy; }
+  const sh=shuffle(src);
+  const w=sh.filter(x=>wrong.has(x.id)).slice(0,Math.max(1,Math.round(n*.3)));
+  const rest=sh.filter(x=>!w.includes(x)).sort((a,b)=>exam?((b.lv===2)-(a.lv===2)):0);
+  return shuffle(w.concat(rest).slice(0,n));
+}
+function mkQ(it){ const w=isExam()?it.w.slice(0,3):it.w.slice(0,2); const opts=shuffle([it.c,...w]); return {...it,opts,ans:opts.indexOf(it.c)}; }
+const newRec = () => ({score:0,correct:0,total:0,wrong:[],combo:0});
+function award(R, first, base=100){ R.total++; if(first){ R.correct++; R.combo++; R.score+=base+Math.min(R.combo,10)*10; } else { R.combo=0; if(!isExam()) R.score+=Math.round(base/2); } }
+
+/* ================= 大廳 ================= */
+function allUnits(){
+  const map=new Map(); const add=(b,u)=>{ const k=b+'|'+u; if(!map.has(k)) map.set(k,{b,u}); };
+  SORT.forEach(r=>add(r.b,r.u)); LAW.forEach(c=>add(c.b,c.u)); ECON.forEach(e=>add(5,e.u)); POL.forEach(p=>add(3,p.u)); SEQ.forEach(q=>add(q.b,q.u)); RULER.forEach(r=>add(r.b,r.u));
+  return [...map.values()].sort((a,b)=>a.b-b.b);
+}
+function renderHome(){
+  document.body.classList.toggle('learn', !isExam());
+  $('#books').innerHTML = [`<button class="chip" data-b="all" aria-pressed="${S.book==='all'}">綜合複習</button>`]
+    .concat([1,2,3,4,5,6].map(b=>`<button class="chip" data-b="${b}" aria-pressed="${String(S.book)===String(b)}">${BOOK_NAME[b]}<small>${BOOK_SEM[b]}</small></button>`)).join('');
+  document.querySelectorAll('#modes button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.m===S.mode?'true':'false'));
+  $('#modeNote').textContent = MODE_NOTE[S.mode];
+  updReadBtn();
+  $('#games').innerHTML = Object.entries(GAMES).map(([k,g])=>{
+    const best = store.get(`best_${k}_${S.mode}`);
+    const rec = S.book!=='all' && g.books.includes(+S.book);
+    const dim = S.book!=='all' && !rec;
+    return `<button class="gcard ${dim?'dim':''}" data-k="${k}" style="--c:${g.c}">
+      <span class="band"></span><span class="art">${I(g.art,'52px')}</span>
+      <span class="theme">${g.theme}</span>
+      <h3>《${g.name}》</h3>
+      <span><span class="tag ${rec?'rec':''}">${rec?'本冊適用':(g.books.length===6?'全六冊':g.books.map(b=>BOOK_SEM[b]).join('・'))}</span></span>
+      <p>${g.desc}</p>
+      <span class="meta"><span>${isExam()?'模擬會考':'見習公民'}最高分 <b>${best??'—'}</b></span><span>開始 →</span></span>
+    </button>`;
+  }).join('');
+  const W=store.get('wrong')||{}; const total=Object.keys(GAMES).reduce((s,k)=>s+((W[k]||[]).length),0);
+  $('#wrongPane').innerHTML = `<h4>${I('notebook','20px')}錯題本</h4>
+    <p class="sub">第一次就答錯的題目會收進來，下次遊戲也會優先出現；重練答對就移除。</p>
+    ${total? Object.entries(GAMES).map(([k,g])=>{ const n=(W[k]||[]).length; return `<div class="wrow" style="--c:${g.c}">${I(g.art,'20px')}<span>${g.name}</span><span class="n">${n} 題</span>${n?`<button class="btn sm alt" data-review="${k}">重練</button>`:''}</div>`; }).join('')
+      : `<p class="sub" style="margin:0">目前沒有錯題。</p>`}`;
+  const M=store.get('mastery')||{};
+  const units=allUnits().filter(x=>S.book==='all'||x.b===+S.book);
+  $('#masteryPane').innerHTML = `<h4>${I('chart','20px')}單元掌握度${S.book==='all'?'':`・${BOOK_NAME[S.book]}`}</h4>
+    <p class="sub">依這台裝置上的作答計算（以第一次作答為準）。作答3題以上、正確率低於60%的單元會標成紅色。</p>
+    <div class="mgrid">${units.map(x=>{ const v=M[x.u]; const pct=v&&v[1]?Math.round(v[0]/v[1]*100):null; const weak=v&&v[1]>=3&&pct<60;
+      return `<div class="mrow ${weak?'weak':''}"><span class="nm" title="${esc(x.u)}"><small>${BOOK_SEM[x.b]}</small>${esc(x.u)}</span><span class="bar"><i style="width:${pct??0}%"></i></span><span class="pct">${pct==null?'—':pct+'%'}</span></div>`; }).join('')}</div>`;
+}
+$('#books').addEventListener('click',e=>{const b=e.target.closest('.chip'); if(!b) return; S.book=b.dataset.b==='all'?'all':+b.dataset.b; store.set('book',S.book); renderHome();});
+$('#modes').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return; S.mode=b.dataset.m; store.set('mode',S.mode); renderHome();});
+$('#games').addEventListener('click',e=>{const b=e.target.closest('.gcard'); if(b) startGame(b.dataset.k);});
+$('#wrongPane').addEventListener('click',e=>{const b=e.target.closest('[data-review]'); if(b) startGame(b.dataset.review,{review:true});});
+$('#soundBtn').addEventListener('click',()=>{soundOn=!soundOn; store.set('sound',soundOn); updSoundBtn(); beep(800,.08);});
+$('#readBtn').addEventListener('click',()=>{S.autoRead=!S.autoRead; store.set('autoRead',S.autoRead); updReadBtn(); if(S.autoRead) speak('自動朗讀已開啟'); else stopSpeak();});
+function updSoundBtn(){ const b=$('#soundBtn'); b.innerHTML = soundOn ? `${I('speaker','16px')}音效` : `${I('mute','16px')}靜音`; b.setAttribute('aria-pressed',soundOn); }
+function updReadBtn(){ const b=$('#readBtn'); b.hidden = !canSpeak || isExam(); b.innerHTML=`${I('read','16px')}自動朗讀${S.autoRead?'：開':'：關'}`; b.setAttribute('aria-pressed',S.autoRead?'true':'false'); }
+$('#backBtn').addEventListener('click',goHome);
+function goHome(){ if(S.cleanup){ S.cleanup(); S.cleanup=null; } stopSpeak(); $('#game').hidden=true; $('#home').hidden=false; renderHome(); }
+function startGame(k, opts={}){
+  if(S.cleanup){ S.cleanup(); S.cleanup=null; }
+  stopSpeak(); S.game=k; S.opts=opts; const g=GAMES[k];
+  $('#home').hidden=true; $('#game').hidden=false;
+  $('#game').style.setProperty('--c', g.c);
+  $('#gTitle').innerHTML = `<span style="color:${g.c};display:inline-flex">${I(g.art,'22px')}</span>${g.name}<span class="mode-pill">${opts.review?'錯題重練':(isExam()?'模擬會考':'見習公民')}</span>`;
+  $('#stage').innerHTML=''; $('#gStats').innerHTML='';
+  ({sort:playSort, law:playLaw, econ:playEcon, pol:playPol, seq:playSeq, ruler:playRuler})[k](opts);
+}
+function setStats(arr){ $('#gStats').innerHTML = arr.map(([l,v])=>`<span class="stat">${l} <b>${v}</b></span>`).join(''); }
+
+/* ================= 共用元件 ================= */
+function intro({icon,title,lines,defs,btn='開始'}, onGo){
+  const ov=document.createElement('div'); ov.className='ovl';
+  ov.innerHTML=`<div class="panel"><div class="pic">${I(icon,'64px')}</div><h3>${esc(title)}</h3>${defs?`<div class="defs">${defs.map(([n,d])=>`<div><b>${esc(n)}</b>${esc(d)}</div>`).join('')}</div>`:''}${lines&&lines.length?`<ul>${lines.map(l=>`<li>${l}</li>`).join('')}</ul>`:''}<div class="row"><span id="ispk"></span><button class="btn go">${btn}</button></div></div>`;
+  $('#stage').appendChild(ov);
+  const txt=title+'。'+(defs?defs.map(([n,d])=>n+'：'+d).join('。'):'')+(lines?lines.map(l=>l.replace(/<[^>]+>/g,'')).join('。'):'');
+  const sp=speakBtn(()=>txt,'朗讀說明'); if(sp) ov.querySelector('#ispk').appendChild(sp);
+  autoSpeak(txt);
+  const go=()=>{ window.removeEventListener('keydown',k); ov.remove(); stopSpeak(); onGo(); };
+  const k=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } };
+  setTimeout(()=>window.addEventListener('keydown',k),120);
+  ov.querySelector('.btn').onclick=go;
+  return ()=>window.removeEventListener('keydown',k);
+}
+/* 見習公民：不倒數，自己按下一題；模擬會考：短暫顯示後自動前進 */
+function feedback(host, o, onNext){
+  host.innerHTML='';
+  const exam=isExam();
+  const d=document.createElement('div'); d.className='fb'+(o.ok?'':' no');
+  d.innerHTML=`<span class="fb-ic">${I(o.ok?'check':'cross','22px')}</span><div class="fb-tx"><b>${esc(o.head)}</b>${o.body?`<span>${o.body}</span>`:''}</div><div class="fb-act"><span class="sp-slot"></span>${exam?'<button class="lnk" data-a="hold">暫停</button>':''}<button class="btn sm go" data-a="go">${esc(o.label||'下一題')} →</button></div>${exam?'<i class="fb-bar"></i>':''}`;
+  host.appendChild(d);
+  const plain=(o.head+'。'+(o.body||'')).replace(/<[^>]+>/g,'');
+  if(!exam){ const sp=speakBtn(()=>plain,'朗讀解析'); if(sp) d.querySelector('.sp-slot').appendChild(sp); autoSpeak(plain); }
+  let done=false, raf=0, held=false; const t0=performance.now(); const wait=o.ok?900:2200;
+  if(exam){ const bar=d.querySelector('.fb-bar'); const step=t=>{ if(held||done) return; const p=Math.min(1,(t-t0)/wait); bar.style.transform=`scaleX(${1-p})`; if(p>=1) go(); else raf=requestAnimationFrame(step); }; raf=requestAnimationFrame(step);
+    const hb=d.querySelector('[data-a=hold]'); hb.onclick=()=>{ held=true; cancelAnimationFrame(raf); bar.style.transform='scaleX(0)'; hb.textContent='已暫停'; hb.disabled=true; }; }
+  const key=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } };
+  const kt=setTimeout(()=>{ if(!done) window.addEventListener('keydown',key); },250);
+  function go(){ if(done) return; done=true; clearTimeout(kt); cancelAnimationFrame(raf); window.removeEventListener('keydown',key); stopSpeak(); d.remove(); onNext&&onNext(); }
+  const gb=d.querySelector('[data-a=go]'); gb.onclick=go; if(!exam) gb.focus({preventScroll:true});
+  return ()=>{ done=true; clearTimeout(kt); cancelAnimationFrame(raf); window.removeEventListener('keydown',key); };
+}
+function hintLine(host, text){ host.innerHTML=`<div class="hintline">${I('bulb','16px')}<span>${esc(text)}</span></div>`; autoSpeak(text); }
+/* 選項：見習公民答錯可以再選；模擬會考只能選一次 */
+function renderOpts(box, q, onDone, o={}){
+  box.innerHTML = q.opts.map((t,i)=>`<button class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span>${o.fmt?o.fmt(t):`<span>${esc(t)}</span>`}</button>`).join('');
+  let done=false, tries=0;
+  const btns=()=>[...box.querySelectorAll('.opt')];
+  const off=()=>window.removeEventListener('keydown',key);
+  const pick=i=>{
+    if(done) return; const b=btns()[i]; if(!b||b.disabled) return;
+    if(i===q.ans){ done=true; off(); btns().forEach((x,j)=>{ x.disabled=true; x.classList.add(j===i?'right':'fade'); }); onDone(tries===0,tries); }
+    else{
+      tries++; b.classList.add('wrong'); b.disabled=true; sfx.bad();
+      if(isExam()){ done=true; off(); btns().forEach((x,j)=>{ x.disabled=true; if(j===q.ans) x.classList.add('right'); else if(j!==i) x.classList.add('fade'); }); onDone(false,tries); }
+      else if(o.onWrong) o.onWrong(tries);
+    }
+  };
+  box.onclick=e=>{ const b=e.target.closest('.opt'); if(b) pick(+b.dataset.i); };
+  const key=e=>{ const n=parseInt(e.key); if(n>=1&&n<=q.opts.length) pick(n-1); };
+  window.addEventListener('keydown',key);
+  return ()=>{ done=true; off(); };
+}
+function stampOn(el, txt='正確'){ el.querySelectorAll(':scope > .stamp').forEach(s=>s.remove()); const s=document.createElement('div'); s.className='stamp'; s.textContent=txt; el.appendChild(s); }
+const lawFmt = t => `<span class="ob"><span class="an">${esc(t)}</span>${LAWD[t]?`<span class="at">${esc(LAWD[t])}</span>`:''}</span>`;
+function finish(R, extraLine=''){
+  stopSpeak();
+  const acc = R.total ? Math.round(R.correct/R.total*100) : 0;
+  const stars = acc>=90?3:acc>=70?2:acc>=40?1:0;
+  let isBest=false;
+  if(!(S.opts&&S.opts.review)){ const key=`best_${S.game}_${S.mode}`, prev=store.get(key)||0; isBest=R.score>prev; if(isBest) store.set(key,R.score); }
+  sfx.win();
+  const ov=document.createElement('div'); ov.className='ovl';
+  const words = isExam()?['再接再厲','穩健進步','表現優秀','融會貫通']:['你完成了！','做得很好！','很厲害！','太棒了！'];
+  ov.innerHTML=`<div class="panel">
+    <h3>${words[stars]}</h3>${extraLine?`<p>${extraLine}</p>`:''}
+    <div class="stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*.18}s">${i<=stars?'合格':'加油'}</span>`).join('')}</div>
+    <div class="rgrid"><div><b>${R.score.toLocaleString('en-US')}</b><small>${isBest?'新的最高分':'得分'}</small></div><div><b>${acc}%</b><small>一次就答對</small></div><div><b>${R.correct}/${R.total}</b><small>題數</small></div></div>
+    ${R.wrong.length?`<div class="notes"><h4>${I('notebook','16px')}這次的錯題筆記（${R.wrong.length}）・已收進錯題本</h4>${R.wrong.map(w=>`<div class="note">${esc(w.q)}<br>正解：<b>${esc(w.a)}</b><br><span style="color:var(--ink2)">${esc(w.e)}</span></div>`).join('')}</div>`:`<p style="color:var(--sage)">全部一次就答對，沒有錯題。</p>`}
+    <div class="row"><button class="btn go" id="again">再玩一次</button><button class="btn alt" id="toHome">回大廳</button></div></div>`;
+  $('#stage').appendChild(ov);
+  ov.querySelector('#again').onclick=()=>startGame(S.game, S.opts&&S.opts.review?{}:S.opts);
+  ov.querySelector('#toHome').onclick=goHome;
+  autoSpeak(words[stars]+'。'+extraLine.replace(/<[^>]+>/g,''));
+}
+
+/* ================= 1. 概念分類投籃 ================= */
+function playSort(opts={}){
+  const R=newRec(), exam=isExam(), review=!!opts.review;
+  let rounds;
+  if(review){
+    const ids=new Set(getWrong('sort'));
+    rounds=SORT.map(r=>({...r,cards:shuffle(r.cards.filter(c=>ids.has(c.id)))})).filter(r=>r.cards.length).slice(0,6);
+    if(!rounds.length){ toast('分類投籃沒有錯題'); return goHome(); }
+  }else{
+    const src=byBook(SORT,'sort',2);
+    rounds=shuffle(src).slice(0,exam?4:3).map(r=>({...r,cards:prefer(r.cards,exam?8:6,'sort')}));
+  }
+  const stage=$('#stage');
+  stage.innerHTML=`<div class="sort groot">
+    <div class="sort-head"><span class="sort-ic" id="sIc"></span><div style="min-width:0"><div class="kicker" id="sKick"></div><div class="sort-title" id="sTitle"></div></div><div class="sort-left" id="sLeft"></div></div>
+    <div class="bins" id="bins"></div>
+    <div class="throwzone" id="tz">
+      <div class="tz-ask">${exam?'這張卡片屬於哪一籃？點籃子、按數字鍵，或把卡片往上拖進籃子。':'這張卡片屬於哪一籃？請點一下上面的籃子。'}</div>
+      <div class="ctimer" id="ctm" ${exam?'':'hidden'}><i id="ctmBar"></i></div>
+      <div class="tcard" id="card"><span id="cardTx"></span><span class="res" id="cardRes"></span></div>
+      <div class="tz-hintbox" id="hintHost"></div>
+      <div class="tz-fb" id="fbHost"></div>
+    </div></div>`;
+  const binsEl=$('#bins'), card=$('#card'), cardTx=$('#cardTx'), cardRes=$('#cardRes');
+  const sb=speakBtn(()=>cardTx.textContent); if(sb) card.appendChild(sb);
+  let ri=0, ci=0, cur=null, busy=true, tries=0, dragX=0, dragY=0, sx=0, sy=0, dragging=false, timerRaf=0, tStart=0, fbCancel=null, introCancel=null, got=[];
+  const LIMIT=10;
+  const upd=()=>setStats([['回合',`${Math.min(ri+1,rounds.length)}/${rounds.length}`],['連續答對',R.combo],['得分',R.score]]);
+  function startRound(){
+    const r=rounds[ri]; ci=0; got=r.bins.map(()=>0);
+    $('#sIc').innerHTML=I(r.ic,'40px'); $('#sKick').textContent=`第 ${ri+1} 回合｜${BOOK_SEM[r.b]}・${r.u}`; $('#sTitle').textContent=r.t;
+    binsEl.style.setProperty('--n', r.bins.length);
+    binsEl.innerHTML=r.bins.map((b,i)=>`<button class="bin" data-i="${i}"><span class="key">${i+1}</span><span class="basket">${I('hoop')}</span><b>${esc(b[0])}</b>${exam?'':`<small>${esc(b[1])}</small>`}<span class="got"></span></button>`).join('');
+    card.style.visibility='hidden'; $('#hintHost').innerHTML=''; $('#fbHost').innerHTML=''; upd();
+    introCancel=intro({icon:r.ic,title:`第 ${ri+1} 回合：${r.t}`,defs:r.bins,lines:[exam?`共 ${r.cards.length} 張卡片，每張限時 10 秒。`:`共 ${r.cards.length} 張卡片，不限時間。讀完卡片，點一下正確的籃子；答錯可以再試。`]},()=>{ introCancel=null; nextCard(); });
+  }
+  function nextCard(){
+    const r=rounds[ri];
+    if(ci>=r.cards.length){ ri++; if(ri>=rounds.length) return finish(R,`完成 ${rounds.length} 個分類回合。`); return startRound(); }
+    cur=r.cards[ci]; tries=0;
+    binsEl.querySelectorAll('.bin').forEach(b=>b.classList.remove('hit','miss','reveal'));
+    $('#hintHost').innerHTML=''; $('#fbHost').innerHTML='';
+    dragX=dragY=0; card.style.transform=''; card.style.visibility='visible';
+    card.classList.remove('ok','no','flying','shake','enter'); cardRes.textContent='';
+    cardTx.textContent=cur.t; void card.offsetWidth; card.classList.add('enter');
+    $('#sLeft').textContent=`第 ${ci+1} 張／共 ${r.cards.length} 張`;
+    busy=false; upd(); autoSpeak(cur.t);
+    if(exam){ tStart=performance.now(); const bar=$('#ctmBar'); const tick=t=>{ if(busy) return; const p=Math.min(1,(t-tStart)/(LIMIT*1000)); bar.style.transform=`scaleX(${1-p})`; if(p>=1){ judge(-1); return; } timerRaf=requestAnimationFrame(tick); }; timerRaf=requestAnimationFrame(tick); }
+  }
+  /* 卡片本身留在原位，只讓一張「影子卡」飛進籃子 */
+  function ghostFly(i){
+    const cr=card.getBoundingClientRect(), br=binsEl.children[i].getBoundingClientRect();
+    const g=document.createElement('div'); g.className='ghost'; g.textContent=cur.t;
+    Object.assign(g.style,{left:cr.left+'px',top:cr.top+'px',width:cr.width+'px'});
+    document.body.appendChild(g);
+    const ex=(br.left+br.width/2)-(cr.left+cr.width/2), ey=(br.top+br.height/2)-(cr.top+cr.height/2);
+    sfx.whoosh(); card.classList.add('flying');
+    const a=g.animate([{transform:'translate(0,0) scale(1)',opacity:.95},{transform:`translate(${ex/2}px,${Math.min(0,ey)/2-50}px) scale(.6)`,opacity:.9,offset:.55},{transform:`translate(${ex}px,${ey}px) scale(.25)`,opacity:0}],{duration:reduceMotion?1:560,easing:'cubic-bezier(.3,.6,.4,1)',fill:'forwards'});
+    const end=()=>{ g.remove(); card.classList.remove('flying'); };
+    return a.finished.then(end,end);
+  }
+  function judge(i){
+    if(busy) return; busy=true; cancelAnimationFrame(timerRaf);
+    const r=rounds[ri], ok=i===cur.bin, bins=binsEl.querySelectorAll('.bin');
+    const settle=()=>{
+      const first=tries===0 && ok;
+      award(R, first); if(exam && first){ R.score+=Math.max(0,Math.round((LIMIT*1000-(performance.now()-tStart))/100)); }
+      record('sort',cur.id,cur.u,first);
+      if(!first) R.wrong.push({q:`「${cur.t}」應該放進哪一籃？`,a:r.bins[cur.bin][0],e:cur.why||r.bins[cur.bin][1]});
+      upd();
+      const bn=r.bins[cur.bin];
+      card.classList.add(ok?'ok':'no');
+      cardRes.textContent = ok ? `已放進「${bn[0]}」` : `${i<0?'時間到。':''}答案是「${bn[0]}」`;
+      const body = exam ? (ok?'':`正解：${esc(bn[0])}`) : `${esc(cur.why||bn[1])}`;
+      $('#hintHost').innerHTML='';
+      fbCancel=feedback($('#fbHost'),{ok:ok,head:ok?`放進「${bn[0]}」，答對了`:(i<0?'時間到':'放錯籃子了'),body,label:ci>=r.cards.length-1?(ri>=rounds.length-1?'看結算':'下一回合'):'下一張'},()=>{ fbCancel=null; ci++; nextCard(); });
+      try{ $('#fbHost').scrollIntoView({block:'nearest',behavior:reduceMotion?'auto':'smooth'}); }catch(_){}
+    };
+    if(i<0){ R.combo=0; sfx.bad(); bins[cur.bin].classList.add('reveal'); return settle(); }
+    ghostFly(i).then(()=>{
+      if(ok){ sfx.ok(); bins[i].classList.add('hit'); got[i]++; const gEl=bins[i].querySelector('.got'); if(gEl) gEl.textContent=`已放 ${got[i]} 張`; settle(); return; }
+      sfx.bad(); bins[i].classList.add('miss'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      if(exam){ bins[cur.bin].classList.add('reveal'); settle(); return; }
+      tries++; setTimeout(()=>bins[i].classList.remove('miss'),500); busy=false;
+      if(tries===1) hintLine($('#hintHost'),`「${r.bins[i][0]}」不對。卡片還在這裡，看看每個籃子下面的說明，再點一次。`);
+      else { bins[cur.bin].classList.add('reveal'); hintLine($('#hintHost'),`提示：答案是正在發光的「${r.bins[cur.bin][0]}」，點一下它。`); }
+    });
+  }
+  binsEl.addEventListener('click',e=>{ const b=e.target.closest('.bin'); if(b) judge(+b.dataset.i); });
+  const key=e=>{ const n=parseInt(e.key); if(!busy && rounds[ri] && n>=1 && n<=rounds[ri].bins.length) judge(n-1); };
+  window.addEventListener('keydown',key);
+  /* 拖曳丟卡只在模擬會考開放；見習公民只用點選，避免手指一滑卡片就飛走 */
+  if(exam){
+    card.addEventListener('pointerdown',e=>{ if(busy) return; dragging=true; sx=e.clientX; sy=e.clientY; dragX=dragY=0; card.classList.add('drag'); try{card.setPointerCapture(e.pointerId);}catch(_){} });
+    card.addEventListener('pointermove',e=>{ if(!dragging) return; dragX=e.clientX-sx; dragY=e.clientY-sy; card.style.transform=`translate(${dragX}px,${dragY}px) rotate(${dragX/30}deg)`; });
+    const reset=()=>{ card.animate([{transform:card.style.transform||'none'},{transform:'none'}],{duration:200,easing:'ease-out'}); card.style.transform=''; dragX=dragY=0; };
+    card.addEventListener('pointerup',()=>{
+      if(!dragging) return; dragging=false; card.classList.remove('drag'); if(busy){ reset(); return; }
+      if(-dragY>80){
+        const cr=card.getBoundingClientRect(); const ccx=cr.left+cr.width/2; let best=-1, bd=1e9;
+        [...binsEl.children].forEach((b,i)=>{ const br=b.getBoundingClientRect(); const d=Math.abs(ccx-(br.left+br.width/2)); if(d<bd){bd=d;best=i;} });
+        card.style.transform=''; dragX=dragY=0; judge(best);
+      } else reset();
+    });
+    card.addEventListener('pointercancel',()=>{ if(!dragging) return; dragging=false; card.classList.remove('drag'); reset(); });
+  }
+  S.cleanup=()=>{ busy=true; cancelAnimationFrame(timerRaf); window.removeEventListener('keydown',key); fbCancel&&fbCancel(); introCancel&&introCancel(); };
+  startRound();
+}
+
+/* ================= 2. 法庭攻防戰 ================= */
+function playLaw(opts={}){
+  const R=newRec(), exam=isExam(), review=!!opts.review;
+  let cases;
+  if(review){ const ids=new Set(getWrong('law')); cases=shuffle(LAW.filter(c=>ids.has(c.id))).slice(0,6); if(!cases.length){ toast('法庭攻防戰沒有錯題'); return goHome(); } }
+  else cases=prefer(byBook(LAW,'law',3),exam?6:4,'law');
+  const BOSSES=[{n:'糾紛小怪',ic:'scroll'},{n:'消費陷阱魔',ic:'tag'},{n:'法盲大魔王',ic:'gavel'}];
+  const per=Math.max(1,Math.ceil(cases.length/3)), bossCount=Math.ceil(cases.length/per);
+  const bossHp=Array.from({length:bossCount},(_,b)=>cases.slice(b*per,b*per+per).reduce((s,c)=>s+c.steps.length,0)), bossMax=[...bossHp];
+  const H0=3; let hearts=H0, ci=0, si=0, unbind=null, fbCancel=null, introCancel=null, q=null;
+  const stage=$('#stage');
+  stage.innerHTML=`<div class="duel groot">
+    <div class="casefile" id="cf">
+      <div class="cf-top"><span id="cNo"></span><span class="cf-boss"><span class="bic" id="bIc"></span><span id="bName"></span><span class="hpbar"><i id="bHp"></i></span></span></div>
+      <h3 class="cf-title" id="cTitle"></h3><p class="cf-story" id="cStory"></p>
+      <ol class="cf-steps" id="cSteps"></ol>
+      <div class="cf-foot"><span class="hearts" id="hearts" ${exam?'':'hidden'}></span><span id="cfSpeak"></span></div>
+    </div>
+    <div class="qside">
+      <div class="qcard" id="qc"><div class="qtop"><span class="kicker" id="qk"></span></div><div class="qtext" id="qt"></div></div>
+      <div id="hint"></div><div class="opts" id="opts"></div><div id="fbHost"></div>
+    </div></div>`;
+  const sp=speakBtn(()=>{ const c=cases[ci]; return c.s+'。'+(q?q.q:''); },'朗讀案情'); if(sp) $('#cfSpeak').appendChild(sp);
+  const bossOf=i=>Math.min(bossCount-1,Math.floor(i/per));
+  const upd=()=>{ const b=bossOf(ci), B=BOSSES[b%3]; $('#bIc').innerHTML=I(B.ic); $('#bName').textContent=B.n; $('#bHp').style.width=(bossHp[b]/bossMax[b]*100)+'%';
+    $('#hearts').innerHTML=Array.from({length:H0},(_,i)=>`<span class="${i<hearts?'':'off'}">${I('heart','16px')}</span>`).join('');
+    setStats([['案件',`${Math.min(ci+1,cases.length)}/${cases.length}`],['連續推理',R.combo],['得分',R.score]]); };
+  function showCase(){ const c=cases[ci]; si=0; $('#cf').querySelectorAll(':scope > .stamp').forEach(s=>s.remove()); $('#cNo').textContent=`案件 ${ci+1}｜${BOOK_SEM[c.b]}・${c.u}`; $('#cTitle').textContent=c.t; $('#cStory').textContent=c.s; showStep(true); }
+  function showStep(first){
+    const c=cases[ci], st=c.steps[si];
+    $('#cSteps').innerHTML=c.steps.map((s,i)=>`<li class="${i<si?'done':i===si?'now':''}">${i+1}. ${esc(s.k)}</li>`).join('');
+    $('#qc').querySelectorAll(':scope > .stamp').forEach(s=>s.remove());
+    q=mkQ(st); $('#qk').textContent=`推理第 ${si+1} 步／共 ${c.steps.length} 步`; $('#qt').textContent=st.q;
+    const hint=$('#hint'); hint.innerHTML='';
+    if(!exam && st.h){ const b=document.createElement('button'); b.className='lnk'; b.textContent='看提示'; b.onclick=()=>hintLine(hint,st.h); hint.appendChild(b); }
+    upd(); autoSpeak((first?c.s+'。':'')+st.q+'。'+q.opts.map((o,i)=>'ABCD'[i]+'，'+o).join('。'));
+    unbind=renderOpts($('#opts'),q,(first1)=>{
+      unbind=null; const b=bossOf(ci);
+      award(R, first1); record('law',c.id,c.u,first1);
+      if(first1||!exam){ sfx.ok(); stampOn($('#qc')); bossHp[b]=Math.max(0,bossHp[b]-1); const ic=$('#bIc'); ic.classList.remove('hitfx'); void ic.offsetWidth; ic.classList.add('hitfx'); }
+      if(!first1){ R.wrong.push({q:`${c.t}｜${st.q}`,a:st.c,e:st.e}); if(exam){ hearts--; const h=$('#hearts'); h.classList.remove('shake'); void h.offsetWidth; h.classList.add('shake'); } }
+      upd(); hint.innerHTML='';
+      const lastStep=si>=c.steps.length-1, end=(exam&&hearts<=0)||(lastStep&&ci>=cases.length-1);
+      const body = exam ? (first1?'':`正解：${esc(st.c)}`) : esc(st.e);
+      fbCancel=feedback($('#fbHost'),{ok:first1||!exam,head:first1?'推理成立':(exam?'推理有誤，對手反擊':'找到正確答案了'),body,label:end?'看結算':(lastStep?'下一案':'下一步')},()=>{
+        fbCancel=null;
+        if(exam&&hearts<=0) return finish(R,'律師體力耗盡。到錯題本把案件再推理一次吧。');
+        if(!lastStep){ si++; return showStep(false); }
+        stampOn($('#cf'),'結案'); const wasBoss=bossOf(ci); ci++;
+        if(ci>=cases.length) return finish(R,`審理完 ${cases.length} 件案件。`);
+        if(bossOf(ci)!==wasBoss) toast(`${BOSSES[wasBoss%3].n}的案件審理完畢，下一位對手登場`);
+        setTimeout(showCase, reduceMotion?0:450);
+      });
+    },{fmt:st.card?lawFmt:null,onWrong:()=>hintLine(hint, st.h?`再想想：${st.h}`:'再想想，把案情再讀一次。')});
+  }
+  S.cleanup=()=>{ unbind&&unbind(); fbCancel&&fbCancel(); introCancel&&introCancel(); };
+  upd();
+  introCancel=intro({icon:'scales',title:'法庭攻防戰：案情推理',lines:['每件案件分成幾個推理步驟：判斷責任、找出法律、想想怎麼處理。', exam?'你有 3 顆心，推理錯誤會被反擊扣一顆。':'不會扣分數到零，答錯可以再選一次，也可以按「看提示」。','左邊的案卷可以按「朗讀案情」聽題目。']},()=>{ introCancel=null; showCase(); });
+}
+
+/* ================= 3. 夜市大老闆 ================= */
+function playEcon(opts={}){
+  const R=newRec(), exam=isExam(), review=!!opts.review;
+  let days;
+  if(review){ const ids=new Set(getWrong('econ')); days=shuffle(ECON.filter(e=>ids.has(e.id))).sort((a,b)=>a.st-b.st).slice(0,10); if(!days.length){ toast('夜市大老闆沒有錯題'); return goHome(); } }
+  else{
+    if(S.book!=='all' && +S.book!==5) toast('夜市大老闆是第五冊的內容，已使用第五冊題目');
+    const n1=exam?4:2, n2=exam?2:1, n3=exam?2:1;
+    days=[...prefer(ECON.filter(e=>e.st===1),n1,'econ'), ECON.find(e=>e.id==='x1'), ...prefer(ECON.filter(e=>e.st===2&&e.id!=='x1'),n2,'econ'), ECON.find(e=>e.id==='s1'), ...prefer(ECON.filter(e=>e.st===3&&e.id!=='s1'),n3,'econ')];
+  }
+  const N=days.length, TARGET=review?0:(exam?16000:8500);
+  const M={a:160,b:1.5,cl:18,imp:.4,r:30,infl:1,F:500,K:100,pf:2,fd:40,exp:false,price:60,share:0,aOld:160,known:true};
+  const cost=()=>(M.cl+M.imp*M.r)*M.infl;
+  const sim=(P,share)=>{ const c=cost(); const qd=Math.max(0,M.a-M.b*P); const cap=M.K*(1-share); const dom=Math.round(Math.min(qd,cap)); const ex=M.exp?Math.round(Math.min(M.fd,M.K*share)):0; const rev=P*dom+M.pf*M.r*ex; const tc=c*(dom+ex)+M.F; return {c,qd,dom,ex,rev,tc,profit:Math.round(rev-tc),expV:M.pf*M.r*ex,lost:Math.max(0,Math.round(qd-cap))}; };
+  let d=0,total=0,hist=[],unbind=null,fbCancel=null,introCancel=null,settleCancel=null;
+  const stage=$('#stage');
+  stage.innerHTML=`<div class="econ groot">
+    <div class="eleft">
+      <div class="shop"><span class="cup">${I('cup')}</span><div style="flex:1;min-width:0"><div class="shop-name">夜市珍奶攤</div><div class="chips" id="chips"></div></div><div class="pricetag" id="ptag">$60</div></div>
+      <div class="chartbox"><canvas id="chart"></canvas></div>
+      <div class="histbox"><div class="hl"><span>每日利潤</span><span>累積 <b id="cum">$0</b>${TARGET?`／目標 ${fmt(TARGET)}`:''}</span></div><div class="hist" id="hist" style="--d:${N}"></div>${TARGET?'<div class="gbar"><i id="gbar"></i></div>':''}</div>
+    </div><div class="qside" id="eright"></div></div>`;
+  const cv=$('#chart'), ctx=cv.getContext('2d'); let W=0,H=0;
+  const resize=()=>{ const dpr=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); draw(); };
+  const ro=new ResizeObserver(resize); ro.observe(cv);
+  const Qmax=180,Pmax=130;
+  function draw(){
+    if(!W||!H) return;
+    const l=46,r=16,t=26,b=34,X=q=>l+(q/Qmax)*(W-l-r),Y=p=>t+(1-p/Pmax)*(H-t-b);
+    ctx.clearRect(0,0,W,H); ctx.font='11px "Noto Sans TC",sans-serif'; ctx.textBaseline='middle';
+    ctx.fillStyle='#2e2b3a'; ctx.textAlign='left'; ctx.font='600 12px "Noto Sans TC",sans-serif'; ctx.fillText('價格越高，買的人越少',l,12); ctx.font='11px "Noto Sans TC",sans-serif';
+    ctx.strokeStyle='rgba(46,43,58,.08)'; ctx.fillStyle='#857d6c'; ctx.lineWidth=1;
+    for(let p=0;p<=120;p+=20){ ctx.beginPath(); ctx.moveTo(l,Y(p)+.5); ctx.lineTo(W-r,Y(p)+.5); ctx.stroke(); ctx.textAlign='right'; ctx.fillText(p,l-6,Y(p)); }
+    ctx.textAlign='center'; for(let q=0;q<=Qmax;q+=30) ctx.fillText(q,X(q),H-b+12);
+    ctx.strokeStyle='#2e2b3a'; ctx.beginPath(); ctx.moveTo(l,t); ctx.lineTo(l,H-b); ctx.lineTo(W-r,H-b); ctx.stroke();
+    ctx.fillStyle='#5b5868'; ctx.textAlign='left'; ctx.fillText('價格（元）',l+4,t+6); ctx.textAlign='right'; ctx.fillText('購買數量（杯）',W-r,H-b-10);
+    const seg=a=>{ let q0=0,p0=a/M.b; if(p0>Pmax){p0=Pmax;q0=a-M.b*Pmax;} let q1=a,p1=0; if(q1>Qmax){q1=Qmax;p1=(a-Qmax)/M.b;} return [q0,p0,q1,p1]; };
+    const shownA=M.known?M.a:M.aOld;
+    if(M.known&&Math.abs(M.aOld-M.a)>.5){ const [q0,p0,q1,p1]=seg(M.aOld); ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(91,88,104,.5)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(X(q0),Y(p0)); ctx.lineTo(X(q1),Y(p1)); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='#857d6c'; ctx.textAlign='left'; ctx.fillText('昨天',X(q1)-30,Y(p1)-10); }
+    { const [q0,p0,q1,p1]=seg(shownA); ctx.strokeStyle=M.known?'#3c4a6e':'rgba(60,74,110,.45)'; ctx.lineWidth=2.2; if(!M.known) ctx.setLineDash([6,4]); ctx.beginPath(); ctx.moveTo(X(q0),Y(p0)); ctx.lineTo(X(q1),Y(p1)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=M.known?'#3c4a6e':'#857d6c'; ctx.textAlign='left'; ctx.font='600 12px "Noto Sans TC",sans-serif'; ctx.fillText(M.known?'今天的客人':'客人變化不明（情報不足）',Math.min(X(q0)+8,W-r-150),Math.max(Y(p0)+12,t+14)); ctx.font='11px "Noto Sans TC",sans-serif'; }
+    const c=cost(); ctx.setLineDash([3,4]); ctx.strokeStyle='#b4553d'; ctx.lineWidth=1.3; ctx.beginPath(); ctx.moveTo(l,Y(c)); ctx.lineTo(W-r,Y(c)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#b4553d'; ctx.textAlign='right'; ctx.fillText(`每杯成本 ${c.toFixed(1)} 元`,W-r-2,Y(c)-9);
+    const P=M.price, qd=Math.max(0,shownA-M.b*P);
+    ctx.strokeStyle='#b8862f'; ctx.lineWidth=1.3; ctx.setLineDash([2,3]); ctx.beginPath(); ctx.moveTo(l,Y(P)); ctx.lineTo(X(Math.min(qd,Qmax)),Y(P)); ctx.lineTo(X(Math.min(qd,Qmax)),H-b); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#b8862f'; ctx.beginPath(); ctx.arc(X(Math.min(qd,Qmax)),Y(P),5,0,7); ctx.fill();
+    ctx.fillStyle='#2e2b3a'; ctx.textAlign='left'; ctx.fillText(`賣 ${P} 元・約 ${Math.round(qd)} 杯`,X(Math.min(qd,Qmax))+8,Y(P)-10);
+  }
+  function chips(){ const c=cost(); $('#chips').innerHTML=[`第 ${Math.min(d+1,N)} 天／${N}`,`每杯成本 ${c.toFixed(1)} 元`].concat(M.exp?[`匯率 1 美元＝${M.r} 元`]:['尚未外銷']).concat(M.infl>1?['物價上漲中']:[]).map(t=>`<span class="chipv ${t.startsWith('物價')?'alert':(t.startsWith('匯率')?'good':'')}">${t}</span>`).join(''); $('#ptag').textContent='$'+M.price; }
+  function histUI(){ const mx=Math.max(1,...hist.map(Math.abs)); $('#hist').innerHTML=Array.from({length:N},(_,i)=>{ const v=hist[i]; if(v==null) return '<i style="height:1px;opacity:.25"></i>'; return `<i class="${v<0?'neg':''}" style="height:${Math.max(2,Math.abs(v)/mx*100)}%"></i>`; }).join(''); $('#cum').textContent=fmt(total); if(TARGET) $('#gbar').style.width=Math.max(0,Math.min(100,total/TARGET*100))+'%'; }
+  const upd=()=>{ chips(); histUI(); setStats([['天數',`${Math.min(d+1,N)}/${N}`],['累積利潤',fmt(total)],['得分',R.score]]); };
+  const right=$('#eright');
+  function dayStart(){
+    if(d>=N){ R.score=Math.max(0,total)+R.correct*200; const msg=TARGET?(total>=TARGET?`營業 ${N} 天，累積利潤 ${fmt(total)}，達成目標！`:`營業 ${N} 天，累積利潤 ${fmt(total)}，目標是 ${fmt(TARGET)}。`):`錯題重練完成，累積利潤 ${fmt(total)}。`; return finish(R,msg); }
+    const ev=days[d]; if(ev.st>=2&&!M.exp&&ev.id!=='x1'){ M.exp=true; M.share=.3; }
+    M.aOld=M.a; M.known=true; upd(); draw();
+    right.innerHTML=`<div class="qcard" id="qc"><div class="qtop"><span class="kicker">第 ${d+1} 天｜${esc(ev.k)}・${esc(ev.u)}</span><span id="esp"></span></div>
+      <div class="qtext">${esc(ev.t)}</div><p style="margin:6px 0 8px;line-height:1.8;color:var(--ink2);font-size:calc(1rem*var(--fz))">${esc(ev.s)}</p>
+      <div style="font-weight:700;line-height:1.7;font-size:calc(1rem*var(--fz))">${esc(ev.q)}</div></div><div id="hint"></div><div class="opts" id="opts"></div><div id="fbHost"></div>`;
+    const q=mkQ(ev); const sp=speakBtn(()=>ev.s+'。'+ev.q+'。'+q.opts.join('，')); if(sp) $('#esp').appendChild(sp);
+    autoSpeak(ev.t+'。'+ev.s+'。'+ev.q);
+    unbind=renderOpts($('#opts'),q,(first)=>{
+      unbind=null;
+      if(ev.fx){ const f=ev.fx; if(f.a) M.a+=f.a; if(f.c) M.cl+=f.c; if(f.r) M.r=f.r; if(f.infl) M.infl*=f.infl; if(f.exp){ M.exp=true; M.share=.3; } }
+      M.known=!exam||first||!(ev.fx&&ev.fx.a);
+      award(R,first); record('econ',ev.id,ev.u,first); sfx.ok(); stampOn($('#qc'));
+      if(!first) R.wrong.push({q:`${ev.t}｜${ev.q}`,a:ev.c,e:ev.e});
+      $('#hint').innerHTML=''; upd(); draw();
+      let body=exam?(first?'':`正解：${esc(ev.c)}`):esc(ev.e);
+      if(!M.known) body+=`${body?'<br>':''}市場情報不足：圖上看不到今天的客人變化，定價要靠自己判斷。`;
+      fbCancel=feedback($('#fbHost'),{ok:first||!exam,head:first?'判斷正確':'找到正確答案了',body,label:'去定價'},()=>{ fbCancel=null; pricing(); });
+    },{onWrong:()=>hintLine($('#hint'),'再想想，把題目再讀一次，看看關鍵字。')});
+  }
+  function pricing(){
+    const ctl=!exam;
+    right.innerHTML=`<div class="ctrl"><h4>第 ${d+1} 天｜決定售價</h4>
+      <label><span>售價</span><button class="stepbtn" data-s="-5" aria-label="降價5元">－</button><input type="range" id="pr" min="30" max="120" step="5" value="${M.price}" aria-label="售價"><button class="stepbtn" data-s="5" aria-label="漲價5元">＋</button><span class="val" id="prv">${M.price} 元</span></label>
+      ${M.exp?(exam?`<label><span>外銷比例</span><span></span><input type="range" id="sh" min="0" max="60" step="5" value="${Math.round(M.share*100)}" aria-label="外銷比例"><span></span><span class="val" id="shv">${Math.round(M.share*100)}%</span></label>`:`<div class="tipline">${I('globe','16px')}<span>每天約 30% 的珍奶外銷日本，每杯 ${M.pf} 美元，用匯率換成新臺幣。</span></div>`):''}
+      ${ctl?`<div class="est"><div>國內約賣<b id="e1"></b></div><div>${M.exp?'外銷':'銷貨收入'}<b id="e2"></b></div><div>預估利潤<b id="e3"></b></div></div>
+      <div class="tipline">${I('bulb','16px')}<span>價格太高，買的人變少；價格太低，可能低於紅線（每杯成本）。找找看利潤最高的價格。</span></div>`:''}
+      <div class="row" style="margin-top:0"><button class="btn go" id="open">開市營業</button></div></div>`;
+    const pr=$('#pr'), sh=$('#sh');
+    const live=()=>{ M.price=+pr.value; if(sh) M.share=+sh.value/100; $('#prv').textContent=M.price+' 元'; if(sh) $('#shv').textContent=sh.value+'%';
+      if(ctl){ const s=sim(M.price,M.share); $('#e1').textContent=s.dom+' 杯'; $('#e2').textContent=M.exp?s.ex+' 杯':fmt(M.price*s.dom); const e3=$('#e3'); e3.textContent=fmt(s.profit); e3.classList.toggle('neg',s.profit<0); }
+      chips(); draw(); };
+    pr.addEventListener('input',live); if(sh) sh.addEventListener('input',live);
+    right.querySelectorAll('.stepbtn').forEach(b=>b.onclick=()=>{ pr.value=Math.max(30,Math.min(120,+pr.value+ +b.dataset.s)); live(); });
+    live(); $('#open').onclick=settle;
+    autoSpeak('請決定今天的售價，然後按開市營業。');
+  }
+  function settle(){
+    const s=sim(M.price,M.share); total+=s.profit; hist[d]=s.profit; if(s.profit>0) sfx.coin(); else sfx.bad();
+    const msgs=[]; if(s.qd===0) msgs.push('價格太高，沒有客人願意買。'); if(M.price<s.c) msgs.push('售價低於每杯成本，賣越多賠越多。'); if(s.lost>0) msgs.push(`做不夠，有約 ${s.lost} 杯的客人沒買到。`); if(!M.known) msgs.push('今天的客人其實已經變了，答對市場題就能看到變化。');
+    right.innerHTML=`<div class="receipt" id="rc"><h4>第 ${d+1} 天營業結算</h4>
+      <div class="ln"><span>國內賣出 ${s.dom} 杯 × ${M.price} 元</span><span>${fmt(M.price*s.dom)}</span></div>
+      ${M.exp?`<div class="ln"><span>外銷 ${s.ex} 杯 × ${M.pf} 美元 × 匯率 ${M.r}</span><span>${fmt(s.expV)}</span></div>`:''}
+      <div class="ln"><span>銷貨收入</span><span>${fmt(s.rev)}</span></div>
+      <div class="ln"><span>生產成本：原料 ${s.dom+s.ex} 杯 + 攤位地租</span><span>-${fmt(s.tc)}</span></div>
+      <div class="ln tot"><span>利潤＝銷貨收入－生產成本</span><span class="${s.profit<0?'neg':''}">${fmt(s.profit)}</span></div>
+      ${msgs.length?`<div class="msg">${msgs.map(esc).join('<br>')}</div>`:''}</div>
+      <div class="row"><span id="rsp"></span><button class="btn go" id="nx">${d>=N-1?'打烊結算':'下一天'} →</button></div>`;
+    stampOn($('#rc'),s.profit>=0?'賺錢':'虧損');
+    const rtxt=`今天的利潤是${s.profit}元。`+msgs.join(''); const sp=speakBtn(()=>rtxt); if(sp) $('#rsp').appendChild(sp); autoSpeak(rtxt);
+    d++; upd();
+    const nx=$('#nx'); nx.focus({preventScroll:true}); let gone=false;
+    const k=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } };
+    const go=()=>{ if(gone) return; gone=true; clearTimeout(kt); window.removeEventListener('keydown',k); settleCancel=null; dayStart(); };
+    const kt=setTimeout(()=>{ if(!gone) window.addEventListener('keydown',k); },250);
+    settleCancel=()=>{ gone=true; clearTimeout(kt); window.removeEventListener('keydown',k); };
+    nx.onclick=go;
+  }
+  S.cleanup=()=>{ unbind&&unbind(); fbCancel&&fbCancel(); introCancel&&introCancel(); settleCancel&&settleCancel(); ro.disconnect(); };
+  upd();
+  introCancel=intro({icon:'cup',title:'夜市大老闆',defs:[['利潤','銷貨收入－生產成本'],['銷貨收入','價格 × 銷售量'],['價格與數量','價格高，客人少買；價格低，客人多買']],lines:['每天先遇到一個經營事件，回答一個問題。','再用滑桿或「＋」「－」決定售價，左邊的圖會顯示大約能賣幾杯。',`中途會外銷日本，也會遇到通貨膨脹。${TARGET?`目標：累積利潤 ${fmt(TARGET)}。`:''}`, exam?'模擬會考：沒有預估數字；答錯客人變化的題目，圖上就看不到新的變化。':'見習公民：會即時顯示預估利潤。']},()=>{ introCancel=null; dayStart(); });
+}
+
+/* ================= 4. 市政快遞員 ================= */
+function playPol(opts={}){
+  const R=newRec(), exam=isExam(), review=!!opts.review;
+  let items;
+  if(review){ const ids=new Set(getWrong('pol')); items=shuffle(POL.filter(p=>ids.has(p.id))).slice(0,10); if(!items.length){ toast('市政快遞員沒有錯題'); return goHome(); } }
+  else { if(S.book!=='all' && +S.book!==3) toast('市政快遞員是第三冊的內容，已使用第三冊題目'); items=prefer(POL,exam?10:6,'pol'); }
+  const Q=items.map(mkQ), N=Q.length, ORDER_T=10, TRAVEL=exam?4.2:6, L0=3;
+  let lives=L0, qi=0, cur=null, nL=exam?4:3, phase='idle', z=1, lane=0, camL=0, scroll=0, bld=[], shake=0, flash=0, openLane=-1, orderLeft=ORDER_T, raf=0, last=0, fbCancel=null, introCancel=null, judged=false, tries=0;
+  const stage=$('#stage');
+  stage.innerHTML=`<div class="runner groot" id="run"><canvas id="rc"></canvas>
+    <div class="r-top" id="rTop" hidden>${I('parcel')}<span class="kicker" id="rK"></span><span class="grow" id="rQ"></span><span id="rsp"></span></div>
+    <div class="r-order" id="rOrder" hidden></div>
+    <div class="r-lanes" id="rLanes"></div>
+    <button class="btn go gobtn" id="goBtn" hidden>衝！送進這個閘門</button>
+    <div class="r-fb" id="fbHost"></div></div>`;
+  const run=$('#run'), cv=$('#rc'), ctx=cv.getContext('2d'); let W=0,H=0;
+  const resize=()=>{ const dpr=Math.min(2,window.devicePixelRatio||1); W=run.clientWidth; H=run.clientHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); };
+  resize(); const ro=new ResizeObserver(resize); ro.observe(run);
+  for(let i=0;i<10;i++) bld.push({side:i%2?1:-1,z:i/10,h:1+Math.random()*2.2,w:.9+Math.random()*.6});
+  const sp=speakBtn(()=>cur?cur.q:''); if(sp) $('#rsp').appendChild(sp);
+  const upd=()=>setStats([['訂單',`${Math.min(qi+1,N)}/${N}`]].concat(exam?[['生命',lives]]:[]).concat([['連續送達',R.combo],['得分',R.score]]));
+  const Pz=z=>1/(1+Math.max(-.12,z)*7), hy=()=>H*.3, Yz=z=>hy()+(H*1.04-hy())*Pz(z), laneW=z=>W*(nL===3?.48:.36)*Pz(z), Xz=(z,L)=>W/2+(L-camL)*laneW(z);
+  const Lpos=i=>i-(nL-1)/2;
+  function laneUI(){ const el=$('#rLanes'); el.style.setProperty('--n',nL); el.innerHTML=cur?cur.opts.map((o,i)=>`<button class="lane ${i===lane?'on':''}" data-i="${i}"><span class="k">${i+1} 號道</span>${esc(o)}</button>`).join(''):''; }
+  function setLane(i){ if(phase==='crash'||phase==='pass'||phase==='wait') return; const b=document.querySelectorAll('#rLanes .lane')[Math.max(0,Math.min(nL-1,i))]; lane=Math.max(0,Math.min(nL-1,i)); document.querySelectorAll('#rLanes .lane').forEach((x,j)=>x.classList.toggle('on',j===lane)); if(b&&!isExam()) autoSpeak(cur.opts[lane]); }
+  $('#rLanes').addEventListener('click',e=>{ const b=e.target.closest('.lane'); if(b) setLane(+b.dataset.i); });
+  let px0=null;
+  cv.addEventListener('pointerdown',e=>{ px0=e.clientX; });
+  cv.addEventListener('pointerup',e=>{ if(px0==null) return; const dx=e.clientX-px0; px0=null; if(Math.abs(dx)>30) setLane(lane+(dx>0?1:-1)); else { const r=cv.getBoundingClientRect(); setLane(lane+((e.clientX-r.left)<W/2?-1:1)); } });
+  const key=e=>{ if(['ArrowLeft','a','A'].includes(e.key)){ e.preventDefault(); setLane(lane-1); } else if(['ArrowRight','d','D'].includes(e.key)){ e.preventDefault(); setLane(lane+1); } else { const n=parseInt(e.key); if(n>=1&&n<=nL) setLane(n-1); else if(e.key==='Enter'){ if(phase==='order'){ e.preventDefault(); depart(); } else if(phase==='hold'){ e.preventDefault(); goNow(); } } } };
+  window.addEventListener('keydown',key);
+  $('#goBtn').onclick=()=>goNow();
+  function nextOrder(){
+    if(qi>=N||(exam&&lives<=0)){ phase='idle'; return finish(R,(exam&&lives<=0)?`機車拋錨了，共送達 ${R.correct} 件。`:`完成 ${N} 件訂單。`); }
+    cur=Q[qi]; nL=cur.opts.length; z=1.02; openLane=-1; judged=false; tries=0; phase='order'; orderLeft=ORDER_T; lane=Math.floor((nL-1)/2); camL=Lpos(lane);
+    $('#rTop').hidden=false; $('#rK').textContent=`訂單 ${qi+1}`; $('#rQ').textContent=cur.q; $('#goBtn').hidden=true;
+    laneUI(); upd();
+    const ord=$('#rOrder'); ord.hidden=false;
+    ord.innerHTML=`<div class="panel" style="--c:var(--c-pol)"><div class="kicker">第 ${qi+1} 件訂單｜八上・${esc(cur.u)}</div><div class="big">${esc(cur.dest?cur.q:'哪個機關負責：'+cur.q)}</div>${exam?'<div class="cd"><i id="cdBar"></i></div>':''}
+      <div class="row" style="justify-content:center;margin-top:0"><span id="osp"></span><button class="btn go" id="dep">我讀完了，出發</button></div>
+      <p class="kicker" style="margin:10px 0 0">${exam?'10 秒後自動出發。':'不限時間，讀完再出發。'}用左右鍵、滑動或點下方車道切換，選對閘門。</p></div>`;
+    const s2=speakBtn(()=>cur.q); if(s2) $('#osp').appendChild(s2);
+    $('#dep').onclick=depart; autoSpeak((cur.dest?'':'哪個機關負責：')+cur.q);
+  }
+  function depart(){ if(phase!=='order') return; $('#rOrder').hidden=true; phase='run'; sfx.whoosh(); }
+  function goNow(){ if(phase!=='hold') return; $('#goBtn').hidden=true; phase='run'; sfx.whoosh(); }
+  function judge(){
+    judged=true; const ok=lane===cur.ans; const laneEls=document.querySelectorAll('#rLanes .lane');
+    if(!ok && !exam){
+      tries++; sfx.bad(); shake=.3; flash=.6; laneEls[lane].classList.add('wrong');
+      const fb=$('#fbHost'); hintLine(fb, tries===1?`「${cur.opts[lane]}」不對喔。閘門沒有打開，換一條車道再試一次。`:`提示：答案是「${cur.c}」，請換到那一條車道。`);
+      z=.36; judged=false; phase='hold'; $('#goBtn').hidden=false; return;
+    }
+    $('#fbHost').innerHTML='';
+    const first=ok&&tries===0;
+    award(R,first); record('pol',cur.id,cur.u,first);
+    if(!first) R.wrong.push({q:(cur.dest?'':'哪個機關負責：')+cur.q,a:cur.c,e:cur.e});
+    laneEls.forEach((b,j)=>{ if(j===cur.ans) b.classList.add('right'); });
+    if(ok){ sfx.ok(); openLane=lane; phase='pass'; } else { lives--; sfx.bad(); shake=.5; flash=1; phase='crash'; laneEls[lane].classList.add('wrong'); }
+    upd();
+    const body=exam?(ok?'':`正確閘門：${esc(cur.c)}`):esc(cur.e);
+    setTimeout(()=>{ phase='wait'; fbCancel=feedback($('#fbHost'),{ok:ok,head:ok?`送達「${cur.c}」`:'撞上閘門，包裹退回',body,label:(qi>=N-1||(exam&&lives<=0))?'看結算':'下一件'},()=>{ fbCancel=null; qi++; nextOrder(); }); }, ok?650:450);
+  }
+  function wrap(text,maxW){ const out=[]; let line=''; for(const ch of text){ const t=line+ch; if(ctx.measureText(t).width>maxW&&line){ out.push(line); line=ch; } else line=t; } if(line) out.push(line); return out.slice(0,3); }
+  function loop(t){
+    const dt=Math.min(.05,(t-last)/1000||0); last=t; const runSpeed=1/TRAVEL;
+    let v=(phase==='run'||phase==='pass')?runSpeed:(phase==='crash'||phase==='wait'||phase==='hold')?0:.12;
+    if(phase==='wait'&&openLane>=0) v=.12;
+    scroll+=v*dt;
+    if(phase==='order'&&exam){ orderLeft-=dt; const b=$('#cdBar'); if(b) b.style.transform=`scaleX(${Math.max(0,orderLeft/ORDER_T)})`; if(orderLeft<=0) depart(); }
+    if(phase==='run'){ z-=dt*runSpeed; if(!exam && tries===0 && z<=.36 && !judged && phase==='run' && !run._held){ run._held=true; phase='hold'; $('#goBtn').hidden=false; hintLine($('#fbHost'),'閘門到了！選好車道後，按「衝！」送出。'); } else if(z<=.12&&!judged) judge(); }
+    if(phase==='pass'||(phase==='wait'&&openLane>=0)) z-=dt*runSpeed;
+    for(const b of bld){ b.z-=v*dt; if(b.z<-.1){ b.z+=1.1; b.h=1+Math.random()*2.2; b.w=.9+Math.random()*.6; } }
+    camL+=(Lpos(lane)-camL)*Math.min(1,dt*9);
+    if(shake>0) shake-=dt; if(flash>0) flash-=dt*2;
+    render(t); raf=requestAnimationFrame(loop);
+  }
+  function render(t){
+    if(!W||!H) return;
+    ctx.save(); if(shake>0) ctx.translate((Math.random()-.5)*12*shake,(Math.random()-.5)*8*shake);
+    ctx.fillStyle='#f3eee3'; ctx.fillRect(-20,-20,W+40,H+40);
+    const h0=hy(); ctx.strokeStyle='rgba(46,43,58,.18)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(0,h0);
+    for(let x=0;x<=W;x+=W/24){ const hh=8+((x*13)%23); ctx.lineTo(x,h0-hh); ctx.lineTo(x+W/48,h0-hh); } ctx.lineTo(W,h0); ctx.stroke();
+    const z0=-.1,z1=1.2,E=nL/2;
+    ctx.fillStyle='#e9e2d2'; ctx.beginPath(); ctx.moveTo(Xz(z0,-E),Yz(z0)); ctx.lineTo(Xz(z0,E),Yz(z0)); ctx.lineTo(Xz(z1,E),Yz(z1)); ctx.lineTo(Xz(z1,-E),Yz(z1)); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle='#2e2b3a'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(Xz(z0,-E),Yz(z0)); ctx.lineTo(Xz(z1,-E),Yz(z1)); ctx.moveTo(Xz(z0,E),Yz(z0)); ctx.lineTo(Xz(z1,E),Yz(z1)); ctx.stroke();
+    const Lc=Lpos(lane); ctx.fillStyle='rgba(95,127,111,.13)'; ctx.beginPath(); ctx.moveTo(Xz(z0,Lc-.5),Yz(z0)); ctx.lineTo(Xz(z0,Lc+.5),Yz(z0)); ctx.lineTo(Xz(z1,Lc+.5),Yz(z1)); ctx.lineTo(Xz(z1,Lc-.5),Yz(z1)); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle='rgba(46,43,58,.45)'; ctx.lineWidth=1.4; const spc=.1, off=scroll%spc;
+    for(let j=1;j<nL;j++){ const L=-E+j; for(let k=0;k<14;k++){ const za=k*spc-off, zb=za+spc*.45; if(zb<z0||za>z1) continue; ctx.beginPath(); ctx.moveTo(Xz(Math.max(za,z0),L),Yz(Math.max(za,z0))); ctx.lineTo(Xz(Math.min(zb,z1),L),Yz(Math.min(zb,z1))); ctx.stroke(); } }
+    for(const b of [...bld].sort((a,c)=>c.z-a.z)){ if(b.z<-.1||b.z>1.15) continue; const L=b.side*(E+.6+b.w/2); const xl=Xz(b.z,L-b.w/2), xr=Xz(b.z,L+b.w/2), yb=Yz(b.z), ht=b.h*laneW(b.z);
+      ctx.fillStyle='#fbf8f1'; ctx.strokeStyle='rgba(46,43,58,.55)'; ctx.lineWidth=1; ctx.fillRect(xl,yb-ht,xr-xl,ht); ctx.strokeRect(xl,yb-ht,xr-xl,ht);
+      ctx.strokeStyle='rgba(46,43,58,.22)'; const rows=Math.max(1,Math.floor(b.h*2)); for(let r=1;r<rows;r++){ const yy=yb-ht*r/rows; ctx.beginPath(); ctx.moveTo(xl+3,yy); ctx.lineTo(xr-3,yy); ctx.stroke(); } }
+    if(cur&&z>-.1&&z<1.1&&phase!=='idle'){
+      const lw=laneW(z), yb=Yz(z), gh=lw*.95, pz=Pz(z);
+      ctx.strokeStyle='#2e2b3a'; ctx.lineWidth=Math.max(1,2.2*pz);
+      ctx.beginPath(); ctx.moveTo(Xz(z,-E),yb-gh-4*pz); ctx.lineTo(Xz(z,E),yb-gh-4*pz); ctx.stroke();
+      const fs=Math.max(8,Math.min(26,lw*.14)); ctx.font=`600 ${fs}px "Noto Serif TC",serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      for(let i=0;i<nL;i++){
+        const cx=Xz(z,Lpos(i)), w=lw*.88, x0=cx-w/2;
+        ctx.beginPath(); ctx.moveTo(cx-lw/2,yb); ctx.lineTo(cx-lw/2,yb-gh-4*pz); ctx.stroke();
+        const lift=i===openLane?gh*.85:0;
+        const isRight=(phase==='crash'||phase==='wait')&&i===cur.ans;
+        ctx.fillStyle=isRight?'#e6eee8':((phase==='crash'||phase==='hold')&&i===lane&&judged===false&&tries>0&&i!==cur.ans?'#f5e4de':'#fffdf8');
+        ctx.fillRect(x0,yb-gh-lift,w,gh*.72); ctx.strokeRect(x0,yb-gh-lift,w,gh*.72);
+        ctx.fillStyle='#2e2b3a'; const lines=wrap(cur.opts[i]||'',w*.86), lh=fs*1.25, cy=yb-gh-lift+gh*.36;
+        lines.forEach((ln,j)=>ctx.fillText(ln,cx,cy+(j-(lines.length-1)/2)*lh));
+      }
+      const xe=Xz(z,E); ctx.beginPath(); ctx.moveTo(xe,yb); ctx.lineTo(xe,yb-gh-4*pz); ctx.stroke();
+    }
+    const bob=(phase==='run'||phase==='pass')?Math.sin(t/90)*2:0, cx=W/2, by=H-96+bob, hw=Math.min(W*.2,190);
+    ctx.strokeStyle='#2e2b3a'; ctx.lineWidth=5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(cx-hw,by+10); ctx.quadraticCurveTo(cx,by-14,cx+hw,by+10); ctx.stroke();
+    ctx.lineWidth=11; ctx.beginPath(); ctx.moveTo(cx-hw,by+10); ctx.lineTo(cx-hw-14,by+16); ctx.moveTo(cx+hw,by+10); ctx.lineTo(cx+hw+14,by+16); ctx.stroke();
+    ctx.lineWidth=2; ctx.fillStyle='#fbf8f1'; ctx.beginPath(); ctx.arc(cx,by-2,17,0,7); ctx.fill(); ctx.stroke();
+    const spd=(phase==='run'||phase==='pass')?1:.25; ctx.beginPath(); ctx.moveTo(cx,by-2); ctx.lineTo(cx+Math.cos(Math.PI*(1.1+spd*.7))*12,by-2+Math.sin(Math.PI*(1.1+spd*.7))*12); ctx.stroke(); ctx.lineCap='butt';
+    if(flash>0){ ctx.fillStyle=`rgba(180,85,61,${.25*flash})`; ctx.fillRect(-20,-20,W+40,H+40); }
+    ctx.restore();
+  }
+  const origNext=nextOrder; nextOrder=function(){ run._held=false; origNext(); };
+  S.cleanup=()=>{ cancelAnimationFrame(raf); ro.disconnect(); window.removeEventListener('keydown',key); fbCancel&&fbCancel(); introCancel&&introCancel(); };
+  upd(); last=performance.now(); raf=requestAnimationFrame(loop);
+  introCancel=intro({icon:'road',title:'市政快遞員',lines:['先讀訂單，讀完按「出發」。', `前方會出現 ${exam?4:3} 道閘門，用左右鍵、數字鍵、滑動或點下方車道選擇。`, exam?'車子會自己往前衝；選錯會撞上閘門，扣一條命（共 3 條）。':'閘門前會停下來等你，選好再按「衝！」。選錯不會扣命，換一條車道再試。']},()=>{ introCancel=null; nextOrder(); });
+}
+
+/* ================= 5. 程序接力賽 ================= */
+function playSeq(opts={}){
+  const R=newRec(), exam=isExam(), review=!!opts.review;
+  let list;
+  if(review){ const ids=new Set(getWrong('seq')); list=shuffle(SEQ.filter(s=>ids.has(s.id))).slice(0,6); if(!list.length){ toast('程序接力賽沒有錯題'); return goHome(); } }
+  else list=prefer(byBook(SEQ,'seq',2),exam?5:4,'seq');
+  const LIMIT=60;
+  let si=0, cur=null, placed=[], pool=[], mist=0, busy=false, timerRaf=0, tStart=0, fbCancel=null, introCancel=null;
+  const stage=$('#stage');
+  stage.innerHTML=`<div class="seq groot">
+    <div class="seq-q" id="sq"></div>
+    <div class="slots" id="slots"></div>
+    <div id="hintHost"></div>
+    <div class="seqfoot"><div class="pool" id="pool"></div><div class="row" style="justify-content:center" id="sfoot"></div><div class="ctimer" id="ctm" style="width:100%" ${exam?'':'hidden'}><i id="ctmBar"></i></div><div id="fbHost"></div></div></div>`;
+  const upd=()=>setStats([['題目',`${Math.min(si+1,list.length)}/${list.length}`],['連續全對',R.combo],['得分',R.score]]);
+  function show(){
+    if(si>=list.length) return finish(R,`排好 ${list.length} 個流程。`);
+    cur=list[si]; mist=0; busy=false;
+    const n=cur.steps.length; placed=Array(n).fill(null);
+    const preset=!exam && n>=4; if(preset) placed[0]=0;
+    pool=shuffle(cur.steps.map((_,i)=>i).filter(i=>!(preset&&i===0)));
+    $('#sq').innerHTML=`${I(cur.ic)}<div class="qt"><div class="kicker">${BOOK_SEM[cur.b]}・${esc(cur.u)}｜${esc(cur.t)}</div>${esc(cur.q)}</div><span id="qsp"></span>`;
+    const sp=speakBtn(()=>cur.q+'。'+pool.map(i=>cur.steps[i]).join('。')); if(sp) $('#qsp').appendChild(sp);
+    $('#hintHost').innerHTML=''; $('#fbHost').innerHTML='';
+    $('#sfoot').innerHTML=exam?'<button class="btn go" id="check" disabled>完成，檢查順序</button>':'';
+    if(exam){ $('#check').onclick=check; tStart=performance.now(); cancelAnimationFrame(timerRaf); const bar=$('#ctmBar'); const tick=t=>{ if(busy) return; const p=Math.min(1,(t-tStart)/(LIMIT*1000)); bar.style.transform=`scaleX(${1-p})`; if(p>=1){ check(); return; } timerRaf=requestAnimationFrame(tick); }; timerRaf=requestAnimationFrame(tick); }
+    render(); upd();
+    autoSpeak(cur.q+(preset?'第一步已經幫你放好了，請找出第二步。':'請找出第一步。'));
+  }
+  function render(){
+    const n=cur.steps.length;
+    $('#slots').innerHTML=placed.map((p,i)=>`<div class="slot ${p!=null?'filled':''} ${(!exam&&p!=null)?'fixed':''}" data-i="${i}"><span class="no">第 ${i+1} 步</span><span class="tx">${p!=null?esc(cur.steps[p]):''}</span>${i<n-1?'<span class="arrow">→</span>':''}</div>`).join('');
+    $('#pool').innerHTML=pool.map(i=>`<button class="pcard" data-s="${i}">${esc(cur.steps[i])}</button>`).join('');
+    if(exam) $('#check').disabled=placed.some(p=>p==null);
+  }
+  $('#pool').addEventListener('click',e=>{
+    const b=e.target.closest('.pcard'); if(!b||busy) return; const s=+b.dataset.s; const slot=placed.indexOf(null); if(slot<0) return;
+    if(!exam && s!==slot){
+      mist++; sfx.bad(); b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong');
+      hintLine($('#hintHost'), mist<3?`「${cur.steps[s]}」不是第 ${slot+1} 步，想想看在它之前要先發生什麼？`:`提示：第 ${slot+1} 步是「${cur.steps[slot]}」。`);
+      return;
+    }
+    placed[slot]=s; pool=pool.filter(x=>x!==s); sfx.whoosh(); $('#hintHost').innerHTML=''; render();
+    if(!exam){ autoSpeak(`第${slot+1}步，${cur.steps[s]}`); if(placed.every(p=>p!=null)) done(mist===0); }
+  });
+  $('#slots').addEventListener('click',e=>{ if(!exam||busy) return; const sl=e.target.closest('.slot.filled'); if(!sl) return; const i=+sl.dataset.i; pool.push(placed[i]); placed[i]=null; render(); });
+  function check(){
+    if(busy) return; busy=true; cancelAnimationFrame(timerRaf);
+    const ok=placed.every((p,i)=>p===i);
+    [...$('#slots').children].forEach((el,i)=>{ el.classList.add(placed[i]===i?'ok':'bad'); });
+    $('#check').disabled=true; done(ok);
+  }
+  function done(ok){
+    busy=true; award(R,ok,120); if(exam&&ok) R.score+=Math.max(0,Math.round((LIMIT*1000-(performance.now()-tStart))/200));
+    record('seq',cur.id,cur.u,ok); if(!ok) R.wrong.push({q:`排出「${cur.t}」的順序`,a:cur.steps.join(' → '),e:cur.e});
+    if(ok||!exam) sfx.ok(); upd();
+    const body=exam&&!ok?`正確順序：${esc(cur.steps.join(' → '))}`:esc(cur.e);
+    fbCancel=feedback($('#fbHost'),{ok:ok||!exam,head:ok?'順序全對':(exam?'順序有誤':'全部排好了'),body,label:si>=list.length-1?'看結算':'下一題'},()=>{ fbCancel=null; si++; show(); });
+  }
+  S.cleanup=()=>{ busy=true; cancelAnimationFrame(timerRaf); fbCancel&&fbCancel(); introCancel&&introCancel(); };
+  upd();
+  introCancel=intro({icon:'steps',title:'程序接力賽',lines:['把打散的步驟卡，依照正確順序放到上方的格子。', exam?`每題限時 ${LIMIT} 秒。放錯的卡片可以點格子拿回來，全部放好後按「完成」。`:'依序點選下一步的卡片。點錯了不會放進去，還會給你提示。四步以上的流程，第一步已經幫你放好。']},()=>{ introCancel=null; show(); });
+}
+
+/* ================= 6. 公民數字尺 ================= */
+function playRuler(opts={}){
+  const R=newRec(), exam=isExam(), review=!!opts.review;
+  let list;
+  if(review){ const ids=new Set(getWrong('ruler')); list=shuffle(RULER.filter(r=>ids.has(r.id))).slice(0,10); if(!list.length){ toast('公民數字尺沒有錯題'); return goHome(); } }
+  else list=prefer(byBook(RULER,'ruler',3),exam?10:7,'ruler');
+  let qi=0, cur=null, tries=0, busy=false, fbCancel=null, introCancel=null, val=0, unbind=null;
+  const stage=$('#stage');
+  stage.innerHTML=`<div class="ruler groot">
+    <div class="rq" id="rq"><div class="qtop"><span class="kicker" id="rk"></span><span id="rsp"></span></div><div class="qtext" id="rqt"></div></div>
+    <div class="rbox"><div class="rbar" id="rbar"></div></div>
+    <div id="hintHost"></div>
+    <div><div class="rctrl" id="rctrl"></div><div id="fbHost" style="margin-top:10px"></div></div></div>`;
+  const sp=speakBtn(()=>cur?cur.q:''); if(sp) $('#rsp').appendChild(sp);
+  const upd=()=>setStats([['題目',`${Math.min(qi+1,list.length)}/${list.length}`],['連續答對',R.combo],['得分',R.score]]);
+  const range=it=>it.ty==='cls'?[0,90]:[it.min,it.max];
+  const pct=(v,it)=>{ const [a,b]=range(it); return Math.max(0,Math.min(100,(v-a)/(b-a)*100)); };
+  function drawRuler(it, markV, showZones){
+    const [a,b]=range(it); const span=b-a; const stepMaj=span<=12?1:span<=30?5:span<=60?10:10; const stepMin=span<=12?0:span<=30?1:5;
+    let h='<div class="rline"></div>';
+    if(stepMin) for(let v=Math.ceil(a/stepMin)*stepMin; v<=b; v+=stepMin){ if(v%stepMaj!==0) h+=`<i class="tick m" style="left:${pct(v,it)}%"></i>`; }
+    for(let v=Math.ceil(a/stepMaj)*stepMaj; v<=b; v+=stepMaj){ h+=`<i class="tick" style="left:${pct(v,it)}%"></i><span class="tlab" style="left:${pct(v,it)}%">${v}</span>`; }
+    if(showZones && it.z && ZONES[it.z]) ZONES[it.z].forEach(([x,y,lab,col])=>{ const l=pct(Math.max(x,a),it), r=pct(Math.min(y,b),it); if(r>l) h+=`<span class="zone" style="left:${l}%;width:${r-l}%;background:${col}" title="${lab}">${lab}</span>`; });
+    if(markV!=null) h+=`<span class="marker" id="mk" style="left:${pct(markV,it)}%">${I('person')}<b>${markV}${esc(it.unit||'歲')}</b></span>`;
+    $('#rbar').innerHTML=h;
+  }
+  function moveMarker(v){ const mk=$('#mk'); if(!mk){ drawRuler(cur,v,false); return; } mk.style.left=pct(v,cur)+'%'; mk.querySelector('b').textContent=v+(cur.unit||'歲'); }
+  function show(){
+    if(qi>=list.length) return finish(R,`完成 ${list.length} 題數字挑戰。`);
+    cur=list[qi]; tries=0; busy=false; $('#hintHost').innerHTML=''; $('#fbHost').innerHTML='';
+    $('#rq').querySelectorAll(':scope > .stamp').forEach(s=>s.remove());
+    $('#rk').textContent=`第 ${qi+1} 題｜${BOOK_SEM[cur.b]}・${cur.u}`; $('#rqt').textContent=cur.q;
+    const ctrl=$('#rctrl');
+    if(cur.ty==='cls'){
+      drawRuler(cur,cur.age,false);
+      const q=mkQ(cur); ctrl.innerHTML='<div class="opts" id="opts" style="width:100%"></div>';
+      unbind=renderOpts($('#opts'),q,(first)=>{ unbind=null; drawRuler(cur,cur.age,true); result(first); },{onWrong:()=>hintLine($('#hintHost'),'再想想：看看這個年齡在哪一段。')});
+      autoSpeak(cur.q+'。'+q.opts.join('，'));
+    } else if(!exam){
+      const mid=Math.round((cur.min+cur.max)/2); drawRuler(cur,null,false);
+      ctrl.innerHTML=shuffle(cur.ch).map(v=>`<button class="bigchip" data-v="${v}">${v} ${esc(cur.unit)}</button>`).join('');
+      ctrl.onclick=e=>{ const b=e.target.closest('.bigchip'); if(!b||busy||b.disabled) return; const v=+b.dataset.v; moveMarker(v);
+        if(v===cur.ans){ busy=true; b.classList.add('right'); ctrl.querySelectorAll('.bigchip').forEach(x=>x.disabled=true); drawRuler(cur,v,true); result(tries===0); }
+        else { tries++; sfx.bad(); b.classList.add('wrong'); b.disabled=true; hintLine($('#hintHost'), tries===1?`${v} ${cur.unit}不對，再看看另一個數字。`:`提示：答案是 ${cur.ans} ${cur.unit}。`); } };
+      autoSpeak(cur.q+'。選項有：'+cur.ch.join(cur.unit+'、')+cur.unit);
+    } else {
+      val=Math.round((cur.min+cur.max)/2); drawRuler(cur,val,false);
+      ctrl.innerHTML=`<div class="rslider"><button class="stepbtn" id="mn" aria-label="減一">－</button><input type="range" id="rs" min="${cur.min}" max="${cur.max}" step="1" value="${val}" aria-label="數值"><button class="stepbtn" id="pl" aria-label="加一">＋</button><span class="rnum" id="rn">${val} ${esc(cur.unit)}</span></div><button class="btn go" id="ok">確定</button>`;
+      const rs=$('#rs'); const set=v=>{ val=Math.max(cur.min,Math.min(cur.max,v)); rs.value=val; $('#rn').textContent=`${val} ${cur.unit}`; moveMarker(val); };
+      rs.addEventListener('input',()=>set(+rs.value)); $('#mn').onclick=()=>set(val-1); $('#pl').onclick=()=>set(val+1);
+      $('#ok').onclick=()=>{ if(busy) return; busy=true; const ok=val===cur.ans; rs.disabled=true; $('#ok').disabled=true; drawRuler(cur,val,true); if(!ok){ const mk=document.createElement('span'); mk.className='marker'; mk.style.left=pct(cur.ans,cur)+'%'; mk.style.color='var(--sage)'; mk.innerHTML=`${I('check')}<b>正解 ${cur.ans}</b>`; $('#rbar').appendChild(mk); } result(ok); };
+    }
+    upd();
+  }
+  function result(first){
+    award(R,first); record('ruler',cur.id,cur.u,first);
+    if(!first) R.wrong.push({q:cur.q,a:cur.ty==='cls'?cur.c:`${cur.ans} ${cur.unit}`,e:cur.e});
+    if(first||!exam){ sfx.ok(); stampOn($('#rq')); } else sfx.bad();
+    upd(); $('#hintHost').innerHTML='';
+    const ans=cur.ty==='cls'?cur.c:`${cur.ans} ${cur.unit}`;
+    const body=exam?(first?'':`正解：${esc(ans)}`):esc(cur.e);
+    fbCancel=feedback($('#fbHost'),{ok:first||!exam,head:first?`答對了：${ans}`:(exam?'差一點':`答案是：${ans}`),body,label:qi>=list.length-1?'看結算':'下一題'},()=>{ fbCancel=null; qi++; show(); });
+  }
+  S.cleanup=()=>{ busy=true; unbind&&unbind(); fbCancel&&fbCancel(); introCancel&&introCancel(); };
+  upd();
+  introCancel=intro({icon:'ruler',title:'公民數字尺',lines:['課本裡有很多重要的年齡和期限，例如成年、投票、童工、猶豫期。', exam?'拖動滑桿或按「＋」「－」，把人物移到正確數字，再按「確定」。數字要完全正確才算對。':'從下面三個數字中選一個，人物會走到那個位置。答錯可以再選。','答完後，尺上會出現年齡分段，幫你記住分界。']},()=>{ introCancel=null; show(); });
+}
+
+/* init */
+updSoundBtn(); renderHome();
+</script>
+
+</body></html>

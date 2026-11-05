@@ -284,3 +284,36 @@ test('Claude 金鑰：無效金鑰會被擋下；匯入遇到金鑰錯誤會暫�
     cleanup();
   }
 });
+
+test('免金鑰：貼上題目文字 → 離線拆題（含題號前答案、卷末答案、數學式轉 KaTeX）；手動新增空白題目', async () => {
+  const { cfg, cleanup } = makeTempBank();
+  const app = await start(cfg);
+  try {
+    const text = '( B )1. 下列何者等於 √9？ (A) 2 (B) 3 (C) 4 (D) 9\n2．x²＝4，x＝？（Ａ）±2（Ｂ）2（Ｃ）4（Ｄ）16\n3. 填充：1+1=__\n參考答案\n2.A';
+    const up = await app.call('/api/admin/import/text', { method: 'POST', body: { 文字: text, 科目: '數學', 版本: '南一', 年級: '國二' } });
+    assert.strictEqual(up.status, 200, up.text);
+    assert.match(up.body.檔案, /^數學\/南一\/國二\/貼上的題目-\d+\.txt$/);
+    await app.call('/api/admin/import/run', { method: 'POST', body: { 檔案: [up.body.檔案], 離線: true } });
+    let job;
+    for (let i = 0; i < 50; i++) {
+      job = (await app.call('/api/admin/import/job')).body.工作;
+      if (job.狀態 === '完成') break;
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    assert.strictEqual(job.結果[0].題數, 2, JSON.stringify(job));
+    const drafts = (await app.call('/api/admin/drafts')).body.草稿.map((d) => d.題目).sort((a, b) => a.原題號 - b.原題號);
+    assert.strictEqual(drafts[0].題幹, '下列何者等於 $\\sqrt{9}$？');
+    assert.strictEqual(drafts[0].答案, 1);
+    assert.strictEqual(drafts[1].答案, 0);
+    assert.strictEqual(drafts[1].科目代碼, 'M');
+    assert.match(drafts[1].id, /^M-N2-\d{4}$/);
+
+    const n = await app.call('/api/admin/drafts-new', { method: 'POST', body: {} });
+    assert.strictEqual(n.status, 200);
+    assert.strictEqual(n.body.題目.選項.length, 4);
+    assert.strictEqual((await app.call('/api/admin/drafts')).body.草稿.length, 3);
+  } finally {
+    app.close();
+    cleanup();
+  }
+});

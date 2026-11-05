@@ -1,0 +1,1704 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#fffaf6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>奶油養成日記：小守宮的大冒險</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fffaf6; --line:#f1e5de; --text:#5d4037; --soft:#a1887f;
+  --accent:#f0839f; --accent-d:#d9677f; --accent-l:#ffe8ee;
+  --hunger:#ffb27a; --health:#7fd1ae; --mood:#f591ab; --growth:#b39cf2;
+  --yoga:#ffd6df; --read:#e2d8ff; --type:#d3ecfb;
+  --dk:clamp(46px, 8.2dvh, 64px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body.lock{overflow:hidden}
+body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;color:var(--text);
+  background:#f3ebe5;-webkit-user-select:none;user-select:none;font-size:16px;-webkit-text-size-adjust:100%}
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation;padding:0}
+input{font-family:inherit}
+
+#app{position:relative;width:100%;max-width:560px;margin:0 auto;min-height:100vh;min-height:100svh;background:var(--bg);
+  display:flex;flex-direction:column;overflow-x:hidden;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+@media (min-width:600px){#app{box-shadow:0 0 0 1px var(--line),0 24px 60px rgba(120,80,60,.12)}}
+
+/* ---------- top ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;
+  padding:10px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left));padding-top:max(10px,env(safe-area-inset-top))}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--accent-l);display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden}
+.avatar svg{width:40px;height:40px}
+.who b{font-size:19px;display:block;line-height:1.2}
+.who small{color:var(--soft);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.coin{display:flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--line);border-radius:999px;
+  padding:5px 13px 5px 9px;font-weight:900;font-size:17px;flex:none}
+.coin.pop{animation:pop .4s}
+
+/* ---------- stage (side-view tank) ---------- */
+.stage{position:relative;isolation:isolate;z-index:0;flex:none;height:clamp(200px,calc(100vh - 380px),560px);height:clamp(200px,calc(100svh - 380px),560px);margin:0 max(12px,env(safe-area-inset-left)) 0 max(12px,env(safe-area-inset-right));
+  border-radius:22px;overflow:hidden;border:3px solid #fff;
+  background:linear-gradient(180deg,#fdf8f3 0%,#f8eee6 46%,#f1e2d6 52%);
+  box-shadow:0 3px 0 #eadcd3,0 10px 24px rgba(140,100,70,.12)}
+#floorCv{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.lay{position:absolute;left:0;top:0;pointer-events:none}
+.lay svg{width:100%;height:100%;display:block;overflow:visible}
+.dish.fill .water{animation:shimmer .45s 4 alternate}
+#gk{position:absolute;left:0;top:0;will-change:transform;pointer-events:none}
+#skin{position:absolute;left:0;top:0;opacity:0;transition:opacity .9s;pointer-events:none}
+#skin svg{width:100%;height:auto;display:block}
+.glass{position:absolute;inset:0;z-index:800;pointer-events:none;
+  background:linear-gradient(112deg,transparent 0 16%,rgba(255,255,255,.38) 17% 19%,transparent 20% 24%,rgba(255,255,255,.22) 25% 26%,transparent 27%)}
+.status{position:absolute;left:10px;top:9px;z-index:900;background:rgba(255,255,255,.88);border-radius:999px;
+  padding:3px 11px;font-size:13px;font-weight:700;box-shadow:0 2px 6px rgba(120,80,60,.08);pointer-events:none}
+.bubble{position:absolute;left:50%;top:40px;transform:translateX(-50%);background:#fff;border-radius:16px;
+  padding:7px 14px;font-weight:700;font-size:15px;box-shadow:0 3px 10px rgba(120,80,60,.14);max-width:86%;width:max-content;
+  text-align:center;transition:opacity .3s;z-index:900;pointer-events:none;line-height:1.45}
+.fx{position:absolute;z-index:950;pointer-events:none;font-size:22px;animation:floatUp 1.4s forwards;margin:-12px 0 0 -12px}
+.flake{position:absolute;z-index:950;width:9px;height:6px;background:rgba(255,255,255,.95);border-radius:40% 60% 50% 40%;
+  box-shadow:0 0 0 1px rgba(190,180,170,.5);animation:flake 1.4s forwards;pointer-events:none}
+
+.who{cursor:pointer}
+.avwrap{position:relative;flex:none}
+.swapb{position:absolute;right:-4px;bottom:-3px;width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid var(--line);
+  font-size:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(120,80,60,.15)}
+.petgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:340px){.petgrid{grid-template-columns:1fr}}
+.petcard{background:#fff;border:2.5px solid var(--line);border-radius:20px;padding:10px 10px 14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:0 4px 0 #efe2da}
+.petcard.sel{border-color:var(--accent);background:#fff6f8}
+.petcard:active{transform:translateY(3px);box-shadow:0 1px 0 #efe2da}
+.petcard .pc-img{width:100%;background:radial-gradient(ellipse 50% 18% at 50% 88%,#efdcc6 0 60%,transparent 100%);border-radius:14px;padding:6px 0}
+.petcard .gkbox{width:100%}
+.petcard b{font-size:21px;margin-top:2px}
+.petcard .sp{font-size:13px;font-weight:700;color:#fff;background:var(--soft);border-radius:999px;padding:1px 10px}
+.petcard p{margin:4px 0 0;font-size:13.5px;color:var(--soft);line-height:1.5}
+.petcard .cur{margin-top:4px;font-size:12.5px;font-weight:700;color:var(--accent-d)}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px 16px;padding:12px 18px 4px;flex:none}
+.st-top{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:5px;white-space:nowrap}
+.st-top b{font-weight:900}
+.st-top em{font-style:normal}.st-top .sh{display:none}
+.bar{height:8px;border-radius:99px;background:#f3e9e3;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .6s}
+.st.low .st-top span{color:#e0546e}
+.st.low .bar{animation:blinkbar 1.4s infinite}
+
+/* ---------- games ---------- */
+.games{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 12px 12px;flex:none}
+.game{border-radius:18px;padding:10px 4px 9px;text-align:center;transition:transform .1s;min-width:0}
+.game:active{transform:scale(.95)}
+.game .em{font-size:28px;line-height:1.1;display:block}
+.game b{display:block;font-size:16px;margin-top:2px;white-space:nowrap}
+.game small{font-size:12px;color:var(--soft);white-space:nowrap}
+
+/* ---------- care buttons ---------- */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px 2px;flex:none}
+.tab{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0 6px;font-size:14px;font-weight:700;color:var(--text);
+  background:#fff;border:1.5px solid var(--line);border-radius:16px;box-shadow:0 3px 0 #efe2da;min-width:0}
+.tab .em{font-size:23px;line-height:1.15}
+.tab:active{background:var(--accent-l);transform:translateY(2px);box-shadow:0 1px 0 #efe2da}
+
+/* compact for shorter phones */
+@media (max-height:740px){
+  .stage{height:clamp(190px,calc(100vh - 300px),560px);height:clamp(190px,calc(100svh - 300px),560px)}
+  .tabs{padding-top:8px;gap:7px}.tab{padding:5px 0 4px;font-size:13px}.tab .em{font-size:20px}
+  .stats{grid-template-columns:repeat(4,1fr);gap:6px 10px;padding:10px 14px 2px}
+  .st-top{font-size:12.5px;margin-bottom:4px}
+  .st-top .lg{display:none}.st-top .sh{display:inline}
+  .bar{height:7px}
+  .game{padding:7px 4px}.game .em{font-size:22px}.game b{font-size:14.5px}.game small{display:none}
+  .games{padding:8px 12px 10px;gap:8px}
+}
+@media (max-height:620px){
+  .top{padding-top:max(6px,env(safe-area-inset-top));padding-bottom:5px}
+  .avatar{width:36px;height:36px}.avatar svg{width:33px;height:33px}
+  .who b{font-size:17px}.who small{font-size:12px}
+  .coin{font-size:15px;padding:4px 11px 4px 8px}
+  .tab{font-size:12.5px;padding:4px 0 3px}.tab .em{font-size:18px}
+  .game{display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 2px}
+  .game .em{font-size:19px;display:inline}.game b{font-size:14px;margin:0}
+}
+@media (max-width:350px){
+  .game b{font-size:13.5px}.who small{font-size:12px}
+  .stats{padding-left:12px;padding-right:12px;gap:6px 8px}
+}
+/* landscape phones: tank on the left, controls on the right */
+@media (orientation:landscape) and (max-height:560px){
+  #app{max-width:none;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(250px,1fr);grid-template-rows:auto auto auto 1fr;
+    align-items:start;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+  .top{grid-column:2;grid-row:1;padding-left:10px}
+  .stage{grid-column:1;grid-row:1/5;position:sticky;top:8px;height:calc(100vh - 16px);height:calc(100svh - 16px);min-height:200px;
+    margin:8px 4px 8px max(8px,env(safe-area-inset-left))}
+  .stats{grid-column:2;grid-row:2;grid-template-columns:1fr 1fr;padding:6px 12px 2px}
+  .stats .st-top .lg{display:inline}.stats .st-top .sh{display:none}
+  .tabs{grid-column:2;grid-row:3;padding:8px 10px 2px}
+  .games{grid-column:2;grid-row:4;padding:10px}
+}
+
+/* ---------- sub page ---------- */
+.page{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:560px;background:var(--bg);display:flex;flex-direction:column;z-index:20;
+  transform:translateX(102%);transition:transform .28s ease,visibility 0s .28s;visibility:hidden}
+.page.show{transform:none;visibility:visible;transition:transform .28s ease}
+.phead{display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid var(--line);
+  padding:8px max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left));padding-top:max(8px,env(safe-area-inset-top))}
+.back{width:42px;height:42px;border-radius:50%;font-size:26px;font-weight:700;line-height:1;background:#fff;border:1.5px solid var(--line);flex:none}
+.phead h2{flex:1;margin:0;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbody{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
+  padding:14px max(16px,env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.center{text-align:center}.soft{color:var(--soft);font-size:14px}
+.lead{font-size:16.5px;margin:4px 0 10px;text-align:center;line-height:1.6}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.btn{border-radius:16px;padding:12px 20px;font-size:17px;font-weight:900;background:var(--accent);color:#fff;
+  box-shadow:0 4px 0 var(--accent-d);min-height:48px;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--accent-d)}
+.btn.ghost{background:#fff;color:var(--text);box-shadow:0 4px 0 #ecdcd4;border:1.5px solid var(--line)}
+.btn.block{width:100%}
+.btn.small{font-size:14px;padding:8px 14px;min-height:38px}
+.btn:disabled,.btn.off{opacity:.45}
+@media (orientation:landscape) and (max-height:560px){.page{max-width:none}.phead{padding-top:6px;padding-bottom:6px}.back{width:38px;height:38px}}
+
+/* d-pad */
+.dpad{display:grid;grid-template-columns:repeat(3,var(--dk));grid-template-rows:repeat(3,var(--dk));gap:5px;justify-content:center}
+.dbtn{border-radius:16px;background:#fff;border:1.5px solid var(--line);box-shadow:0 4px 0 #ecdcd4;font-size:calc(var(--dk) * .46);touch-action:none}
+.dbtn:active,.dbtn.on{transform:translateY(3px);box-shadow:0 1px 0 #ecdcd4;background:var(--accent-l)}
+.dbtn.up{grid-column:2;grid-row:1}.dbtn.left{grid-column:1;grid-row:2}.dbtn.right{grid-column:3;grid-row:2}.dbtn.down{grid-column:2;grid-row:3}
+
+/* gecko box on pages */
+.gkstage{height:clamp(120px,26dvh,230px);display:flex;align-items:flex-end;justify-content:center;
+  background:radial-gradient(ellipse 42% 12% at 50% 90%,#f1dfca 0 55%,transparent 100%)}
+.gkbox{width:min(270px,70vw,calc(clamp(120px,26dvh,230px) * 1.45));aspect-ratio:260/160}
+.gkbox.oops{animation:shake .4s}
+.gkbox .sgwrap{width:100%;height:100%;transition:transform .3s;transform-origin:66% 92%}
+.gkbox .flip{width:100%;height:100%;transition:transform .3s}
+.pose-up .sgwrap{transform:rotate(22deg)}
+.pose-down .sgwrap{transform:scale(1.08,.82)}
+.pose-left .sgwrap{transform:translateX(-12%) scale(1.06,.97)}
+.pose-right .flip{transform:scaleX(-1)}
+.duo{display:flex;flex-direction:column;align-items:center}
+.duo>div{width:100%}
+@media (orientation:landscape) and (max-height:560px){
+  .duo{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
+  .gkstage{height:clamp(100px,42dvh,200px)}
+  .gkbox{width:min(260px,calc(clamp(100px,42dvh,200px) * 1.45))}
+}
+
+/* yoga */
+.seq{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin:10px 0 14px}
+.ac{font-size:26px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#fff;
+  border-radius:14px;border:2px solid var(--line);transition:.2s}
+.ac.now{border-color:var(--accent);transform:scale(1.1);box-shadow:0 0 0 4px var(--accent-l)}
+.ac.done{background:#e3f6ec;border-color:var(--health);opacity:.7}
+.ac.shake{animation:shake .4s}
+
+/* reading */
+.passage{background:#fff;border-radius:18px;padding:14px 16px;border:1.5px solid var(--line);line-height:1.9;font-size:17.5px}
+.passage h3{margin:0 0 4px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:17.5px}
+.speak{background:#eaf5fd;border-radius:12px;padding:6px 12px;font-size:14px;font-weight:700;white-space:nowrap}
+.q{font-weight:900;font-size:17.5px;margin:16px 0 10px;line-height:1.6}
+.opts{display:grid;gap:10px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:16px;padding:12px 16px;font-size:16.5px;font-weight:700;text-align:left}
+.opt.right{background:#e3f6ec;border-color:var(--health)}
+.opt.wrong{background:#ffecee;border-color:#f3a7b4;opacity:.7}
+.result{margin-top:14px;font-size:16.5px;font-weight:700;text-align:center;line-height:1.7}
+
+/* typing with zhuyin */
+.sent{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:10px 0 14px}
+.cb{display:flex;align-items:center;gap:1px;padding:6px 5px 6px 7px;border-radius:12px;background:#fff;border:2px solid var(--line);transition:.15s}
+.cb .ch{font-size:30px;font-weight:700;line-height:1}
+.zy{position:relative;display:flex;flex-direction:column;font-size:10.5px;line-height:1.08;width:12px;align-items:center;font-weight:500}
+.zy i{font-style:normal;display:block}
+.zy .tn{position:absolute;right:-6px;font-size:10px}
+.zy .nt{font-size:11px;line-height:.6}
+.cb.ok{background:#e3f6ec;border-color:var(--health)}
+.cb.bad{background:#ffe8ed;border-color:#f3a0b2}
+@media (max-width:380px){.cb .ch{font-size:25px}.cb{padding:5px 3px 5px 5px}.sent{gap:4px}}
+.type-in{width:100%;font-size:21px;padding:11px 14px;border-radius:16px;border:2px solid #f4d5df;outline:none;text-align:center;background:#fff;-webkit-user-select:text;user-select:text}
+.type-in:focus{border-color:var(--accent)}
+
+/* shop / feed */
+.list{display:grid;gap:10px}
+@media (min-width:640px),(orientation:landscape) and (max-height:560px){.list.two{grid-template-columns:1fr 1fr}}
+.item{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px 12px;min-width:0}
+.item.sel{border-color:var(--accent);background:#fff5f8}
+.item.dis{opacity:.45}
+.item .ic{width:54px;height:54px;flex:none;display:flex;align-items:center;justify-content:center;background:#fbf4ee;border-radius:14px}
+.item .ic svg{width:44px;height:44px}
+.item .tx{flex:1;min-width:0}
+.item .tx b{font-size:16.5px}
+.item .tx p{margin:2px 0 0;font-size:13px;color:var(--soft);line-height:1.45}
+.buy{border-radius:12px;padding:9px 12px;font-weight:900;font-size:15px;background:var(--accent);color:#fff;white-space:nowrap;flex:none}
+.buy.off{opacity:.4}
+.sec{font-weight:900;font-size:15px;color:var(--soft);margin:14px 2px 8px}
+.bag{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+.bag span{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;font-weight:700}
+.preview{background:#fff;border:1.5px dashed #ecd2c4;border-radius:16px;padding:10px 14px;text-align:center;margin-top:14px;line-height:1.7;font-size:15px}
+.d0{color:#3fa97a;font-weight:900}.d1{color:#e08b3a;font-weight:900}.d2{color:#e0546e;font-weight:900}
+
+/* maze */
+.mz-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.mz-info{font-size:15px;text-align:center;line-height:1.5}
+.board{position:relative;touch-action:none;border-radius:16px;overflow:hidden;box-shadow:0 4px 0 rgba(160,110,70,.25);flex:none}
+.board canvas{display:block;width:100%;height:100%}
+.ent{position:absolute;left:0;top:0;pointer-events:none;will-change:transform}
+.ent svg{width:100%;height:100%;display:block;overflow:visible}
+.ent.catch{animation:pop .5s}
+@media (orientation:landscape) and (max-height:560px){
+  .mz-wrap{display:grid;grid-template-columns:auto auto;grid-template-rows:auto 1fr;grid-template-areas:"board info" "board pad";
+    column-gap:22px;row-gap:8px;justify-content:center;align-items:center}
+  .mz-info{grid-area:info}.board{grid-area:board}#mzPad{grid-area:pad}
+}
+
+/* diary */
+.diary p{margin:0;padding:10px 2px;border-bottom:1px dashed var(--line);font-size:15px;line-height:1.5}
+.diary time{color:var(--soft);font-size:13px;margin-right:6px}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px}
+.chips2 span{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 11px;font-size:13px;font-weight:700}
+.shedbox{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:10px 14px;margin-bottom:10px;font-size:14.5px;line-height:1.6}
+.shedbar{height:8px;border-radius:99px;background:#f3e9e3;overflow:hidden;margin-top:6px}
+.shedbar i{display:block;height:100%;background:#cfc6e8;border-radius:99px}
+
+/* toast & fx */
+#toast{position:fixed;left:50%;bottom:calc(110px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(30px);opacity:0;background:var(--text);color:#fff;
+  border-radius:999px;padding:10px 20px;font-weight:700;font-size:15px;z-index:100;transition:.3s;max-width:88vw;text-align:center;pointer-events:none}
+#toast.show{opacity:.95;transform:translateX(-50%) translateY(0)}
+#fxl{position:fixed;inset:0;pointer-events:none;z-index:110}
+#fxl .g{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-size:20px;font-weight:900;color:var(--accent-d);
+  background:#fff;border-radius:999px;padding:6px 16px;box-shadow:0 4px 14px rgba(120,80,60,.15);animation:floatUp2 1.6s forwards;white-space:nowrap}
+
+/* ---------- side-view Butter ---------- */
+.sgwrap{width:100%;height:100%;transform-origin:50% 92%}
+.flip{width:100%;height:100%;transition:transform .3s}
+.sg{width:100%;height:100%;display:block;overflow:visible;transition:filter .8s}
+.sg .leg,.sg .tail,.sg .head,.sg .bodyg{transform-box:view-box}
+.sg .bodyg{transform-origin:138px 140px;animation:sgBreath 3.2s ease-in-out infinite}
+.sg .head{animation:sgHead 3.2s ease-in-out infinite}
+.sg .tail{animation:sgTail 3.8s ease-in-out infinite}
+.sg .lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(var(--lid,.36));animation:blinkS 5s infinite}
+.sg .head{transform-origin:110px 112px}
+.sg .tongue{transform-box:fill-box;transform-origin:100% 50%}
+.sg .closed,.sg .joy,.sg .brow,.sg .mopen,.sg .tongue{display:none}
+.walking .sg .leg.a{animation:sgLegA .34s ease-in-out infinite alternate}
+.walking .sg .leg.b{animation:sgLegB .34s ease-in-out infinite alternate}
+.walking .sgwrap{animation:bob .34s ease-in-out infinite alternate}
+.walking .sg .tail{animation:sgTailW .34s ease-in-out infinite alternate}
+.sleepy .sg .lid{animation:none;transform:scaleY(.62)}
+.sleep .sg .lid{animation:none;transform:scaleY(1)}
+.sleep .sg .closed{display:inline}
+.sleep .sg .ridge,.happy .sg .ridge{opacity:.6}
+.sleep .sg .bodyg{animation:sgBreath 4.6s ease-in-out infinite}
+.sleep .sg .tail,.sleep .sg .head{animation:none}
+.happy .sg .lid{animation:none;transform:scaleY(1)}
+.happy .sg .joy{display:inline}
+.happy .sg .closed{display:none}
+.happy .sg .tail{animation:wagF .18s ease-in-out 8 alternate}
+.happy .sgwrap{animation:hop .55s ease-out}
+.angry .sg .lid{animation:none;transform:scaleY(.5)}
+.angry .sg .pupil{ry:5}
+.angry .sg .closed,.angry .sg .joy{display:none}
+.angry .sg .brow,.angry .sg .mopen{display:inline}
+.angry .sg .mouth{display:none}
+.angry .sg .tail{animation:wagF .11s linear infinite alternate}
+.angry .sgwrap{animation:shake .32s 4}
+.lick .sg .tongue{display:inline;animation:tongue .2s 8 alternate}
+.dull .sg{filter:grayscale(.62) brightness(1.1) contrast(.9)}
+.rub .sgwrap{animation:rub .28s ease-in-out infinite alternate}
+
+/* ---------- top-down Butter (maze only) ---------- */
+.gkv .g-head{transform-origin:128px 50px}
+.gkv .g-tail{transform-origin:72px 50px;animation:tailIdle 3.2s ease-in-out infinite}
+.gkv .lid{transform-box:fill-box;transform-origin:center;transform:scaleY(0);animation:blink 5s infinite}
+.walking .gkv .leg.a{animation:legA .36s ease-in-out infinite alternate}
+.walking .gkv .leg.b{animation:legB .36s ease-in-out infinite alternate}
+.walking .gkv .g-tail{animation:tailWalk .36s ease-in-out infinite alternate}
+.running .rv .rl.a{animation:rlegA .12s linear infinite alternate}
+.running .rv .rl.b{animation:rlegB .12s linear infinite alternate}
+.running .rv .ant{animation:ant .2s linear infinite alternate}
+.worm-wiggle{animation:wig 1.2s ease-in-out infinite}
+
+@keyframes sgBreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.035)}}
+@keyframes sgHead{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.3px)}}
+@keyframes sgTail{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg)}}
+@keyframes sgTailW{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+@keyframes sgLegA{from{transform:rotate(-17deg)}to{transform:rotate(17deg)}}
+@keyframes sgLegB{from{transform:rotate(17deg)}to{transform:rotate(-17deg)}}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-3%)}}
+@keyframes wagF{from{transform:rotate(-9deg)}to{transform:rotate(11deg)}}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-16%) scale(1.03,.97)}70%{transform:translateY(0) scale(1.05,.94)}}
+@keyframes rub{from{transform:rotate(-2.5deg) translateX(-2%)}to{transform:rotate(2.5deg) translateX(2%)}}
+@keyframes tongue{from{transform:scaleX(.4)}to{transform:scaleX(1.1)}}
+@keyframes legA{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
+@keyframes legB{from{transform:rotate(18deg)}to{transform:rotate(-18deg)}}
+@keyframes tailIdle{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes tailWalk{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+@keyframes blinkS{0%,92%,100%{transform:scaleY(var(--lid,.36))}95%{transform:scaleY(1)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(0)}95%{transform:scaleY(1)}}
+@keyframes rlegA{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+@keyframes rlegB{from{transform:rotate(14deg)}to{transform:rotate(-14deg)}}
+@keyframes ant{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+@keyframes wig{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes pop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes floatUp{0%{opacity:0;transform:translateY(6px)}15%{opacity:1}100%{opacity:0;transform:translateY(-60px)}}
+@keyframes floatUp2{0%{opacity:0;transform:translate(-50%,10px)}12%{opacity:1}100%{opacity:0;transform:translate(-50%,-60px)}}
+@keyframes flake{0%{opacity:0;transform:translate(0,0) rotate(0)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx),26px) rotate(170deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes shimmer{from{fill:#a9def5}to{fill:#e0f6ff}}
+@keyframes blinkbar{50%{opacity:.5}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="who" onclick="openChooser()" role="button" aria-label="換寵物">
+      <div class="avwrap"><div class="avatar" id="avatar"></div><span class="swapb" aria-hidden="true">🔁</span></div>
+      <div style="min-width:0"><b id="petName">奶油</b><small id="subline"></small></div>
+    </div>
+    <div class="coin" id="coinBox">💰 <span class="coinv">0</span></div>
+  </header>
+
+  <section class="stage" id="stage">
+    <canvas id="floorCv"></canvas>
+    <div class="lay" id="caveBack" style="z-index:1">
+      <svg viewBox="0 0 200 130" preserveAspectRatio="none"><defs><radialGradient id="cvIn" cx=".5" cy=".85" r=".7"><stop offset="0" stop-color="#55575e"/><stop offset="1" stop-color="#25262b"/></radialGradient></defs>
+      <path d="M50 130 C50 94 74 68 104 68 C134 68 156 94 156 130 Z" fill="url(#cvIn)"/><ellipse cx="104" cy="126" rx="44" ry="5" fill="#6d5a45" opacity=".55"/></svg>
+    </div>
+    <div class="lay" id="plant">
+      <svg viewBox="0 0 100 130"><ellipse cx="50" cy="126" rx="30" ry="4" fill="rgba(70,40,20,.16)"/>
+      <g fill="none" stroke-linecap="round"><path d="M50 124 Q48 90 30 58" stroke="#6fae86" stroke-width="3"/><path d="M50 124 Q54 80 74 46" stroke="#6fae86" stroke-width="3"/><path d="M50 124 Q50 70 52 22" stroke="#6fae86" stroke-width="3"/></g>
+      <g fill="#8fcfa4" stroke="#6aa983" stroke-width="1.2"><ellipse cx="28" cy="56" rx="13" ry="6" transform="rotate(-35 28 56)"/><ellipse cx="38" cy="78" rx="12" ry="5.5" transform="rotate(-20 38 78)"/><ellipse cx="76" cy="44" rx="13" ry="6" transform="rotate(30 76 44)"/><ellipse cx="66" cy="70" rx="12" ry="5.5" transform="rotate(25 66 70)"/><ellipse cx="52" cy="22" rx="6" ry="13"/><ellipse cx="44" cy="44" rx="11" ry="5" transform="rotate(-50 44 44)"/></g>
+      <g fill="#c7b3ee" stroke="#a991dc" stroke-width="1"><ellipse cx="22" cy="96" rx="12" ry="5" transform="rotate(-15 22 96)"/><ellipse cx="78" cy="94" rx="12" ry="5" transform="rotate(15 78 94)"/><ellipse cx="60" cy="104" rx="10" ry="4.5" transform="rotate(20 60 104)"/></g>
+      <path d="M36 112 L40 128 L60 128 L64 112 Z" fill="#cfa77c" stroke="#b18a60" stroke-width="1.5"/></svg>
+    </div>
+    <div class="lay" id="sign">
+      <svg viewBox="0 0 120 62"><path d="M30 4 L60 -6 L90 4" stroke="#b58c66" stroke-width="2" fill="none"/><circle cx="60" cy="-5" r="2.5" fill="#b58c66"/>
+      <rect x="6" y="4" width="108" height="52" rx="12" fill="#f4dcc0" stroke="#d7b48e" stroke-width="2.5"/>
+      <text id="signTxt" x="60" y="38" text-anchor="middle" font-size="21" font-weight="900" fill="#8a5a3c" font-family="Noto Sans TC,PingFang TC,sans-serif">奶油的家</text>
+      <g fill="#f3a5b8"><circle cx="17" cy="16" r="3"/><circle cx="103" cy="16" r="3"/></g></svg>
+    </div>
+    <div class="lay" id="cup">
+      <svg viewBox="0 0 60 64"><defs><linearGradient id="cupG" x1="0" x2="1"><stop offset="0" stop-color="#aab1bc"/><stop offset=".35" stop-color="#f1f3f7"/><stop offset=".7" stop-color="#c6ccd5"/><stop offset="1" stop-color="#9aa2ae"/></linearGradient></defs>
+      <ellipse cx="31" cy="59" rx="25" ry="4" fill="rgba(70,40,20,.18)"/><path d="M8 16 L13 56 Q30 62 47 56 L52 16 Z" fill="url(#cupG)"/>
+      <ellipse cx="30" cy="16" rx="22" ry="6" fill="#f4f6f9" stroke="#b8bec8" stroke-width="1.5"/><ellipse cx="30" cy="17" rx="17" ry="3.8" fill="#fff"/><circle cx="25" cy="16.5" r="1" fill="#e8e3f3"/><circle cx="34" cy="17.5" r="1" fill="#e8e3f3"/></svg>
+    </div>
+    <div class="lay" id="caveFront">
+      <svg viewBox="0 0 200 130" preserveAspectRatio="none"><defs><linearGradient id="rk" x1="0" y1="0" x2=".3" y2="1"><stop offset="0" stop-color="#b3b8c0"/><stop offset=".55" stop-color="#8d939c"/><stop offset="1" stop-color="#6c717a"/></linearGradient></defs>
+      <ellipse cx="102" cy="128" rx="100" ry="5" fill="rgba(70,45,25,.22)"/>
+      <path fill-rule="evenodd" fill="url(#rk)" stroke="#5e636b" stroke-width="2.5" stroke-linejoin="round"
+        d="M4 129 C0 98 8 64 34 42 C58 20 96 8 138 14 C176 20 198 50 198 86 C198 104 197 118 196 129 Z M50 129 C50 94 74 68 104 68 C134 68 156 94 156 129 Z"/>
+      <path d="M14 66 Q40 34 80 24 Q104 18 128 20" stroke="#c9cdd3" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7"/>
+      <g stroke="#cbd0d6" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".85"><path d="M30 64 Q48 50 70 46"/><path d="M112 30 Q144 28 168 46"/><path d="M170 70 Q184 84 186 104"/><path d="M14 100 Q24 90 38 94"/><path d="M160 112 Q170 106 182 110"/></g>
+      <g stroke="#555a62" stroke-width="2" fill="none" stroke-linecap="round"><path d="M86 30 L95 44 L90 56"/><path d="M158 92 L170 100"/><path d="M24 80 L34 84"/></g>
+      <g fill="#4d5158"><circle cx="66" cy="56" r="4.2"/><circle cx="132" cy="44" r="3.4"/><circle cx="178" cy="64" r="3"/><circle cx="40" cy="108" r="2.6"/></g>
+      <g fill="#d6dade"><circle cx="65" cy="54.6" r="1.4"/><circle cx="131" cy="42.8" r="1.1"/></g></svg>
+    </div>
+    <div class="lay dish" id="dish">
+      <svg viewBox="0 0 120 64"><defs><linearGradient id="dsG" x1="0" x2="1"><stop offset="0" stop-color="#8459c9"/><stop offset=".4" stop-color="#a47ce4"/><stop offset="1" stop-color="#7a50bf"/></linearGradient></defs>
+      <ellipse cx="60" cy="58" rx="56" ry="5.5" fill="rgba(70,40,20,.2)"/><path d="M6 18 L16 52 Q60 62 104 52 L114 18 Z" fill="url(#dsG)"/>
+      <ellipse cx="60" cy="18" rx="54" ry="11" fill="#bb9af3"/><ellipse class="water" cx="60" cy="19" rx="45" ry="7.5" fill="#a9def5"/>
+      <ellipse cx="44" cy="17" rx="12" ry="2.4" fill="#fff" opacity=".75"/><path d="M20 26 Q24 40 28 48" stroke="#fff" stroke-width="4" opacity=".28" fill="none" stroke-linecap="round"/></svg>
+    </div>
+    <div id="skin">
+      <svg viewBox="0 0 100 40"><path d="M4 27 C10 14 22 19 30 12 C40 6 50 15 60 10 C72 5 84 14 96 21 C88 25 80 22 72 29 C60 35 48 28 38 33 C26 37 14 35 4 27 Z" fill="rgba(255,255,255,.92)" stroke="#d7d0c6" stroke-width="1.5"/>
+      <g fill="none" stroke="#e5ded4" stroke-width="1.2"><path d="M20 22 Q30 18 40 22"/><path d="M50 18 Q60 15 70 20"/><path d="M30 28 Q44 25 58 27"/></g>
+      <g fill="#ebe5dc"><circle cx="24" cy="25" r="1.3"/><circle cx="46" cy="20" r="1.3"/><circle cx="66" cy="23" r="1.3"/><circle cx="80" cy="20" r="1.1"/></g></svg>
+    </div>
+    <div id="gk"><div class="sgwrap"><div class="flip" id="gkFlip"></div></div></div>
+    <div class="glass"></div>
+    <div class="status" id="status"></div>
+    <div class="bubble" id="bubble" style="opacity:0"></div>
+  </section>
+
+  <section class="stats">
+    <div class="st" id="st-hunger"><div class="st-top"><span>🦗 <em class="lg">飽足度</em><em class="sh">飽足</em></span><b></b></div><div class="bar"><i style="background:var(--hunger)"></i></div></div>
+    <div class="st" id="st-health"><div class="st-top"><span>🦴 <em class="lg">鈣質健康</em><em class="sh">鈣質</em></span><b></b></div><div class="bar"><i style="background:var(--health)"></i></div></div>
+    <div class="st" id="st-mood"><div class="st-top"><span>💗 <em class="lg">心情</em><em class="sh">心情</em></span><b></b></div><div class="bar"><i style="background:var(--mood)"></i></div></div>
+    <div class="st" id="st-growth"><div class="st-top"><span>🌱 <em class="lg">成長</em><em class="sh">成長</em></span><b></b></div><div class="bar"><i style="background:var(--growth)"></i></div></div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab" onclick="openFeed()"><span class="em">🍽️</span>餵食</button>
+    <button class="tab" onclick="openShop()"><span class="em">🛒</span>商店</button>
+    <button class="tab" onclick="giveWater()"><span class="em">💧</span>換水</button>
+    <button class="tab" onclick="openDiary()"><span class="em">📔</span>日記</button>
+  </nav>
+  <section class="games">
+    <button class="game" style="background:var(--yoga)" onclick="startYoga()"><span class="em">🧘</span><b id="yogaLbl">奶油瑜伽</b><small>跟著箭頭</small></button>
+    <button class="game" style="background:var(--read)" onclick="startRead()"><span class="em">📖</span><b>讀書關卡</b><small>讀文章答題</small></button>
+    <button class="game" style="background:var(--type)" onclick="startType()"><span class="em">✍️</span><b>寫字練習</b><small>打出心情小語</small></button>
+  </section>
+
+
+  <div class="page" id="page">
+    <div class="phead"><button class="back" onclick="closePage()" aria-label="返回">‹</button><h2 id="ptitle"></h2><div class="coin">💰 <span class="coinv">0</span></div></div>
+    <div class="pbody" id="pbody"></div>
+  </div>
+</div>
+<div id="toast"></div>
+<div id="fxl"></div>
+
+<script>
+/* =========================================================
+   資料與存檔
+   ========================================================= */
+const SAVE_KEY = 'butterGeckoDiary_v1';
+const DAY = 86400000, SHED_DAYS = 10;
+const DEFAULT = {
+  coins: 30, hunger: 60, health: 70, mood: 70, growth: 0,
+  inv: { worm: 1, roach: 0, calcium: 0 },
+  lastTick: Date.now(), created: Date.now(), lastShed: 0, shedCount: 0,
+  diary: [], stats: { fed: 0, yoga: 0, read: 0, type: 0 },
+  lastWater: 0, sound: true, recentRead: [], recentType: [], pet: 'butter', pets: {}
+};
+let S;
+const $ = s => document.querySelector(s);
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function load(){
+  try{ const raw = localStorage.getItem(SAVE_KEY); S = raw ? Object.assign(clone(DEFAULT), JSON.parse(raw)) : clone(DEFAULT); }
+  catch(e){ S = clone(DEFAULT); }
+  S.inv = Object.assign({ worm:0, roach:0, calcium:0 }, S.inv);
+  S.stats = Object.assign({ fed:0, yoga:0, read:0, type:0 }, S.stats);
+  if (!Array.isArray(S.recentRead)) S.recentRead = [];
+  if (!Array.isArray(S.recentType)) S.recentType = [];
+  if (!S.lastShed) S.lastShed = S.created || Date.now();
+  if (!PETS[S.pet]) S.pet = 'butter';
+  if (!S.pets || typeof S.pets !== 'object') S.pets = {};
+}
+const PETS = {
+  butter: { id:'butter', name:'奶油', zy:'ㄋㄞˇ ㄧㄡˊ', species:'豹紋守宮', desc:'眼神銳利的小豹紋，橘色條紋上有黃色小顆粒。' },
+  choco:  { id:'choco',  name:'巧克力', zy:'ㄑㄧㄠˇ ㄎㄜˋ ㄌㄧˋ', species:'肥尾守宮', desc:'黑黑圓圓的大眼睛，背上一條白線，尾巴胖嘟嘟。' }
+};
+const P = () => PETS[S.pet] || PETS.butter;
+const nm = s => String(s).replaceAll('奶油', P().name).replaceAll('豹紋守宮', P().species);
+const PET_FIELDS = ['hunger','health','mood','growth','lastTick','created','lastShed','shedCount','diary','stats','lastWater'];
+function freshPet(){ const n = Date.now(); return { hunger:60, health:70, mood:70, growth:0, lastTick:n, created:n, lastShed:n, shedCount:0, diary:[], stats:{ fed:0, yoga:0, read:0, type:0 }, lastWater:0 }; }
+function switchPet(id){
+  const cur = {}; PET_FIELDS.forEach(k => cur[k] = clone(S[k] === undefined ? null : S[k])); S.pets[S.pet] = cur;
+  const nx = S.pets[id] || freshPet(), fr = freshPet();
+  PET_FIELDS.forEach(k => S[k] = (nx[k] === undefined || nx[k] === null) ? fr[k] : clone(nx[k]));
+  S.pet = id;
+  decay(Date.now() - S.lastTick, true); S.lastTick = Date.now();
+  if (!S.diary.length) addDiary(`🦎 ${P().name}來到資源班了！請大家多多照顧牠～`);
+  save();
+}
+function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+
+const FOODS = {
+  worm:    { name:'蟲泥',       price:10, hunger:20, growth:3, health:2 },
+  roach:   { name:'杜比亞蟑螂', price:25, hunger:50, growth:6, health:5 },
+  calcium: { name:'鈣粉',       price:15 }
+};
+const foodName = (f, cal) => (cal ? '加鈣粉的' : '') + FOODS[f].name;
+
+/* ---------- 讀書關卡（第一個選項是正確答案，顯示時打亂） ---------- */
+const READS = [
+ {pet:'butter', t:'奶油的老家',p:'豹紋守宮的老家在巴基斯坦、阿富汗和印度西北部。那裡是乾燥的岩石荒地，白天很熱，晚上比較涼。所以奶油喜歡溫暖、乾燥的環境。',q:'豹紋守宮的老家是什麼樣的地方？',o:['乾燥的岩石荒地','下雪的森林','很深的大海'],e:'豹紋守宮住在乾燥、有很多石頭的地方。'},
+ {t:'胖胖的尾巴',p:'豹紋守宮的尾巴會儲存脂肪，就像一個小小的便當盒。尾巴胖胖的，代表守宮營養很充足；尾巴變得很細，可能是生病或太久沒吃東西了。',q:'豹紋守宮的尾巴胖胖的，代表什麼？',o:['營養很充足','牠在生氣','牠想睡覺'],e:'尾巴是守宮的「營養倉庫」。'},
+ {t:'會眨眼的守宮',p:'大部分的守宮沒有眼皮，要用舌頭舔眼睛來清潔。但是豹紋守宮很特別，牠有眼皮，可以眨眼睛，睡覺時也會閉上眼睛。',q:'豹紋守宮為什麼可以眨眼睛？',o:['因為牠有眼皮','因為牠戴眼鏡','因為牠很愛哭'],e:'有眼皮是豹紋守宮的特色之一。'},
+ {t:'夜晚的小探險家',p:'豹紋守宮白天喜歡躲在躲避屋裡睡覺，到了傍晚和晚上才會出來散步、找東西吃。所以白天如果奶油在睡覺，我們要輕聲細語，不要吵醒牠。',q:'豹紋守宮什麼時候最活潑？',o:['傍晚和晚上','中午大太陽時','永遠都不動'],e:'豹紋守宮多在黃昏和夜晚活動。'},
+ {t:'換新衣服',p:'守宮長大時會「蛻皮」，把舊的皮脫掉，換上新的皮。蛻皮前，牠的顏色會變得灰灰白白的。蛻完皮後，豹紋守宮常常會把舊皮吃掉喔！',q:'豹紋守宮蛻皮後，舊皮常常會怎麼樣？',o:['被牠吃掉','變成蝴蝶','黏在天花板上'],e:'吃掉舊皮可以回收營養。'},
+ {t:'鈣粉的祕密',p:'守宮的骨頭需要鈣質，才能長得又直又強壯。如果長期缺少鈣質，骨頭會變軟，嚴重時會生病。所以餵食時，可以在蟲蟲身上撒一點鈣粉。',q:'為什麼要幫守宮的食物撒鈣粉？',o:['讓骨頭強壯','讓牠變顏色','讓食物變甜'],e:'鈣質能讓守宮的骨骼健康。'},
+ {t:'不會爬玻璃',p:'很多壁虎的腳底有特別的皮瓣，可以在牆壁上爬。但是豹紋守宮的腳趾是小爪子，沒有那種皮瓣，所以牠不能在光滑的玻璃上爬來爬去。',q:'豹紋守宮能在光滑的玻璃上爬嗎？',o:['不能','可以，而且很快','只能在晚上爬'],e:'豹紋守宮是住在地面的守宮。'},
+ {t:'斷尾求生',p:'遇到危險時，守宮可以自己把尾巴斷掉，讓敵人去追會動的尾巴，自己趁機逃走。新長出來的尾巴形狀會不太一樣。所以我們不可以抓奶油的尾巴！',q:'摸奶油時，我們不可以做什麼？',o:['抓牠的尾巴','輕輕摸牠的背','安靜地看牠'],e:'抓尾巴可能讓守宮受到驚嚇而斷尾。'},
+ {pet:'butter', t:'為什麼叫豹紋',p:'很多豹紋守宮小時候身上是一條一條的花紋，長大以後，花紋會慢慢變成一點一點的斑點，看起來很像豹的花紋，所以叫做「豹紋守宮」。',q:'為什麼叫做「豹紋守宮」？',o:['花紋像豹','跑得像豹一樣快','會像豹一樣吼叫'],e:'長大後的斑點像豹紋。'},
+ {t:'需要溫暖',p:'守宮是外溫動物，身體沒辦法自己產生足夠的熱，要靠環境的溫度讓身體暖起來。所以守宮的家裡需要一個溫暖的地方，牠才有力氣消化食物。',q:'守宮靠什麼讓身體變溫暖？',o:['環境的溫度','穿毛衣','一直跑步'],e:'外溫動物要靠外面的熱來保暖。'},
+ {t:'用舌頭認識世界',p:'奶油常常會伸出舌頭舔一舔東西。這不是在調皮，而是用舌頭收集味道，幫助牠認識身邊的東西，判斷是不是食物。',q:'奶油用舌頭舔東西，是在做什麼？',o:['認識身邊的東西','跟我們吵架','刷牙'],e:'舌頭可以幫守宮「聞」味道。'},
+ {t:'乾淨的水',p:'雖然守宮住在乾燥的地方，但是牠還是需要喝水。水盆裡的水要常常換新的，保持乾淨，奶油才不會生病。',q:'守宮的水盆應該怎麼照顧？',o:['常常換乾淨的水','裝滿果汁','一個月換一次'],e:'乾淨的水是健康的基礎。'},
+ {t:'摸完要洗手',p:'摸完奶油或清理牠的家以後，一定要用肥皂把手洗乾淨。這樣可以保護自己，也能保護奶油，大家都健健康康。',q:'摸完奶油之後，應該要做什麼？',o:['用肥皂洗手','直接吃點心','摸摸別人的臉'],e:'洗手可以避免細菌傳播。'},
+ {t:'固定的廁所',p:'豹紋守宮很愛乾淨，牠常常會在家裡固定的角落上廁所。照顧的人只要每天檢查那個角落，就能很快把家清理乾淨。',q:'豹紋守宮上廁所有什麼習慣？',o:['常在固定的角落','一定要在水盆裡','從來不上廁所'],e:'固定的廁所讓清潔變簡單。'},
+ {t:'長長的約定',p:'如果照顧得好，豹紋守宮可以活十五年以上，甚至二十年。養寵物是一個長長的約定，要每天用心照顧牠。',q:'照顧得好的豹紋守宮，大約可以活多久？',o:['十五年以上','一個星期','一百年'],e:'守宮是可以陪伴很久的朋友。'},
+ {t:'躲避屋',p:'奶油的家裡有一個像石頭的小山洞，叫做「躲避屋」。當奶油想休息或覺得緊張時，就會躲進去，那裡讓牠覺得很安全。',q:'奶油什麼時候會躲進躲避屋？',o:['想休息或緊張時','想游泳時','想唱歌時'],e:'躲避屋是守宮的安全小窩。'},
+ {t:'肚子餓的守宮',p:'守宮肚子太餓的時候，會沒有力氣，常常躲在躲避屋裡睡覺。這時候如果一直去摸牠，牠會不開心，甚至會搖尾巴生氣。先讓牠吃飽，牠才會有精神。',q:'奶油肚子太餓時，我們應該怎麼做？',o:['先餵牠吃東西','一直摸牠','把牠叫醒玩遊戲'],e:'吃飽了，奶油才會有精神陪我們。'},
+ {pet:'butter', t:'銳利的眼神',p:'奶油的眼睛是橘紅色的，中間有一條細細直直的瞳孔，像貓咪一樣。光線很亮的時候，瞳孔會縮成細細的一條線，所以奶油看起來總是眼神銳利。',q:'奶油的瞳孔是什麼形狀？',o:['細細直直的一條線','愛心形','星星形'],e:'直直的瞳孔可以調整進入眼睛的光線。'},
+ {pet:'choco', t:'巧克力的老家',p:'肥尾守宮的老家在西非，像是奈及利亞、迦納這些地方。那裡有草原和樹林，比豹紋守宮的老家潮濕一點。所以巧克力的躲避屋裡，可以放一點濕濕的水苔，讓牠蛻皮更順利。',q:'肥尾守宮的老家在哪裡？',o:['西非','南極','北極'],e:'肥尾守宮來自西非，喜歡比較潮濕的環境。'},
+ {pet:'choco', t:'為什麼叫肥尾',p:'肥尾守宮的名字，就是因為牠的尾巴又短又胖，像一顆小水滴。尾巴裡面存了很多養分，肚子餓的時候可以慢慢用。尾巴胖胖的，代表巧克力吃得很好。',q:'肥尾守宮為什麼叫「肥尾」？',o:['因為尾巴又短又胖','因為牠很愛吃肥肉','因為牠跑得很慢'],e:'胖胖的尾巴是牠的營養倉庫。'},
+ {pet:'choco', t:'背上的白線',p:'巧克力的背上有一條白白的線，從鼻子一路畫到尾巴，就像有人用白色的筆幫牠畫了一條線。背上有這條白線的肥尾守宮，常常被叫做「白線」。',q:'巧克力背上的白線，從哪裡畫到哪裡？',o:['從鼻子畫到尾巴','從左腳畫到右腳','只畫在肚子上'],e:'白線是巧克力最好認的特徵。'},
+ {pet:'choco', t:'溫柔的大眼睛',p:'肥尾守宮的眼睛顏色很深，看起來黑黑圓圓的，好像一直在對你微笑。牠的個性通常很溫和，動作也比較慢，是很好照顧的守宮。',q:'肥尾守宮的眼睛看起來怎麼樣？',o:['黑黑圓圓的','綠色會發光','只有一隻'],e:'深色的大眼睛讓牠看起來很溫柔。'},
+ {t:'輪流照顧班寵',p:'資源班的同學們一起照顧奶油。今天小安負責換水，小傑負責清理，大家輪流做，每個人都是重要的小幫手。',q:'今天誰負責換水？',o:['小安','小傑','奶油'],e:'大家輪流，照顧班寵更輕鬆。'},
+ {t:'下雨天',p:'早上出門時，天空灰灰的，媽媽提醒小美帶雨傘。到了中午果然下起大雨，小美撐著雨傘，開心地說：「還好有聽媽媽的話！」',q:'小美為什麼很開心？',o:['因為有帶雨傘','因為衣服濕了','因為沒有去上學'],e:'聽進提醒，就能做好準備。'},
+ {t:'排隊買點心',p:'下課時，福利社前有很多人。小宇沒有插隊，乖乖排在最後面。輪到他時，阿姨稱讚他很有禮貌，還對他微笑。',q:'阿姨為什麼稱讚小宇？',o:['因為他乖乖排隊','因為他插隊','因為他大聲吵鬧'],e:'遵守秩序是好習慣。'},
+ {t:'說出需要',p:'小晴的鉛筆不見了，她覺得很著急。她先深呼吸，然後舉手告訴老師：「老師，我需要幫忙。」老師和同學一起幫她找到了鉛筆。',q:'小晴遇到困難時怎麼做？',o:['舉手請老師幫忙','生氣丟東西','一直哭不說話'],e:'說出需要，就能得到幫助。'}
+];
+
+/* ---------- 心情小語（含注音，一字一組） ---------- */
+const SENTENCES = [
+ {s:'我今天很棒', z:'ㄨㄛˇ ㄐㄧㄣ ㄊㄧㄢ ㄏㄣˇ ㄅㄤˋ'},
+ {s:'慢慢來沒關係', z:'ㄇㄢˋ ㄇㄢˋ ㄌㄞˊ ㄇㄟˊ ㄍㄨㄢ ㄒㄧˋ'},
+ {s:'我可以做到', z:'ㄨㄛˇ ㄎㄜˇ ㄧˇ ㄗㄨㄛˋ ㄉㄠˋ'},
+ {s:'每天進步一點點', z:'ㄇㄟˇ ㄊㄧㄢ ㄐㄧㄣˋ ㄅㄨˋ ㄧ ㄉㄧㄢˇ ㄉㄧㄢˇ'},
+ {s:'謝謝你的幫忙', z:'ㄒㄧㄝˋ ㄒㄧㄝ˙ ㄋㄧˇ ㄉㄜ˙ ㄅㄤ ㄇㄤˊ'},
+ {s:'我喜歡我自己', z:'ㄨㄛˇ ㄒㄧˇ ㄏㄨㄢ ㄨㄛˇ ㄗˋ ㄐㄧˇ'},
+ {s:'失敗了再試一次', z:'ㄕ ㄅㄞˋ ㄌㄜ˙ ㄗㄞˋ ㄕˋ ㄧ ㄘˋ'},
+ {s:'今天也要加油', z:'ㄐㄧㄣ ㄊㄧㄢ ㄧㄝˇ ㄧㄠˋ ㄐㄧㄚ ㄧㄡˊ'},
+ {s:'微笑讓心情變好', z:'ㄨㄟˊ ㄒㄧㄠˋ ㄖㄤˋ ㄒㄧㄣ ㄑㄧㄥˊ ㄅㄧㄢˋ ㄏㄠˇ'},
+ {s:'奶油是我的好朋友', z:'ㄋㄞˇ ㄧㄡˊ ㄕˋ ㄨㄛˇ ㄉㄜ˙ ㄏㄠˇ ㄆㄥˊ ㄧㄡˇ'},
+ {s:'深呼吸讓自己平靜', z:'ㄕㄣ ㄏㄨ ㄒㄧ ㄖㄤˋ ㄗˋ ㄐㄧˇ ㄆㄧㄥˊ ㄐㄧㄥˋ'},
+ {s:'我會好好照顧奶油', z:'ㄨㄛˇ ㄏㄨㄟˋ ㄏㄠˇ ㄏㄠˇ ㄓㄠˋ ㄍㄨˋ ㄋㄞˇ ㄧㄡˊ'},
+ {s:'努力的我最可愛', z:'ㄋㄨˇ ㄌㄧˋ ㄉㄜ˙ ㄨㄛˇ ㄗㄨㄟˋ ㄎㄜˇ ㄞˋ'},
+ {s:'說謝謝很有禮貌', z:'ㄕㄨㄛ ㄒㄧㄝˋ ㄒㄧㄝ˙ ㄏㄣˇ ㄧㄡˇ ㄌㄧˇ ㄇㄠˋ'},
+ {s:'我願意試試看', z:'ㄨㄛˇ ㄩㄢˋ ㄧˋ ㄕˋ ㄕˋ ㄎㄢˋ'},
+ {s:'休息一下再出發', z:'ㄒㄧㄡ ㄒㄧˊ ㄧ ㄒㄧㄚˋ ㄗㄞˋ ㄔㄨ ㄈㄚ'},
+ {s:'每天都是新的開始', z:'ㄇㄟˇ ㄊㄧㄢ ㄉㄡ ㄕˋ ㄒㄧㄣ ㄉㄜ˙ ㄎㄞ ㄕˇ'},
+ {s:'我是很棒的小幫手', z:'ㄨㄛˇ ㄕˋ ㄏㄣˇ ㄅㄤˋ ㄉㄜ˙ ㄒㄧㄠˇ ㄅㄤ ㄕㄡˇ'},
+ {s:'遇到困難可以求助', z:'ㄩˋ ㄉㄠˋ ㄎㄨㄣˋ ㄋㄢˊ ㄎㄜˇ ㄧˇ ㄑㄧㄡˊ ㄓㄨˋ'},
+ {s:'我的心情很美麗', z:'ㄨㄛˇ ㄉㄜ˙ ㄒㄧㄣ ㄑㄧㄥˊ ㄏㄣˇ ㄇㄟˇ ㄌㄧˋ'}
+];
+
+/* =========================================================
+   插畫：側面的奶油（頭朝左，有光影的立體感）
+   ========================================================= */
+let gkUid = 0;
+const dotsS = (pts, c) => `<g fill="${c}">${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}"/>`).join('')}</g>`;
+
+/* ---------- 兩隻守宮的外觀設定 ---------- */
+const LOOKS = {
+  butter: {
+    b: ['#e9b9cb','#efc6d5','#f9e6ed'], ol: '#d29aae', sh: '#8a4f6a', belly: '#fbecf1',
+    bands: ['M102 86 C108 98 100 112 107 124 L121 124 C115 110 124 98 117 86 Z','M131 84 C138 96 129 110 137 124 L153 124 C146 110 155 96 148 84 Z','M163 86 C169 98 161 112 168 124 L180 124 C175 112 182 98 177 86 Z'],
+    band: '#d98c52', dotY: '#f4d679', dotW: '#fff5f8',
+    tailBands: ['M194 92 C198 104 192 124 199 140 L211 140 C206 124 212 106 207 92 Z','M219 92 C223 106 218 124 223 140 L232 140 C228 124 233 108 229 92 Z','M239 100 C242 110 238 124 242 136 L248 136 C246 124 249 112 246 100 Z'],
+    ringOp: .45,
+    h: ['#fbf4dd','#f6ecd2','#f8e4e2'], hol: '#d6bf8e', patch: '#dfe6b8', chin: '#fbe3e6',
+    headMarks: `<path d="M44 86 C50 82 56 82 60 86 C56 90 48 90 44 86Z M66 81 C72 78 80 79 84 83 C80 87 70 87 66 81Z M88 84 C94 83 100 86 102 91 C97 93 91 91 88 84Z M34 94 C37 91 41 91 43 94 C40 97 36 97 34 94Z" fill="#d98c52"/>`
+      + dotsS([[93,98,3],[101,103,2.6],[106,96,2.2],[86,92,1.8],[76,88,1.6],[52,92,1.6],[30,99,1.3],[98,111,1.8],[106,110,1.5]], '#d98c52')
+      + dotsS([[56,86,.9],[63,84,.9],[72,84,.9],[80,86,.9],[90,89,.9],[48,88,.8],[99,95,.9],[96,105,.8]], '#f6dd8c'),
+    legO: '#d6a0b3', legF: '#f5d3de', farO: '#c995a9', farF: '#e4b7c7', legDot: '#e7a868', legDot2: '#f2d27c', thigh: '#f2cdda',
+    iris: ['#ee8a4b','#c0512d','#6d2514'], rays: .45, pupilOp: 1, hl: 2.1,
+    rim: '#f1d27c', rimS: '#cfae6a', rimDots: '#f7e7b0', lid: '#e4e8bf', lidS: '#9c6b3e', lidV: .36,
+    ear: '#cf7480', earS: '#b85a66', mouth: '#b97764', nose: '#a27c62', noseTip: null, stripe: null,
+    top: { body:'#f2c8d6', tail:'#f3cad7', ol:'#d897a9', band:'#df955c', dot:'#f8dc6f', head:'#f7f0d4', hol:'#dcc791', patch:'#e2eabf',
+           hdot:'#e2a25e', eyeRim:'#f1c95a', iris:'#a64f3b', leg:'#f6d0da', legO:'#d897a9', toe:'#f9dde5', stripe:null }
+  },
+  choco: {
+    b: ['#b8857c','#c79d95','#dcc8d1'], ol: '#9a6f69', sh: '#3d1f1c', belly: '#d9c7d4',
+    bands: ['M104 86 C112 98 104 112 112 126 L136 126 C128 112 136 98 128 86 Z','M152 84 C162 96 152 112 162 126 L186 126 C178 112 190 98 180 86 Z'],
+    band: '#5e3029', dotY: '#c9998d', dotW: '#e8d5d9',
+    tailBands: ['M190 92 C196 106 190 124 196 140 L214 140 C210 124 216 106 210 92 Z','M222 92 C228 106 222 124 228 140 L240 140 C236 124 242 108 236 92 Z'],
+    ringOp: .5,
+    h: ['#cfa39b','#c39890','#e2ccd2'], hol: '#9a6f69', patch: null, chin: '#ead9df',
+    headMarks: `<path d="M74 79 C86 78 98 81 106 88 L112 120 C102 121 94 118 88 113 C83 104 78 92 74 79 Z" fill="#5e3029"/>
+      <path d="M30 93 C38 87 48 85 55 87 C50 91 40 94 30 96Z" fill="#8a5a50" opacity=".55"/>`
+      + dotsS([[60,86,.8],[70,85,.8],[50,90,.7],[44,96,.7],[56,106,.7],[66,110,.7]], '#a77870'),
+    legO: '#a68ea0', legF: '#cdb9ca', farO: '#957d90', farF: '#b9a3b6', legDot: '#a8888f', legDot2: '#e6d8e0', thigh: '#c8b3c4',
+    iris: ['#5b3a30','#24120c','#080302'], rays: .15, pupilOp: .5, hl: 2.9,
+    rim: '#6e4c48', rimS: '#4d3330', rimDots: '#a07e7a', lid: '#c19790', lidS: '#5e3d39', lidV: .1,
+    ear: '#e0485a', earS: '#b3303f', mouth: '#7c5550', nose: '#6b4640', noseTip: '#e8909f', stripe: '#f6ecf0',
+    top: { body:'#c79d95', tail:'#bf938c', ol:'#8f6560', band:'#5e3029', dot:'#d9b3a6', head:'#c39890', hol:'#93685f', patch:'#b88a83',
+           hdot:'#5e3029', eyeRim:'#4d3330', iris:'#160907', leg:'#cbb6c8', legO:'#a88e9f', toe:'#d6c6d3', stripe:'#f6ecf0' }
+  }
+};
+const curLook = () => LOOKS[(typeof S !== 'undefined' && S && S.pet) || 'butter'] || LOOKS.butter;
+
+/* ---------- 側面的守宮（頭朝左） ---------- */
+function sideLeg(K, cls, hx, hy, kx, ky, fx, fy, far, extra){
+  const o = far ? K.farO : K.legO, f = far ? K.farF : K.legF;
+  const d = `M${hx} ${hy} Q${kx} ${ky} ${fx} ${fy}`;
+  const T = [[-10,1],[-8,3.5],[-3,4.5],[2,4.2],[6,2.5]];
+  const toes = T.map(([dx,dy]) => `M${fx} ${fy} l${dx} ${dy}`).join(' ');
+  const tips = T.map(([dx,dy]) => `<circle cx="${fx+dx}" cy="${fy+dy}" r="1.25"/>`).join('');
+  return `<g class="leg ${cls}" style="transform-origin:${hx}px ${hy}px">${extra || ''}
+    <path d="${d}" stroke="${o}" stroke-width="9.5" fill="none" stroke-linecap="round"/>
+    <path d="${d}" stroke="${f}" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="${toes}" stroke="${o}" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="${toes}" stroke="${f}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <g fill="${f}" stroke="${o}" stroke-width=".6">${tips}</g>
+    ${far ? '' : `<circle cx="${(hx+kx)/2}" cy="${(hy+ky)/2}" r="1.4" fill="${K.legDot}"/><circle cx="${(hx+kx)/2-2}" cy="${(hy+ky)/2+4}" r="1" fill="${K.legDot2}"/><circle cx="${(kx+fx)/2}" cy="${(ky+fy)/2}" r="1.1" fill="${K.legDot}"/>`}
+  </g>`;
+}
+function sideGeckoSVG(viewBox, K){
+  K = K || curLook();
+  const u = 'sg' + (++gkUid);
+  const TAIL = 'M184 100 C210 96 234 103 249 117 C256 124 253 131 245 129 C231 127 214 131 197 135 C190 136 185 134 180 131 Z';
+  const HEAD = 'M21 105 C21 97 29 91 41 88 C53 84 66 79 80 80 C94 81 104 87 110 96 L113 119 C105 125 95 127 83 126 C65 125 46 122 34 117 C26 114 21 110 21 105 Z';
+  const BODY = 'M92 104 C100 92 124 88 146 89 C170 90 190 96 194 110 C197 123 182 134 156 136 C130 138 104 134 96 126 C90 120 88 111 92 104 Z';
+  const rays = Array.from({ length: 14 }, (_, i) => { const a = i / 14 * Math.PI * 2; return `M${(63 + Math.cos(a) * 3).toFixed(1)} ${(96 + Math.sin(a) * 3).toFixed(1)} L${(63 + Math.cos(a) * 8.6).toFixed(1)} ${(96 + Math.sin(a) * 8.6).toFixed(1)}`; }).join(' ');
+  const rings = [192,200,208,216,224,232,240].map(x => `<path d="M${x} 96 Q${x+3} 116 ${x} 138" stroke="#fff" stroke-width=".9" opacity="${K.ringOp}" fill="none"/>`).join('');
+  const stripe = (d, w) => K.stripe ? `<path d="${d}" stroke="${K.stripe}" stroke-width="${w}" fill="none" stroke-linecap="round" opacity=".95"/>` : '';
+  return `<svg class="sg" viewBox="${viewBox || '0 0 260 160'}" style="--lid:${K.lidV}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="${u}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K.b[0]}"/><stop offset=".45" stop-color="${K.b[1]}"/><stop offset="1" stop-color="${K.b[2]}"/></linearGradient>
+    <linearGradient id="${u}sh" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="${K.sh}" stop-opacity="0"/><stop offset="1" stop-color="${K.sh}" stop-opacity=".16"/></linearGradient>
+    <linearGradient id="${u}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K.h[0]}"/><stop offset=".6" stop-color="${K.h[1]}"/><stop offset="1" stop-color="${K.h[2]}"/></linearGradient>
+    <radialGradient id="${u}i" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="${K.iris[0]}"/><stop offset=".55" stop-color="${K.iris[1]}"/><stop offset="1" stop-color="${K.iris[2]}"/></radialGradient>
+    <linearGradient id="${u}nk" x1="0" x2="1"><stop offset="0" stop-color="${K.b[1]}" stop-opacity="0"/><stop offset=".8" stop-color="${K.b[1]}"/></linearGradient>
+    <clipPath id="${u}cb"><path d="${BODY}"/></clipPath>
+    <clipPath id="${u}ct"><path d="${TAIL}"/></clipPath>
+    <clipPath id="${u}ch"><path d="${HEAD}"/></clipPath>
+    <clipPath id="${u}ce"><circle cx="63" cy="96" r="9.6"/></clipPath>
+  </defs>
+  <ellipse cx="140" cy="148" rx="100" ry="5.5" fill="rgba(70,40,20,.16)"/>
+  ${sideLeg(K, 'b', 112,116, 108,132, 104,145, true)}
+  ${sideLeg(K, 'a', 176,116, 190,131, 184,145, true)}
+  <g class="tail" style="transform-origin:184px 116px">
+    <path d="${TAIL}" fill="url(#${u}b)"/>
+    <g clip-path="url(#${u}ct)">
+      ${K.tailBands.map(d => `<path d="${d}" fill="${K.band}"/>`).join('')}
+      ${rings}
+      ${dotsS([[200,104,1.6],[203,112,1.3],[199,121,1.4],[224,107,1.5],[226,116,1.2],[243,114,1.1]], K.dotY)}
+      ${dotsS([[214,108,1.2],[215,118,1.1],[235,113,1.1],[189,110,1.3]], K.dotW)}
+      <path d="M184 128 C210 131 232 127 250 124 L250 140 L184 140 Z" fill="${K.belly}" opacity=".7"/>
+      <path d="${TAIL}" fill="url(#${u}sh)"/>
+      <path d="M188 103 C212 100 233 106 247 118" stroke="#fff" stroke-width="2.4" opacity=".3" fill="none" stroke-linecap="round"/>
+      ${stripe('M183 104 C208 101 230 107 246 119', 3.8)}
+    </g>
+    <path d="${TAIL}" fill="none" stroke="${K.ol}" stroke-width="1.8" stroke-linejoin="round"/>
+  </g>
+  <g class="bodyg">
+    <path d="${BODY}" fill="url(#${u}b)"/>
+    <g clip-path="url(#${u}cb)">
+      ${K.bands.map(d => `<path d="${d}" fill="${K.band}"/>`).join('')}
+      ${dotsS([[107,95,1.7],[111,104,1.5],[106,112,1.4],[114,97,1.2],[137,93,1.8],[142,102,1.6],[137,110,1.5],[146,96,1.3],[144,114,1.2],[168,96,1.6],[172,105,1.4],[167,113,1.3],[175,99,1.1],[186,106,1.2]], K.dotY)}
+      ${dotsS([[124,96,1.4],[126,106,1.2],[123,114,1.1],[157,96,1.4],[158,106,1.2],[156,115,1.1],[96,106,1.2],[188,116,1.1]], K.dotW)}
+      <g fill="#fff" opacity=".28">${Array.from({ length: 48 }, (_, i) => `<circle cx="${96 + (i % 16) * 6.2 + (i / 16 | 0) % 2 * 3}" cy="${95 + (i / 16 | 0) * 8}" r=".9"/>`).join('')}</g>
+      <path d="M92 124 C120 134 160 136 196 122 L196 140 L92 140 Z" fill="${K.belly}"/>
+      <path d="${BODY}" fill="url(#${u}sh)"/>
+      <path d="M100 96 C124 89 160 89 186 98" stroke="#fff" stroke-width="3" opacity=".32" fill="none" stroke-linecap="round"/>
+      ${stripe('M92 104 C112 94 150 92 194 104', 4.6)}
+    </g>
+    <path d="${BODY}" fill="none" stroke="${K.ol}" stroke-width="1.8"/>
+  </g>
+  ${sideLeg(K, 'a', 100,118, 94,133, 88,146, false)}
+  ${sideLeg(K, 'b', 168,120, 177,135, 173,146, false, `<ellipse cx="170" cy="124" rx="9" ry="12" transform="rotate(-25 170 124)" fill="${K.thigh}"/><circle cx="168" cy="121" r="1.3" fill="${K.legDot}"/><circle cx="173" cy="127" r="1.1" fill="${K.legDot2}"/>`)}
+  <g class="head">
+    <path d="${HEAD}" fill="url(#${u}h)"/>
+    <g clip-path="url(#${u}ch)">
+      ${K.patch ? `<ellipse cx="64" cy="97" rx="17" ry="13" fill="${K.patch}" opacity=".95"/>` : ''}
+      ${K.headMarks}
+      <path d="M21 105 C34 114 60 120 113 118 L113 130 L21 130 Z" fill="${K.chin}" opacity=".95"/>
+      <path d="M36 89 C52 82 74 79 96 84" stroke="#fff" stroke-width="2.6" opacity=".45" fill="none" stroke-linecap="round"/>
+      ${stripe('M30 96 C42 89 60 85 80 86 C92 87 102 91 112 98', 4)}
+      <rect x="94" y="76" width="22" height="56" fill="url(#${u}nk)"/>
+      ${stripe('M98 89 C104 91 108 94 113 99', 4)}
+    </g>
+    <path d="M110 96 C104 87 94 81 80 80 C66 79 53 84 41 88 C29 91 21 97 21 105 C21 110 26 114 34 117 C46 122 65 125 83 126 C95 127 104 125 111 121" fill="none" stroke="${K.hol}" stroke-width="1.8" stroke-linecap="round"/>
+    ${K.noseTip ? `<circle cx="22.5" cy="104" r="2.4" fill="${K.noseTip}"/>` : ''}
+    <ellipse cx="27" cy="99" rx="1.6" ry="1.2" fill="${K.nose}"/>
+    <ellipse cx="100" cy="104" rx="1.8" ry="2.8" fill="${K.ear}" stroke="${K.earS}" stroke-width=".5"/>
+    <ellipse class="tongue" cx="17" cy="108" rx="5.5" ry="2.6" fill="#ff8aa3"/>
+    <path class="mouth" d="M22 107 Q46 116 88 112" stroke="${K.mouth}" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path class="mopen" d="M22 107 Q44 125 74 114 Q46 116 22 107 Z" fill="#e47a8b" stroke="${K.mouth}" stroke-width="1.6" stroke-linejoin="round"/>
+    <g class="eye">
+      <circle cx="63" cy="96" r="12" fill="${K.rim}" stroke="${K.rimS}" stroke-width="1"/>
+      <g fill="${K.rimDots}">${Array.from({ length: 12 }, (_, i) => { const a = i / 12 * Math.PI * 2; return `<circle cx="${(63 + Math.cos(a) * 11.4).toFixed(1)}" cy="${(96 + Math.sin(a) * 11.4).toFixed(1)}" r="1.1"/>`; }).join('')}</g>
+      <circle cx="63" cy="96" r="9.6" fill="url(#${u}i)"/>
+      <g clip-path="url(#${u}ce)">
+        <path d="${rays}" stroke="#5a1c0e" stroke-width=".7" opacity="${K.rays}"/>
+        <ellipse class="pupil" cx="63" cy="96" rx="1.5" ry="8.8" fill="#1d0905" opacity="${K.pupilOp}"/>
+        <circle cx="59.5" cy="92" r="${K.hl}" fill="#fff" opacity=".95"/>
+        <circle cx="66.5" cy="100.5" r=".9" fill="#fff" opacity=".7"/>
+        <path d="M54 92 Q63 86 72 92" stroke="#2a0d06" stroke-width="2.4" fill="none" opacity=".3"/>
+      </g>
+      <ellipse class="lid" cx="63" cy="96" rx="12.4" ry="12.4" fill="${K.lid}" stroke="${K.lidS}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+      <g class="ridge" fill="${K.rimDots}" opacity=".9"><circle cx="53" cy="83.5" r="1.1"/><circle cx="58" cy="81.6" r="1.2"/><circle cx="64" cy="81" r="1.2"/><circle cx="70" cy="82" r="1.1"/><circle cx="75" cy="84.4" r="1"/></g>
+      <g class="closed" stroke="#6e3f2e" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M51 98 Q63 105 75 98"/><path d="M55 101 l-2 3 M63 103 l0 4 M71 101 l2 3" stroke-width="1.5"/></g>
+      <path class="joy" d="M51 99 Q63 88 75 99" stroke="#6e3f2e" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path class="brow" d="M46 83 L79 91" stroke="#7a4a30" stroke-width="3.4" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>`;
+}
+function gkHTML(cls, K){ return `<div class="gkbox ${cls || ''}"><div class="sgwrap"><div class="flip">${sideGeckoSVG(null, K)}</div></div></div>`; }
+
+/* ---------- 迷宮用：俯視的守宮（整隻） ---------- */
+function toes(t, x, y, base){
+  let o = '', f = '';
+  for (let i = -2; i <= 2; i++){
+    const a = (base + i * 26) * Math.PI / 180, ex = x + Math.cos(a) * 7, ey = y + Math.sin(a) * 7;
+    o += `<line x1="${x}" y1="${y}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}"/>`;
+    f += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="1.5"/>`;
+  }
+  return `<g stroke="${t.legO}" stroke-width="4" stroke-linecap="round">${o}</g><g stroke="${t.toe}" stroke-width="2.4" stroke-linecap="round">${o}</g><g fill="${t.toe}" stroke="${t.legO}" stroke-width=".8">${f}</g>`;
+}
+function leg(t, cls, hx, hy, kx, ky, fx, fy, base){
+  const d = `M${hx} ${hy} Q${kx} ${ky} ${fx} ${fy}`;
+  return `<g class="leg ${cls}" style="transform-origin:${hx}px ${hy}px">
+    <path d="${d}" stroke="${t.legO}" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="${d}" stroke="${t.leg}" stroke-width="7" fill="none" stroke-linecap="round"/>
+    ${toes(t, fx, fy, base)}</g>`;
+}
+function topGeckoSVG(K){
+  const t = (K || curLook()).top;
+  const id = 'tg' + (++gkUid);
+  const dots = (pts, c, r) => `<g fill="${c}">${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${r}"/>`).join('')}</g>`;
+  return `<svg class="gkv" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="${id}b"><ellipse cx="100" cy="50" rx="37" ry="19"/><path d="M118 38 Q130 36 136 42 L136 58 Q130 64 118 62Z"/></clipPath>
+    <clipPath id="${id}t"><path d="M76 38 C58 33 40 39 6 50 C40 61 58 67 76 62 Z"/></clipPath>
+  </defs>
+  <ellipse cx="104" cy="56" rx="62" ry="17" fill="rgba(80,50,30,.10)"/>
+  ${leg(t, 'a bl', 80, 37, 70, 21, 60, 16, -135)}
+  ${leg(t, 'b br', 80, 63, 70, 79, 60, 84, 135)}
+  ${leg(t, 'b fl', 122, 37, 134, 22, 142, 16, -55)}
+  ${leg(t, 'a fr', 122, 63, 134, 78, 142, 84, 55)}
+  <g class="g-tail">
+    <path d="M76 38 C58 33 40 39 6 50 C40 61 58 67 76 62 Z" fill="${t.tail}" stroke="${t.ol}" stroke-width="2.4" stroke-linejoin="round"/>
+    <g clip-path="url(#${id}t)">
+      <rect x="57" y="20" width="9" height="60" fill="${t.band}"/><rect x="40" y="20" width="8" height="60" fill="${t.band}"/><rect x="24" y="20" width="6" height="60" fill="${t.band}"/>
+      ${dots([[61,42],[61,56],[44,45],[44,55],[27,50]], t.dot, 1.4)}
+      ${t.stripe ? `<path d="M78 50 L8 50" stroke="${t.stripe}" stroke-width="3"/>` : ''}
+    </g>
+  </g>
+  <ellipse cx="100" cy="50" rx="37" ry="19" fill="${t.body}" stroke="${t.ol}" stroke-width="2.4"/>
+  <g clip-path="url(#${id}b)">
+    <rect x="72" y="25" width="13" height="50" rx="5" fill="${t.band}"/><rect x="93" y="25" width="14" height="50" rx="5" fill="${t.band}"/><rect x="115" y="25" width="12" height="50" rx="5" fill="${t.band}"/>
+    ${dots([[77,40],[80,50],[77,60],[98,38],[102,47],[98,55],[103,62],[119,42],[122,51],[119,59]], t.dot, 1.7)}
+    <ellipse cx="98" cy="45" rx="30" ry="5" fill="#fff" opacity=".22"/>
+    ${t.stripe ? `<path d="M62 50 L138 50" stroke="${t.stripe}" stroke-width="3.4"/>` : ''}
+  </g>
+  <g class="g-head">
+    <path d="M126 38 C138 30 160 31 172 40 C181 46 181 54 172 60 C160 69 138 70 126 62 C122 56 122 44 126 38Z" fill="${t.head}" stroke="${t.hol}" stroke-width="2.4"/>
+    <ellipse cx="150" cy="40" rx="11" ry="6" fill="${t.patch}"/><ellipse cx="150" cy="60" rx="11" ry="6" fill="${t.patch}"/>
+    ${dots([[134,45],[139,52],[133,57],[144,47],[146,55],[156,48],[160,53],[165,47],[154,54],[169,51],[140,40],[140,60],[128,50]], t.hdot, 2.3)}
+    ${t.stripe ? `<path d="M124 50 L176 50" stroke="${t.stripe}" stroke-width="3"/>` : ''}
+    <ellipse cx="176" cy="50" rx="4" ry="6.5" fill="#f9dbe0"/>
+    <g><ellipse cx="152" cy="33" rx="7.5" ry="5.5" fill="${t.eyeRim}"/><ellipse cx="152" cy="32.5" rx="5.6" ry="3.8" fill="${t.iris}"/><circle cx="150" cy="31.2" r="1.3" fill="#fff"/><ellipse class="lid" cx="152" cy="33" rx="8" ry="6" fill="${t.head}"/></g>
+    <g><ellipse cx="152" cy="67" rx="7.5" ry="5.5" fill="${t.eyeRim}"/><ellipse cx="152" cy="67.5" rx="5.6" ry="3.8" fill="${t.iris}"/><circle cx="150" cy="66.3" r="1.3" fill="#fff"/><ellipse class="lid" cx="152" cy="67" rx="8" ry="6" fill="${t.head}"/></g>
+  </g>
+</svg>`;
+}
+
+/* ---------- 食物插畫 ---------- */
+function roachSVG(cal){
+  const L = (cls, x1, y1, x2, y2, x3, y3) => `<g class="rl ${cls}" style="transform-origin:${x1}px ${y1}px"><path d="M${x1} ${y1} L${x2} ${y2} L${x3} ${y3}" stroke="#4a2a17" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  return `<svg class="rv" viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="40" rx="40" ry="20" fill="rgba(60,30,10,.15)"/>
+    ${L('a',64,26,72,12,80,8)}${L('b',50,24,50,9,44,3)}${L('a',36,26,26,13,16,10)}
+    ${L('b',64,44,72,58,80,62)}${L('a',50,46,50,61,44,67)}${L('b',36,44,26,57,16,60)}
+    <g class="ant" style="transform-origin:86px 35px"><path d="M86 31 Q94 18 99 8 M86 39 Q94 52 99 62" stroke="#4a2a17" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>
+    <ellipse cx="45" cy="35" rx="31" ry="17" fill="${cal ? '#9b6a48' : '#7b4a2b'}" stroke="#4a2a17" stroke-width="2"/>
+    <path d="M15 35 L66 35" stroke="#4a2a17" stroke-width="1.6"/>
+    <ellipse cx="71" cy="35" rx="9" ry="13" fill="#5e361e" stroke="#4a2a17" stroke-width="2"/>
+    <ellipse cx="82" cy="35" rx="5" ry="6.5" fill="#43260f"/>
+    <ellipse cx="38" cy="28" rx="14" ry="3.5" fill="#fff" opacity=".25"/>
+    ${cal ? '<g fill="#fff"><circle cx="30" cy="28" r="2.4"/><circle cx="46" cy="41" r="2.4"/><circle cx="56" cy="27" r="2"/><circle cx="24" cy="41" r="2"/><circle cx="70" cy="31" r="1.8"/><circle cx="38" cy="36" r="1.6"/><circle cx="60" cy="42" r="1.6"/></g>' : ''}
+  </svg>`;
+}
+function wormSVG(cal){
+  return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="42" cy="43" r="34" fill="rgba(60,30,10,.15)"/>
+    <circle cx="40" cy="40" r="33" fill="#dfe2e9" stroke="#b6bcc7" stroke-width="2"/><circle cx="40" cy="40" r="26" fill="#c9cdd6"/>
+    <path d="M18 42 C18 26 30 18 42 20 C56 22 62 32 61 42 C60 56 48 62 38 61 C26 60 18 54 18 42Z" fill="#a8703f"/>
+    <g fill="#c48a52"><circle cx="30" cy="34" r="4"/><circle cx="44" cy="30" r="4.5"/><circle cx="52" cy="42" r="3.8"/><circle cx="36" cy="48" r="4"/><circle cx="46" cy="52" r="3"/></g>
+    ${cal ? '<g fill="#fff"><circle cx="28" cy="42" r="1.8"/><circle cx="40" cy="38" r="1.8"/><circle cx="50" cy="34" r="1.8"/><circle cx="44" cy="46" r="1.6"/></g>' : ''}
+  </svg>`;
+}
+function calciumSVG(){
+  return `<svg viewBox="0 0 60 60"><rect x="15" y="8" width="30" height="10" rx="4" fill="#f0839f"/><rect x="11" y="16" width="38" height="38" rx="10" fill="#fff" stroke="#e3d6f2" stroke-width="3"/><rect x="16" y="27" width="28" height="15" rx="4" fill="#b39cf2"/><text x="30" y="38.5" font-size="10" text-anchor="middle" fill="#fff" font-weight="900" font-family="sans-serif">Ca</text></svg>`;
+}
+const iconOf = (k, cal) => k === 'worm' ? wormSVG(cal) : k === 'roach' ? roachSVG(cal) : calciumSVG();
+
+/* =========================================================
+   工具
+   ========================================================= */
+let actx;
+function beep(type){
+  if (!S.sound) return;
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const f = { ok:[660,990], bad:[320,220], coin:[880,1400], eat:[480,760], up:[520,1040] }[type] || [600,600];
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime;
+    o.frequency.setValueAtTime(f[0], t); o.frequency.linearRampToValueAtTime(f[1], t + .15);
+    g.gain.setValueAtTime(.14, t); g.gain.exponentialRampToValueAtTime(.001, t + .26);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + .28);
+  }catch(e){}
+}
+function speak(text){
+  if (!('speechSynthesis' in window)){ toast('這台裝置不支援朗讀'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(nm(text)); u.lang = 'zh-TW'; u.rate = .85;
+  speechSynthesis.speak(u);
+}
+let toastT;
+function toast(m){ const t = $('#toast'); t.textContent = nm(m); t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+function gainFx(text){ const el = document.createElement('div'); el.className = 'g'; el.textContent = text; $('#fxl').appendChild(el); setTimeout(() => el.remove(), 1600); }
+function stageFx(emoji, n, pos){
+  const st = $('#stage');
+  for (let i = 0; i < n; i++){
+    const el = document.createElement('div'); el.className = 'fx'; el.textContent = emoji;
+    el.style.left = (pos.x + (Math.random() - .5) * 36) + 'px';
+    el.style.top = (pos.y + (Math.random() - .5) * 14) + 'px';
+    el.style.animationDelay = (i * .14) + 's';
+    st.appendChild(el); setTimeout(() => el.remove(), 1500 + i * 140);
+  }
+}
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function pickRandom(len, key, keep){
+  let i, g = 0;
+  do { i = Math.random() * len | 0; g++; } while (S[key].includes(i) && g < 60);
+  S[key] = [i, ...S[key]].slice(0, keep); return i;
+}
+function addDiary(m){ S.diary.unshift({ t: Date.now(), m: nm(m) }); S.diary = S.diary.slice(0, 60); }
+function fmtTime(ts){ const d = new Date(ts), p = n => String(n).padStart(2, '0'); return `${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+const clamp = v => Math.max(0, Math.min(100, v));
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const lerp = (a, b, p) => a + (b - a) * p;
+const ease = p => p < .5 ? 2*p*p : 1 - Math.pow(-2*p + 2, 2) / 2;
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* =========================================================
+   狀態系統
+   ========================================================= */
+const stageOf = g => g >= 100 ? '成體守宮' : g >= 60 ? '亞成體' : g >= 25 ? '幼體' : '小寶寶';
+const daysSinceShed = () => (Date.now() - S.lastShed) / DAY;
+const shedDue = () => daysSinceShed() >= SHED_DAYS;
+const preShed = () => daysSinceShed() >= SHED_DAYS - 1;
+function changeStats(ch, silent){
+  const before = stageOf(S.growth);
+  ['hunger','health','mood','growth'].forEach(k => { if (ch[k]) S[k] = clamp(S[k] + ch[k]); });
+  if (ch.coins){
+    S.coins = Math.max(0, S.coins + ch.coins);
+    document.querySelectorAll('.coin').forEach(c => { c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); });
+  }
+  if (!silent){
+    const p = [];
+    if (ch.coins > 0) p.push(`+${ch.coins} 💰`);
+    if (ch.hunger > 0) p.push(`+${ch.hunger} 🦗`);
+    if (ch.health > 0) p.push(`+${ch.health} 🦴`);
+    if (ch.mood > 0) p.push(`+${ch.mood} 💗`);
+    if (ch.growth > 0) p.push(`+${ch.growth} 🌱`);
+    if (p.length) gainFx(p.join('  '));
+    if (ch.coins > 0) beep('coin');
+  }
+  const after = stageOf(S.growth);
+  if (before !== after){
+    addDiary(`🎉 奶油長大了！變成「${after}」囉！`);
+    setTimeout(() => { toast(`🎉 恭喜！奶油長大成「${after}」了！`); beep('up'); }, 700);
+  }
+  save(); render();
+}
+function decay(ms, offline){
+  let min = ms / 60000; if (offline) min = Math.min(min, 180);
+  if (min <= 0) return;
+  const floor = offline ? 10 : 0;
+  const dec = (k, d) => { if (S[k] > floor) S[k] = Math.max(floor, S[k] - d); };
+  const hungry = S.hunger < 20;
+  dec('hunger', min / 4);
+  dec('health', min / 8 * (hungry ? 2 : 1));
+  dec('mood', min / 5 * ((hungry || S.health < 20) ? 1.6 : 1));
+}
+function tick(){ const now = Date.now(); decay(now - S.lastTick, false); S.lastTick = now; save(); render(); }
+
+function statusText(){
+  if (G.shedding) return '✨ 蛻皮中';
+  if (G.state === 'sleep' || G.state === 'enter') return G.reason === 'hungry' ? '😴 餓到睡著了' : '💤 在躲避屋睡覺';
+  if (S.hunger < 20) return '🥺 肚子好餓';
+  if (preShed()) return '🌫️ 快要蛻皮了';
+  if (S.health < 30) return '🦴 需要鈣質';
+  if (S.mood < 30) return '😔 有點無聊';
+  if (S.hunger < 30) return '😪 有點餓了';
+  return '😊 心情很好';
+}
+function render(){
+  document.querySelectorAll('.coinv').forEach(e => e.textContent = S.coins);
+  ['hunger','health','mood','growth'].forEach(k => {
+    const el = $('#st-' + k), v = Math.round(S[k]);
+    el.querySelector('b').textContent = v;
+    el.querySelector('.bar i').style.width = v + '%';
+    el.classList.toggle('low', k !== 'growth' && v < 30);
+  });
+  const day = Math.floor((Date.now() - S.created) / DAY) + 1;
+  $('#subline').textContent = `${P().species}・${stageOf(S.growth)}・第 ${day} 天`;
+  $('#petName').textContent = P().name; const st_ = $('#signTxt'); st_.textContent = P().name + '的家'; st_.setAttribute('font-size', P().name.length > 2 ? 18 : 21); $('#yogaLbl').textContent = P().name + '瑜伽';
+  $('#status').textContent = statusText();
+}
+function moodLine(){
+  if (S.hunger < 20) return '好餓…沒有力氣… 🥺';
+  if (preShed()) return '我身體灰灰的，快要蛻皮了～';
+  if (S.health < 30) return '想要鈣粉，讓骨頭強壯 🦴';
+  if (S.mood < 30) return '有點無聊…陪我做瑜伽好嗎？';
+  if (S.hunger < 30) return '肚子有點餓了…想吃蟲蟲 🦗';
+  if (S.hunger > 92) return '吃得好飽喔～';
+  const l = ['今天也很開心！','謝謝你照顧我 💕','我最喜歡你了～','一起加油吧！','我的尾巴胖胖的！','要不要一起讀書呀？','散步散步～','你今天好棒喔 ✨'];
+  return l[Math.random() * l.length | 0];
+}
+let bubT;
+function bubble(t, ms){ const b = $('#bubble'); b.textContent = nm(t); b.style.opacity = 1; clearTimeout(bubT); bubT = setTimeout(() => b.style.opacity = 0, ms || 4500); }
+
+/* =========================================================
+   飼養箱（側面）：版面
+   ========================================================= */
+let L = null;
+function place(el, x, y, w, h, z){ el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.width = w + 'px'; el.style.height = h + 'px'; if (z != null) el.style.zIndex = z; }
+function layoutStage(){
+  const st = $('#stage'), W = st.clientWidth, H = st.clientHeight;
+  if (!W || !H) return;
+  if (L && L.W === W && L.H === H) return;
+  const floorTop = H * .5, bandTop = H * .68, bandBot = H * .95;
+  const gs0 = Math.min(W * .66, H * .86);
+  const cw = Math.min(W * .52, H * .74), ch = cw * .65, cx = W * .975 - cw, cb = bandTop - 3;
+  const dw = Math.min(W * .27, H * .36), dh = dw * 64 / 120, db = H * .99;
+  const uw = Math.min(W * .1, H * .15), uh = uw * 64 / 60, ub = floorTop + (bandTop - floorTop) * .5;
+  L = { W, H, floorTop, bandTop, bandBot, gs0,
+        cave: { x: cx, y: cb - ch, w: cw, h: ch, base: cb, holeL: cx + cw * .25, holeW: cw * .53 },
+        dish: { x: W * .03, y: db - dh, w: dw, h: dh, base: db },
+        cup:  { x: W * .1, y: ub - uh, w: uw, h: uh, base: ub } };
+  place($('#caveBack'), cx, cb - ch, cw, ch, 1);
+  place($('#caveFront'), cx, cb - ch, cw, ch, Math.round(cb));
+  place($('#cup'), L.cup.x, L.cup.y, uw, uh, Math.round(ub));
+  const pw = Math.min(W * .27, H * .4), ph = pw * 1.3, pb = floorTop + (bandTop - floorTop) * .3;
+  place($('#plant'), W * .02, pb - ph, pw, ph, Math.round(pb));
+  const sgw = Math.min(W * .3, 130), sgh = sgw * 62 / 120, sgy = Math.max(100, (cb - ch) * .5 - sgh / 2 + 24);
+  const sign = $('#sign'); place(sign, cx + cw / 2 - sgw / 2, sgy, sgw, sgh, 3);
+  sign.style.display = (cb - ch) - sgy - sgh > 10 ? '' : 'none';
+  place($('#dish'), L.dish.x, L.dish.y, dw, dh, Math.round(db));
+  drawFloor();
+}
+function drawFloor(){
+  const cv = $('#floorCv'), { W, H, floorTop: ft } = L, dpr = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+  let g = ctx.createLinearGradient(0, ft - 34, 0, ft);
+  g.addColorStop(0, 'rgba(160,115,80,0)'); g.addColorStop(1, 'rgba(160,115,80,.2)');
+  ctx.fillStyle = g; ctx.fillRect(0, ft - 34, W, 34);
+  g = ctx.createLinearGradient(0, ft, 0, H);
+  g.addColorStop(0, '#b98d5f'); g.addColorStop(.25, '#cba275'); g.addColorStop(1, '#ddb98b');
+  ctx.fillStyle = g; ctx.fillRect(0, ft, W, H - ft);
+  const r = rng(20241014), base = Math.max(13, Math.min(W, H * 1.6) / 12);
+  const pal = ['#e8c99e','#dcb586','#d2a675','#efd8b2','#cf9f6d','#e2bf92','#f3e0be'];
+  const n = Math.min(900, Math.round(W * (H - ft) / (base * base * .3)));
+  const chips = [];
+  for (let i = 0; i < n; i++){ const t = Math.pow(r(), .75); chips.push({ x: r() * (W + 30) - 15, y: ft + t * (H - ft) + 2, t, a: r(), b: r(), c: r(), d: r(), e: r() }); }
+  chips.sort((p, q) => p.y - q.y);
+  for (const c of chips){
+    const s = .38 + .8 * c.t, w = base * (.7 + c.a * .9) * s, h = w * (.32 + c.b * .26) * (.55 + .45 * c.t);
+    const j = h * .35, ang = (c.c - .5) * .9;
+    const pts = [[-w/2 + (c.d-.5)*j, -h/2], [w/2, -h/2 + (c.e-.5)*j], [w/2 - (c.d-.5)*j, h/2], [-w/2, h/2 - (c.e-.5)*j]];
+    ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(ang);
+    ctx.fillStyle = 'rgba(100,65,32,.15)';
+    ctx.beginPath(); pts.forEach((p, k) => k ? ctx.lineTo(p[0] + 1.4*s, p[1] + 2*s) : ctx.moveTo(p[0] + 1.4*s, p[1] + 2*s)); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = pal[(c.a * 97 | 0) % pal.length];
+    ctx.beginPath(); pts.forEach((p, k) => k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(130,85,45,.22)'; ctx.lineWidth = .8; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,246,228,.6)'; ctx.lineWidth = 1.1 * s;
+    ctx.beginPath(); ctx.moveTo(pts[0][0] + 1, pts[0][1] + 1); ctx.lineTo(pts[1][0] - 1, pts[1][1] + 1); ctx.stroke();
+    ctx.strokeStyle = 'rgba(140,92,50,.3)'; ctx.lineWidth = .8;
+    ctx.beginPath(); ctx.moveTo(-w * .3, (c.b - .5) * h * .4); ctx.lineTo(w * .3, (c.d - .5) * h * .4); ctx.stroke();
+    ctx.restore();
+  }
+  g = ctx.createLinearGradient(0, ft, 0, ft + (H - ft) * .25);
+  g.addColorStop(0, 'rgba(110,70,40,.28)'); g.addColorStop(1, 'rgba(110,70,40,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, ft, W, (H - ft) * .25);
+}
+
+/* =========================================================
+   飼養箱：奶油的行為
+   ========================================================= */
+const G = { u:.38, v:.55, tu:0, tv:0, face:-1, state:'idle', until:0, reason:'', p:0, onArrive:null, inCave:false,
+            sleepUntil:0, zzzAt:0, pendingShed:false, pendingDemo:false, shedding:false, justShed:false, seq:0, last:0, px:0, py:0, w:0, h:0 };
+let pageOpen = false, mode = null, onPageClose = null, lastPet = 0, lastAngry = 0;
+const gs = () => L.gs0 * (0.74 + S.growth * 0.0036);
+const ds = v => .84 + .16 * v;
+const xFromU = u => { const w = gs(); return w / 2 + 6 + u * (L.W - w - 12); };
+const uFromX = x => { const w = gs(); return clamp01((x - w / 2 - 6) / (L.W - w - 12)); };
+const yFromV = v => L.bandTop + v * (L.bandBot - L.bandTop);
+const vFromY = y => clamp01((y - L.bandTop) / (L.bandBot - L.bandTop));
+function cavePos(){ const sc = ds(0) * .74, w = gs() * sc; return { x: L.cave.holeL + L.cave.holeW * .05 + w / 2, y: L.cave.base - L.cave.h * .03, s: sc }; }
+const entranceUV = () => ({ u: uFromX(L.cave.holeL + L.cave.holeW * .5), v: 0 });
+function headPos(){ return { x: G.px + (G.face < 0 ? -G.w * .3 : G.w * .3), y: G.py - G.h * .72 }; }
+
+function geckoFrame(){
+  const el = $('#gk');
+  let x = xFromU(G.u), y = yFromV(G.v), sc = ds(G.v), z = Math.round(y), dim = 0;
+  if (G.inCave){
+    const c = cavePos(), p = ease(G.p);
+    x = lerp(x, c.x, p); y = lerp(y, c.y, p); sc = lerp(sc, c.s, p); z = 2; dim = p * .3;
+  }
+  const w = gs() * sc, h = w * 160 / 260;
+  el.style.width = w + 'px'; el.style.height = h + 'px';
+  el.style.transform = `translate(${x - w / 2}px,${y - h * 148 / 160}px)`;
+  el.style.zIndex = z;
+  el.style.filter = dim ? `brightness(${(1 - dim).toFixed(2)})` : '';
+  $('#gkFlip').style.transform = G.face < 0 ? 'none' : 'scaleX(-1)';
+  G.px = x; G.py = y; G.w = w; G.h = h;
+}
+function walkTo(u, v, cb){ G.tu = clamp01(u); G.tv = clamp01(v); G.state = 'walk'; G.onArrive = cb || null; }
+function arrive(){ G.state = 'idle'; G.until = performance.now() + 1800 + Math.random() * 3500; if (G.onArrive){ const f = G.onArrive; G.onArrive = null; f(); } }
+function goSleep(reason){
+  G.reason = reason;
+  const e = entranceUV();
+  walkTo(e.u, e.v, () => {
+    G.inCave = true; G.p = 0; G.state = 'enter'; G.zzzAt = 0;
+    G.sleepUntil = performance.now() + 25000 + Math.random() * 25000;
+  });
+}
+function wake(msg){
+  if (G.state === 'sleep' || G.state === 'enter'){ G.state = 'exit'; if (msg) bubble(msg, 3000); }
+  else if (G.state === 'walk' && G.onArrive){ G.onArrive = null; G.state = 'idle'; G.until = performance.now() + 1500; }
+}
+function decide(t){
+  if (shedDue()) return startShed(false);
+  if (S.hunger < 20){ bubble('好餓…沒力氣了，我先去躲避屋睡覺…', 3500); return goSleep('hungry'); }
+  const r = Math.random();
+  if (r < .1){ bubble('有點睏…我去睡個午覺 💤', 3000); return goSleep('nap'); }
+  if (r < .2){ flash('lick', 1400); G.until = t + 2600; return; }
+  walkTo(Math.random(), Math.random());
+}
+const flashT = {};
+function flash(cls, ms){
+  const g = $('#gk'); g.classList.remove(cls); void g.offsetWidth; g.classList.add(cls);
+  clearTimeout(flashT[cls]); flashT[cls] = setTimeout(() => g.classList.remove(cls), ms);
+}
+function update(dt, t){
+  switch (G.state){
+    case 'idle': if (t > G.until && !pageOpen) decide(t); break;
+    case 'walk': {
+      const du = G.tu - G.u, dv = G.tv - G.v, k = L.W - gs() - 12, hb = L.bandBot - L.bandTop;
+      const dxp = du * k, dyp = dv * hb, d = Math.hypot(dxp, dyp);
+      const sp = (S.hunger < 30 ? 30 : 50) * (L.gs0 / 150) * (S.pet === 'choco' ? .85 : 1);
+      if (d < 1.5){ G.u = G.tu; G.v = G.tv; arrive(); }
+      else { const s = Math.min(d, sp * dt); G.u += du * s / d; G.v += dv * s / d; if (Math.abs(dxp) > 3) G.face = dxp > 0 ? 1 : -1; }
+      break;
+    }
+    case 'enter': G.p = Math.min(1, G.p + dt / 1.1); if (G.p >= 1){ G.state = 'sleep'; G.face = -1; } break;
+    case 'sleep':
+      if (shedDue() && !pageOpen){ G.pendingShed = true; G.pendingDemo = false; wake('身體癢癢的…我要蛻皮了！'); }
+      else if (G.reason === 'hungry' && S.hunger >= 20 && !pageOpen) wake('吃飽飽，有精神了！謝謝你 💕');
+      else if (G.reason === 'nap' && t > G.sleepUntil) wake('呼啊～睡飽了！');
+      else if (t > G.zzzAt){ G.zzzAt = t + 2600; if (!pageOpen) stageFx('💤', 1, headPos()); }
+      break;
+    case 'exit':
+      G.p = Math.max(0, G.p - dt / 1.1);
+      if (G.p <= 0){
+        G.inCave = false; G.state = 'idle'; G.until = t + 1200;
+        if (G.pendingShed){ G.pendingShed = false; startShed(G.pendingDemo); }
+      }
+      break;
+  }
+  const gk = $('#gk');
+  gk.classList.toggle('walking', G.state === 'walk' || G.state === 'enter' || G.state === 'exit');
+  gk.classList.toggle('sleep', G.state === 'sleep');
+  gk.classList.toggle('sleepy', G.state !== 'sleep' && S.hunger < 30);
+  gk.classList.toggle('dull', G.shedding || (preShed() && !G.justShed));
+}
+function loop(t){
+  const dt = Math.min(.05, (t - (G.last || t)) / 1000); G.last = t;
+  if (L){ update(dt, t); geckoFrame(); }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- 點擊互動 ---------- */
+function onStageTap(e){
+  if (!L) return;
+  const r = $('#stage').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  const c = L.cave;
+  const hit = G.inCave
+    ? (x > c.x && x < c.x + c.w && y > c.y + c.h * .3 && y < c.base + 8)
+    : (Math.abs(x - G.px) < G.w * .46 && y > G.py - G.h * .9 && y < G.py + 8);
+  if (hit) return petGecko();
+  if (G.state === 'sleep' || G.state === 'enter'){ bubble('噓～奶油在睡覺 💤', 2200); return; }
+  if (G.state === 'busy' || G.state === 'exit') return;
+  if (S.hunger < 20){ bubble('肚子好餓…走不動了… 🥺', 2200); return; }
+  walkTo(uFromX(x), vFromY(y));
+}
+function petGecko(){
+  if (S.hunger < 20) return angry();
+  if (G.state === 'busy'){ if (G.shedding) bubble('我正在換新衣服，等一下喔～', 2200); return; }
+  if (G.state === 'sleep' || G.state === 'enter'){ wake('呼啊～被你叫醒了，早安！'); return; }
+  if (G.state === 'exit') return;
+  if (G.state === 'walk'){ G.onArrive = null; G.state = 'idle'; }
+  G.until = performance.now() + 2800;
+  flash('happy', 1500); stageFx('💕', 3, headPos()); beep('ok');
+  const l = ['好舒服～','嘿嘿，好癢！','最喜歡你了 💕','再摸一下嘛～','我很乖喔！'];
+  bubble(l[Math.random() * l.length | 0], 2400);
+  if (Date.now() - lastPet > 4000){ lastPet = Date.now(); changeStats({ mood: 2 }); }
+}
+function angry(){
+  flash('angry', 1400); stageFx('💢', 2, headPos()); beep('bad');
+  const l = ['好餓喔…不要吵我啦！💢','肚子餓的時候不想被摸！','先餵我吃東西好不好… 🦗'];
+  bubble(l[Math.random() * l.length | 0], 2600);
+  if (G.state === 'idle') G.until = performance.now() + 2500;
+  if (Date.now() - lastAngry > 5000){ lastAngry = Date.now(); changeStats({ mood: -2 }, true); }
+}
+
+/* ---------- 換水 ---------- */
+function giveWater(){
+  const dish = $('#dish'); dish.classList.remove('fill'); void dish.offsetWidth; dish.classList.add('fill');
+  if (Date.now() - S.lastWater < 120000){ bubble('水盆的水還很乾淨喔！謝謝你 💧', 2800); return; }
+  S.lastWater = Date.now();
+  addDiary('💧 幫奶油換了乾淨的水。');
+  changeStats({ health: 3, mood: 3 });
+  if (G.state === 'sleep' || G.state === 'enter'){ bubble('噓～奶油在睡覺，水已經換好囉 💧', 2800); return; }
+  if (G.state === 'busy' || G.state === 'exit') return;
+  if (S.hunger < 20){ bubble('謝謝你換水…可是我好餓 🥺', 2800); return; }
+  const y = L.dish.base - L.dish.h * .32, w = gs() * ds(vFromY(y));
+  bubble('有新的水！我去喝一口～', 2400);
+  walkTo(uFromX(L.dish.x + L.dish.w * .55 + w * .34), vFromY(y), () => {
+    G.face = -1; flash('lick', 1800); stageFx('💧', 3, headPos());
+    bubble('咕嚕咕嚕～好清涼！', 2800); G.until = performance.now() + 3200;
+  });
+}
+
+/* ---------- 蛻皮（約 10 天一次） ---------- */
+function startShed(demo){
+  if (G.state === 'sleep' || G.state === 'enter'){ G.pendingShed = true; G.pendingDemo = demo; wake('身體癢癢的…我要蛻皮了！'); return; }
+  if (G.shedding) return;
+  const tok = ++G.seq;
+  G.state = 'busy'; G.shedding = true; G.onArrive = null;
+  bubble('身體癢癢的…我要換新衣服囉！', 3200);
+  const gk = $('#gk'); gk.classList.add('rub');
+  const fl = setInterval(flakeFx, 200);
+  setTimeout(() => {
+    if (tok !== G.seq) return;
+    clearInterval(fl); gk.classList.remove('rub'); G.shedding = false; G.justShed = true;
+    const dry = Date.now() - S.lastWater > DAY;
+    if (!demo){
+      S.lastShed = Date.now(); S.shedCount = (S.shedCount || 0) + 1;
+      addDiary(`🦎 奶油第 ${S.shedCount} 次蛻皮！換上亮晶晶的新衣服。`);
+      changeStats({ growth: 4, mood: 5, health: dry ? -3 : 0 });
+    } else { addDiary('🦎（老師示範）奶油表演了一次蛻皮。'); save(); render(); }
+    setTimeout(() => G.justShed = false, 6000);
+    const sx = G.px + (G.face < 0 ? G.w * .28 : -G.w * .28), sy = G.py;
+    const sk = $('#skin'), sw = G.w * .55;
+    place(sk, sx - sw / 2, sy - sw * .32, sw, sw * .4, Math.round(sy) - 1);
+    sk.style.opacity = 1;
+    stageFx('✨', 4, { x: G.px, y: G.py - G.h * .6 }); flash('happy', 1500); beep('up');
+    bubble(dry ? '換好新衣服了！可是皮有點乾，記得常換水喔 💧' : '換好新衣服了！亮晶晶 ✨', 3400);
+    setTimeout(() => {
+      if (tok !== G.seq) return;
+      const right = sx > G.px, w = G.w;
+      G.state = 'idle';
+      walkTo(uFromX(right ? sx - w * .3 : sx + w * .3), vFromY(sy), () => {
+        G.face = right ? 1 : -1; flash('lick', 1700);
+        bubble('把舊皮吃掉～回收營養！😋', 2800);
+        setTimeout(() => sk.style.opacity = 0, 600);
+        G.until = performance.now() + 3200;
+      });
+    }, 2600);
+  }, 3600);
+}
+function flakeFx(){
+  const el = document.createElement('div'); el.className = 'flake';
+  el.style.left = (G.px + (Math.random() - .5) * G.w * .7) + 'px';
+  el.style.top = (G.py - G.h * (.25 + Math.random() * .45)) + 'px';
+  el.style.setProperty('--dx', ((Math.random() - .5) * 40) + 'px');
+  $('#stage').appendChild(el); setTimeout(() => el.remove(), 1400);
+}
+
+/* =========================================================
+   頁面
+   ========================================================= */
+function openPage(title, html, raw){
+  $('#ptitle').textContent = raw ? title : nm(title); $('#pbody').innerHTML = raw ? html : nm(html); $('#pbody').scrollTop = 0;
+  $('#page').classList.add('show'); document.body.classList.add('lock'); pageOpen = true; render();
+}
+function closePage(){
+  if (onPageClose){ const f = onPageClose; onPageClose = null; f(); }
+  stopMaze(); mode = null; pageOpen = false;
+  $('#page').classList.remove('show'); document.body.classList.remove('lock');
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  render();
+  setTimeout(() => { if (!pageOpen) $('#pbody').innerHTML = ''; if (G.state !== 'sleep' && G.state !== 'exit') bubble(moodLine(), 4000); }, 320);
+}
+function dpadHTML(){
+  return `<div class="dpad">
+    <button class="dbtn up" data-dir="up" aria-label="上">⬆️</button>
+    <button class="dbtn left" data-dir="left" aria-label="左">⬅️</button>
+    <button class="dbtn right" data-dir="right" aria-label="右">➡️</button>
+    <button class="dbtn down" data-dir="down" aria-label="下">⬇️</button></div>`;
+}
+
+/* =========================================================
+   🧘 奶油瑜伽
+   ========================================================= */
+const ARROWS = { up:'⬆️', down:'⬇️', left:'⬅️', right:'➡️' }, DIRS = ['up','down','left','right'];
+let Y = null;
+function startYoga(){ mode = 'yoga'; Y = { round: 0, earned: 0 }; yogaRound(); }
+function yogaRound(){
+  Y.seq = Array.from({ length: 3 + Y.round }, () => DIRS[Math.random() * 4 | 0]); Y.idx = 0; Y.lock = false;
+  openPage('🧘 奶油瑜伽', `
+    <p class="lead">第 <b>${Y.round + 1}</b> / 3 回合：照著箭頭，帶奶油伸展！</p>
+    <div class="duo"><div>
+      <div class="gkstage">${gkHTML()}</div>
+      <div class="seq">${Y.seq.map((d, i) => `<span class="ac" id="ac${i}">${ARROWS[d]}</span>`).join('')}</div>
+    </div><div>${dpadHTML()}</div></div>`);
+  $('#pbody').querySelectorAll('.dbtn').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); yogaPress(b.dataset.dir); }));
+  markAc();
+}
+function markAc(){ Y.seq.forEach((_, i) => { const c = $('#ac' + i); c.classList.toggle('now', i === Y.idx); c.classList.toggle('done', i < Y.idx); }); }
+function yogaPress(dir){
+  if (!Y || Y.lock) return;
+  const g = $('#pbody .gkbox');
+  if (dir === Y.seq[Y.idx]){
+    beep('ok'); g.className = 'gkbox pose-' + dir;
+    setTimeout(() => { if (g) g.className = 'gkbox'; }, 560);
+    Y.idx++; markAc();
+    if (Y.idx >= Y.seq.length){
+      Y.lock = true; Y.round++; Y.earned += 3;
+      changeStats({ coins: 3, mood: 5 });
+      setTimeout(() => { if (mode !== 'yoga') return; Y.round < 3 ? yogaRound() : yogaDone(); }, 950);
+    }
+  } else {
+    beep('bad');
+    const c = $('#ac' + Y.idx); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    g.classList.remove('oops'); void g.offsetWidth; g.classList.add('oops');
+    toast('再看一次箭頭喔～你可以的！');
+  }
+}
+function yogaDone(){
+  S.stats.yoga++; addDiary('🧘 和奶油一起做完了 3 回合瑜伽！');
+  changeStats({ coins: 3, growth: 1 });
+  openPage('🧘 瑜伽完成！', `
+    <div class="gkstage">${gkHTML('happy')}</div>
+    <p class="lead">太厲害了！奶油全身都伸展開了 ✨<br>這次共獲得 <b>💰 ${Y.earned + 3}</b> 金幣</p>
+    <div class="row"><button class="btn" onclick="startYoga()">再做一次</button><button class="btn ghost" onclick="closePage()">回家</button></div>`);
+}
+
+/* =========================================================
+   📖 讀書關卡
+   ========================================================= */
+let R = null;
+function startRead(){
+  mode = 'read';
+  const pool = READS.map((r, k) => k).filter(k => !READS[k].pet || READS[k].pet === S.pet);
+  let i, g = 0; do { i = pool[Math.random() * pool.length | 0]; g++; } while (S.recentRead.includes(i) && g < 60);
+  S.recentRead = [i, ...S.recentRead].slice(0, 8);
+  const it = READS[i];
+  R = { it, tries: 0, done: false, opts: shuffle([...it.o]) };
+  openPage('📖 讀書關卡', `
+    <div class="passage"><h3><span>${it.t}</span><button class="speak" onclick="speak(R.it.p)">🔊 朗讀</button></h3>${it.p}</div>
+    <div class="q">❓ ${it.q}</div>
+    <div class="opts">${R.opts.map((o, k) => `<button class="opt" id="op${k}" onclick="answer(${k})">${'ABC'[k]}. ${o}</button>`).join('')}</div>
+    <div class="result" id="rres"></div>`);
+}
+function answer(k){
+  if (!R || R.done) return;
+  const b = $('#op' + k), res = $('#rres');
+  if (R.opts[k] === R.it.o[0]){
+    R.done = true; b.classList.add('right'); beep('ok');
+    const coins = R.tries === 0 ? 8 : 4;
+    S.stats.read++; addDiary(`📖 讀了「${R.it.t}」，${R.tries === 0 ? '一次就答對' : '想一想後答對'}了！`);
+    changeStats({ coins, mood: 3 });
+    res.innerHTML = `🎉 答對了！獲得 💰${coins}<br><span class="soft">💡 ${R.it.e}</span>
+      <div class="row"><button class="btn" onclick="startRead()">下一篇</button><button class="btn ghost" onclick="closePage()">回家</button></div>`;
+    setTimeout(() => res.scrollIntoView({ behavior:'smooth', block:'end' }), 100);
+  } else {
+    R.tries++; b.classList.add('wrong'); b.disabled = true; beep('bad');
+    res.textContent = '🤔 再想想看～可以再讀一次文章喔！';
+  }
+}
+
+/* =========================================================
+   ✍️ 寫字練習（含注音）
+   ========================================================= */
+let T = null;
+const norm = s => s.replace(/[\s，。！？、,.!?~～：:；;「」"'…]/g, '');
+function zyHTML(z){
+  const tones = 'ˊˇˋ˙'; let tone = '', s = z;
+  if (tones.includes(s.slice(-1))){ tone = s.slice(-1); s = s.slice(0, -1); }
+  const sy = [...s], neutral = tone === '˙';
+  const tn = tone && !neutral ? `<i class="tn" style="top:${(sy.length - 1) * 1.08 - .15}em">${tone}</i>` : '';
+  return `<span class="zy">${neutral ? '<i class="nt">˙</i>' : ''}${sy.map(c => `<i>${c}</i>`).join('')}${tn}</span>`;
+}
+function startType(){
+  mode = 'type';
+  const i = pickRandom(SENTENCES.length, 'recentType', 8), raw = SENTENCES[i];
+  const item = { s: raw.s.replace('奶油', P().name), z: raw.z.replace('ㄋㄞˇ ㄧㄡˊ', P().zy) };
+  const chars = [...item.s], zs = item.z.split(' ');
+  T = { s: item.s, done: false, composing: false };
+  openPage('✍️ 寫字練習', `
+    <p class="lead">把奶油的心情小語打出來 💌 <button class="speak" onclick="speak(T.s)">🔊 唸給我聽</button></p>
+    <div class="sent" id="sent">${chars.map((c, k) => `<span class="cb"><span class="ch">${c}</span>${zs.length === chars.length ? zyHTML(zs[k]) : ''}</span>`).join('')}</div>
+    <input class="type-in" id="tin" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="在這裡輸入…">
+    <p class="center soft">綠色是打對的字，紅色要再檢查一下喔</p>
+    <div class="result" id="tres"></div>
+    <div class="row" id="trow"><button class="btn" onclick="checkType()">完成</button><button class="btn ghost" onclick="startType()">換一句</button></div>`);
+  const inp = $('#tin');
+  inp.addEventListener('compositionstart', () => T.composing = true);
+  inp.addEventListener('compositionend', () => { T.composing = false; typeUpd(); });
+  inp.addEventListener('input', typeUpd);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !T.composing) checkType(); });
+}
+function typeUpd(){
+  if (!T || T.done || T.composing) return;
+  const v = [...norm($('#tin').value)], tg = [...norm(T.s)];
+  $('#sent').querySelectorAll('.cb').forEach((b, i) => b.className = 'cb' + (i < v.length ? (v[i] === tg[i] ? ' ok' : ' bad') : ''));
+  if (v.join('') === tg.join('')) typeOK();
+}
+function checkType(){
+  if (!T || T.done) return;
+  if (norm($('#tin').value) === norm(T.s)) typeOK();
+  else { beep('bad'); $('#tres').textContent = '還有字不一樣喔，看看紅色或空白的格子～'; }
+}
+function typeOK(){
+  T.done = true; beep('ok');
+  const coins = 5 + Math.ceil(norm(T.s).length / 3);
+  S.stats.type++; addDiary(`✍️ 寫下了心情小語：「${T.s}」`);
+  changeStats({ coins, mood: 3 });
+  $('#tin').disabled = true; $('#tin').blur();
+  $('#tres').textContent = `🌟 寫得好棒！獲得 💰${coins}`;
+  $('#trow').innerHTML = `<button class="btn" onclick="startType()">下一句</button><button class="btn ghost" onclick="closePage()">回家</button>`;
+  speak(T.s);
+}
+
+/* =========================================================
+   🛒 商店
+   ========================================================= */
+function openShop(){ mode = 'shop'; renderShop(); }
+function renderShop(){
+  const desc = { worm: '飽足度 +20・迷宮簡單（不會動）', roach: '飽足度 +50・迷宮中等（到處亂跑）', calcium: '撒在食物上，鈣質健康 +30<br>加在蟑螂上：迷宮變困難！' };
+  const it = k => { const F = FOODS[k], poor = S.coins < F.price;
+    return `<div class="item"><div class="ic">${iconOf(k)}</div><div class="tx"><b>${F.name}</b><p>${desc[k]}</p><p>背包：${S.inv[k]} 個</p></div>
+      <button class="buy ${poor ? 'off' : ''}" onclick="buy('${k}')">💰 ${F.price}</button></div>`; };
+  const scroll = $('#pbody').scrollTop;
+  openPage('🛒 商店', `<div class="list two">${it('worm')}${it('roach')}${it('calcium')}
+      <div class="item"><div class="ic" style="font-size:28px">💧</div><div class="tx"><b>水盆補水</b><p>免費！在主畫面按下方「換水」</p></div></div></div>
+    <button class="btn block" style="margin-top:16px" onclick="openFeed()">🍽️ 去餵奶油</button>`);
+  $('#pbody').scrollTop = scroll;
+}
+function buy(k){
+  const F = FOODS[k];
+  if (S.coins < F.price){ beep('bad'); toast('金幣不夠喔，去玩小遊戲賺金幣吧！'); return; }
+  S.inv[k]++; changeStats({ coins: -F.price }, true); beep('coin'); toast(`買到了 ${F.name}！`); renderShop();
+}
+
+/* =========================================================
+   🍽️ 餵食
+   ========================================================= */
+let FS = { food: null, cal: false };
+function openFeed(){
+  mode = 'feed';
+  if (S.hunger >= 95){
+    openPage('🍽️ 餵食', `<div class="gkstage">${gkHTML('happy')}</div>
+      <p class="lead">奶油已經吃得飽飽的了～<br>等一下再餵吧！吃太多也不健康喔 😊</p>
+      <div class="row"><button class="btn ghost" onclick="closePage()">回家</button></div>`); return;
+  }
+  if (S.inv.worm + S.inv.roach === 0){
+    openPage('🍽️ 餵食', `<p class="lead" style="margin-top:24px">背包裡沒有食物了 🥺<br>先去商店買蟲泥或杜比亞吧！</p>
+      <div class="row"><button class="btn" onclick="openShop()">🛒 去商店</button><button class="btn ghost" onclick="closePage()">回家</button></div>`); return;
+  }
+  if (!FS.food || S.inv[FS.food] < 1) FS.food = S.inv.roach > 0 ? 'roach' : 'worm';
+  if (S.inv.calcium < 1) FS.cal = false;
+  renderFeed();
+}
+function renderFeed(){
+  const F = FOODS[FS.food], cal = FS.cal, diff = FS.food === 'worm' ? 0 : (cal ? 2 : 1);
+  const dTxt = ['⭐ 簡單：食物不會動','⭐⭐ 中等：蟑螂會到處亂跑','⭐⭐⭐ 困難：加鈣粉的蟑螂又快又會躲！'][diff];
+  const fi = k => `<div class="item ${FS.food === k ? 'sel' : ''} ${S.inv[k] < 1 ? 'dis' : ''}" onclick="pickFood('${k}')">
+      <div class="ic">${iconOf(k)}</div><div class="tx"><b>${FOODS[k].name}</b><p>擁有 ${S.inv[k]} 個</p></div>${FS.food === k ? '✅' : ''}</div>`;
+  openPage('🍽️ 要吃什麼？', `
+    ${S.hunger < 20 ? '<p class="lead" style="color:#e0546e;font-weight:700">奶油餓到睡著了，快餵牠吃東西吧！</p>' : ''}
+    <div class="sec">① 選食物</div><div class="list two">${fi('worm')}${fi('roach')}</div>
+    <div class="sec">② 要撒鈣粉嗎？</div>
+    <div class="list two">
+      <div class="item ${!cal ? 'sel' : ''}" onclick="pickCal(false)"><div class="ic" style="font-size:24px">🙅</div><div class="tx"><b>不加</b></div>${!cal ? '✅' : ''}</div>
+      <div class="item ${cal ? 'sel' : ''} ${S.inv.calcium < 1 ? 'dis' : ''}" onclick="pickCal(true)"><div class="ic">${calciumSVG()}</div><div class="tx"><b>加鈣粉</b><p>擁有 ${S.inv.calcium} 個・鈣質 +30</p></div>${cal ? '✅' : ''}</div>
+    </div>
+    <div class="preview"><b>${foodName(FS.food, cal)}</b><br><span class="d${diff}">${dTxt}</span><br>
+      飽足 +${F.hunger + (cal ? 5 : 0)}・健康 +${F.health + (cal ? 30 : 0)}・成長 +${F.growth + (cal ? 2 : 0)}</div>
+    <button class="btn block" style="margin-top:14px" onclick="startMaze(FS.food, FS.cal)">🦎 出發去覓食！</button>`);
+}
+function pickFood(k){ if (S.inv[k] < 1){ toast(`沒有${FOODS[k].name}了，去商店買吧！`); return; } FS.food = k; renderFeed(); }
+function pickCal(v){ if (v && S.inv.calcium < 1){ toast('沒有鈣粉了，去商店買吧！'); return; } FS.cal = v; renderFeed(); }
+
+/* =========================================================
+   🧩 覓食迷宮（連續移動）
+   ========================================================= */
+const DX = [0,1,0,-1], DY = [-1,0,1,0], DIRI = { up:0, right:1, down:2, left:3 };
+let MZ = null, mzRaf = 0;
+function genMaze(c, r){
+  const cells = [];
+  for (let y = 0; y < r; y++) for (let x = 0; x < c; x++) cells.push({ x, y, w:[true,true,true,true], v:false });
+  const at = (x, y) => cells[y * c + x], st = [at(0,0)]; at(0,0).v = true;
+  while (st.length){
+    const cur = st[st.length - 1], ns = [];
+    for (let d = 0; d < 4; d++){ const nx = cur.x + DX[d], ny = cur.y + DY[d]; if (nx >= 0 && ny >= 0 && nx < c && ny < r && !at(nx, ny).v) ns.push(d); }
+    if (!ns.length){ st.pop(); continue; }
+    const d = ns[Math.random() * ns.length | 0], nb = at(cur.x + DX[d], cur.y + DY[d]);
+    cur.w[d] = false; nb.w[(d + 2) % 4] = false; nb.v = true; st.push(nb);
+  }
+  const extra = Math.floor(c * r * 0.08);
+  for (let k = 0; k < extra; k++){
+    const x = Math.random() * (c - 1) | 0, y = Math.random() * (r - 1) | 0, d = Math.random() < .5 ? 1 : 2;
+    at(x, y).w[d] = false; at(x + DX[d], y + DY[d]).w[(d + 2) % 4] = false;
+  }
+  return { c, r, cells, at };
+}
+function bfs(mz, sx, sy){
+  const dist = new Array(mz.c * mz.r).fill(-1), q = [[sx, sy]]; let h = 0;
+  dist[sy * mz.c + sx] = 0;
+  while (h < q.length){
+    const [x, y] = q[h++];
+    for (let d = 0; d < 4; d++){
+      if (mz.at(x, y).w[d]) continue;
+      const nx = x + DX[d], ny = y + DY[d], i = ny * mz.c + nx;
+      if (dist[i] < 0){ dist[i] = dist[y * mz.c + x] + 1; q.push([nx, ny]); }
+    }
+  }
+  return dist;
+}
+const mover = (x, y) => ({ cx:x, cy:y, nx:x, ny:y, p:0, moving:false, dir:1, ang:0, pause:0 });
+const posOf = m => ({ x: m.cx + (m.nx - m.cx) * m.p, y: m.cy + (m.ny - m.cy) * m.p });
+
+function startMaze(food, cal){
+  if (!food || S.inv[food] < 1) return;
+  if (cal && S.inv.calcium < 1) cal = false;
+  S.inv[food]--; if (cal) S.inv.calcium--; save();
+  const diff = food === 'worm' ? 0 : (cal ? 2 : 1), size = [6, 7, 8][diff];
+  stopMaze(); mode = 'maze';
+  MZ = { food, cal, diff, mz: genMaze(size, size), g: mover(0, 0), f: null, caught: false,
+         hold: null, tap: null, run: null, startAt: performance.now() + 700, last: 0,
+         speedG: 4.2, speedF: [0, 2.3, 3.6][diff] };
+  const dist = bfs(MZ.mz, 0, 0); let best = 0; dist.forEach((v, i) => { if (v > dist[best]) best = i; });
+  MZ.f = mover(best % size, Math.floor(best / size));
+  onPageClose = () => { if (MZ && !MZ.caught){ S.inv[food]++; if (cal) S.inv.calcium++; save(); toast('食物已經放回背包囉！'); } };
+  const label = ['⭐ 簡單：食物不會動','⭐⭐ 中等：蟑螂到處亂跑！','⭐⭐⭐ 困難：蟑螂跑超快又會躲！'][diff];
+  openPage('🧩 覓食迷宮', `<div class="mz-wrap" id="mzWrap">
+    <div class="mz-info" id="mzInfo">帶奶油去抓 <b>${foodName(food, cal)}</b><br><span class="d${diff}">${label}</span></div>
+    <div class="board" id="board"><canvas id="mzc"></canvas>
+      <div class="ent ${food === 'worm' ? '' : 'running'}" id="fe">${food === 'worm' ? `<div class="worm-wiggle" style="width:100%;height:100%">${wormSVG(cal)}</div>` : roachSVG(cal)}</div>
+      <div class="ent" id="ge">${topGeckoSVG()}</div>
+    </div>
+    <div id="mzPad">${dpadHTML()}<p class="center soft" style="margin:6px 0 0">按住按鈕一直走・也可以滑動</p></div>
+  </div>`);
+  $('#pbody').style.overflow = 'hidden';
+  $('#pbody').querySelectorAll('.dbtn').forEach(b => {
+    const d = DIRI[b.dataset.dir];
+    b.addEventListener('pointerdown', e => { e.preventDefault(); MZ.hold = d; MZ.tap = d; MZ.run = null; b.classList.add('on'); });
+    ['pointerup','pointerleave','pointercancel'].forEach(ev => b.addEventListener(ev, () => { if (MZ && MZ.hold === d) MZ.hold = null; b.classList.remove('on'); }));
+  });
+  const board = $('#board'); let sx = 0, sy = 0;
+  board.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
+  board.addEventListener('pointerup', e => {
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return;
+    MZ.run = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
+  });
+  requestAnimationFrame(() => { mazeLayout(); MZ.last = performance.now(); mzRaf = requestAnimationFrame(mazeLoop); });
+}
+function mazeLayout(){
+  if (!MZ || !$('#board')) return;
+  const body = $('#pbody'), board = $('#board'), cv = $('#mzc'), wrap = $('#mzWrap');
+  const cs = getComputedStyle(body);
+  const bw = body.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const bh = body.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const land = getComputedStyle(wrap).display === 'grid';
+  const padBox = $('#mzPad'), info = $('#mzInfo');
+  const Wd = Math.floor(Math.max(180, land
+    ? Math.min(bh - 4, bw - Math.max(padBox.offsetWidth, info.offsetWidth) - 26)
+    : Math.min(bw, bh - info.offsetHeight - padBox.offsetHeight - 24, 560)));
+  board.style.width = board.style.height = Wd + 'px';
+  const dpr = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Wd * dpr; cv.height = Wd * dpr;
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const { mz } = MZ, lw = Math.max(4, Wd / mz.c * .12), pad = lw / 2 + 1;
+  MZ.pad = pad; MZ.cell = (Wd - pad * 2) / mz.c;
+  const c = MZ.cell, r = rng(99);
+  ctx.fillStyle = '#f6e7cf'; ctx.fillRect(0, 0, Wd, Wd);
+  ctx.fillStyle = 'rgba(190,140,90,.12)';
+  for (let i = 0; i < mz.c * mz.r * 3; i++){ ctx.save(); ctx.translate(r() * Wd, r() * Wd); ctx.rotate(r() * 3); ctx.fillRect(-4, -2, 8, 4); ctx.restore(); }
+  ctx.strokeStyle = '#b4835c'; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.beginPath();
+  mz.cells.forEach(k => {
+    const x0 = pad + k.x * c, y0 = pad + k.y * c, x1 = x0 + c, y1 = y0 + c;
+    if (k.w[0]){ ctx.moveTo(x0, y0); ctx.lineTo(x1, y0); }
+    if (k.w[1]){ ctx.moveTo(x1, y0); ctx.lineTo(x1, y1); }
+    if (k.w[2]){ ctx.moveTo(x0, y1); ctx.lineTo(x1, y1); }
+    if (k.w[3]){ ctx.moveTo(x0, y0); ctx.lineTo(x0, y1); }
+  });
+  ctx.stroke();
+  drawEnts();
+}
+function turnToward(m, dt){ const want = m.dir * 90 - 90, diff = ((want - m.ang + 540) % 360) - 180; m.ang += Math.sign(diff) * Math.min(Math.abs(diff), 900 * dt); }
+function inputDir(){ return MZ.hold ?? MZ.tap ?? MZ.run; }
+function updGecko(dt){
+  const g = MZ.g, want = inputDir();
+  if (g.moving && want != null && want === (g.dir + 2) % 4){ [g.cx, g.nx] = [g.nx, g.cx]; [g.cy, g.ny] = [g.ny, g.cy]; g.p = 1 - g.p; g.dir = want; }
+  if (g.moving){ g.p += MZ.speedG * dt; if (g.p >= 1){ g.cx = g.nx; g.cy = g.ny; g.p = 0; g.moving = false; } }
+  if (!g.moving){
+    const d = inputDir();
+    if (d != null){
+      if (!MZ.mz.at(g.cx, g.cy).w[d]){ g.dir = d; g.nx = g.cx + DX[d]; g.ny = g.cy + DY[d]; g.p = 0; g.moving = true; }
+      else { if (MZ.run === d) MZ.run = null; g.dir = d; }
+      if (MZ.tap === d) MZ.tap = null;
+    }
+  }
+  turnToward(g, dt);
+}
+function updFood(dt){
+  const f = MZ.f, g = MZ.g;
+  if (MZ.diff === 0) return;
+  if (f.pause > 0){ f.pause -= dt; return; }
+  if (f.moving){
+    f.p += MZ.speedF * dt;
+    if (f.p >= 1){ f.cx = f.nx; f.cy = f.ny; f.p = 0; f.moving = false; if (Math.random() < (MZ.diff === 1 ? .12 : .05)) f.pause = .25 + Math.random() * .6; }
+  }
+  if (!f.moving && f.pause <= 0){
+    const gp = [[g.cx, g.cy], [g.nx, g.ny]], opts = [];
+    for (let d = 0; d < 4; d++){
+      if (MZ.mz.at(f.cx, f.cy).w[d]) continue;
+      const nx = f.cx + DX[d], ny = f.cy + DY[d];
+      if (gp.some(p => p[0] === nx && p[1] === ny)) continue;
+      opts.push({ d, nx, ny });
+    }
+    if (!opts.length){ f.pause = .2; return; }
+    let pick;
+    if (Math.random() < (MZ.diff === 2 ? .75 : .3)){
+      const dist = bfs(MZ.mz, g.cx, g.cy);
+      pick = opts.reduce((a, o) => dist[o.ny * MZ.mz.c + o.nx] > dist[a.ny * MZ.mz.c + a.nx] ? o : a);
+    } else {
+      let cand = opts.filter(o => o.d !== (f.dir + 2) % 4); if (!cand.length) cand = opts;
+      pick = cand[Math.random() * cand.length | 0];
+    }
+    f.dir = pick.d; f.nx = pick.nx; f.ny = pick.ny; f.moving = true;
+  }
+  turnToward(f, dt);
+}
+function drawEnts(){
+  const c = MZ.cell;
+  const put = (el, m, wc, hc) => {
+    const p = posOf(m), w = wc * c, h = hc * c, x = MZ.pad + (p.x + .5) * c, y = MZ.pad + (p.y + .5) * c;
+    el.style.width = w + 'px'; el.style.height = h + 'px';
+    el.style.transform = `translate(${x - w/2}px,${y - h/2}px) rotate(${m.ang}deg)`;
+  };
+  put($('#ge'), MZ.g, 1.75, .875);
+  if (MZ.food === 'worm') put($('#fe'), MZ.f, .78, .78); else put($('#fe'), MZ.f, .78, .55);
+  $('#ge').classList.toggle('walking', MZ.g.moving);
+  if (MZ.food !== 'worm') $('#fe').classList.toggle('running', MZ.f.moving);
+}
+function mazeLoop(t){
+  if (!MZ || MZ.caught || mode !== 'maze') return;
+  const dt = Math.min(.05, (t - MZ.last) / 1000); MZ.last = t;
+  updGecko(dt);
+  if (t > MZ.startAt) updFood(dt);
+  drawEnts();
+  const a = posOf(MZ.g), b = posOf(MZ.f), hx = a.x + DX[MZ.g.dir] * .3, hy = a.y + DY[MZ.g.dir] * .3;
+  if (Math.hypot(a.x - b.x, a.y - b.y) < .55 || Math.hypot(hx - b.x, hy - b.y) < .4){ caught(); return; }
+  mzRaf = requestAnimationFrame(mazeLoop);
+}
+function caught(){
+  MZ.caught = true; onPageClose = null; beep('eat');
+  $('#fe').style.transition = 'opacity .3s'; $('#fe').style.opacity = 0;
+  $('#ge').classList.add('catch'); $('#ge').classList.remove('walking');
+  setTimeout(feedResult, 750);
+}
+function stopMaze(){ cancelAnimationFrame(mzRaf); const pb = $('#pbody'); if (pb) pb.style.overflow = ''; }
+function feedResult(){
+  if (!MZ || mode !== 'maze') return;
+  const { food, cal } = MZ, F = FOODS[food], slow = S.health < 30;
+  let gr = F.growth + (cal ? 2 : 0); if (slow) gr = Math.ceil(gr / 2);
+  const ch = { hunger: F.hunger + (cal ? 5 : 0), health: F.health + (cal ? 30 : 0), mood: 5, growth: gr };
+  S.stats.fed++; addDiary(`🍽️ 奶油在迷宮抓到了${foodName(food, cal)}，吃得好開心！`);
+  stopMaze(); mode = 'done';
+  changeStats(ch);
+  openPage('🎉 抓到了！', `
+    <div class="gkstage">${gkHTML('lick')}</div>
+    <p class="lead">奶油吃掉了 <b>${foodName(food, cal)}</b>，好好吃～😋</p>
+    <div class="preview">🦗 飽足 +${ch.hunger}・🦴 健康 +${ch.health}・💗 心情 +5・🌱 成長 +${gr}
+      ${slow ? '<br><span class="d2">鈣質不足，長大得比較慢，記得加鈣粉喔！</span>' : ''}</div>
+    <div class="row"><button class="btn" onclick="openFeed()">再餵一次</button><button class="btn ghost" onclick="closePage()">回家</button></div>`);
+}
+
+/* =========================================================
+   📔 日記
+   ========================================================= */
+function openDiary(){
+  mode = 'diary';
+  const dss = daysSinceShed(), left = Math.max(0, Math.ceil(SHED_DAYS - dss));
+  const shedMsg = dss >= SHED_DAYS ? '今天就會蛻皮喔！' : left <= 1 ? '明天左右就要蛻皮了，身體會變得灰灰的' : `大約再 ${left} 天會蛻皮`;
+  const list = S.diary.length ? S.diary.map(d => `<p><time>${fmtTime(d.t)}</time>${d.m}</p>`).join('') : '<p>還沒有日記，快去照顧奶油吧！</p>';
+  openPage('📔 成長日記', `
+    <div class="shedbox">🦎 <b>蛻皮週期</b>（約 ${SHED_DAYS} 天一次）・已蛻皮 ${S.shedCount || 0} 次<br>${shedMsg}
+      <div class="shedbar"><i style="width:${Math.min(100, dss / SHED_DAYS * 100)}%"></i></div></div>
+    <div class="bag"><span>🥣 蟲泥 ${S.inv.worm}</span><span>🪳 杜比亞 ${S.inv.roach}</span><span>🦴 鈣粉 ${S.inv.calcium}</span></div>
+    <div class="chips2"><span>餵食 ${S.stats.fed}</span><span>瑜伽 ${S.stats.yoga}</span><span>讀書 ${S.stats.read}</span><span>寫字 ${S.stats.type}</span></div>
+    <div class="diary">${list}</div>
+    <div class="row">
+      <button class="btn ghost small" onclick="toggleSound()">${S.sound ? '🔊 音效開' : '🔇 音效關'}</button>
+      <button class="btn ghost small" onclick="openChooser()">🔁 換一隻寵物</button>
+      <button class="btn ghost small" onclick="demoShed()">🦎 老師示範蛻皮</button>
+      <button class="btn ghost small" onclick="resetGame()">♻️ 重新開始</button>
+    </div>`);
+}
+function openChooser(first){
+  if (G.state === 'busy') { toast('等奶油蛻完皮再換喔～'); return; }
+  mode = 'choose';
+  const card = id => { const p = PETS[id], cur = S.pet === id && !first;
+    return `<button class="petcard ${cur ? 'sel' : ''}" onclick="choosePet('${id}')">
+      <div class="pc-img">${gkHTML('', LOOKS[id])}</div>
+      <b>${p.name}</b><span class="sp">${p.species}</span><p>${p.desc}</p>${cur ? '<span class="cur">✅ 正在照顧</span>' : ''}</button>`; };
+  openPage(first ? '🦎 選一隻班寵來照顧' : '🔁 換一隻寵物', `
+    <p class="lead">${first ? '資源班有兩隻守宮，你想照顧哪一隻呢？' : '每一隻都有自己的狀態和日記，<br>金幣和背包是大家共用的喔！'}</p>
+    <div class="petgrid">${card('butter')}${card('choco')}</div>`, true);
+}
+function choosePet(id){
+  const changed = id !== S.pet;
+  if (changed) switchPet(id);
+  closePage(); setupPet();
+  if (changed || S.diary.length <= 1) setTimeout(() => bubble(`嗨！我是${P().name}，請多多指教～`, 3800), 400);
+}
+function setupPet(){
+  const K = curLook();
+  G.seq++; G.inCave = false; G.p = 0; G.state = 'idle'; G.shedding = false; G.justShed = false; G.onArrive = null; G.pendingShed = false;
+  G.u = .38; G.v = .55; G.face = -1;
+  $('#skin').style.opacity = 0; $('#gk').className = '';
+  $('#gkFlip').innerHTML = sideGeckoSVG(null, K);
+  $('#avatar').innerHTML = sideGeckoSVG('20 70 96 62', K);
+  document.title = `${P().name}養成日記：小守宮的大冒險`;
+  if (S.hunger < 20 && L){
+    G.reason = 'hungry'; G.inCave = true; G.p = 1; G.state = 'sleep';
+    const e = entranceUV(); G.u = e.u; G.v = e.v;
+  } else G.until = performance.now() + 1500;
+  render();
+}
+function toggleSound(){ S.sound = !S.sound; save(); openDiary(); }
+function demoShed(){ closePage(); setTimeout(() => startShed(true), 500); }
+function resetGame(){
+  if (confirm('確定要重新開始嗎？\n所有金幣、背包和奶油的成長紀錄都會清除喔！')){
+    try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+    location.reload();
+  }
+}
+
+/* =========================================================
+   鍵盤
+   ========================================================= */
+const KEYMAP = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right' };
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && pageOpen){ closePage(); return; }
+  const dir = KEYMAP[e.key]; if (!dir) return;
+  if (mode === 'yoga'){ e.preventDefault(); if (!e.repeat) yogaPress(dir); }
+  else if (mode === 'maze' && MZ){ e.preventDefault(); MZ.hold = DIRI[dir]; if (!e.repeat) MZ.tap = DIRI[dir]; MZ.run = null; }
+});
+document.addEventListener('keyup', e => { const dir = KEYMAP[e.key]; if (dir && mode === 'maze' && MZ && MZ.hold === DIRI[dir]) MZ.hold = null; });
+
+/* =========================================================
+   啟動
+   ========================================================= */
+function setAppHeight(){ document.documentElement.style.setProperty('--apph', window.innerHeight + 'px'); }
+function onResize(){
+  setAppHeight();
+  requestAnimationFrame(() => { layoutStage(); if (mode === 'maze' && MZ && !MZ.caught) mazeLayout(); });
+}
+function init(){
+  setAppHeight();
+  let firstRun = false; try { firstRun = !localStorage.getItem(SAVE_KEY); } catch(e){}
+  load();
+  const now = Date.now(), away = now - S.lastTick;
+  decay(away, true); S.lastTick = now;
+  if (!S.diary.length) addDiary('🦎 奶油來到資源班了！請大家多多照顧牠～');
+  save();
+  layoutStage();
+  setupPet();
+  if (G.state === 'sleep') bubble('奶油餓到在躲避屋睡著了…快餵牠吃東西 🦗', 4500);
+  else bubble(away > 3600000 ? '你回來了！我好想你～ 💕' : '嗨！我是奶油，點我可以摸摸我喔～', 4200);
+  if (firstRun) setTimeout(() => openChooser(true), 600);
+  $('#stage').addEventListener('click', onStageTap);
+  render();
+  requestAnimationFrame(loop);
+  setInterval(tick, 10000);
+  setInterval(() => { $('#status').textContent = statusText(); }, 1000);
+  setInterval(() => { if (!pageOpen && G.state !== 'sleep' && G.state !== 'busy' && G.state !== 'exit') bubble(moodLine(), 4500); }, 16000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', () => setTimeout(onResize, 250));
+  if (window.ResizeObserver) new ResizeObserver(() => layoutStage()).observe($('#stage'));
+}
+init();
+</script>
+</body>
+</html>
+
+</body></html>

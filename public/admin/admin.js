@@ -111,6 +111,18 @@
     if (isFlag('選項') || isFlag('答案')) optWrap.classList.add('flag');
     g.append(el('label', { textContent: '選項 / 答案' }), optWrap);
 
+    // 學生看到的樣子：數學式用 $...$ 包住會以 KaTeX 顯示，例如 $\frac{1}{2}$、$x^2$、$\sqrt{3}$
+    const preview = el('div', { className: 'mpreview' });
+    const refreshPreview = () => {
+      const rows = [...optsBox.children].map((r, i) => `${LETTERS[i]}. ${r.querySelector('input[type=text]').value}`);
+      preview.replaceChildren(el('div', { className: 'mp-stem', textContent: stem.value }), ...rows.map((t) => el('div', { textContent: t })));
+      window.MathRender?.render(preview);
+    };
+    let pt = null;
+    c.addEventListener('input', () => { clearTimeout(pt); pt = setTimeout(refreshPreview, 250); });
+    g.append(el('label', {}, '學生畫面預覽', el('small', { className: 'muted', textContent: ' 數學式用 $ 包住' })), preview);
+    setTimeout(refreshPreview, 0);
+
     const diff = el('select', {}, el('option', { value: '', textContent: '（未設定）' }), ...[1, 2, 3].map((n) => el('option', { value: n, textContent: ['', '1 基礎', '2 中等', '3 進階'][n] })));
     diff.value = q.難度 || '';
     field('難度', diff, '難度');
@@ -229,6 +241,14 @@
   }
 
   $('#reload').onclick = load;
+  $('#new-q').onclick = async () => {
+    try {
+      await api('/api/admin/drafts-new', { method: 'POST', body: '{}' });
+      await load();
+      toast('已新增一題空白題目，填好後按「通過」');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) { toast(e.message); }
+  };
   $('#showRejected').onchange = load;
   init().catch((e) => { $('#list').textContent = '載入失敗：' + e.message; });
 })();

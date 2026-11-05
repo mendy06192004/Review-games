@@ -23,6 +23,12 @@
         <b>點這裡選擇檔案</b><span class="muted">或把檔案拖曳到這個框裡</span>
       </label>
       <p id="u-msg" class="muted"></p>
+      <details class="paste">
+        <summary>沒有檔案？直接貼上題目文字</summary>
+        <p class="muted small">從 Word、網頁或電子書複製題目貼進來。格式：<code>1. 題目 (A)選項 (B)選項 (C)選項 (D)選項</code>，答案可以寫在題號前 <code>( B )1.</code>、題目後 <code>答：B</code>，或最後一行 <code>答案 1.B 2.C</code>。數學式可用 <code>$\frac{1}{2}$</code>。</p>
+        <textarea id="p-text" rows="8" placeholder="( B )1. 下列何者等於 √9？ (A) 2 (B) 3 (C) 4 (D) 9&#10;2. x² = 4，x = ？ (A) ±2 (B) 2 (C) 4 (D) 16&#10;答案 2.A"></textarea>
+        <div class="actions"><button type="button" id="p-add">加入待匯入清單</button></div>
+      </details>
     </section>
 
     <section class="card">
@@ -32,12 +38,13 @@
 
       <p class="keystatus" id="keystatus" hidden><span id="keystatus-text"></span> <button type="button" class="small" id="key-change">更換金鑰</button></p>
       <div class="keybox" id="keybox" hidden>
-        <p><b id="keybox-title">還沒有 Claude API 金鑰。</b>AI 整理需要金鑰；貼上後只保存在這次開啟的平台中，關掉黑色視窗就會清除，不會寫進任何檔案。</p>
+        <p><b>沒有金鑰也可以：</b>已自動勾選下面的「離線模式」，Word 檔、有文字的 PDF、貼上的文字都能匯入（免費）。只有掃描檔、照片需要 AI 金鑰。</p>
+        <p><b id="keybox-title">還沒有 Claude API 金鑰。</b>（選用）AI 整理需要金鑰；貼上後只保存在這次開啟的平台中，關掉黑色視窗就會清除，不會寫進任何檔案。</p>
         <p class="muted small">金鑰要到 <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> 登入後，在「API Keys」按「Create Key」產生，是一長串以 <code>sk-ant-</code> 開頭的文字（只會顯示一次，請完整複製）。帳戶需要先在 Billing 儲值才能使用。注意：Claude.ai 的訂閱（Pro / Max）和 API 金鑰是分開的。</p>
         <div class="row"><input type="password" id="key" placeholder="sk-ant-…"><button type="button" id="key-save">檢查並使用這把金鑰</button></div>
         <p class="muted small">想要每次啟動都自動有金鑰：雙擊專案資料夾裡的「設定金鑰-Windows.bat」一次即可。</p>
       </div>
-      <label class="offline"><input type="checkbox" id="offline"> 離線模式（不用 AI，只能處理「有文字、格式整齊」的 PDF；掃描檔與照片不適用）</label>
+      <label class="offline"><input type="checkbox" id="offline"> 離線模式（免費、不用金鑰：依題號與 (A)(B)(C)(D) 自動拆題；適用 Word、有文字的 PDF、貼上的文字，掃描檔與照片不適用）</label>
 
       <div class="actions">
         <button type="button" class="primary" id="run" disabled>開始匯入勾選的檔案</button>

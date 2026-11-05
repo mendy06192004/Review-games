@@ -202,6 +202,14 @@ body.playing .topbar,body.playing .foot{display:none}
 .seal svg{width:18px;height:18px;display:block}
 .nav:has(> .btn.primary:only-child){justify-content:flex-end}
 
+/* 同一款遊戲的兩種玩法：一張卡片、兩個按鈕 */
+.gcard.pair{cursor:default}
+.gcard.pair:hover{transform:none;border-color:var(--line)}
+.gcard.pair .cover{cursor:default}
+.gcard.pair .gbody{display:flex;flex-direction:column;gap:6px;flex:1}
+.gactions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:10px}
+.gactions .btn{min-height:40px;padding:6px 14px;letter-spacing:.06em}
+
 /* 手機掃碼 */
 .qr-btn{border:1px solid var(--line);background:transparent;border-radius:var(--r);padding:4px 12px;min-height:36px;color:var(--ink-2);font:inherit;font-size:.88rem;cursor:pointer;white-space:nowrap}
 .qr-btn{margin-left:auto}

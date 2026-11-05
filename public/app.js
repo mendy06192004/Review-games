@@ -165,24 +165,45 @@ function pickSubject(code, name) {
     }));
     tabs.hidden = cats.length < 2;
   } else {
-    // 內建題庫版（有「平台版」欄位）緊接在平台題庫版後面，兩張卡片並排
-    const bank = [];
-    for (const g of list.filter((x) => x.使用題庫)) {
-      bank.push(g);
-      bank.push(...list.filter((x) => x.平台版 === g.id));
-    }
-    const fixed = list.filter((g) => !g.使用題庫 && !bank.includes(g));
+    // 同一款遊戲的「平台題庫版」與「內建題庫版」合成一張卡片，下方兩個按鈕選玩法
+    const pairs = list.filter((x) => x.使用題庫).map((g) => ({ bank: g, classic: list.find((x) => x.平台版 === g.id) || null }));
+    const paired = new Set(pairs.flatMap((p) => [p.bank.id, p.classic?.id]).filter(Boolean));
+    const fixed = list.filter((g) => !paired.has(g.id));
     $('#games-eyebrow').textContent = `${name}・${S.counts[code] || 0} 題`;
     $('#games-title').textContent = '選一個遊戲';
-    $('#games-lede').textContent = bank.length ? '「用題庫出題」的遊戲，下一步會讓你選版本與章節。' : '';
+    $('#games-lede').textContent = pairs.length ? '「用題庫出題」會讓你選版本與章節；「直接開始」就是遊戲內建的題目。' : '';
     const sections = [];
-    if (bank.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '複習遊戲', el('small', { textContent: '平台題庫：選範圍、題目來自老師整理的題庫　內建題庫：直接開始' })), el('div', { className: 'gcards' }, ...bank.map(gameCard))));
+    if (pairs.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '複習遊戲', el('small', { textContent: '每個遊戲可選兩種玩法' })), el('div', { className: 'gcards' }, ...pairs.map(pairCard))));
     if (fixed.length) sections.push(el('section', { className: 'gsection' }, el('h2', {}, '學科小遊戲', el('small', { textContent: '內建固定範圍，直接開始' })), el('div', { className: 'gcards' }, ...fixed.map(gameCard))));
     if (!sections.length) sections.push(el('p', { className: 'empty', textContent: '這一科目前還沒有遊戲。' }));
     $('#game-list').replaceChildren(...sections);
     tabs.hidden = true;
   }
   show('games');
+}
+
+function pairCard(p) {
+  const { bank, classic } = p;
+  const noBank = !(S.counts[S.subject] > 0);
+  const title = bank.名稱.replace(/（(平台題庫|內建題庫)）$/, '');
+  const card = el('article', { className: 'gcard pair' },
+    cover(bank),
+    el('div', { className: 'gbody' },
+      el('span', { className: 'gname', textContent: title }),
+      bank.年級 || bank.章節 ? el('span', { className: 'gchips' },
+        bank.年級 ? el('span', { className: 'gchip', textContent: bank.年級 }) : null,
+        bank.章節 ? el('span', { className: 'gchip', textContent: bank.章節 }) : null) : null,
+      el('span', { className: 'gdesc', textContent: bank.說明 }),
+      el('div', { className: 'gactions' },
+        el('button', { className: 'btn small primary', type: 'button', textContent: '用題庫出題', disabled: noBank,
+          title: noBank ? '題庫還沒有這一科的題目' : '選版本、章節，題目來自老師整理的題庫' }),
+        classic ? el('button', { className: 'btn small', type: 'button', textContent: '直接開始', title: '遊戲內建的題目，點了就玩' }) : null)));
+  const [useBank, direct] = card.querySelectorAll('button');
+  card.dataset.id = bank.id;
+  if (classic) card.dataset.alt = classic.id;
+  useBank.addEventListener('click', () => pickGame(bank));
+  if (direct) direct.addEventListener('click', () => pickGame(classic));
+  return card;
 }
 
 function pickGame(g) {
@@ -458,7 +479,7 @@ function openFromLink() {
     if (g.使用題庫) pickGame(g);
     else {
       // 直接開始的遊戲：先停在選遊戲頁並標出來，讓學生自己點（手機瀏覽器要點一下才能全螢幕、播音效）
-      const card = [...document.querySelectorAll('#game-list .gcard')].find((c) => c.dataset.id === g.id);
+      const card = [...document.querySelectorAll('#game-list .gcard')].find((c) => c.dataset.id === g.id || c.dataset.alt === g.id);
       if (card) { card.classList.add('flash'); card.scrollIntoView({ block: 'center' }); }
     }
   }

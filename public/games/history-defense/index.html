@@ -404,7 +404,7 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:n
     </div>
     <div class="right-t">
       <div class="modes" id="modes"></div>
-      <div class="trow"><label><input type="checkbox" id="teach"> 教師模式：開放全部時期</label></div>
+      <div class="trow"><label><input type="checkbox" id="teach"> 教師模式：開放全部時期</label><button class="btn sm ink" id="resetAll">全部重置</button></div>
     </div>
   </div>
 </section>
@@ -1226,7 +1226,7 @@ function openMap(){S.mode='region';setAcc(REG[S.region].c);renderMap();show('scr
 function renderMap(){
   const R=REG[S.region];
   $('#mapTitle').innerHTML=`${R.grade}・${R.name}時空地圖<br><small style="font-size:14px;font-family:var(--sans)">等級：${DIFF[S.diff].name}</small>`;
-  let h=`<div class="maptools"><button class="btn mus" id="mSort">時空排序挑戰</button><button class="btn" id="mRev">本冊複習 10 回合</button></div>`;
+  let h=`<div class="maptools"><button class="btn mus" id="mSort">時空排序挑戰</button><button class="btn" id="mRev">本冊複習 10 回合</button><button class="btn ink" id="mReset">重置本冊進度</button></div>`;
   R.periods.forEach((p,pi)=>{
     const ss=R.st.filter(s=>s.p===p),un=periodUnlocked(S.region,pi),got=ss.filter(s=>cleared(s.id)).length;
     h+=`<div class="period ${un?'':'locked'}"><div class="ph"><b>${p}</b><small>${ss[0].era} 起</small><small>已解決 ${got} / ${ss.length}</small>${un?'':`<div class="lockmsg">${ICON.lock.replace('<svg','<svg style="width:14px;vertical-align:-2px"')} 上一時期完成 2 關後開啟</div>`}</div><div class="nodes">`+
@@ -1236,6 +1236,7 @@ function renderMap(){
   $$('#mapBody .node').forEach(b=>b.onclick=()=>{const s=BYID[b.dataset.id];if(!stageUnlocked(s)){Snd.wrong();return;}Snd.click();S.mode='region';startBattle(s);});
   $('#mSort').onclick=()=>{Snd.click();S.mode='region';startSort(S.region);};
   $('#mRev').onclick=()=>{Snd.click();startReview(S.region);};
+  $('#mReset').onclick=()=>{Snd.click();askReset(S.region);};
 }
 
 /* ---------- 對戰（人物＋事件＋環境） ---------- */
@@ -1515,6 +1516,18 @@ function reviewDone(){
   $('#rv-again').onclick=()=>{Snd.click();closeOv();startReview(S.rRegion);};
   $('#rv-home').onclick=()=>{if(S.rRegion){Snd.click();closeOv();S.region=S.rRegion;openMap();}else goHome();};
 }
+function askReset(rk){
+  const what=rk?`${REG[rk].grade}${REG[rk].name}的星星與時空排序紀錄`:'三冊所有星星、時空排序紀錄、知識能量，並關閉教師模式';
+  ov(`<div class="ov-h" style="color:var(--navy)">${rk?'重置本冊進度？':'全部重置？'}</div><div style="width:90px;margin:8px auto">${IC('hourglass','#6b4a5e')}</div><div class="ov-sub">會清除${what}，所有時期重新從第一個開始解鎖。<br>清除後無法復原。</div><div class="btnrow"><button class="btn red" id="rsYes">確定重置</button><button class="btn ink" id="rsNo">取消</button></div>`);
+  $('#rsNo').onclick=()=>{Snd.click();closeOv();};
+  $('#rsYes').onclick=()=>{
+    if(rk){Object.keys(PROG).forEach(k=>{if(k.startsWith(rk+'_')||k.startsWith('sort_'+rk+'_'))delete PROG[k];});}
+    else{PROG={};S.points=0;store.set('hgw_pts',0);S.teacher=false;store.set('hgw_teacher',false);}
+    store.set('hgw_prog2',PROG);updPts();Snd.stamp();
+    ov(`<div class="ov-h">已重置！</div><div class="ov-sub">重新開始複習吧！</div><div class="btnrow"><button class="btn" id="rsOk">好</button></div>`);
+    $('#rsOk').onclick=()=>{Snd.click();closeOv();if(rk)renderMap();else renderTitle();};
+  };
+}
 function goHome(){Snd.click();clearIdle();closeOv();S.stage=null;renderTitle();show('scr-title');}
 function goBack(){Snd.click();clearIdle();S.busy=false;S.stage=null;if(S.mode==='review'&&!S.rRegion)goHome();else{if(S.rRegion)S.region=S.rRegion;openMap();}}
 
@@ -1546,6 +1559,7 @@ function init(){
   $('#btn-help').onclick=()=>{Snd.click();showHelp();};
   $('#btn-full').onclick=async()=>{Snd.click();try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen();}catch(e){}try{await screen.orientation.lock('landscape');}catch(e){}};
   $('#teach').onchange=e=>{S.teacher=e.target.checked;store.set('hgw_teacher',S.teacher);};
+  $('#resetAll').onclick=()=>{Snd.click();askReset(null);};
   $('#m-back').onclick=goHome;$('#b-back').onclick=goBack;$('#s-back').onclick=goBack;
   $('#attack').onclick=attack;
   $('#b-say').onclick=()=>speak('危機：'+S.stage.c+'。'+S.stage.d);

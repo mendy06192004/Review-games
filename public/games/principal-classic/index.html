@@ -1524,7 +1524,7 @@ function nextQ(){
 }
 async function answer(i){
   if(Q.answered)return;Q.answered=true;clearInterval(Q.timer);
-  if(Q.cur.id){$$(".opt").forEach(b=>b.disabled=true);
+  if(Q.cur.id&&window.GameBridge&&GameBridge.active){$$(".opt").forEach(b=>b.disabled=true);
     try{const r=await GameBridge.check(Q.cur.id,i);Q.cur.ans=r.答案;Q.cur.exp=r.解析||"";}
     catch(e){Q.answered=false;$$(".opt").forEach(b=>b.disabled=false);toast("無法驗證答案："+e.message);return;}}
   const el=(Date.now()-Q.t0)/1000,ok=i===Q.cur.ans,st=qst(),fb=$("#qFb");

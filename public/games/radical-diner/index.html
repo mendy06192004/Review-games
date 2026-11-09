@@ -198,6 +198,11 @@ svg.px{display:block;width:100%;height:auto;image-rendering:pixelated}
 .waitnote{font-size:14px;color:#6a5a7a}
 
 /* START OVERLAY */
+.overlay.center{align-items:center;z-index:60}
+.confirm{max-width:380px;text-align:center}
+.confirm h2{margin:0 0 8px;font-weight:normal;font-size:24px;color:var(--mustard);letter-spacing:2px}
+.confirm p{margin:0 0 16px;font-size:15px;color:var(--cream)}
+.crow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .overlay{position:fixed;inset:0;background:rgba(18,13,34,.95);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;
   padding:max(20px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
 .card{background:var(--panel);max-width:540px;width:100%;padding:22px 20px;margin:8px auto}
@@ -249,6 +254,7 @@ svg.px{display:block;width:100%;height:auto;image-rendering:pixelated}
       <div class="stat" title="小費"><span id="coinIcon"></span><b id="hudScore">0</b></div>
       <div class="stat" title="連續一次答對">COMBO <b id="hudStreak">0</b></div>
       <button class="btn small alt" id="sndBtn" aria-pressed="true">SND ON</button>
+      <button class="btn small" id="homeBtn" aria-label="回到主畫面">HOME</button>
     </div>
   </header>
 
@@ -306,6 +312,13 @@ svg.px{display:block;width:100%;height:auto;image-rendering:pixelated}
   </div>
 </div>
 
+<div class="overlay center" id="confirmBox" hidden role="dialog" aria-modal="true" aria-labelledby="confirmT">
+  <div class="card pb confirm">
+    <h2 id="confirmT">回到主畫面？</h2>
+    <p id="confirmS">這一桌還沒結帳，回去後小費和 COMBO 會歸零。</p>
+    <div class="crow"><button class="btn" id="confirmNo">繼續營業</button><button class="btn go" id="confirmYes">回主畫面</button></div>
+  </div>
+</div>
 <div class="overlay" id="overlay">
   <div class="card pb">
     <h1>RADICAL DINER</h1>
@@ -326,7 +339,9 @@ svg.px{display:block;width:100%;height:auto;image-rendering:pixelated}
 (()=>{
 const $=id=>document.getElementById(id);
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const wait=ms=>new Promise(r=>setTimeout(r,RM?Math.min(ms,120):ms));
+let EPOCH=0;
+const gate=()=>{const e=EPOCH;return v=>e===EPOCH?v:new Promise(()=>{})};
+const wait=ms=>{const g=gate();return new Promise(r=>setTimeout(r,RM?Math.min(ms,120):ms)).then(g)};
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -526,7 +541,7 @@ function flyItem(from,to,html,arc=40){
   const dx=to.left-from.left,dy=to.top-from.top;
   if(RM||!el.animate){el.remove();return Promise.resolve()}
   const a=el.animate([{transform:'translate(0,0) rotate(0)'},{transform:`translate(${dx*.5}px,${dy*.5-arc}px) rotate(180deg)`},{transform:`translate(${dx}px,${dy}px) rotate(360deg)`}],{duration:440,easing:'steps(8)'});
-  return a.finished.then(()=>el.remove(),()=>el.remove());
+  const g=gate();return a.finished.then(()=>el.remove(),()=>el.remove()).then(g);
 }
 function mouth(i){const p=S.people[i],r=p.el.querySelector('.sp').getBoundingClientRect(),a=p.acc==='none'?0:3;return {left:r.left+r.width/2-7,top:r.top+r.height*((a+7.5)/(a+14))}}
 function lastItem(container,sel){const a=container.querySelectorAll(sel);return a[a.length-1]}
@@ -784,7 +799,31 @@ TIERS.forEach((t,k)=>{
 $('startBtn').onclick=()=>{audio();sfx.click();S.n=startN;$('overlay').hidden=true;newTable()};
 
 /* idle preview behind the start screen */
-S.orders=[{c:9,r:7},{c:-2,r:7}];S.dishes=[7];S.target={7:7};buildScene();S.slots[1].spat=2;renderSlot(1);buildBoard();renderLegend();hud();
+function idleScene(){
+  S.n=1;S.orders=[{c:9,r:7},{c:-2,r:7}];S.dishes=[7];S.target={7:7};S.phase='idle';
+  buildScene();S.slots[1].spat=2;renderSlot(1);buildBoard();renderLegend();renderLog(0);hud();
+  $('hint').hidden=true;$('submitBtn').hidden=false;$('nextBtn').hidden=true;$('tray').hidden=true;$('waiter').style.left='';
+  $('waiter').className='waiter idle';hideBanner();lockBoard(true);$('replayBtn').disabled=true;ticker('按「開店營業」開始');
+}
+idleScene();
+
+/* home button */
+let lastFocus=null;
+function goHome(){
+  EPOCH++;S.run++;S.score=0;S.streak=0;$('fx').innerHTML='';
+  $('confirmBox').hidden=true;idleScene();$('overlay').hidden=false;$('overlay').scrollTop=0;$('startBtn').focus({preventScroll:true});
+}
+function closeConfirm(){$('confirmBox').hidden=true;if(lastFocus)lastFocus.focus({preventScroll:true})}
+$('homeBtn').onclick=()=>{
+  sfx.click();if(!$('overlay').hidden)return;
+  if(S.phase==='done'&&S.score===0){goHome();return}
+  $('confirmS').textContent=S.phase==='done'?`目前小費 ${S.score}，回去後小費和 COMBO 會歸零。`:`第 ${S.n} 桌還沒結帳，回去後這桌進度、小費和 COMBO 都會歸零。`;
+  lastFocus=document.activeElement;$('confirmBox').hidden=false;$('confirmNo').focus();
+};
+$('confirmNo').onclick=()=>{sfx.click();closeConfirm()};
+$('confirmYes').onclick=()=>{sfx.click();goHome()};
+$('confirmBox').onclick=e=>{if(e.target===$('confirmBox'))closeConfirm()};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('confirmBox').hidden)closeConfirm()});
 })();
 </script>
 

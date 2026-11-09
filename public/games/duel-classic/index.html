@@ -1754,7 +1754,7 @@ if(BANK.on)GameBridge.questions().then(qs=>{BANK.qs=qs;const box=document.queryS
   if(box){[...box.children].slice(1).forEach(c=>{c.hidden=true;});const p=document.createElement('p');p.className='small';
     p.textContent=`題目來自你在平台選的範圍（共 ${qs.length} 題），所有玩家共用。`;box.appendChild(p);}});
 function bankQuestion(){if(!BANK.deck.length)BANK.deck=shuffle(BANK.qs.slice());const q=BANK.deck.pop();
-  return {id:q.id,text:true,topic:'老師題庫',sub:'',kind:'選出正確答案',disp:q.題幹,eq:'',opts:q.選項,ans:null,time:Math.round(40*cfg.tm),ok:null,who:null};}
+  return {id:q.id,bank:true,text:true,topic:'老師題庫',sub:'',kind:'選出正確答案',disp:q.題幹,eq:'',opts:q.選項,ans:null,time:Math.round(40*cfg.tm),ok:null,who:null};}
 const txt=(el,s)=>{el.textContent=s;};
 function askQuestion(){
   D.phase='question';const f=cur(),m=D.move,lvl=m.d==='hard'?'hard':'easy';
@@ -1769,7 +1769,7 @@ function askQuestion(){
 async function duelAnswer(k){
   if(!D||D.phase!=='question')return;D.phase='resolve';stopTimer();
   const f=cur(),m=D.move,Q=D.Q;D.hist.push(Q);
-  if(Q.id){try{const r=await GameBridge.check(Q.id,k);Q.ans=Q.opts[r.答案];Q.eq=null;Q.explain=r.解析;}catch(e){Q.ans=null;}}
+  if(Q.bank){try{const r=await GameBridge.check(Q.id,k);Q.ans=Q.opts[r.答案];Q.eq=null;Q.explain=r.解析;}catch(e){Q.ans=null;}}
   const btns=[...document.querySelectorAll('#dopts .opt')];$('#dopts').classList.add('locked');
   btns.forEach((b,j)=>{if(Q.opts[j]===Q.ans)b.classList.add('right');});
   const u=$('#u'+f.i);

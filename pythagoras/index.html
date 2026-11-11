@@ -67,7 +67,7 @@ sup{font-size:.6em}
 .hero p{margin:.3rem 0 0;font-size:1.2rem;color:var(--mut)}
 .spells{display:flex;gap:1rem}
 .spell{padding:.55rem 1.2rem;border-radius:999px;background:rgba(0,0,0,.25);border:2px dashed var(--line);font-size:1.3rem;font-weight:900}
-.doors{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;width:min(100%,60rem)}
+.doors{display:grid;grid-template-columns:repeat(5,1fr);gap:.9rem;width:min(100%,64rem)}
 .door{cursor:pointer;text-align:center;padding:1.1rem .7rem;border-radius:1.4rem 1.4rem 1rem 1rem;background:linear-gradient(180deg,rgba(139,92,246,.35),rgba(30,20,80,.6));border:2px solid var(--line);transition:transform .15s;position:relative;overflow:hidden}
 .door:active{transform:scale(.96)}
 .door .em{font-size:3rem;display:block;animation:bob 3s ease-in-out infinite}
@@ -345,6 +345,9 @@ body{position:fixed;inset:0}
 .hatcard svg{width:5.5rem;height:5.5rem}
 .hatcard .btn{width:100%;margin-top:.3rem}
 .gside .stat .pill{font-size:.95rem}
+.prog i.fx{background:#facc15}
+.solsteps{margin-top:.3rem;font-size:1.05rem;line-height:1.7;background:rgba(0,0,0,.2);border-radius:.7rem;padding:.4rem .7rem}
+#chFb{max-height:16rem;overflow:auto}
 </style>
 </head>
 <body>
@@ -374,8 +377,9 @@ body{position:fixed;inset:0}
   <nav class="nav">
    <button data-v="learn"><span class="n">1</span>學習</button>
    <button data-v="practice"><span class="n">2</span>練習</button>
-   <button data-v="challenge"><span class="n">3</span>挑戰</button>
-   <button data-v="game"><span class="n">4</span>遊戲</button>
+   <button data-v="advanced"><span class="n">3</span>進階</button>
+   <button data-v="challenge"><span class="n">4</span>挑戰</button>
+   <button data-v="game"><span class="n">5</span>遊戲</button>
   </nav>
   <div class="tools">
    <span class="pill coinpill" id="coinPill" title="魔法商店">🪙 0</span>
@@ -399,8 +403,9 @@ body{position:fixed;inset:0}
    <div class="doors">
     <div class="door" data-v="learn"><span class="em">📖</span><span class="no">1 學習</span><h3>魔法圖書館</h3><div class="mg">看見面積的秘密</div><p>認識股和斜，看格子拼起來</p></div>
     <div class="door" data-v="practice"><span class="em">🧪</span><span class="no">2 練習</span><h3>咒語練習室</h3><div class="mg">一步一步算</div><p>角蛙老師陪你填空</p></div>
-    <div class="door" data-v="challenge"><span class="em">🗼</span><span class="no">3 挑戰</span><h3>試煉之塔</h3><div class="mg">自己算出答案</div><p>三角形會轉來轉去喔</p></div>
-    <div class="door" data-v="game"><span class="em">🎮</span><span class="no">4 遊戲</span><h3>魔法遊樂園</h3><div class="mg">三種不同的遊戲</div><p>連連看、點泡泡、守城戰</p></div>
+    <div class="door" data-v="advanced"><span class="em">🔮</span><span class="no">3 進階</span><h3>魔咒研究室</h3><div class="mg">提示少一點</div><p>自己選咒語、算出答案</p></div>
+    <div class="door" data-v="challenge"><span class="em">🗼</span><span class="no">4 挑戰</span><h3>試煉之塔</h3><div class="mg">自己算出答案</div><p>三角形會轉來轉去喔</p></div>
+    <div class="door" data-v="game"><span class="em">🎮</span><span class="no">5 遊戲</span><h3>魔法遊樂園</h3><div class="mg">三種不同的遊戲</div><p>連連看、點泡泡、守城戰</p></div>
    </div>
    <div class="note">🔈 點角蛙老師的對話框，可以再聽一次。右上角 🗣️ 可以開關語音。</div>
   </section>
@@ -471,6 +476,25 @@ body{position:fixed;inset:0}
      <div class="card" style="display:flex;gap:.6rem;align-items:stretch">
       <div class="kp grow" data-kp></div>
       <div class="col" style="gap:.5rem;justify-content:center"><button class="btn sec" id="prHint" style="padding:.6rem .8rem">💡<br>提示</button><button class="btn grn" id="prGo" style="display:none;padding:.6rem .8rem">下一題<br>▶</button></div>
+     </div>
+    </div>
+   </div>
+  </section>
+
+  <!-- ADVANCED -->
+  <section class="view" id="v-advanced">
+   <div class="row grow">
+    <div class="card col" style="flex:0 0 43%">
+     <div class="hdr"><h2 class="ttl">🔮 進階</h2><button class="btn sm ghost" id="adPrev">◀</button><span class="pill" id="adNo"></span><button class="btn sm ghost" id="adNext">▶</button><span class="sp"></span><button class="btn sm ghost" data-reset="advanced">↺ 重置</button></div>
+     <div class="prog" id="adProg"></div>
+     <div class="svgbox" id="adSvg"></div>
+     <div class="frog" id="frogA"><svg><use href="#frog"/></svg><div class="bubble"></div></div>
+    </div>
+    <div class="col grow">
+     <div class="card steps" id="adSteps"></div>
+     <div class="card" style="display:flex;gap:.6rem;align-items:stretch">
+      <div class="kp grow" data-kp></div>
+      <div class="col" style="gap:.5rem;justify-content:center"><button class="btn sec" id="adHint" style="padding:.6rem .8rem">💡<br>提示</button><button class="btn grn" id="adGo" style="display:none;padding:.6rem .8rem">下一題<br>▶</button></div>
      </div>
     </div>
    </div>
@@ -556,7 +580,7 @@ body{position:fixed;inset:0}
   <!-- TEACHER -->
   <section class="view" id="v-teacher">
    <div class="hdr"><h2 class="ttl">🧙 教師後台</h2><span class="note">題庫存在這台裝置的瀏覽器。平板與學習單的題號、順序、圖形角度完全相同。</span><span class="sp"></span><button class="btn sm ghost" data-v="worksheet">🖨️ 前往學習單</button></div>
-   <div class="hdr"><b style="font-size:1.15rem">正在編輯：</b><div class="seg" id="tBankSeg"><button data-b="P" class="on">🧪 練習題庫</button><button data-b="C">🗼 挑戰題庫</button></div></div>
+   <div class="hdr"><b style="font-size:1.15rem">正在編輯：</b><div class="seg" id="tBankSeg"><button data-b="P" class="on">🧪 練習題庫</button><button data-b="A">🔮 進階題庫</button><button data-b="C">🗼 挑戰題庫</button></div></div>
    <div class="tgrid">
     <div class="col">
      <div class="card">
@@ -583,6 +607,7 @@ body{position:fixed;inset:0}
       <div class="hdr" style="margin-top:.5rem">
        <button class="btn sm ghost" data-reset="learn">📖 重置學習</button>
        <button class="btn sm ghost" data-reset="practice">🧪 重置練習進度</button>
+       <button class="btn sm ghost" data-reset="advanced">🔮 重置進階</button>
        <button class="btn sm ghost" data-reset="challenge">🗼 重置挑戰</button>
        <button class="btn sm ghost" data-reset="game">🎮 清除遊戲星星</button>
        <button class="btn sm red" data-reset="all">♻️ 全部學生紀錄重置</button>
@@ -604,7 +629,8 @@ body{position:fixed;inset:0}
      <h2 class="ttl">🖨️ 一鍵列印學習單</h2>
      <div class="form-row"><label style="min-width:auto">標題</label><input class="inp" id="wsTitle" style="width:100%" value="畢氏定理魔法學習單"></div>
      <div class="chk"><input type="checkbox" id="wsP" checked> 🧪 練習區（對照平板「2 練習」）</div>
-     <div class="chk"><input type="checkbox" id="wsC" checked> 🗼 挑戰區（對照平板「3 挑戰」）</div>
+     <div class="chk"><input type="checkbox" id="wsA" checked> 🔮 進階區（對照平板「3 進階」）</div>
+     <div class="chk"><input type="checkbox" id="wsC" checked> 🗼 挑戰區（對照平板「4 挑戰」）</div>
      <div class="chk"><input type="checkbox" id="wsKey" checked> 附上教師解答頁</div>
      <div class="chk"><input type="checkbox" id="wsPer4"> 練習區每頁 4 題（字更大）</div>
      <div class="note" style="margin:.5rem 0">✔ 題號、順序、三角形角度都和平板完全一樣，學生可以一邊看平板一邊寫。<br>要改題目請到 🧙 教師後台。</div>
@@ -659,13 +685,14 @@ const P0=(mode,s1,s2,rot=0,flip=false)=>({mode,s1,s2,rot,flip});
 const DEF_P=[P0('hyp','3','4'),P0('hyp','6','8'),P0('hyp','5','12'),P0('hyp','2','3'),P0('hyp','1','7'),P0('hyp','4','4'),P0('hyp','√5','2'),P0('leg','5','3'),P0('leg','13','5'),P0('leg','6','4'),P0('leg','7','√13'),P0('leg','10','7')];
 const DEF_C=[P0('hyp','3','4',135),P0('leg','10','6',210),P0('hyp','2','5',60,true),P0('leg','13','12',300),P0('hyp','1','3',90,true),P0('hyp','5','5',225),P0('leg','8','5',30,true),P0('hyp','√7','3',150),P0('leg','9','√17',270,true),P0('hyp','8','15',330),P0('leg','17','8',120),P0('hyp','√11','5',240,true)];
 const OLD_C10=JSON.stringify(DEF_C.slice(0,10));
+const DEF_A=[P0('hyp','6','8'),P0('leg','5','4',90),P0('hyp','2','4',180,true),P0('leg','10','8',270),P0('hyp','1','5',45),P0('leg','8','6',135,true),P0('hyp','9','12',0,true),P0('leg','√20','2',90),P0('hyp','3','√7',225),P0('leg','15','9',315),P0('hyp','5','6',30),P0('leg','9','5',180)];
 const ROTS=[0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330];
 function fixP(p){return{mode:p.mode==='leg'?'leg':'hyp',s1:canon(p.s1),s2:canon(p.s2),rot:isFinite(+p.rot)?+p.rot:0,flip:!!p.flip}}
 function loadBank(k,def,old){let b=store.get(k,null);if(!Array.isArray(b)&&old){b=store.get(old,null)}if(!Array.isArray(b)||!b.length)b=JSON.parse(JSON.stringify(def));return b.map(fixP).filter(solve)}
-let bankP=loadBank('bankP',DEF_P,'bank'), bankC=loadBank('bankC',DEF_C);
+let bankP=loadBank('bankP',DEF_P,'bank'), bankC=loadBank('bankC',DEF_C), bankA=loadBank('bankA',DEF_A);
 if(JSON.stringify(bankC)===OLD_C10){bankC=JSON.parse(JSON.stringify(DEF_C));try{localStorage.setItem('pyth_bankC',JSON.stringify(bankC))}catch(e){}}
 let settings=Object.assign({speed:1,gameSrc:'mix',pin:'1234',vrate:.95},store.get('settings',{}));
-const saveBanks=()=>{store.set('bankP',bankP);store.set('bankC',bankC)}, saveSet=()=>store.set('settings',settings);
+const saveBanks=()=>{store.set('bankP',bankP);store.set('bankC',bankC);store.set('bankA',bankA)}, saveSet=()=>store.set('settings',settings);
 
 function genProblem(level){
  const sw=(x,y)=>Math.random()<.5?[x,y]:[y,x];
@@ -679,7 +706,7 @@ function genProblem(level){
  if(level>=3&&Math.random()<.4){const b=rint(1,4),c=b*b+rint(3,20);return P0(mode,'√'+c,String(b))}
  const c=rint(3,10),b=rint(1,c-1);return P0(mode,String(c),String(b));
 }
-function gameProb(level){const vb=[...bankP,...bankC];const src=settings.gameSrc;
+function gameProb(level){const vb=[...bankP,...bankA,...bankC];const src=settings.gameSrc;
  if(vb.length&&(src==='bank'||(src==='mix'&&Math.random()<.4)))return Object.assign({},pick(vb));return genProblem(level)}
 
 /* ================= Voice (Speech Synthesis) ================= */
@@ -795,6 +822,7 @@ function go(v){
  $('#btnTeacher').classList.toggle('on',v==='teacher');
  if(v==='learn')lnShow(lnTab);
  if(v==='practice')prRender(true);
+ if(v==='advanced')adRender(true);
  if(v==='challenge'){if(!CH.list.length)chStart();else if(!CH.ended)chSpeakQ()}
  if(v==='game')gEnter();
  if(v==='teacher')tRender();
@@ -807,17 +835,18 @@ $('#btnTeacher').onclick=()=>{Snd.tap();go('teacher')};
 const RESETS={
  learn:['重新學習','「認識股和斜」會從第 1 題開始，面積魔法和咒語卡也會還原。',()=>{L0.n=0;L0.p=null;arBuild();$$('.lines').forEach(b=>{b.dataset.init='';b.innerHTML=''});$$('[data-rev]').forEach(b=>b.textContent='下一步 ▶');$('#flGo').classList.remove('on');lnTab=0;if(curView==='learn')lnShow(0);toast('學習已重置')}],
  practice:['重置練習','練習會回到第 1 題，完成紀錄會清除。',()=>{PR.doneSet=[];store.set('prDone',[]);prLoad(0,true);toast('練習已重置，從第 1 題開始')}],
+ advanced:['重置進階','進階會回到第 1 題，完成紀錄會清除。',()=>{AD.doneSet=[];store.set('adDone',[]);adLoad(0,false);toast('進階已重置，從第 1 題開始')}],
  challenge:['重新挑戰','挑戰會從第 1 題重新開始，分數歸零。',()=>{chStart();toast('挑戰已重置')}],
  game:['清除遊戲星星','三個遊戲的星星紀錄都會清除。',()=>{store.set('gStars2',[0,0,0]);if(curView==='game'&&!gCur)gMenu();toast('遊戲星星已清除')}],
- all:['全部學生紀錄重置','學習、練習、挑戰、遊戲的紀錄、金幣和帽子全部清除（題庫不會被刪除）。',()=>{['learn','practice','challenge','game'].forEach(k=>RESETS[k][2]());store.set('chBest',0);coins=0;store.set('coins',0);hatsOwned=['wiz'];hatId='wiz';store.set('hats',hatsOwned);store.set('hat','wiz');applyHat();coinHud();toast('全部紀錄已重置')}]};
+ all:['全部學生紀錄重置','學習、練習、挑戰、遊戲的紀錄、金幣和帽子全部清除（題庫不會被刪除）。',()=>{['learn','practice','advanced','challenge','game'].forEach(k=>RESETS[k][2]());store.set('chBest',0);coins=0;store.set('coins',0);hatsOwned=['wiz'];hatId='wiz';store.set('hats',hatsOwned);store.set('hat','wiz');applyHat();coinHud();toast('全部紀錄已重置')}]};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-reset]');if(!b)return;const r=RESETS[b.dataset.reset];Snd.tap();confirmBox('↺ '+r[0]+'？',r[1],r[2],'確定重置')});
 
 /* ================= Keypad ================= */
 const KP_KEYS=[['7'],['8'],['9'],['√','k-rt','rt'],['⌫','k-fn','del'],['4'],['5'],['6'],['0'],['清除','k-fn','clr'],['1'],['2'],['3'],['確定 ✔','k-ok','ok']];
 $$('[data-kp]').forEach(k=>{k.innerHTML=KP_KEYS.map(([t,c,a])=>`<button class="${c||''}" data-k="${a||t}">${t}</button>`).join('');
  k.addEventListener('click',e=>{const b=e.target.closest('button');if(b)kpPress(b.dataset.k)})});
-function kpCtx(){if(curView==='practice')return prCtx;if(curView==='challenge')return chCtx;return null}
-function kpPress(k){const c=kpCtx();if(!c||!c.can())return;let v=c.get();
+function kpCtx(){if(curView==='practice')return prCtx;if(curView==='advanced')return adCtx;if(curView==='challenge')return chCtx;return null}
+function kpPress(k){const c=kpCtx();if(!c)return;if(!c.can()){const w=c.why&&c.why();if(w)toast(w);return}let v=c.get();
  if(k==='ok'){c.submit();return}
  if(k==='del')v=v.slice(0,-1);else if(k==='clr')v='';
  else if(k==='rt'){if(c.noRt&&c.noRt()){toast('這一步是算「平方」，不需要 √ 喔！');Voice.say('這一步是算平方，不需要根號喔');Snd.bad();return}if(v.includes('√')){toast('一個答案只要一個 √ 就好');return}v+='√'}
@@ -971,28 +1000,94 @@ $('#prHint').onclick=()=>{Snd.tap();const p=prProb(),s=solve(p),hyp=p.mode==='hy
  frogSay('frogP','💡 '+t)};
 $('#prPrev').onclick=()=>{Snd.tap();prLoad(PR.i-1)};$('#prNext').onclick=$('#prGo').onclick=()=>{Snd.tap();prLoad(PR.i+1)};
 
-/* ================= 3. CHALLENGE ================= */
+/* ================= 3. ADVANCED (進階) ================= */
+const AD={i:store.get('adI',0),step:0,vals:{},ok:{},bad:{},act:null,done:false,doneSet:store.get('adDone',[]),miss:[0,0,0]};
+function adProb(){if(AD.i>=bankA.length)AD.i=0;return bankA[AD.i]}
+function adLoad(i,speak=true){AD.i=bankA.length?(i+bankA.length)%bankA.length:0;store.set('adI',AD.i);Object.assign(AD,{step:0,vals:{},ok:{},bad:{},act:null,done:false,miss:[0,0,0]});adRender(speak)}
+function adF(id){const cls=['fld'];if(AD.ok[id])cls.push('ok');else if(AD.bad[id])cls.push('no');else if(AD.act===id&&!AD.done)cls.push('act');
+ const v=AD.vals[id]||'';return `<span class="${cls.join(' ')}" data-af="${id}">${v?radHTML(v):'<span class="ph">?</span>'}</span>`}
+function adRender(fresh){if(!bankA.length){$('#adSteps').innerHTML='進階題庫沒有題目，請到教師後台新增。';return}
+ const p=adProb(),s=solve(p),hyp=p.mode==='hyp',st=AD.step,op=hyp?'＋':'－';
+ $('#adNo').textContent=`第 ${AD.i+1} / ${bankA.length} 題`;
+ $('#adProg').innerHTML=bankA.map((_,i)=>`<i class="${AD.doneSet.includes(i)?'ok':i===AD.i?'cur':''}"></i>`).join('');
+ $('#adSvg').innerHTML=probTri(p,{named:false,w:500,h:340,fs:30,pad:56});
+ const cls=[0,1,2].map(i=>AD.done||i<st?'done':i===st?'cur':'');
+ let h=`<div class="step ${cls[0]}"><div class="sn">${st>0?'✔':'1'}</div><div style="flex:1"><div class="st">第一步：問號 ? 在哪一條邊？選對咒語</div><div class="sl" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">`+
+  (st>0?`<span class="pill" style="font-size:1.15rem">${hyp?'<span class="c1">股²</span> ＋ <span class="c2">股²</span> ＝ <span class="ch">斜²</span>　（? 是斜邊）':'<span class="ch">斜²</span> － <span class="c1">股²</span> ＝ <span class="c2">股²</span>　（? 是股）'}</span>`
+   :`<button class="btn sm sec" data-spell="hyp">股² ＋ 股² ＝ 斜²</button><button class="btn sm sec" data-spell="leg">斜² － 股² ＝ 股²</button>`)+`</div></div></div>`;
+ h+=`<div class="step ${cls[1]}"><div class="sn">${st>1||AD.done?'✔':'2'}</div><div><div class="st">第二步：把兩個數平方，再${st>0?(hyp?'「相加」':'「相減」'):'加或減'}</div><div class="sl">?² ＝ ${adF('a')} ${st>0?op:'○'} ${adF('b')} ＝ ${adF('c')}</div></div></div>`;
+ h+=`<div class="step ${cls[2]}"><div class="sn">${AD.done?'✔':'3'}</div><div><div class="st">第三步：開根號，求出 ?</div><div class="sl">?² ＝ ${AD.ok.c?s.ansSq:'?'}，? ＝ ${adF('d')}${AD.done&&simpStr(s.ansSq)!==fmt(s.ansSq)?` <span style="font-size:.9rem;color:var(--mut)">（也可寫成 ${radHTML(simpStr(s.ansSq))}）</span>`:''}</div></div></div>`;
+ $('#adSteps').innerHTML=h;
+ $$('#adSteps [data-spell]').forEach(b=>b.onclick=()=>adSpell(b.dataset.spell));
+ $$('#adSteps .fld').forEach(f=>f.onclick=()=>{const id=f.dataset.af;if(AD.done||AD.ok[id])return;const need=AD.step===1?['a','b','c']:AD.step===2?['d']:[];if(!need.includes(id)){toast(AD.step===0?'先選一個咒語喔！':'先完成前面的步驟喔！');return}AD.act=id;Snd.tap();adRender()});
+ const rt=$('#v-advanced .k-rt');rt.classList.toggle('dim',AD.step<2);rt.classList.toggle('pulse',AD.step===2&&!AD.done);
+ $('#adGo').style.display=AD.done?'':'none';$('#adHint').style.display=AD.done?'none':'';
+ if(fresh&&!AD.done)frogSay('frogA',`進階第 ${AD.i+1} 題！先看看問號在哪一條邊，選對咒語。`)}
+function adSpell(m){const p=adProb(),hyp=p.mode==='hyp';if(AD.step!==0)return;
+ if(m===p.mode){AD.step=1;AD.act='a';Snd.ok();adRender();frogSay('frogA',hyp?'對！問號在直角的對面，是斜邊，用加法。接著把兩個數平方再相加。':'對！問號碰到直角，是股，用減法。接著用斜² 減掉 股²。','good')}
+ else{AD.miss[0]++;Snd.bad();frogSay('frogA',hyp?'再看一次：問號在直角（黃色小方塊）的「對面」，它是最長的斜邊喔！':'再看一次：問號有碰到直角，所以它是股。最長的那條（直角對面）才是斜邊。','bad')}}
+const adCtx={can:()=>!AD.done&&AD.step>0&&!!AD.act&&bankA.length>0,why:()=>AD.done?'':AD.step===0?'先選一個咒語喔！':'',get:()=>AD.vals[AD.act]||'',set:v=>{AD.vals[AD.act]=v;delete AD.bad[AD.act];adRender()},noRt:()=>AD.step<2,submit:()=>adCheck()};
+function adSqMsg(side){side=norm(side);if(/^\d+$/.test(side)){const k=+side;return `${k}² ＝ ${k} × ${k}`}const m=side.match(/^(\d*)√(\d+)$/);if(m&&!m[1])return `(${radHTML(side)})² ＝ ${m[2]}，根號會消失`;return `(${radHTML(side)})² ＝ ${m[1]}² × ${m[2]}`}
+function adCheck(){const p=adProb(),s=solve(p),hyp=p.mode==='hyp';
+ if(AD.step===1){const need=['a','b','c'],empty=need.find(id=>!AD.ok[id]&&!AD.vals[id]);if(empty){AD.act=empty;adRender();frogSay('frogA','還有黃色框框沒填喔！','bad');Snd.bad();return}
+  const v=id=>AD.vals[id]||'',num=id=>v(id).includes('√')?NaN:+v(id);let msg=null;
+  if(hyp){const set=[s.legSq1,s.legSq2],a=num('a'),b=num('b');
+   const same=s.legSq1===s.legSq2,aok=same?a===s.legSq1:set.includes(a),bok=same?b===s.legSq1:(set.includes(b)&&(!aok||b!==a));
+   if(!AD.ok.a){if(aok)AD.ok.a=true;else{AD.bad.a=true;msg=v('a').includes('√')?'平方的答案是一般數字，不用根號喔！':`把邊長平方：${adSqMsg(p.s1)}，${adSqMsg(p.s2)}`}}
+   if(!AD.ok.b){if(bok)AD.ok.b=true;else{AD.bad.b=true;msg=msg||`另一個數也要平方喔！`}}
+   if(!AD.ok.c){if(num('c')===s.ansSq)AD.ok.c=true;else{AD.bad.c=true;msg=msg||(num('c')===Math.abs(s.legSq1-s.legSq2)?'求斜邊要用「加」法喔！':'把兩個平方加起來，再算一次！')}}}
+  else{const a=num('a'),b=num('b');
+   if(!AD.ok.a||!AD.ok.b){if(a===s.legSq1&&b===s.hypSq){AD.bad.a=AD.bad.b=true;msg='減法要用「大的減小的」：斜² 放前面喔！'}
+    else{if(!AD.ok.a){if(a===s.hypSq)AD.ok.a=true;else{AD.bad.a=true;msg=`第一格放斜邊的平方：${adSqMsg(p.s1)}`}}
+     if(!AD.ok.b){if(b===s.legSq1)AD.ok.b=true;else{AD.bad.b=true;msg=msg||`第二格放股的平方：${adSqMsg(p.s2)}`}}}}
+   if(!AD.ok.c){if(num('c')===s.ansSq)AD.ok.c=true;else{AD.bad.c=true;msg=msg||(num('c')===s.hypSq+s.legSq1?'求股要用「減」法喔！':'用大的減小的，再算一次！')}}}
+  if(AD.ok.a&&AD.ok.b&&AD.ok.c){AD.step=2;AD.act='d';Snd.ok();starBurst($('#adSteps'),4);adRender();frogSay('frogA','太棒了！最後一步：按粉紅色的 √ 鍵，把平方解開。','good');return}
+  AD.miss[1]++;Snd.bad();const bad=need.find(id=>AD.bad[id]);AD.act=bad;adRender();
+  if(AD.miss[1]>=2)msg+=`<br>💡 這一步是：?² ＝ ${hyp?s.legSq1:s.hypSq} ${hyp?'＋':'－'} ${hyp?s.legSq2:s.legSq1} ＝ ${s.ansSq}`;
+  frogSay('frogA',msg,'bad');setTimeout(()=>{need.forEach(id=>{if(AD.bad[id])AD.vals[id]=''});adRender()},900);return}
+ if(AD.step===2){const val=AD.vals.d||'';if(!val){frogSay('frogA','先在黃色框框輸入答案喔！','bad');return}const sq=parseRad(val),S=s.ansSq;
+  if(sq===S){AD.ok.d=true;AD.done=true;AD.act=null;if(!AD.doneSet.includes(AD.i)){AD.doneSet.push(AD.i);store.set('adDone',AD.doneSet);addCoins(4)}adRender();Snd.win();confetti(70);
+   frogSay('frogA',(isSq(S)&&norm(val)!==fmt(S)?`${radHTML(val)} 可以化簡成 <b>${fmt(S)}</b>！`:'')+`完成了！? ＝ <b>${radHTML(fmt(S))}</b>。按「下一題」繼續！`,'good');return}
+  AD.miss[2]++;Snd.bad();AD.bad.d=true;adRender();
+  let msg=(!val.includes('√')&&+val===S)?(isSq(S)?`${S} 是平方喔！想一想：誰 × 自己 ＝ ${S}？`:`${S} 是 ?²，? 要加上根號：按 √ 再輸入 ${S}`):`?² ＝ ${S}，所以 ? ＝ √${S}`;
+  frogSay('frogA',msg,'bad');setTimeout(()=>{AD.vals.d='';adRender()},900)}}
+$('#adHint').onclick=()=>{Snd.tap();const p=adProb(),s=solve(p),hyp=p.mode==='hyp';
+ const t=[`找到黃色小方塊（直角）。直角「對面」的邊是斜邊。問號在斜邊上就用加法；問號是股就用減法。`,
+  hyp?`把兩個邊長各自平方（自己 × 自己），再加起來。`:`斜邊的平方，減掉股的平方，大的減小的。`,
+  isSq(s.ansSq)?`?² ＝ ${s.ansSq}，想一想誰 × 自己 ＝ ${s.ansSq}？`:`?² ＝ ${s.ansSq}，先按 √ 再按數字。`][AD.step];frogSay('frogA','💡 '+t)};
+$('#adPrev').onclick=()=>{Snd.tap();adLoad(AD.i-1)};$('#adNext').onclick=$('#adGo').onclick=()=>{Snd.tap();adLoad(AD.i+1)};
+
+/* ================= 4. CHALLENGE ================= */
 const CH={list:[],i:0,score:0,res:[],val:'',answered:false,ended:false};
-function chStart(){CH.list=bankC.map(p=>Object.assign({},p));Object.assign(CH,{i:0,score:0,res:[],val:'',answered:false,ended:false});$('#chFb').className='fb';$('#chMain').style.display='flex';$('#chSum').style.display='none';
+function chStart(){CH.list=bankC.map(p=>Object.assign({},p));Object.assign(CH,{i:0,score:0,res:[],val:'',answered:false,ended:false,tries:0});$('#chFb').className='fb';$('#chMain').style.display='flex';$('#chSum').style.display='none';
  if(!CH.list.length){$('#chSvg').innerHTML='<div class="note" style="font-size:1.2rem">挑戰題庫沒有題目，請到教師後台新增。</div>';return}chRender();if(curView==='challenge')chSpeakQ()}
 function chSpeakQ(){if(CH.list.length&&!CH.answered)Voice.say(`挑戰第 ${CH.i+1} 題，求出問號那條邊的長度`)}
 function chRender(){const p=CH.list[CH.i];if(!p)return;$('#chNo').textContent=`挑戰 第 ${CH.i+1} / ${CH.list.length} 題`;$('#chScore').textContent=`🏆 ${CH.score} 分`;
- $('#chProg').innerHTML=CH.list.map((_,i)=>`<i class="${CH.res[i]===true?'ok':CH.res[i]===false?'no':i===CH.i?'cur':''}"></i>`).join('');
+ $('#chProg').innerHTML=CH.list.map((_,i)=>`<i class="${CH.res[i]===true?'ok':CH.res[i]==='fix'?'fx':i===CH.i?'cur':''}"></i>`).join('');
  $('#chSvg').innerHTML=probTri(p,{named:false,mono:true,w:560,h:380,fs:30});
- $('#chFld').innerHTML=CH.val?radHTML(CH.val):'<span class="ph">?</span>';$('#chFld').className='fld'+(CH.answered?(CH.res[CH.i]?' ok':' no'):' act');
+ $('#chFld').innerHTML=CH.val?radHTML(CH.val):'<span class="ph">?</span>';$('#chFld').className='fld'+(CH.answered?' ok':' act');
  $('#chGo').style.display=CH.answered?'':'none'}
-const chCtx={can:()=>!CH.answered&&CH.list.length>0,get:()=>CH.val,set:v=>{CH.val=v;chRender()},submit:()=>chCheck()};
+const chCtx={can:()=>!CH.answered&&CH.list.length>0&&!CH.ended,get:()=>CH.val,set:v=>{CH.val=v;chRender()},submit:()=>chCheck()};
+function chSteps(p,s){const hyp=p.mode==='hyp',S=s.ansSq,fin=isSq(S)?` ＝ <b>${fmt(S)}</b>`:simpStr(S)!==fmt(S)?` ＝ <b>${radHTML(simpStr(S))}</b>`:'';
+ return `<div class="solsteps"><div>① 找斜邊：? ${hyp?'在直角的對面，是<b>斜邊</b> → 用<b>加法</b>':'碰到直角，是<b>股</b> → 用<b>減法</b>'}</div>
+ <div>② 先平方：${hyp?`${sqHTML(p.s1)} ＝ ${s.legSq1}，${sqHTML(p.s2)} ＝ ${s.legSq2}`:`斜² ＝ ${sqHTML(p.s1)} ＝ ${s.hypSq}，股² ＝ ${sqHTML(p.s2)} ＝ ${s.legSq1}`}</div>
+ <div>③ 再${hyp?'相加':'相減'}：?² ＝ ${hyp?`${s.legSq1} ＋ ${s.legSq2}`:`${s.hypSq} － ${s.legSq1}`} ＝ ${S}</div>
+ <div>④ 開根號：? ＝ ${radHTML('√'+S)}${fin}</div></div>`}
 function chCheck(){if(!CH.val){toast('請先輸入答案喔！');return}const p=CH.list[CH.i],s=solve(p),sq=parseRad(CH.val);
  if(sq==null){toast('答案可以寫成 5、√13 或 2√3 這樣');return}
- const ok=sq===s.ansSq;CH.answered=true;CH.res[CH.i]=ok;const fb=$('#chFb');
- const steps=p.mode==='hyp'?`${sqHTML(p.s1)} ＋ ${sqHTML(p.s2)} ＝ ${s.legSq1} ＋ ${s.legSq2} ＝ ${s.ansSq}`:`${sqHTML(p.s1)} － ${sqHTML(p.s2)} ＝ ${s.hypSq} － ${s.legSq1} ＝ ${s.ansSq}`;
- if(ok){CH.score+=10;addCoins(3);Snd.ok();starBurst($('#chFld'));fb.className='fb show ok';fb.innerHTML=`✔ 答對了！+10 分 ${isSq(s.ansSq)&&norm(CH.val)!==fmt(s.ansSq)?`（${radHTML(CH.val)} ＝ ${fmt(s.ansSq)}）`:''}`;Voice.say(pick(['答對了！','太棒了！','好厲害！']))}
- else{Snd.bad();fb.className='fb show no';fb.innerHTML=`✘ 正確答案：<b>${radHTML(fmt(s.ansSq))}</b>${simpStr(s.ansSq)!==fmt(s.ansSq)?`（＝${radHTML(simpStr(s.ansSq))}）`:''}<br><span style="font-size:1rem">${uName(p)}² ＝ ${steps}</span>`;Voice.say(`再加油！正確答案是 ${fmt(s.ansSq)}`)}
- chRender()}
-$('#chGo').onclick=()=>{Snd.tap();$('#chFb').className='fb';if(CH.i+1>=CH.list.length){chEnd();return}CH.i++;CH.val='';CH.answered=false;chRender();chSpeakQ()};
-function chEnd(){CH.ended=true;const n=CH.list.length,r=CH.res.filter(Boolean).length,pc=r/n,st=pc>=.9?3:pc>=.7?2:pc>=.4?1:0;const best=Math.max(store.get('chBest',0),CH.score);store.set('chBest',best);
+ const fb=$('#chFb');
+ if(sq===s.ansSq){const first=!CH.tries;CH.answered=true;CH.res[CH.i]=first?true:'fix';Snd.ok();starBurst($('#chFld'));fb.className='fb show ok';
+  const simpNote=isSq(s.ansSq)&&norm(CH.val)!==fmt(s.ansSq)?`（${radHTML(CH.val)} ＝ ${fmt(s.ansSq)}）`:'';
+  if(first){CH.score+=10;addCoins(3);fb.innerHTML=`✔ 一次就答對！+10 分 ${simpNote}`;Voice.say(pick(['答對了！','太棒了！','好厲害！']))}
+  else{CH.score+=3;addCoins(1);fb.innerHTML=`✔ 改正成功！+3 分 ${simpNote}<br><span style="font-size:1rem">記住這四個步驟，下一題試試一次答對！</span>`;Voice.say('改正成功！你學會了！')}
+  chRender();return}
+ CH.tries++;Snd.bad();fb.className='fb show no';
+ fb.innerHTML=`✘ 還不對喔！跟著角蛙老師的步驟算一次：${chSteps(p,s)}<div style="margin-top:.3rem;color:var(--gold)">👉 照著步驟，再輸入一次正確答案才能前往下一題！</div>`;
+ Voice.say('還不對喔，跟著步驟算一次。'+speechText(chSteps(p,s)));CH.val='';chRender()}
+$('#chGo').onclick=()=>{Snd.tap();$('#chFb').className='fb';if(CH.i+1>=CH.list.length){chEnd();return}CH.i++;CH.val='';CH.answered=false;CH.tries=0;chRender();chSpeakQ()};
+function chEnd(){CH.ended=true;const n=CH.list.length,r=CH.res.filter(x=>x===true).length,fx=CH.res.filter(x=>x==='fix').length,pc=r/n,st=pc>=.9?3:pc>=.7?2:pc>=.4?1:0;const best=Math.max(store.get('chBest',0),CH.score);store.set('chBest',best);
  $('#chMain').style.display='none';const S=$('#chSum');S.style.display='block';const msg=st>=3?'太厲害了！你是畢氏大魔法師！':st>=2?'很棒喔！再挑戰一次拿滿三顆星！':'沒關係！可以先回練習多練幾題再來挑戰！';
- S.innerHTML=`<h2 class="ttl" style="font-size:2rem">🗼 試煉完成！</h2><div class="stars">${starsHTML(st)}</div><div style="font-size:1.4rem;font-weight:900;margin:.6rem 0">答對 ${r} / ${n} 題　得分 ${CH.score}　<span class="cg">最高 ${best}</span></div>
+ S.innerHTML=`<h2 class="ttl" style="font-size:2rem">🗼 試煉完成！</h2><div class="stars">${starsHTML(st)}</div><div style="font-size:1.4rem;font-weight:900;margin:.6rem 0">一次答對 ${r} 題、改正 ${fx} 題（共 ${n} 題）　得分 ${CH.score}　<span class="cg">最高 ${best}</span></div>
  <div class="frog" style="justify-content:center"><svg><use href="#frog"/></svg><div class="bubble" style="flex:0 1 auto">${msg}</div></div>
  <div class="hdr" style="justify-content:center;margin-top:.8rem"><button class="btn" onclick="chStart()">↺ 再挑戰一次</button><button class="btn sec" data-v="practice">🧪 回去練習</button></div>`;
  Voice.say(`挑戰完成！答對 ${r} 題。${msg}`);
@@ -1297,7 +1392,7 @@ function gDrawMon(c,m,t,isT){const r=m.r;let x=m.x,y=m.y;const a=m.dead?Math.max
 function askPin(){showModal(`<h2 class="ttl">🧙 教師後台</h2><p style="font-weight:700">請輸入教師密碼</p><input class="inp" id="pinIn" type="password" inputmode="numeric" style="width:100%;font-size:1.6rem;text-align:center"><div class="err" id="pinErr"></div><div class="hdr" style="justify-content:flex-end"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn" id="pinOk">進入</button></div>`);
  const ok=()=>{if($('#pinIn').value===String(settings.pin)){window._tOk=1;closeModal();go('teacher')}else{$('#pinErr').textContent='密碼不正確';Snd.bad()}};$('#pinOk').onclick=ok;$('#pinIn').onkeydown=e=>{if(e.key==='Enter')ok()};setTimeout(()=>$('#pinIn').focus(),50)}
 const TF={mode:'hyp',edit:-1,bank:'P'};
-const curBank=()=>TF.bank==='P'?bankP:bankC;
+const curBank=()=>TF.bank==='P'?bankP:TF.bank==='A'?bankA:bankC;const bankName=()=>({P:'🧪 練習題庫',A:'🔮 進階題庫',C:'🗼 挑戰題庫'})[TF.bank];
 $('#tfRot').innerHTML=`<option value="r">🎲 隨機（儲存時固定）</option>`+ROTS.map(r=>`<option value="${r}">${r}°${r===0?'（正放）':''}</option>`).join('');
 function tfMode(m){TF.mode=m;$$('#tfMode button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));$('#tfL1').textContent=m==='hyp'?'股':'斜邊';$('#tfL2').textContent=m==='hyp'?'股':'已知的股';tfPreview()}
 $('#tfMode').onclick=e=>{const b=e.target.closest('button');if(b){Snd.tap();tfMode(b.dataset.m)}};
@@ -1311,13 +1406,13 @@ function tfPreview(){const p=tfRead(),e=$('#tfErr');let err='';
  else if(p.mode==='leg'&&parseRad(p.s1)<=parseRad(p.s2))err='斜邊必須比股長！（斜² 要大於 股²）';
  if(err){e.textContent=err;$('#tfPrev').innerHTML='';return null}
  const s=solve(p);e.innerHTML=`<span style="color:#9df5b8">✔ 答案：${uName(p)} ＝ ${radHTML(fmt(s.ansSq))}${simpStr(s.ansSq)!==fmt(s.ansSq)?'（＝'+radHTML(simpStr(s.ansSq))+'）':''}</span>`;
- $('#tfPrev').innerHTML=probTri(Object.assign({},p,{rot:p.rot??0}),{w:480,h:220,fs:24,pad:50,named:TF.bank==='P',mono:TF.bank==='C'});return p}
+ $('#tfPrev').innerHTML=probTri(Object.assign({},p,{rot:p.rot??0}),{w:480,h:220,fs:24,pad:50,named:TF.bank==='P',mono:TF.bank!=='P'});return p}
 $('#tfSave').onclick=()=>{const p=tfPreview();if(!p){Snd.bad();return}if(p.rot==null){p.rot=pick(ROTS.filter(r=>r));p.flip=Math.random()<.5}
  const b=curBank();if(TF.edit>=0){b[TF.edit]=p;toast('✔ 已儲存修改')}else{b.push(p);toast('✔ 已新增第 '+b.length+' 題')}saveBanks();Snd.ok();tfClear();tRender();CH.list=[]};
 $('#tfCancel').onclick=()=>{Snd.tap();tfClear();tRender()};
-function tfClear(){TF.edit=-1;$('#tfS1').value='';$('#tfS2').value='';$('#tfRot').value=TF.bank==='C'?'r':'0';$('#tfFlip').checked=false;$('#tfTitle').textContent='➕ 新增題目';$('#tfSave').textContent='➕ 新增題目';$('#tfCancel').style.display='none';tfPreview()}
+function tfClear(){TF.edit=-1;$('#tfS1').value='';$('#tfS2').value='';$('#tfRot').value=TF.bank==='P'?'0':'r';$('#tfFlip').checked=false;$('#tfTitle').textContent='➕ 新增題目';$('#tfSave').textContent='➕ 新增題目';$('#tfCancel').style.display='none';tfPreview()}
 function tRender(){const b=curBank();$$('#tBankSeg button').forEach(x=>x.classList.toggle('on',x.dataset.b===TF.bank));
- $('#tListT').innerHTML=`${TF.bank==='P'?'🧪 練習題庫':'🗼 挑戰題庫'}（${b.length} 題）`;
+ $('#tListT').innerHTML=`${bankName()}（${b.length} 題）`;
  $('#tList').innerHTML=b.map((p,i)=>{const s=solve(p);return `<div class="qi ${TF.edit===i?'edit':''}"><span class="num">${i+1}</span><span class="badge ${p.mode==='hyp'?'h':'l'}">${p.mode==='hyp'?'求斜':'求股'}</span><span class="tx">${p.mode==='hyp'?`股＝${radHTML(p.s1)}、股＝${radHTML(p.s2)}`:`斜＝${radHTML(p.s1)}、股＝${radHTML(p.s2)}`} → <b class="cg">${radHTML(fmt(s.ansSq))}</b> <span class="note">${p.rot}°${p.flip?' 翻轉':''}</span></span><button data-te="${i}" title="修改">✏️</button><button data-tu="${i}" title="上移">⬆️</button><button data-td="${i}" title="刪除">🗑️</button></div>`}).join('')||'<div class="note">題庫是空的，請在左邊新增題目。</div>';
  $$('#stSpd button').forEach(x=>x.classList.toggle('on',+x.dataset.s===+settings.speed));$$('#stSrc button').forEach(x=>x.classList.toggle('on',x.dataset.s===settings.gameSrc));
  $$('#stVoice button').forEach(x=>x.classList.toggle('on',(x.dataset.s==='1')===Voice.on));$$('#stRate button').forEach(x=>x.classList.toggle('on',+x.dataset.s===+settings.vrate));tfPreview()}
@@ -1331,18 +1426,18 @@ $('#stVoice').onclick=e=>{const b=e.target.closest('button');if(!b)return;Voice.
 $('#stRate').onclick=e=>{const b=e.target.closest('button');if(!b)return;settings.vrate=+b.dataset.s;saveSet();tRender();Voice.say('我是角蛙老師，這是我的說話速度。')};
 $('#stVTest').onclick=()=>{if(!Voice.ok){toast('這台裝置的瀏覽器不支援語音');return}if(!Voice.on){toast('請先把語音打開');return}Voice.say('大家好，我是角蛙老師！股的平方加股的平方，等於斜的平方。')};
 $('#stPinSave').onclick=()=>{const v=$('#stPin').value.trim();if(v.length<3){toast('密碼至少 3 個字');return}settings.pin=v;saveSet();$('#stPin').value='';toast('✔ 密碼已更新')};
-$('#tResetBank').onclick=()=>confirmBox(`恢復預設${TF.bank==='P'?'練習':'挑戰'}題庫？`,'目前這份題庫會被換成預設題目。',()=>{if(TF.bank==='P')bankP=JSON.parse(JSON.stringify(DEF_P));else bankC=JSON.parse(JSON.stringify(DEF_C));saveBanks();CH.list=[];tfClear();tRender();toast('已恢復預設題庫')});
-$('#tExport').onclick=()=>{showModal(`<h2 class="ttl">📤 匯出題庫</h2><p class="note">複製下面的文字（含練習與挑戰），貼到另一台平板的「匯入題庫」即可。</p><textarea class="inp" id="exTx" readonly>${esc(JSON.stringify({practice:bankP,challenge:bankC}))}</textarea><div class="hdr" style="justify-content:flex-end;margin-top:.6rem"><button class="btn sec" id="exCp">複製</button><button class="btn" onclick="closeModal()">關閉</button></div>`);
+$('#tResetBank').onclick=()=>confirmBox(`恢復預設的${bankName()}？`,'目前這份題庫會被換成預設題目。',()=>{const d=x=>JSON.parse(JSON.stringify(x));if(TF.bank==='P')bankP=d(DEF_P);else if(TF.bank==='A')bankA=d(DEF_A);else bankC=d(DEF_C);saveBanks();CH.list=[];tfClear();tRender();toast('已恢復預設題庫')});
+$('#tExport').onclick=()=>{showModal(`<h2 class="ttl">📤 匯出題庫</h2><p class="note">複製下面的文字（含練習與挑戰），貼到另一台平板的「匯入題庫」即可。</p><textarea class="inp" id="exTx" readonly>${esc(JSON.stringify({practice:bankP,advanced:bankA,challenge:bankC}))}</textarea><div class="hdr" style="justify-content:flex-end;margin-top:.6rem"><button class="btn sec" id="exCp">複製</button><button class="btn" onclick="closeModal()">關閉</button></div>`);
  $('#exCp').onclick=()=>{const t=$('#exTx');t.select();try{navigator.clipboard.writeText(t.value).then(()=>toast('已複製'),()=>{document.execCommand('copy');toast('已複製')})}catch(e){document.execCommand('copy');toast('已複製')}}};
 $('#tImport').onclick=()=>{showModal(`<h2 class="ttl">📥 匯入題庫</h2><p class="note">貼上匯出的文字（會取代目前題庫）。</p><textarea class="inp" id="imTx"></textarea><div class="err" id="imErr"></div><div class="hdr" style="justify-content:flex-end"><button class="btn ghost" onclick="closeModal()">取消</button><button class="btn" id="imOk">匯入</button></div>`);
  $('#imOk').onclick=()=>{try{const a=JSON.parse($('#imTx').value);const cl=x=>(x||[]).filter(p=>p&&(p.mode==='hyp'||p.mode==='leg')).map(fixP).filter(solve);
-  let P,C;if(Array.isArray(a)){P=cl(a);C=bankC}else{P=cl(a.practice);C=cl(a.challenge)}if(!P.length&&!C.length)throw 0;bankP=P.length?P:bankP;bankC=C.length?C:bankC;saveBanks();CH.list=[];closeModal();tRender();toast(`已匯入：練習 ${bankP.length} 題、挑戰 ${bankC.length} 題`)}catch(e){$('#imErr').textContent='格式不正確，請確認是完整的匯出文字'}}};
+  let P,C,A=[];if(Array.isArray(a)){P=cl(a);C=bankC}else{P=cl(a.practice);C=cl(a.challenge);A=cl(a.advanced)}if(!P.length&&!C.length&&!A.length)throw 0;bankP=P.length?P:bankP;bankC=C.length?C:bankC;bankA=A.length?A:bankA;saveBanks();CH.list=[];closeModal();tRender();toast(`已匯入：練習 ${bankP.length} 題、進階 ${bankA.length} 題、挑戰 ${bankC.length} 題`)}catch(e){$('#imErr').textContent='格式不正確，請確認是完整的匯出文字'}}};
 
 /* ================= WORKSHEET ================= */
-['#wsP','#wsC','#wsKey','#wsPer4'].forEach(s=>$(s).onchange=wsBuild);$('#wsTitle').oninput=()=>{clearTimeout(window._wsT);window._wsT=setTimeout(wsBuild,300)};
+['#wsP','#wsA','#wsC','#wsKey','#wsPer4'].forEach(s=>$(s).onchange=wsBuild);$('#wsTitle').oninput=()=>{clearTimeout(window._wsT);window._wsT=setTimeout(wsBuild,300)};
 function wsBuild(){const html=wsHTML();$('#wsPrev').innerHTML=html;$('#printRoot').innerHTML=html;const w=$('#wsPrev').clientWidth-32,z=Math.min(1,w/800);$$('#wsPrev .ws-page').forEach(p=>p.style.zoom=z)}
-function wsHTML(){const doP=$('#wsP').checked&&bankP.length,doC=$('#wsC').checked&&bankC.length,per=$('#wsPer4').checked?4:6,title=esc($('#wsTitle').value||'畢氏定理魔法學習單');
- if(!doP&&!doC)return'<div class="ws-page" style="display:grid;place-items:center;font-size:16pt">請勾選練習區或挑戰區</div>';
+function wsHTML(){const doA=$('#wsA').checked&&bankA.length,doP=$('#wsP').checked&&bankP.length,doC=$('#wsC').checked&&bankC.length,per=$('#wsPer4').checked?4:6,title=esc($('#wsTitle').value||'畢氏定理魔法學習單');
+ if(!doP&&!doC&&!doA)return'<div class="ws-page" style="display:grid;place-items:center;font-size:16pt">請至少勾選一區</div>';
  const info=`<div class="ws-info">班級：______ 座號：____ 姓名：____________<br>日期：______ 得分：______</div>`;
  const head=(sub,first)=>`<div class="ws-head"><div><div class="ws-title">${title}</div><div class="ws-sub">${sub}</div></div>${first?info:'<div class="ws-info">姓名：____________</div>'}</div>`;
  const formula=`<div class="ws-formula"><div>求斜邊：股² ＋ 股² ＝ 斜²</div><div>求股：斜² － 股² ＝ 股²</div><div>(${radHTML('√13')})² ＝ 13；邊² ＝ 13 → 邊 ＝ ${radHTML('√13')}</div></div>`;
@@ -1355,11 +1450,14 @@ function wsHTML(){const doP=$('#wsP').checked&&bankP.length,doC=$('#wsC').checke
     :[`① <b>斜²</b> ＝ ${sqHTML(p.s1)} ＝ ${bl()}　<b>股²</b> ＝ ${sqHTML(p.s2)} ＝ ${bl()}`,`② <b>股²</b> ＝ ${bl()} － ${bl()} ＝ ${bl()}　(減法)`,`③ <b>股²</b> ＝ ${bl()}，<b>股</b> ＝ ${bl()}`];
    return `<div class="ws-q"><div class="qh"><span class="qn">${x.n}</span>練習 第 ${x.n} 題　${hyp?'求斜邊':'求股'}</div><div class="qsvg">${probTri(p,{print:true,w:420,h:per===4?230:180,fs:per===4?19:17,pad:22})}</div><div class="ql" style="${per===4?'font-size:12.5pt;line-height:2.4':''}">${l.join('<br>')}</div></div>`};
   pages.forEach((pg,pi)=>{out+=`<div class="ws-page">${head('畢氏魔法學院・學習單',first)}<div class="ws-sec"><span>🧪 練習區　對照平板「2 練習」第 ${pg[0].n}～${pg[pg.length-1].n} 題</span><span>${pi+1} / ${pages.length}</span></div>${pi===0?formula:''}<div class="ws-grid" style="grid-template-rows:repeat(${per/2},1fr)">${pg.map(qHTML).join('')}</div><div class="ws-foot">🐸 角蛙老師：先平方 → 再加或減 → 最後加上根號！</div></div>`;first=false})}
+ if(doA){const pages=chunk(bankA.map((p,i)=>({p,n:i+1})),6);
+  const aq=x=>`<div class="ws-q"><div class="qh"><span class="qn">${x.n}</span>進階 第 ${x.n} 題</div><div class="qsvg">${probTri(x.p,{print:true,named:false,w:420,h:180,fs:19,pad:22})}</div><div class="ql">① 圈出咒語：　股² ＋ 股² ＝ 斜²　／　斜² － 股² ＝ 股²<br>② ?² ＝ ${bl()} ○ ${bl()} ＝ ${bl()}<br>③ ? ＝ ${bl()}</div></div>`;
+  pages.forEach((pg,pi)=>{out+=`<div class="ws-page">${head('畢氏魔法學院・學習單',first)}<div class="ws-sec"><span>🔮 進階區　對照平板「3 進階」第 ${pg[0].n}～${pg[pg.length-1].n} 題</span><span>${pi+1} / ${pages.length}</span></div><div class="ws-grid" style="grid-template-rows:repeat(3,1fr)">${pg.map(aq).join('')}</div><div class="ws-foot">🐸 進階提示：先找斜邊，選對咒語！</div></div>`;first=false})}
  if(doC){const pages=chunk(bankC.map((p,i)=>({p,n:i+1})),6);
-  pages.forEach((pg,pi)=>{out+=`<div class="ws-page">${head('畢氏魔法學院・學習單',first)}<div class="ws-sec"><span>🗼 挑戰區　對照平板「3 挑戰」第 ${pg[0].n}～${pg[pg.length-1].n} 題　自己判斷哪條是斜邊！</span><span>${pi+1} / ${pages.length}</span></div><div class="ws-grid" style="grid-template-rows:repeat(3,1fr)">${pg.map(x=>`<div class="ws-cq"><div class="qh" style="font-weight:900;font-size:11pt;display:flex;gap:2mm;align-items:center"><span class="qn" style="width:6.5mm;height:6.5mm;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;font-size:10pt">${x.n}</span>挑戰 第 ${x.n} 題</div><div class="qsvg">${probTri(x.p,{print:true,named:false,w:420,h:210,fs:20,pad:20})}</div><div class="ans">? ＝ ________________</div><div class="work">✏️ 計算區</div></div>`).join('')}</div><div class="ws-foot">🐸 挑戰提示：先找直角，對面就是斜邊！</div></div>`;first=false})}
+  pages.forEach((pg,pi)=>{out+=`<div class="ws-page">${head('畢氏魔法學院・學習單',first)}<div class="ws-sec"><span>🗼 挑戰區　對照平板「4 挑戰」第 ${pg[0].n}～${pg[pg.length-1].n} 題　自己判斷哪條是斜邊！</span><span>${pi+1} / ${pages.length}</span></div><div class="ws-grid" style="grid-template-rows:repeat(3,1fr)">${pg.map(x=>`<div class="ws-cq"><div class="qh" style="font-weight:900;font-size:11pt;display:flex;gap:2mm;align-items:center"><span class="qn" style="width:6.5mm;height:6.5mm;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;font-size:10pt">${x.n}</span>挑戰 第 ${x.n} 題</div><div class="qsvg">${probTri(x.p,{print:true,named:false,w:420,h:210,fs:20,pad:20})}</div><div class="ans">? ＝ ________________</div><div class="work">✏️ 計算區</div></div>`).join('')}</div><div class="ws-foot">🐸 挑戰提示：先找直角，對面就是斜邊！</div></div>`;first=false})}
  if($('#wsKey').checked){const row=(p,n)=>{const s=solve(p),hyp=p.mode==='hyp';return `<tr><td>${n}</td><td>${hyp?'求斜':'求股'}</td><td>${hyp?'股':'斜'}＝${radHTML(p.s1)}，股＝${radHTML(p.s2)}</td><td>${hyp?s.legSq1+'，'+s.legSq2:s.hypSq+'，'+s.legSq1}</td><td>${hyp?`${s.legSq1}＋${s.legSq2}＝${s.ansSq}`:`${s.hypSq}－${s.legSq1}＝${s.ansSq}`}</td><td><b>${radHTML(fmt(s.ansSq))}</b>${simpStr(s.ansSq)!==fmt(s.ansSq)?'＝'+radHTML(simpStr(s.ansSq)):''}</td></tr>`};
   const th='<tr><th>題號</th><th>題型</th><th>已知</th><th>① 平方</th><th>② 加／減</th><th>③ 答案</th></tr>';
-  out+=`<div class="ws-page"><div class="ws-head"><div><div class="ws-title">${title}　解答</div><div class="ws-sub">教師用</div></div></div><div class="ws-key">${doP?`<h3>🧪 練習區</h3><table>${th}${bankP.map((p,i)=>row(p,i+1)).join('')}</table>`:''}${doC?`<h3>🗼 挑戰區</h3><table>${th}${bankC.map((p,i)=>row(p,i+1)).join('')}</table>`:''}</div></div>`}
+  out+=`<div class="ws-page"><div class="ws-head"><div><div class="ws-title">${title}　解答</div><div class="ws-sub">教師用</div></div></div><div class="ws-key">${doP?`<h3>🧪 練習區</h3><table>${th}${bankP.map((p,i)=>row(p,i+1)).join('')}</table>`:''}${doA?`<h3>🔮 進階區</h3><table>${th}${bankA.map((p,i)=>row(p,i+1)).join('')}</table>`:''}${doC?`<h3>🗼 挑戰區</h3><table>${th}${bankC.map((p,i)=>row(p,i+1)).join('')}</table>`:''}</div></div>`}
  return out}
 $('#wsPrint').onclick=()=>{wsBuild();$$('#printRoot .ws-page').forEach(p=>p.style.zoom='');let ok=true;try{window.print()}catch(e){ok=false}
  setTimeout(()=>toast('如果沒有跳出列印視窗，請改按「📄 下載 A4 PDF」',4200),800)};
@@ -1398,11 +1496,12 @@ function triCv(c,p,bx,by,W,H,named,fsPt){const s=solve(p),hyp=p.mode==='hyp';
   x=Math.max(bx+w/2+2,Math.min(bx+W-w/2-2,x));y=Math.max(by+h/2+2,Math.min(by+H-h/2-2,y));
   c.fillStyle='#fff';rrect(c,x-w/2,y-h/2,w,h,h/2.4);c.fill();c.lineWidth=2;c.strokeStyle='#111';if(k===unknown)c.setLineDash([7,5]);c.stroke();c.setLineDash([]);
   c.fillStyle='#111';const fs=parseFloat(c.font.match(/(\d+)px/)[1]);radDraw(c,t,x-radW(c,t)/2,y+fs*.36)}}
-function wsPagesData(){const doP=$('#wsP').checked&&bankP.length,doC=$('#wsC').checked&&bankC.length,per=$('#wsPer4').checked?4:6;const pages=[];
+function wsPagesData(){const doA=$('#wsA').checked&&bankA.length,doP=$('#wsP').checked&&bankP.length,doC=$('#wsC').checked&&bankC.length,per=$('#wsPer4').checked?4:6;const pages=[];
  const ch=(a,n)=>{const r=[];for(let i=0;i<a.length;i+=n)r.push(a.slice(i,i+n));return r};
  if(doP){const pg=ch(bankP.map((p,i)=>({p,n:i+1})),per);pg.forEach((items,i)=>pages.push({kind:'P',items,i,tot:pg.length,per}))}
+ if(doA){const pg=ch(bankA.map((p,i)=>({p,n:i+1})),6);pg.forEach((items,i)=>pages.push({kind:'A',items,i,tot:pg.length,per:6}))}
  if(doC){const pg=ch(bankC.map((p,i)=>({p,n:i+1})),6);pg.forEach((items,i)=>pages.push({kind:'C',items,i,tot:pg.length}))}
- if((doP||doC)&&$('#wsKey').checked)pages.push({kind:'K',doP,doC});return pages}
+ if((doP||doC||doA)&&$('#wsKey').checked)pages.push({kind:'K',doP,doC,doA});return pages}
 function wsCanvas(pg,first,title){const cv=document.createElement('canvas');cv.width=1654;cv.height=2339;const c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.fillStyle='#111';c.textBaseline='alphabetic';
  const X0=mm(12),X1=mm(198),Wd=X1-X0;let y=mm(11);
  // header
@@ -1410,20 +1509,23 @@ function wsCanvas(pg,first,title){const cv=document.createElement('canvas');cv.w
  if(pg.kind!=='K'){pFont(c,11,500);c.textAlign='right';if(first){c.fillText('班級：______  座號：____  姓名：____________',X1,y+mm(5));c.fillText('日期：______  得分：______',X1,y+mm(11))}else c.fillText('姓名：____________',X1,y+mm(8));c.textAlign='left'}
  y+=mm(14.5);c.lineWidth=5;c.beginPath();c.moveTo(X0,y);c.lineTo(X1,y);c.stroke();y+=mm(3);
  if(pg.kind==='K'){pFont(c,12,500);const th=['題號','題型','已知','① 平方','② 加／減','③ 答案'],cw=[16,18,42,34,42,34].map(mm);
-  const table=(name,bank)=>{pFont(c,13,900);c.fillText(name,X0,y+mm(6));y+=mm(9);const rh=mm(8.6);const row=(cells,bold)=>{let x=X0;pFont(c,10.5,bold?900:500);cells.forEach((t,i)=>{c.strokeStyle='#444';c.lineWidth=1.5;c.strokeRect(x,y,cw[i],rh);const w=radW(c,t);radDraw(c,t,x+(cw[i]-w)/2,y+rh*.68);x+=cw[i]});y+=rh};
+  const nrows=(pg.doP?bankP.length+1:0)+(pg.doA?bankA.length+1:0)+(pg.doC?bankC.length+1:0),nt=(pg.doP?1:0)+(pg.doA?1:0)+(pg.doC?1:0),rh=Math.min(mm(8.6),(mm(297-14)-y-nt*mm(14))/nrows);
+  const table=(name,bank)=>{pFont(c,13,900);c.fillText(name,X0,y+mm(6));y+=mm(9);const row=(cells,bold)=>{let x=X0;pFont(c,rh<mm(7)?9.5:10.5,bold?900:500);cells.forEach((t,i)=>{c.strokeStyle='#444';c.lineWidth=1.5;c.strokeRect(x,y,cw[i],rh);const w=radW(c,t);radDraw(c,t,x+(cw[i]-w)/2,y+rh*.68);x+=cw[i]});y+=rh};
    row(th,true);bank.forEach((p,i)=>{const s=solve(p),hyp=p.mode==='hyp';row([String(i+1),hyp?'求斜':'求股',`${hyp?'股':'斜'}＝${p.s1}，股＝${p.s2}`,hyp?`${s.legSq1}，${s.legSq2}`:`${s.hypSq}，${s.legSq1}`,hyp?`${s.legSq1}＋${s.legSq2}＝${s.ansSq}`:`${s.hypSq}－${s.legSq1}＝${s.ansSq}`,fmt(s.ansSq)+(simpStr(s.ansSq)!==fmt(s.ansSq)?'＝'+simpStr(s.ansSq):'')])});y+=mm(5)};
-  if(pg.doP)table('練習區',bankP);if(pg.doC)table('挑戰區',bankC);return cv}
+  if(pg.doP)table('練習區',bankP);if(pg.doA)table('進階區',bankA);if(pg.doC)table('挑戰區',bankC);return cv}
  // section bar
  const bh=mm(7.5);c.fillStyle='#111';rrect(c,X0,y,Wd,bh,mm(2));c.fill();c.fillStyle='#fff';pFont(c,12.5,900);
- const it=pg.items;c.fillText(pg.kind==='P'?`練習區　對照平板「2 練習」第 ${it[0].n}～${it[it.length-1].n} 題`:`挑戰區　對照平板「3 挑戰」第 ${it[0].n}～${it[it.length-1].n} 題　自己判斷哪條是斜邊！`,X0+mm(3),y+bh*.7);
+ const it=pg.items;c.fillText(pg.kind==='P'?`練習區　對照平板「2 練習」第 ${it[0].n}～${it[it.length-1].n} 題`:pg.kind==='A'?`進階區　對照平板「3 進階」第 ${it[0].n}～${it[it.length-1].n} 題`:`挑戰區　對照平板「4 挑戰」第 ${it[0].n}～${it[it.length-1].n} 題　自己判斷哪條是斜邊！`,X0+mm(3),y+bh*.7);
  c.textAlign='right';c.fillText(`${pg.i+1} / ${pg.tot}`,X1-mm(3),y+bh*.7);c.textAlign='left';c.fillStyle='#111';y+=bh+mm(3);
  if(pg.kind==='P'&&pg.i===0){const fb=['求斜邊：股² ＋ 股² ＝ 斜²','求股：斜² － 股² ＝ 股²','邊² ＝ 13 → 邊 ＝ √13'],fw=(Wd-mm(8))/3,fh=mm(9);pFont(c,11,900);
   fb.forEach((t,i)=>{const x=X0+i*(fw+mm(4));c.setLineDash([8,6]);c.lineWidth=2;rrect(c,x,y,fw,fh,mm(2.5));c.stroke();c.setLineDash([]);const w=radW(c,t);radDraw(c,t,x+(fw-w)/2,y+fh*.66)});y+=fh+mm(3)}
- const foot=mm(8),gy0=y,gH=mm(297-11)-foot-gy0,rows=pg.kind==='P'?pg.per/2:3,gap=mm(3),cw=(Wd-gap)/2,chh=(gH-gap*(rows-1))/rows;
+ const foot=mm(8),gy0=y,gH=mm(297-11)-foot-gy0,rows=pg.kind==='C'?3:pg.per/2,gap=mm(3),cw=(Wd-gap)/2,chh=(gH-gap*(rows-1))/rows;
  it.forEach((x,k)=>{const col=k%2,row=Math.floor(k/2),bx=X0+col*(cw+gap),by=gy0+row*(chh+gap);c.strokeStyle='#333';c.lineWidth=2.4;rrect(c,bx,by,cw,chh,mm(3));c.stroke();
   const p=x.p,hyp=p.mode==='hyp',n=uName(p);c.fillStyle='#111';c.beginPath();c.arc(bx+mm(6),by+mm(6),mm(3.2),0,7);c.fill();c.fillStyle='#fff';pFont(c,10,900);c.textAlign='center';c.fillText(x.n,bx+mm(6),by+mm(7.3));c.textAlign='left';c.fillStyle='#111';
-  pFont(c,11.5,900);c.fillText(pg.kind==='P'?`練習 第 ${x.n} 題　${hyp?'求斜邊':'求股'}`:`挑戰 第 ${x.n} 題`,bx+mm(11),by+mm(7.6));
-  if(pg.kind==='P'){const big=pg.per===4,lineH=mm(big?10:8.2),fsz=big?13:11,lines=3;const triH=chh-mm(11)-lineH*lines-mm(3);
+  pFont(c,11.5,900);c.fillText(pg.kind==='P'?`練習 第 ${x.n} 題　${hyp?'求斜邊':'求股'}`:pg.kind==='A'?`進階 第 ${x.n} 題`:`挑戰 第 ${x.n} 題`,bx+mm(11),by+mm(7.6));
+  if(pg.kind==='A'){const lineH=mm(8.2),lines=3,triH=chh-mm(11)-lineH*lines-mm(3);triCv(c,p,bx+mm(3),by+mm(10),cw-mm(6),triH,false,13);const B=w=>({b:w});
+   const L=[['① 圈咒語：股²＋股²＝斜²  ／  斜²－股²＝股²'],['② ?² ＝ ',B(14),' ○ ',B(14),' ＝ ',B(14)],['③ ? ＝ ',B(20)]];let ly=by+chh-lineH*lines-mm(1.2);L.forEach((parts,k)=>{pFont(c,k===0?10:11,500);ly+=lineH*.82;richDraw(c,parts,bx+mm(3.5),ly);ly+=lineH*.18})}
+  else if(pg.kind==='P'){const big=pg.per===4,lineH=mm(big?10:8.2),fsz=big?13:11,lines=3;const triH=chh-mm(11)-lineH*lines-mm(3);
    triCv(c,p,bx+mm(3),by+mm(10),cw-mm(6),triH,true,big?13:11.5);
    const B=w=>({b:w}),bw=big?15:13;
    const L=hyp?[['① 股² ＝ ',sqT(p.s1),' ＝ ',B(bw),'　股² ＝ ',sqT(p.s2),' ＝ ',B(bw)],['② 斜² ＝ ',B(bw),' ＋ ',B(bw),' ＝ ',B(bw),'（加法）'],['③ 斜² ＝ ',B(bw),'，斜 ＝ ',B(bw+4)]]
@@ -1434,7 +1536,7 @@ function wsCanvas(pg,first,title){const cv=document.createElement('canvas');cv.w
    const wy=ay+mm(3),wx=bx+mm(3),ww=cw-mm(6),wh=by+chh-mm(3)-wy;c.setLineDash([8,6]);c.lineWidth=1.8;c.strokeStyle='#999';rrect(c,wx,wy,ww,wh,mm(2));c.stroke();c.setLineDash([]);
    c.strokeStyle='#ddd';c.lineWidth=1.5;for(let ry=wy+mm(6.5);ry<wy+wh-mm(2);ry+=mm(6.5)){c.beginPath();c.moveTo(wx+mm(2),ry);c.lineTo(wx+ww-mm(2),ry);c.stroke()}
    pFont(c,8.5,500);c.fillStyle='#888';c.fillText('計算區',wx+mm(1.8),wy+mm(4));c.fillStyle='#111'}});
- pFont(c,9,500);c.fillStyle='#666';c.textAlign='center';c.fillText(pg.kind==='P'?'角蛙老師：先平方 → 再加或減 → 最後加上根號！':'挑戰提示：先找直角，對面就是斜邊！',mm(105),mm(297-9));c.textAlign='left';
+ pFont(c,9,500);c.fillStyle='#666';c.textAlign='center';c.fillText(pg.kind==='P'?'角蛙老師：先平方 → 再加或減 → 最後加上根號！':pg.kind==='A'?'進階提示：先找斜邊，選對咒語！':'挑戰提示：先找直角，對面就是斜邊！',mm(105),mm(297-9));c.textAlign='left';
  return cv}
 function b64bytes(d){const s=atob(d.split(',')[1]),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
 function buildPDF(cvs){const enc=new TextEncoder(),parts=[],offs=[];let off=0;const push=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);off+=b.length};
@@ -1464,7 +1566,7 @@ $('#wsPdf').onclick=()=>{Snd.tap();wsPDF()};
 applyHat();coinHud();
 function chkOri(){$('#rotateHint').style.display=(!window._rotOk&&innerHeight>innerWidth*1.05)?'flex':'none'}
 window.addEventListener('resize',chkOri);chkOri();
-if(location.hash&&['learn','practice','challenge','game','worksheet'].includes(location.hash.slice(1)))go(location.hash.slice(1));
+if(location.hash&&['learn','practice','advanced','challenge','game','worksheet'].includes(location.hash.slice(1)))go(location.hash.slice(1));
 </script>
 </body>
 </html>
